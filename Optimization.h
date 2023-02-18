@@ -950,6 +950,20 @@ void vipmvars_init(void *_p, bool make_automatic);
 void vipmvars_copy(void *_dst, void *_src, bool make_automatic);
 void vipmvars_free(void *_p, bool make_automatic);
 
+struct vipmreducedsparsesystem {
+   sparsematrix rawsystem;
+   ae_vector effectivediag;
+   ae_vector isdiagonal;
+   ae_vector rowdegrees;
+   ae_vector coldegrees;
+   ae_int_t ntotal;
+   spcholanalysis analysis;
+   ae_vector priorities;
+};
+void vipmreducedsparsesystem_init(void *_p, bool make_automatic);
+void vipmreducedsparsesystem_copy(void *_dst, void *_src, bool make_automatic);
+void vipmreducedsparsesystem_free(void *_p, bool make_automatic);
+
 struct vipmrighthandside {
    ae_vector sigma;
    ae_vector beta;
@@ -983,6 +997,7 @@ struct vipmstate {
    sparsematrix sparseh;
    ae_vector diagr;
    ae_int_t hkind;
+   bool isdiagonalh;
    ae_vector bndl;
    ae_vector bndu;
    ae_vector rawbndl;
@@ -1001,7 +1016,6 @@ struct vipmstate {
    ae_vector hasr;
    ae_int_t mdense;
    ae_int_t msparse;
-   vipmvars x0;
    vipmvars current;
    vipmvars best;
    vipmvars trial;
@@ -1012,6 +1026,10 @@ struct vipmstate {
    ae_vector hasts;
    ae_vector haswv;
    ae_vector haspq;
+   ae_int_t cntgz;
+   ae_int_t cntts;
+   ae_int_t cntwv;
+   ae_int_t cntpq;
    ae_int_t repiterationscount;
    ae_int_t repncholesky;
    ae_int_t factorizationtype;
@@ -1036,12 +1054,8 @@ struct vipmstate {
    ae_vector factregdhrh;
    ae_vector factinvregdzrz;
    ae_vector factregewave;
-   sparsematrix factsparsekkttmpl;
-   sparsematrix factsparsekkt;
-   ae_vector factsparsekktpivp;
    ae_vector facttmpdiag;
-   spcholanalysis ldltanalysis;
-   ae_vector factsparsediagd;
+   vipmreducedsparsesystem reducedsparsesystem;
    vipmrighthandside rhs;
    ae_vector rhsalphacap;
    ae_vector rhsbetacap;
@@ -2126,6 +2140,7 @@ struct minslpstate {
    minslpphase13state state13;
    minslpphase2state state2;
    double trustrad;
+   double bigc;
    ae_int_t lpfailurecnt;
    ae_int_t fstagnationcnt;
    ae_vector step0x;
@@ -2781,6 +2796,10 @@ void lptestproblemserialize(ae_serializer *s, lptestproblem *p);
 void lptestproblemunserialize(ae_serializer *s, lptestproblem *p);
 
 void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p);
+bool lptestproblemhasknowntarget(lptestproblem *p);
+double lptestproblemgettargetf(lptestproblem *p);
+ae_int_t lptestproblemgetn(lptestproblem *p);
+ae_int_t lptestproblemgetm(lptestproblem *p);
 void lptestproblemsetscale(lptestproblem *p, RVector *s);
 void lptestproblemsetcost(lptestproblem *p, RVector *c);
 void lptestproblemsetbc(lptestproblem *p, RVector *bndl, RVector *bndu);
@@ -2796,6 +2815,10 @@ void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj);
 void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj);
 
 void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p);
+bool lptestproblemhasknowntarget(const lptestproblem &p);
+double lptestproblemgettargetf(const lptestproblem &p);
+ae_int_t lptestproblemgetn(const lptestproblem &p);
+ae_int_t lptestproblemgetm(const lptestproblem &p);
 void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s);
 void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c);
 void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu);

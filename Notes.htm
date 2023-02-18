@@ -437,11 +437,12 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>FITSPHERE: (Optimization) MINLM, MINNLC</li>
    <li>PARAMETRIC: (Integration) AUTOGK │ SPLINE1D</li>
    <li>RBFV1: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
+   <li>RBFV3: (AlgLibMisc) NEARESTNEIGHBOR | (LinAlg) RCOND | (Solvers) ITERATIVESPARSE</li>
    <li>SPLINE2D: SPLINE1D</li>
    <li>RBFV2: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
    <li>SPLINE3D: SPLINE1D</li>
    <li>INTCOMP: SPLINE1D, FITSPHERE</li>
-   <li>RBF: RBFV1, RBFV2</li>
+   <li>RBF: RBFV1, RBFV3, RBFV2</li>
 </ul></li>
 <li>DataAnalysis: Statistics Optimization [AlgLibInternal AlgLibMisc SpecialFunctions LinAlg Solvers]<ul>
    <li>PCA: (LinAlg) EVD, SVD │ (Statistics) BASESTAT</li>

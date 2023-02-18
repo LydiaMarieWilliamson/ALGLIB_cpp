@@ -1901,10 +1901,10 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             continue;
          }
       // We CAN'T process point if R-criterion isn't satisfied,
-      // i.e. (RNeeded != 0) AND (PtDist > R).
+      // i.e. (RNeeded != 0) and (PtDist > R).
          if (buf->rneeded == 0 || ptdist <= buf->rneeded) {
          // R-criterion is satisfied, we must either:
-         // * replace worst point, if (KNeeded != 0) AND (KCur == KNeeded)
+         // * replace worst point, if (KNeeded != 0) and (KCur == KNeeded)
          //   (or skip, if worst point is better)
          // * add point without replacement otherwise
             if (buf->kcur < buf->kneeded || buf->kneeded == 0) {

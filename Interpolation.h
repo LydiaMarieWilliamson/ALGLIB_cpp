@@ -707,9 +707,227 @@ double rbfv1calc2(rbfv1model *s, double x0, double x1);
 double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2);
 void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y);
 void rbfv1tscalcbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y);
+void rbfv1tsdiffbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y, RVector *dy);
+void rbfv1tshessbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y, RVector *dy, RVector *d2y);
 void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
 void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y);
 void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v);
+} // end of namespace alglib_impl
+
+// === RBFV3 Package ===
+// Depends on: (AlgLibMisc) NEARESTNEIGHBOR
+// Depends on: (LinAlg) RCOND
+// Depends on: (Solvers) ITERATIVESPARSE
+namespace alglib_impl {
+struct rbf3evaluator {
+   ae_int_t n;
+   ae_int_t storagetype;
+   ae_matrix f;
+   ae_int_t nx;
+   ae_int_t functype;
+   double funcparam;
+   ae_int_t chunksize;
+   ae_vector entireset;
+   ae_matrix x;
+   ae_matrix xtchunked;
+   ae_shared_pool bufferpool;
+   ae_vector chunk1;
+};
+void rbf3evaluator_init(void *_p, bool make_automatic);
+void rbf3evaluator_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3evaluator_free(void *_p, bool make_automatic);
+
+struct rbf3evaluatorbuffer {
+   ae_vector x;
+   ae_vector coeffbuf;
+   ae_vector funcbuf;
+   ae_vector wrkbuf;
+   ae_vector mindist2;
+   ae_vector df1;
+   ae_vector df2;
+   ae_matrix deltabuf;
+};
+void rbf3evaluatorbuffer_init(void *_p, bool make_automatic);
+void rbf3evaluatorbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3evaluatorbuffer_free(void *_p, bool make_automatic);
+
+struct rbfv3calcbuffer {
+   ae_vector x;
+   rbf3evaluatorbuffer evalbuf;
+   ae_vector x123;
+   ae_vector y123;
+   ae_vector xg;
+   ae_vector yg;
+};
+void rbfv3calcbuffer_init(void *_p, bool make_automatic);
+void rbfv3calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv3calcbuffer_free(void *_p, bool make_automatic);
+
+struct acbfbuilder {
+   ae_int_t ntotal;
+   ae_int_t nx;
+   ae_matrix xx;
+   ae_int_t functype;
+   double funcparam;
+   double roughdatasetdiameter;
+   ae_int_t nglobal;
+   ae_vector globalgrid;
+   double globalgridseparation;
+   ae_int_t nlocal;
+   ae_int_t ncorrection;
+   double correctorgrowth;
+   ae_int_t batchsize;
+   double lambdav;
+   ae_int_t aterm;
+   kdtree kdt;
+   kdtree kdt1;
+   kdtree kdt2;
+   ae_shared_pool bufferpool;
+   ae_shared_pool chunksproducer;
+   ae_shared_pool chunkspool;
+   ae_vector wrkidx;
+};
+void acbfbuilder_init(void *_p, bool make_automatic);
+void acbfbuilder_copy(void *_dst, void *_src, bool make_automatic);
+void acbfbuilder_free(void *_p, bool make_automatic);
+
+struct acbfbuffer {
+   ae_vector bflags;
+   kdtreerequestbuffer kdtbuf;
+   kdtreerequestbuffer kdt1buf;
+   kdtreerequestbuffer kdt2buf;
+   ae_vector tmpboxmin;
+   ae_vector tmpboxmax;
+   ae_vector currentnodes;
+   ae_vector neighbors;
+   ae_vector chosenneighbors;
+   ae_vector y;
+   ae_vector z;
+   ae_vector d;
+   ae_matrix atwrk;
+   ae_matrix xq;
+   ae_matrix q;
+   ae_matrix q1;
+   ae_matrix wrkq;
+   ae_matrix b;
+   ae_matrix c;
+   ae_vector choltmp;
+   ae_vector tau;
+   ae_matrix r;
+   ae_vector perm;
+};
+void acbfbuffer_init(void *_p, bool make_automatic);
+void acbfbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void acbfbuffer_free(void *_p, bool make_automatic);
+
+struct acbfchunk {
+   ae_int_t ntargetrows;
+   ae_int_t ntargetcols;
+   ae_vector targetrows;
+   ae_vector targetcols;
+   ae_matrix s;
+};
+void acbfchunk_init(void *_p, bool make_automatic);
+void acbfchunk_copy(void *_dst, void *_src, bool make_automatic);
+void acbfchunk_free(void *_p, bool make_automatic);
+
+struct rbf3ddmbuffer {
+   ae_vector bflags;
+   ae_vector idx2preccol;
+   kdtreerequestbuffer kdtbuf;
+   ae_vector tmpboxmin;
+   ae_vector tmpboxmax;
+};
+void rbf3ddmbuffer_init(void *_p, bool make_automatic);
+void rbf3ddmbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3ddmbuffer_free(void *_p, bool make_automatic);
+
+struct rbf3ddmsubproblem {
+   bool isvalid;
+   ae_int_t ntarget;
+   ae_vector targetnodes;
+   ae_int_t nwork;
+   ae_vector workingnodes;
+   ae_matrix regsystem;
+   ae_int_t decomposition;
+   ae_matrix wrklu;
+   ae_matrix rhs;
+   ae_matrix qtrhs;
+   ae_matrix sol;
+   ae_matrix pred;
+   ae_vector wrkp;
+   ae_matrix wrkq;
+   ae_matrix wrkr;
+};
+void rbf3ddmsubproblem_init(void *_p, bool make_automatic);
+void rbf3ddmsubproblem_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3ddmsubproblem_free(void *_p, bool make_automatic);
+
+struct rbf3ddmsolver {
+   double lambdav;
+   kdtree kdt;
+   ae_shared_pool bufferpool;
+   ae_int_t subproblemscnt;
+   ae_shared_pool subproblemspool;
+   ae_shared_pool subproblemsbuffer;
+   ae_int_t ncorrector;
+   ae_matrix corrq;
+   ae_matrix corrr;
+   ae_vector corrnodes;
+   ae_matrix corrx;
+   ae_matrix tmpres1;
+   ae_matrix tmpupd1;
+   ae_int_t cntlu;
+   ae_int_t cntregqr;
+};
+void rbf3ddmsolver_init(void *_p, bool make_automatic);
+void rbf3ddmsolver_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3ddmsolver_free(void *_p, bool make_automatic);
+
+struct rbfv3model {
+   ae_int_t ny;
+   ae_int_t nx;
+   ae_int_t bftype;
+   double bfparam;
+   ae_vector s;
+   ae_matrix v;
+   ae_vector cw;
+   ae_vector pointindexes;
+   ae_int_t nc;
+   rbf3evaluator evaluator;
+   ae_matrix wchunked;
+   rbfv3calcbuffer calcbuf;
+   bool dbgregqrusedforddm;
+};
+void rbfv3model_init(void *_p, bool make_automatic);
+void rbfv3model_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv3model_free(void *_p, bool make_automatic);
+
+struct rbfv3report {
+   ae_int_t terminationtype;
+   double maxerror;
+   double rmserror;
+   ae_int_t iterationscount;
+};
+void rbfv3report_init(void *_p, bool make_automatic);
+void rbfv3report_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv3report_free(void *_p, bool make_automatic);
+void rbfv3alloc(ae_serializer *s, rbfv3model *model);
+void rbfv3serialize(ae_serializer *s, rbfv3model *model);
+void rbfv3unserialize(ae_serializer *s, rbfv3model *model);
+
+void rbfv3create(ae_int_t nx, ae_int_t ny, ae_int_t bf, double bfp, rbfv3model *s);
+void rbfv3createcalcbuffer(rbfv3model *s, rbfv3calcbuffer *buf);
+void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, ae_int_t bftype, double bfparamraw, double lambdavraw, ae_int_t aterm, rbfv3model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv3report *rep);
+void rbfv3tscalcbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y);
+void rbfv3calcbuf(rbfv3model *s, RVector *x, RVector *y);
+double rbfv3calc1(rbfv3model *s, double x0);
+double rbfv3calc2(rbfv3model *s, double x0, double x1);
+double rbfv3calc3(rbfv3model *s, double x0, double x1, double x2);
+void rbfv3tsdiffbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y, RVector *dy);
+void rbfv3tshessbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y, RVector *dy, RVector *d2y);
+void rbfv3gridcalcvx(rbfv3model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, BVector *flagy, bool sparsey, RVector *y);
+void rbfv3unpack(rbfv3model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v);
 } // end of namespace alglib_impl
 
 // === SPLINE2D Package ===
@@ -968,6 +1186,8 @@ void rbfv2calcbuf(rbfv2model *s, RVector *x, RVector *y);
 double rbfv2calc1(rbfv2model *s, double x0);
 double rbfv2calc2(rbfv2model *s, double x0, double x1);
 double rbfv2calc3(rbfv2model *s, double x0, double x1, double x2);
+void rbfv2tsdiffbuf(rbfv2model *s, rbfv2calcbuffer *buf, RVector *x, RVector *y, RVector *dy);
+void rbfv2tshessbuf(rbfv2model *s, rbfv2calcbuffer *buf, RVector *x, RVector *y, RVector *dy, RVector *d2y);
 void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, ZVector *blocks3, ae_int_t block3a, ae_int_t block3b, BVector *flagy, bool sparsey, ae_int_t levelidx, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y);
 void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, BVector *flagy, bool sparsey, RVector *y);
 void rbfv2gridcalc2(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
@@ -1034,12 +1254,16 @@ void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_in
 } // end of namespace alglib
 
 // === RBF Package ===
-// Depends on: RBFV1, RBFV2
+// Depends on: RBFV1, RBFV3, RBFV2
 namespace alglib_impl {
 struct rbfcalcbuffer {
    ae_int_t modelversion;
    rbfv1calcbuffer bufv1;
    rbfv2calcbuffer bufv2;
+   rbfv3calcbuffer bufv3;
+   ae_vector x;
+   ae_vector y;
+   ae_vector dy;
 };
 void rbfcalcbuffer_init(void *_p, bool make_automatic);
 void rbfcalcbuffer_copy(void *_dst, void *_src, bool make_automatic);
@@ -1051,12 +1275,16 @@ struct rbfmodel {
    ae_int_t modelversion;
    rbfv1model model1;
    rbfv2model model2;
+   rbfv3model model3;
+   rbfcalcbuffer calcbuf;
    double lambdav;
    double radvalue;
    double radzvalue;
    ae_int_t nlayers;
    ae_int_t aterm;
    ae_int_t algorithmtype;
+   ae_int_t bftype;
+   double bfparam;
    double epsort;
    double epserr;
    ae_int_t maxits;
@@ -1090,13 +1318,17 @@ void rbfreport_init(void *_p, bool make_automatic);
 void rbfreport_copy(void *_dst, void *_src, bool make_automatic);
 void rbfreport_free(void *_p, bool make_automatic);
 
-void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s);
 void rbfcreatecalcbuffer(rbfmodel *s, rbfcalcbuffer *buf);
+void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s);
 void rbfsetpoints(rbfmodel *s, RMatrix *xy, ae_int_t n);
 void rbfsetpointsandscales(rbfmodel *r, RMatrix *xy, ae_int_t n, RVector *s);
 void rbfsetalgoqnn(rbfmodel *s, double q, double z);
 void rbfsetalgomultilayer(rbfmodel *s, double rbase, ae_int_t nlayers, double lambdav);
 void rbfsetalgohierarchical(rbfmodel *s, double rbase, ae_int_t nlayers, double lambdans);
+void rbfsetalgothinplatespline(rbfmodel *s, double lambdav);
+void rbfsetalgomultiquadricmanual(rbfmodel *s, double alpha, double lambdav);
+void rbfsetalgomultiquadricauto(rbfmodel *s, double lambdav);
+void rbfsetalgobiharmonic(rbfmodel *s, double lambdav);
 void rbfsetlinterm(rbfmodel *s);
 void rbfsetconstterm(rbfmodel *s);
 void rbfsetzeroterm(rbfmodel *s);
@@ -1108,13 +1340,22 @@ void rbfbuildmodel(rbfmodel *s, rbfreport *rep);
 double rbfcalc1(rbfmodel *s, double x0);
 double rbfcalc2(rbfmodel *s, double x0, double x1);
 double rbfcalc3(rbfmodel *s, double x0, double x1, double x2);
+void rbftsdiffbuf(rbfmodel *s, rbfcalcbuffer *buf, RVector *x, RVector *y, RVector *dy);
+void rbfdiffbuf(rbfmodel *s, RVector *x, RVector *y, RVector *dy);
+void rbfdiff(rbfmodel *s, RVector *x, RVector *y, RVector *dy);
+void rbfdiff1(rbfmodel *s, double x0, double *y, double *dy0);
+void rbfdiff2(rbfmodel *s, double x0, double x1, double *y, double *dy0, double *dy1);
+void rbfdiff3(rbfmodel *s, double x0, double x1, double x2, double *y, double *dy0, double *dy1, double *dy2);
+void rbftshessbuf(rbfmodel *s, rbfcalcbuffer *buf, RVector *x, RVector *y, RVector *dy, RVector *d2y);
+void rbfhessbuf(rbfmodel *s, RVector *x, RVector *y, RVector *dy, RVector *d2y);
+void rbfhess(rbfmodel *s, RVector *x, RVector *y, RVector *dy, RVector *d2y);
 void rbftscalcbuf(rbfmodel *s, rbfcalcbuffer *buf, RVector *x, RVector *y);
 void rbfcalcbuf(rbfmodel *s, RVector *x, RVector *y);
 void rbfcalc(rbfmodel *s, RVector *x, RVector *y);
-void rbfgridcalc2(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
 void rbfgridcalc2vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, BVector *flagy, bool sparsey, RVector *y);
 void rbfgridcalc2v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *y);
 void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, BVector *flagy, RVector *y);
+void rbfgridcalc2(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
 void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, BVector *flagy, bool sparsey, RVector *y);
 void rbfgridcalc3v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *y);
 void rbfgridcalc3vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, BVector *flagy, RVector *y);
@@ -1133,8 +1374,8 @@ void rbfserialize(rbfmodel &obj, std::ostream &s_out);
 void rbfunserialize(const std::string &s_in, rbfmodel &obj);
 void rbfunserialize(const std::istream &s_in, rbfmodel &obj);
 
-void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s);
 void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf);
+void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s);
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n);
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy);
 void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_int_t n, const real_1d_array &s);
@@ -1144,6 +1385,14 @@ void rbfsetalgoqnn(const rbfmodel &s);
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdav);
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers);
 void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdans);
+void rbfsetalgothinplatespline(const rbfmodel &s, const double lambdav);
+void rbfsetalgothinplatespline(const rbfmodel &s);
+void rbfsetalgomultiquadricmanual(const rbfmodel &s, const double alpha, const double lambdav);
+void rbfsetalgomultiquadricmanual(const rbfmodel &s, const double alpha);
+void rbfsetalgomultiquadricauto(const rbfmodel &s, const double lambdav);
+void rbfsetalgomultiquadricauto(const rbfmodel &s);
+void rbfsetalgobiharmonic(const rbfmodel &s, const double lambdav);
+void rbfsetalgobiharmonic(const rbfmodel &s);
 void rbfsetlinterm(const rbfmodel &s);
 void rbfsetconstterm(const rbfmodel &s);
 void rbfsetzeroterm(const rbfmodel &s);
@@ -1154,12 +1403,21 @@ void rbfbuildmodel(const rbfmodel &s, rbfreport &rep);
 double rbfcalc1(const rbfmodel &s, const double x0);
 double rbfcalc2(const rbfmodel &s, const double x0, const double x1);
 double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const double x2);
+void rbftsdiffbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, real_1d_array &dy);
+void rbfdiffbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, real_1d_array &dy);
+void rbfdiff(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, real_1d_array &dy);
+void rbfdiff1(const rbfmodel &s, const double x0, double &y, double &dy0);
+void rbfdiff2(const rbfmodel &s, const double x0, const double x1, double &y, double &dy0, double &dy1);
+void rbfdiff3(const rbfmodel &s, const double x0, const double x1, const double x2, double &y, double &dy0, double &dy1, double &dy2);
+void rbftshessbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, real_1d_array &dy, real_1d_array &d2y);
+void rbfhessbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, real_1d_array &dy, real_1d_array &d2y);
+void rbfhess(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, real_1d_array &dy, real_1d_array &d2y);
 void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y);
 void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
 void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
-void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y);
 void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_1d_array &y);
 void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const boolean_1d_array &flagy, real_1d_array &y);
+void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y);
 void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y);
 void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, const boolean_1d_array &flagy, real_1d_array &y);
 void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr, ae_int_t &nc, real_2d_array &v, ae_int_t &modelversion);

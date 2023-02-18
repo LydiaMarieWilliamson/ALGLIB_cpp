@@ -13056,7 +13056,7 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
       e -= 10;
    }
    while (v < 0.5) {
-      v *= 2;
+      v *= 2.0;
       e--;
    }
    ae_assert(v >= 0.5 && v < 1.0, "StreamFloat: integrity check failed");
@@ -22555,13 +22555,13 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
          rep->ncholesky++;
          if (!spd) {
             lambdav *= lambdaup * nu;
-            nu *= 2;
+            nu *= 2.0;
             continue;
          }
          spdmatrixcholeskysolve(&hmod, wcount, true, &g, &solverinfo, &solverrep, &wdir);
          if (solverinfo < 0) {
             lambdav *= lambdaup * nu;
-            nu *= 2;
+            nu *= 2.0;
             continue;
          }
          ae_v_muld(wdir.xR, 1, wcount, -1);
@@ -22579,7 +22579,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
          }
          if (enew > e) {
             lambdav *= lambdaup * nu;
-            nu *= 2;
+            nu *= 2.0;
             continue;
          }
       // Optimize using inv(cholesky(H)) as preconditioner

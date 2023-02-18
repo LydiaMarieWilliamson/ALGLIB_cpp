@@ -9,6 +9,10 @@ double fma_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__restr
 double fma_rdotv2(const ae_int_t n, const Real *__restrict x);
 void fma_raddv(const ae_int_t n, const double alpha, const Real *__restrict y, Real *__restrict x);
 void fma_raddvx(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x);
+void fma_rmuladdv(const ae_int_t n, const double *__restrict y, const double *__restrict z, double *__restrict x);
+void fma_rnegmuladdv(const ae_int_t n, const double *__restrict y, const double *__restrict z, double *__restrict x);
+void fma_rcopymuladdv(const ae_int_t n, const double *__restrict y, const double *__restrict z, const double *__restrict x, double *__restrict r);
+void fma_rcopynegmuladdv(const ae_int_t n, const double *__restrict y, const double *__restrict z, const double *__restrict x, double *__restrict r);
 void fma_rgemv_straight(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const double *__restrict x, double *__restrict y);
 void fma_rgemv_transposed(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const double *__restrict x, double *__restrict y);
 void fma_rgemvx_straight(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y);

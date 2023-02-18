@@ -612,7 +612,7 @@ It is possible to selectively disable a SIMD instruction set of your choice by c
 <a name=gs_configuring_os class=sheader></a><h3>4.4. Utilizing SMP</h3>
 The following applies only to the Commercial Edition of ALGLIB, and has not been inherited by or made available in ALGLIB++.
 The open source version of ALGLIB is always OS-agnostic (it does not use functions beyond the C/C++ standard library),
-even in the presence of OS-specific definitions.
+ven in the presence of OS-specific definitions.
 </p>
 <p>
 If you want to use multithreaded capabilities of the <i>Commercial</i> Edition,
@@ -1357,13 +1357,41 @@ Future enhancements or additions include a larger set of DSP (and multi-precisio
 <p>
 <a name=gs_advanced class=sheader></a><h2>7. Advanced Topics</h2>
 <font size=2>[
+<a href=#gs_redzones>Using Red Zones To Find Memory Access Violations</a> |
 <a href=#gs_exceptionfree>Exception-Free Mode</a> |
 <a href=#gs_partial_compiling>Partial Compilation</a> |
 <a href=#gs_testing>Testing ALGLIB++</a>
 ]</font>
 </p>
 <p>
-<a name=gs_exceptionfree class=sheader></a><h3>7.1. Exception-Free Mode</h3>
+<a name=gs_redzones class='sheader'></a><h3>7.1 Using Red Zones To Find Memory Access Violations</h3>
+A ‟Red Zone” monitoring facility, added to ALGLIB in version 3.19.0, has also been incorporated into ALGLIB++.
+A Red Zone is a fixed size area added <i>before</i> and <i>after</i> each dynamically allocated block,
+that is filled by the special red zone control value during its allocation,
+and checked when the dynamically allocated block is freed to monitor for possible out-of-bounds writes
+that may have been done either by ALGLIB++, itself, or by user code that works with arrays allocated through ALGLIB++.
+Red Zones are essential for finding memory access errors that silently corrupt your data and/or crash your program.
+</p>
+<p>
+It is disabled, by default, and may be enabled by #defining <code>ALGLIB_REDZONE=512</code>
+(or any other positive multiple of 64 bytes) at the global level.
+Larger values mean that a larger buffer is added, and a better opportunity to detect large misses.
+E.g., if your write is just 8 bytes away from the array, a 64-byte red zone is enough to detect it.
+On the other hand, a 1024-byte miss needs a red zone at least that large.
+</p>
+<p>
+ALGLIB++ checks the red zone of the dynamic array when it is deallocated by its destructor (or reallocated),
+and prints a message to <code>stderr</code> and terminates the program, if it detects any damage to the red zone.
+Two kinds of errors are distinguished: writes past the end, and writes prior to the beginning.
+You can find out the exact variable being damaged by looking to the trace stack.
+It is one which is currently deallocated or reallocated.
+</p>
+<p>
+Red zones add some memory overhead (insignificant for large arrays) and some modest performance overhead.
+Your program may become a few percent slower (in the very worst case - a few tens of percent).
+</p>
+<p>
+<a name=gs_exceptionfree class=sheader></a><h3>7.2. Exception-Free Mode</h3>
 ALGLIB++ can be compiled in exception-free mode, with exceptions
 (<code>throw</code>/<code>try</code>/<code>catch</code> constructs) being disabled at compiler level.
 Such a feature is sometimes used by developers of embedded software.
@@ -1437,7 +1465,7 @@ resizing arrays with <code>setlength()</code>/<code>setcontent()</code> and atta
 </ul>
 </p>
 <p>
-<a name=gs_partial_compiling class=sheader></a><h3>7.2. Partial Compilation</h3>
+<a name=gs_partial_compiling class=sheader></a><h3>7.3. Partial Compilation</h3>
 As of version 3.13.0, ALGLIB included the ability to selectively compile subpackages.
 It has been eliminated from ALGLIB++ with a possible future splitting into subpackage files in mind, as ALGLIB had before version 3.
 For those who wish to carry out partial compilation, each of the package files has been cleanly separated into their component subpackages, each occupying a contiguous section within the package file.
@@ -1475,7 +1503,7 @@ to reduce build time.
 </ul>
 Neither of these are as much an issue as they were with older machines and compilers, and it is just easier to work directly with the package files instead.
 <p>
-<a name=gs_testing class=sheader></a><h3>7.3. Testing ALGLIB++</h3>
+<a name=gs_testing class=sheader></a><h3>7.4. Testing ALGLIB++</h3>
 <b>Note:</b> In the original distribution of the GPL version of ALGLIB, the test suite is included separately under a different directory (tests/), the source being placed in its own directory (src/). Here, they are included together as part of one package, with the test suite being provided as an example implementation and use of the library itself. Although they provide, in many cases, stress tests of the various parts of the library that push it beyond conditions it was designed for, this can be illustrative in itself (to show you where the limits lie) and the methods used in the routines in many cases still exemplify the intended use of the library.
 </p>
 <p>
@@ -1483,7 +1511,7 @@ There are three test suites in ALGLIB:
 <ul><li>
 <b>Computational tests</b> are located in <code>TestC.cpp</code>.
 They are focused on numerical properties of algorithms, stress testing and "deep" tests (large automatically generated problems).
-They require only a few minutes to finish even on older machines (example: the test times listed under the supplementary section <a href="History.htm#supp_History3">A6.3 Test Results</a>).
+They require only a few minutes to finish even on older machines (example: the test times listed under the supplementary section <a href="Notes.htm#supp_History3">A6.3 Test Results</a>).
 </li>
 <li>
 <b>Interface tests</b> are located in <code>TestI.cpp</code>.
@@ -18532,8 +18560,7 @@ Outputs:
 NOTES:
 * this function  assumes  that  there all consequent points  are distinct.
   I.e. (x0,y0) &ne; (x1,y1),  (x1,y1) &ne; (x2,y2),  (x2,y2) &ne; (x3,y3)  and  so on.
-  However, non-consequent points may coincide, i.e. we can  have  (x0,y0)=
-  =(x2,y2).
+  However, non-consequent points may coincide, i.e. we can  have  (x0,y0) == (x2,y2).
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18567,8 +18594,7 @@ Outputs:
 NOTES:
 * this function  assumes  that there all consequent points  are  distinct.
   I.e. (x0,y0) &ne; (x1,y1), (x1,y1) &ne; (x2,y2),  (x2,y2) &ne; (x3,y3)  and  so  on.
-  However, non-consequent points may coincide, i.e. we can  have  (x0,y0)=
-  =(x2,y2).
+  However, non-consequent points may coincide, i.e. we can  have  (x0,y0) == (x2,y2).
 * last point of sequence is NOT equal to the first  point.  You  shouldn't
   make curve &quot;explicitly periodic&quot; by making them equal.
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
@@ -19621,18 +19647,29 @@ ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 <a href=#sub_rbfcalcbuf class=toc>rbfcalcbuf</a> |
 <a href=#sub_rbfcreate class=toc>rbfcreate</a> |
 <a href=#sub_rbfcreatecalcbuffer class=toc>rbfcreatecalcbuffer</a> |
+<a href=#sub_rbfdiff class=toc>rbfdiff</a> |
+<a href=#sub_rbfdiff1 class=toc>rbfdiff1</a> |
+<a href=#sub_rbfdiff2 class=toc>rbfdiff2</a> |
+<a href=#sub_rbfdiff3 class=toc>rbfdiff3</a> |
+<a href=#sub_rbfdiffbuf class=toc>rbfdiffbuf</a> |
 <a href=#sub_rbfgetmodelversion class=toc>rbfgetmodelversion</a> |
 <a href=#sub_rbfgridcalc2 class=toc>rbfgridcalc2</a> |
 <a href=#sub_rbfgridcalc2v class=toc>rbfgridcalc2v</a> |
 <a href=#sub_rbfgridcalc2vsubset class=toc>rbfgridcalc2vsubset</a> |
 <a href=#sub_rbfgridcalc3v class=toc>rbfgridcalc3v</a> |
 <a href=#sub_rbfgridcalc3vsubset class=toc>rbfgridcalc3vsubset</a> |
+<a href=#sub_rbfhess class=toc>rbfhess</a> |
+<a href=#sub_rbfhessbuf class=toc>rbfhessbuf</a> |
 <a href=#sub_rbfpeekprogress class=toc>rbfpeekprogress</a> |
 <a href=#sub_rbfrequesttermination class=toc>rbfrequesttermination</a> |
 <a href=#sub_rbfserialize class=toc>rbfserialize</a> |
+<a href=#sub_rbfsetalgobiharmonic class=toc>rbfsetalgobiharmonic</a> |
 <a href=#sub_rbfsetalgohierarchical class=toc>rbfsetalgohierarchical</a> |
 <a href=#sub_rbfsetalgomultilayer class=toc>rbfsetalgomultilayer</a> |
+<a href=#sub_rbfsetalgomultiquadricauto class=toc>rbfsetalgomultiquadricauto</a> |
+<a href=#sub_rbfsetalgomultiquadricmanual class=toc>rbfsetalgomultiquadricmanual</a> |
 <a href=#sub_rbfsetalgoqnn class=toc>rbfsetalgoqnn</a> |
+<a href=#sub_rbfsetalgothinplatespline class=toc>rbfsetalgothinplatespline</a> |
 <a href=#sub_rbfsetconstterm class=toc>rbfsetconstterm</a> |
 <a href=#sub_rbfsetlinterm class=toc>rbfsetlinterm</a> |
 <a href=#sub_rbfsetpoints class=toc>rbfsetpoints</a> |
@@ -19642,6 +19679,8 @@ ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 <a href=#sub_rbfsetv2supportr class=toc>rbfsetv2supportr</a> |
 <a href=#sub_rbfsetzeroterm class=toc>rbfsetzeroterm</a> |
 <a href=#sub_rbftscalcbuf class=toc>rbftscalcbuf</a> |
+<a href=#sub_rbftsdiffbuf class=toc>rbftsdiffbuf</a> |
+<a href=#sub_rbftshessbuf class=toc>rbftshessbuf</a> |
 <a href=#sub_rbfunpack class=toc>rbfunpack</a> |
 <a href=#sub_rbfunserialize class=toc>rbfunserialize</a>
 ]</font>
@@ -19656,10 +19695,10 @@ ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 <a name=struct_rbfcalcbuffer></a><h6 class=pageheader>rbfcalcbuffer Class</h6>
 <hr width=600 align=left>
 <pre class=narration>
-Buffer object which is used to perform nearest neighbor  requests  in  the
-multithreaded mode (multiple threads working with same KD-tree object).
+Buffer object which is used to perform RBF model calculation in the
+multithreaded mode (multiple threads working with same RBF object).
 
-This object should be created with KDTreeCreateBuffer().
+This object should be created with RBFCreateCalcBuffer().
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -19728,8 +19767,9 @@ Inputs:
                   * -4 - nonconvergence of the internal SVD solver
                   * -3   incorrect model construction algorithm was chosen:
                          QNN or RBF-ML, combined with one of the incompatible
-                         features - NX == 1 or NX &gt; 3; points with per-dimension
-                         scales.
+                         features:
+                         * NX == 1 or NX &gt; 3
+                         * points with per-dimension scales.
                   *  1 - successful termination
                   *  8 - a termination request was submitted via
                          rbfrequesttermination() function.
@@ -19767,8 +19807,12 @@ the space of arguments) and NY (dimension of the function itself). However
 when  you  have  NY == 1  you  may  find more convenient to use rbfcalc2() or
 rbfcalc3().
 
-If you want to perform parallel model evaluation  from  multiple  threads,
-use rbftscalcbuf() with per-thread buffer object.
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
 
 This function returns 0.0 when model is not initialized.
 
@@ -19793,23 +19837,22 @@ ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 <a name=sub_rbfcalc1></a><h6 class=pageheader>rbfcalc1 Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-This function calculates values of the RBF model in the given point.
+This function calculates values of the 1-dimensional RBF model with scalar
+output (NY == 1) at the given point.
 
 IMPORTANT: this function works only with modern  (hierarchical)  RBFs.  It
            can not be used with legacy (version 1) RBFs because older  RBF
            code does not support 1-dimensional models.
 
-This function should be used when we have NY == 1 (scalar function) and  NX == 1
-(1-dimensional space). If you have 3-dimensional space, use rbfcalc3(). If
-you  have  2-dimensional  space,  use  rbfcalc3().  If  you  have  general
-situation (NX-dimensional space, NY-dimensional function)  you  should use
-generic rbfcalc().
-
-If you want to perform parallel model evaluation  from  multiple  threads,
-use rbftscalcbuf() with per-thread buffer object.
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
 
 This function returns 0.0 when:
-* model is not initialized
+* the model is not initialized
 * NX &ne; 1
 * NY &ne; 1
 
@@ -19828,19 +19871,15 @@ ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 <a name=sub_rbfcalc2></a><h6 class=pageheader>rbfcalc2 Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-This function calculates values of the RBF model in the given point.
+This function calculates values of the 2-dimensional RBF model with scalar
+output (NY == 1) at the given point.
 
-This function should be used when we have NY == 1 (scalar function) and  NX == 2
-(2-dimensional space). If you have 3-dimensional space, use rbfcalc3(). If
-you have general situation (NX-dimensional space, NY-dimensional function)
-you should use generic rbfcalc().
-
-If  you  want  to  calculate  function  values  many times, consider using
-rbfgridcalc2v(), which is far more efficient than many subsequent calls to
-rbfcalc2().
-
-If you want to perform parallel model evaluation  from  multiple  threads,
-use rbftscalcbuf() with per-thread buffer object.
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
 
 This function returns 0.0 when:
 * model is not initialized
@@ -19864,19 +19903,15 @@ ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 <a name=sub_rbfcalc3></a><h6 class=pageheader>rbfcalc3 Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-This function calculates value of the RBF model in the given point.
+This function calculates values of the 3-dimensional RBF model with scalar
+output (NY == 1) at the given point.
 
-This function should be used when we have NY == 1 (scalar function) and  NX == 3
-(3-dimensional space). If you have 2-dimensional space, use rbfcalc2(). If
-you have general situation (NX-dimensional space, NY-dimensional function)
-you should use generic rbfcalc().
-
-If  you  want  to  calculate  function  values  many times, consider using
-rbfgridcalc3v(), which is far more efficient than many subsequent calls to
-rbfcalc3().
-
-If you want to perform parallel model evaluation  from  multiple  threads,
-use rbftscalcbuf() with per-thread buffer object.
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
 
 This function returns 0.0 when:
 * model is not initialized
@@ -19905,8 +19940,12 @@ This function calculates values of the RBF model at the given point.
 Same as rbfcalc(), but does not reallocate Y when in is large enough to
 store function values.
 
-If you want to perform parallel model evaluation  from  multiple  threads,
-use rbftscalcbuf() with per-thread buffer object.
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
 
 Inputs:
     S       -   RBF model
@@ -19937,30 +19976,28 @@ rbfbuildmodel() which will update model according to your specification.
 
 USAGE:
 1. User creates model with rbfcreate()
-2. User adds dataset with rbfsetpoints() (points do NOT have to  be  on  a
-   regular grid) or rbfsetpointsandscales().
-3. (OPTIONAL) User chooses polynomial term by calling:
-   * rbflinterm() to set linear term
+2. User adds dataset with rbfsetpoints() or rbfsetpointsandscales()
+3. User selects RBF solver by calling:
+   * rbfsetalgohierarchical() - for a HRBF solver,  a  hierarchical large-
+     scale Gaussian RBFs  (works  well  for  uniformly  distributed  point
+     clouds, but may fail when the data are non-uniform; use other solvers
+     below in such cases)
+   * rbfsetalgothinplatespline() - for a large-scale DDM-RBF  solver  with
+     thin plate spline basis function being used
+   * rbfsetalgobiharmonic() -  for  a  large-scale  DDM-RBF  solver   with
+     biharmonic basis function being used
+   * rbfsetalgomultiquadricauto() -  for a large-scale DDM-RBF solver with
+     multiquadric basis function being used (automatic  selection  of  the
+     scale parameter Alpha)
+   * rbfsetalgomultiquadricmanual() -  for a  large-scale  DDM-RBF  solver
+     with multiquadric basis function being used (manual selection  of the
+     scale parameter Alpha)
+4. (OPTIONAL) User chooses polynomial term by calling:
+   * rbflinterm() to set linear term (default)
    * rbfconstterm() to set constant term
    * rbfzeroterm() to set zero term
-   By default, linear term is used.
-4. User tweaks algorithm properties with  rbfsetalgohierarchical()  method
-   (or chooses one of the legacy algorithms - QNN  (rbfsetalgoqnn)  or  ML
-   (rbfsetalgomultilayer)).
 5. User calls rbfbuildmodel() function which rebuilds model  according  to
    the specification
-6. User may call rbfcalc() to calculate model value at the specified point,
-   rbfgridcalc() to  calculate   model  values at the points of the regular
-   grid. User may extract model coefficients with rbfunpack() call.
-
-IMPORTANT: we recommend you to use latest model construction  algorithm  -
-           hierarchical RBFs, which is activated by rbfsetalgohierarchical()
-           function. This algorithm is the fastest one, and  most  memory-
-           efficient.
-           However,  it  is  incompatible  with older versions  of  ALGLIB
-           (pre-3.11). So, if you serialize hierarchical model,  you  will
-           be unable to load it in pre-3.11 ALGLIB. Other model types (QNN
-           and RBF-ML) are still backward-compatible.
 
 Inputs:
     NX      -   dimension of the space, NX &ge; 1
@@ -19972,26 +20009,9 @@ Outputs:
 NOTE 1: memory requirements. RBF models require amount of memory  which is
         proportional  to the number of data points. Some additional memory
         is allocated during model construction, but most of this memory is
-        freed after model coefficients  are  calculated.  Amount  of  this
-        additional memory depends on model  construction  algorithm  being
-        used.
-
-NOTE 2: prior to ALGLIB version 3.11, RBF models supported  only  NX == 2  or
-        NX == 3. Any  attempt  to  create  single-dimensional  or  more  than
-        3-dimensional RBF model resulted in exception.
-
-        ALGLIB 3.11 supports any NX &gt; 0, but models created with  NX &ne; 2  and
-        NX &ne; 3 are incompatible with (a) older versions of ALGLIB, (b)  old
-        model construction algorithms (QNN or RBF-ML).
-
-        So, if you create a model with NX == 2 or NX == 3,  then,  depending  on
-        specific  model construction algorithm being chosen, you will (QNN
-        and RBF-ML) or will not (HierarchicalRBF) get backward compatibility
-        with older versions of ALGLIB. You have a choice here.
-
-        However, if you create a model with NX neither 2 nor 3,  you  have
-        no backward compatibility from the start, and you  are  forced  to
-        use hierarchical RBFs and ALGLIB 3.11 or later.
+        freed after the model  coefficients  are   calculated.  Amount  of
+        this additional memory depends  on  model  construction  algorithm
+        being used.
 ALGLIB: Copyright 13.12.2011, 20.06.2016 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -20005,11 +20025,21 @@ ALGLIB: Copyright 13.12.2011, 20.06.2016 by Sergey Bochkanov
 This function creates buffer  structure  which  can  be  used  to  perform
 parallel  RBF  model  evaluations  (with  one  RBF  model  instance  being
 used from multiple threads, as long as  different  threads  use  different
-instances of buffer).
+instances of the buffer).
 
 This buffer object can be used with  rbftscalcbuf()  function  (here  &quot;ts&quot;
 stands for &quot;thread-safe&quot;, &quot;buf&quot; is a suffix which denotes  function  which
 reuses previously allocated output space).
+
+A buffer creation function (this function) is also thread-safe.  I.e.  you
+may safely create multiple buffers for the same  RBF  model  from multiple
+threads.
+
+NOTE: the  buffer  object  is  just  a  collection of several preallocated
+      dynamic arrays and precomputed values. If you  delete  its  &quot;parent&quot;
+      RBF model when the buffer is still alive, nothing  bad  will  happen
+      (no dangling pointers or resource leaks).  The  buffer  will  simply
+      become useless.
 
 How to use it:
 * create RBF model structure with rbfcreate()
@@ -20020,6 +20050,9 @@ How to use it:
   for more information)
 * call rbftscalcbuf() from different threads,  with  each  thread  working
   with its own copy of buffer object.
+* it is recommended to reuse buffer as much  as  possible  because  buffer
+  creation involves allocation of several large dynamic arrays.  It  is  a
+  huge waste of resource to use it just once.
 
 Inputs:
     S           -   RBF model
@@ -20044,6 +20077,214 @@ ALGLIB: Copyright 02.04.2016 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> rbfcreatecalcbuffer(rbfmodel s, rbfcalcbuffer &amp;buf);
+</pre>
+<a name=sub_rbfdiff></a><h6 class=pageheader>rbfdiff Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates values of the RBF model and  its  derivatives  at
+the given point.
+
+This is general function which can be used for arbitrary NX (dimension  of
+the space of arguments) and NY (dimension of the function itself). However
+if you have NX == 3 and NY == 1, you may find more convenient to use rbfdiff3().
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftsdiffbuf() with per-thread buffer object.
+
+This function returns 0.0 in Y and/or DY in the following cases:
+* the model is not initialized (Y == 0, DY == 0)
+* the gradient is undefined at the trial point. Some basis  functions have
+  discontinuous derivatives at the interpolation nodes:
+  * biharmonic splines f == r have no Hessian and no gradient at the nodes
+  In these cases only DY is set to zero (Y is still returned)
+
+Inputs:
+    S       -   RBF model
+    X       -   coordinates, array[NX].
+                X may have more than NX elements, in this case only
+                leading NX will be used.
+
+Outputs:
+    Y       -   function value, array[NY]. Y is out-parameter and
+                reallocated after call to this function. In case you  want
+                to reuse previously allocated Y, you may use RBFDiffBuf(),
+                which reallocates Y only when it is too small.
+    DY      -   derivatives, array[NX*NY]:
+                * Y[I*NX+J] with 0 &le; I &lt; NY and 0 &le; J &lt; NX  stores derivative of
+                  function component I with respect to input J.
+                * for NY == 1 it is simply NX-dimensional gradient of the
+                  scalar NX-dimensional function
+                DY is out-parameter and reallocated  after  call  to  this
+                function. In case you want to reuse  previously  allocated
+                DY, you may use RBFDiffBuf(), which  reallocates  DY  only
+                when it is too small to store the result.
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfdiff(rbfmodel s, real_1d_array x, real_1d_array &amp;y, real_1d_array &amp;dy);
+</pre>
+<a name=sub_rbfdiff1></a><h6 class=pageheader>rbfdiff1 Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates value and derivatives of  the  1-dimensional  RBF
+model with scalar output (NY == 1) at the given point.
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
+
+This function returns 0.0 in Y and/or DY in the following cases:
+* the model is not initialized (Y == 0, DY == 0)
+* NX &ne; 1 or NY &ne; 1 (Y == 0, DY == 0)
+* the gradient is undefined at the trial point. Some basis  functions have
+  discontinuous derivatives at the interpolation nodes:
+  * biharmonic splines f == r have no Hessian and no gradient at the nodes
+  In these cases only DY is set to zero (Y is still returned)
+
+Inputs:
+    S       -   RBF model
+    X0      -   first coordinate, finite number
+
+Outputs:
+    Y       -   value of the model or 0.0 (as defined above)
+    DY0     -   derivative with respect to X0
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfdiff1(rbfmodel s, <b>double</b> x0, <b>double</b> &amp;y, <b>double</b> &amp;dy0);
+</pre>
+<a name=sub_rbfdiff2></a><h6 class=pageheader>rbfdiff2 Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates value and derivatives of  the  2-dimensional  RBF
+model with scalar output (NY == 1) at the given point.
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
+
+This function returns 0.0 in Y and/or DY in the following cases:
+* the model is not initialized (Y == 0, DY == 0)
+* NX &ne; 2 or NY &ne; 1 (Y == 0, DY == 0)
+* the gradient is undefined at the trial point. Some basis  functions have
+  discontinuous derivatives at the interpolation nodes:
+  * biharmonic splines f == r have no Hessian and no gradient at the nodes
+  In these cases only DY is set to zero (Y is still returned)
+
+Inputs:
+    S       -   RBF model
+    X0      -   first coordinate, finite number
+    X1      -   second coordinate, finite number
+
+Outputs:
+    Y       -   value of the model or 0.0 (as defined above)
+    DY0     -   derivative with respect to X0
+    DY1     -   derivative with respect to X1
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfdiff2(rbfmodel s, <b>double</b> x0, <b>double</b> x1, <b>double</b> &amp;y, <b>double</b> &amp;dy0, <b>double</b> &amp;dy1);
+</pre>
+<a name=sub_rbfdiff3></a><h6 class=pageheader>rbfdiff3 Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates value and derivatives of  the  3-dimensional  RBF
+model with scalar output (NY == 1) at the given point.
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with per-thread buffer object.
+
+This function returns 0.0 in Y and/or DY in the following cases:
+* the model is not initialized (Y == 0, DY == 0)
+* NX &ne; 3 or NY &ne; 1 (Y == 0, DY == 0)
+* the gradient is undefined at the trial point. Some basis  functions have
+  discontinuous derivatives at the interpolation nodes:
+  * biharmonic splines f == r have no Hessian and no gradient at the nodes
+  In these cases only DY is set to zero (Y is still returned)
+
+Inputs:
+    S       -   RBF model
+    X0      -   first coordinate, finite number
+    X1      -   second coordinate, finite number
+    X2      -   third coordinate, finite number
+
+Outputs:
+    Y       -   value of the model or 0.0 (as defined above)
+    DY0     -   derivative with respect to X0
+    DY1     -   derivative with respect to X1
+    DY2     -   derivative with respect to X2
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfdiff3(rbfmodel s, <b>double</b> x0, <b>double</b> x1, <b>double</b> x2, <b>double</b> &amp;y, <b>double</b> &amp;dy0, <b>double</b> &amp;dy1, <b>double</b> &amp;dy2);
+</pre>
+<a name=sub_rbfdiffbuf></a><h6 class=pageheader>rbfdiffbuf Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates values of the RBF model and  its  derivatives  at
+the given point. It is a buffered version of the RBFDiff() which tries  to
+reuse possibly preallocated output arrays Y/DY as much as possible.
+
+This is general function which can be used for arbitrary NX (dimension  of
+the space of arguments) and NY (dimension of the function itself). However
+if you have NX == 1, 2 or 3 and NY == 1, you may find  more  convenient  to  use
+rbfdiff1(), rbfdiff2() or rbfdiff3().
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftsdiffbuf() with per-thread buffer object.
+
+This function returns 0.0 in Y and/or DY in the following cases:
+* the model is not initialized (Y == 0, DY == 0)
+* the gradient is undefined at the trial point. Some basis  functions have
+  discontinuous derivatives at the interpolation nodes:
+  * biharmonic splines f == r have no Hessian and no gradient at the nodes
+  In these cases only DY is set to zero (Y is still returned)
+
+Inputs:
+    S       -   RBF model
+    X       -   coordinates, array[NX].
+                X may have more than NX elements, in this case only
+                leading NX will be used.
+    Y, DY   -   possibly preallocated arrays; if array size is large enough
+                to store results, this function does not  reallocate  array
+                to fit output size exactly.
+
+Outputs:
+    Y       -   function value, array[NY].
+    DY      -   derivatives, array[NX*NY]:
+                * Y[I*NX+J] with 0 &le; I &lt; NY and 0 &le; J &lt; NX  stores derivative of
+                  function component I with respect to input J.
+                * for NY == 1 it is simply NX-dimensional gradient of the
+                  scalar NX-dimensional function
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfdiffbuf(rbfmodel s, real_1d_array x, real_1d_array &amp;y, real_1d_array &amp;dy);
 </pre>
 <a name=sub_rbfgetmodelversion></a><h6 class=pageheader>rbfgetmodelversion Function</h6>
 <hr width=600 align=left>
@@ -20339,6 +20580,128 @@ ALGLIB: Copyright 04.03.2016 by Sergey Bochkanov
 <pre class=declaration>
 <b>void</b> rbfgridcalc3vsubset(rbfmodel s, real_1d_array x0, ae_int_t n0, real_1d_array x1, ae_int_t n1, real_1d_array x2, ae_int_t n2, boolean_1d_array flagy, real_1d_array &amp;y);
 </pre>
+<a name=sub_rbfhess></a><h6 class=pageheader>rbfhess Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates values of the RBF model and  its first and second
+derivatives (Hessian matrix) at the given point.
+
+This function supports both scalar (NY == 1) and vector-valued (NY &gt; 1) RBFs.
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftshessbuf() with per-thread buffer object.
+
+This function returns 0 in Y and/or DY and/or D2Y in the following cases:
+* the model is not initialized (Y == 0, DY == 0, D2Y == 0)
+* the gradient and/or Hessian is undefined at the trial point.  Some basis
+  functions have discontinuous derivatives at the interpolation nodes:
+  * thin plate splines have no Hessian at the nodes
+  * biharmonic splines f == r have no Hessian and no gradient at the  nodes
+  In these cases only corresponding derivative is set  to  zero,  and  the
+  rest of the derivatives is still returned.
+
+Inputs:
+    S       -   RBF model
+    X       -   coordinates, array[NX].
+                X may have more than NX elements, in this case only
+                leading NX will be used.
+
+Outputs:
+    Y       -   function value, array[NY].
+                Y is out-parameter and  reallocated  after  call  to  this
+                function. In case you  want to reuse previously  allocated
+                Y, you may use RBFHessBuf(), which reallocates Y only when
+                it is too small.
+    DY      -   first derivatives, array[NY*NX]:
+                * Y[I*NX+J] with 0 &le; I &lt; NY and 0 &le; J &lt; NX  stores derivative of
+                  function component I with respect to input J.
+                * for NY == 1 it is simply NX-dimensional gradient of the
+                  scalar NX-dimensional function
+                DY is out-parameter and reallocated  after  call  to  this
+                function. In case you want to reuse  previously  allocated
+                DY, you may use RBFHessBuf(), which  reallocates  DY  only
+                when it is too small to store the result.
+    D2Y     -   second derivatives, array[NY*NX*NX]:
+                * for NY == 1 it is NX*NX array that stores  Hessian  matrix,
+                  with Y[I*NX+J] == Y[J*NX+I].
+                * for  a  vector-valued  RBF  with  NY &gt; 1  it  contains  NY
+                  subsequently stored Hessians: an element Y[K*NX*NX+I*NX+J]
+                  with  0 &le; K &lt; NY,  0 &le; I &lt; NX  and  0 &le; J &lt; NX    stores   second
+                  derivative of the function #K  with  respect  to  inputs
+                  #I and #J.
+                D2Y is out-parameter and reallocated  after  call  to this
+                function. In case you want to reuse  previously  allocated
+                D2Y, you may use RBFHessBuf(), which  reallocates D2Y only
+                when it is too small to store the result.
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfhess(rbfmodel s, real_1d_array x, real_1d_array &amp;y, real_1d_array &amp;dy, real_1d_array &amp;d2y);
+</pre>
+<a name=sub_rbfhessbuf></a><h6 class=pageheader>rbfhessbuf Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates values of the RBF model and  its first and second
+derivatives (Hessian matrix) at the given point. It is a buffered  version
+that reuses memory  allocated  in  output  buffers  Y/DY/D2Y  as  much  as
+possible.
+
+This function supports both scalar (NY == 1) and vector-valued (NY &gt; 1) RBFs.
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftshessbuf() with per-thread buffer object.
+
+This function returns 0 in Y and/or DY and/or D2Y in the following cases:
+* the model is not initialized (Y == 0, DY == 0, D2Y == 0)
+* the gradient and/or Hessian is undefined at the trial point.  Some basis
+  functions have discontinuous derivatives at the interpolation nodes:
+  * thin plate splines have no Hessian at the nodes
+  * biharmonic splines f == r have no Hessian and no gradient at the  nodes
+  In these cases only corresponding derivative is set  to  zero,  and  the
+  rest of the derivatives is still returned.
+
+Inputs:
+    S       -   RBF model
+    X       -   coordinates, array[NX].
+                X may have more than NX elements, in this case only
+                leading NX will be used.
+    Y,DY,D2Y-   possible preallocated output arrays. If these  arrays  are
+                smaller than  required  to  store  the  result,  they  are
+                automatically reallocated. If array is large enough, it is
+                not resized.
+
+Outputs:
+    Y       -   function value, array[NY].
+    DY      -   first derivatives, array[NY*NX]:
+                * Y[I*NX+J] with 0 &le; I &lt; NY and 0 &le; J &lt; NX  stores derivative of
+                  function component I with respect to input J.
+                * for NY == 1 it is simply NX-dimensional gradient of the
+                  scalar NX-dimensional function
+    D2Y     -   second derivatives, array[NY*NX*NX]:
+                * for NY == 1 it is NX*NX array that stores  Hessian  matrix,
+                  with Y[I*NX+J] == Y[J*NX+I].
+                * for  a  vector-valued  RBF  with  NY &gt; 1  it  contains  NY
+                  subsequently stored Hessians: an element Y[K*NX*NX+I*NX+J]
+                  with  0 &le; K &lt; NY,  0 &le; I &lt; NX  and  0 &le; J &lt; NX    stores   second
+                  derivative of the function #K  with  respect  to  inputs
+                  #I and #J.
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfhessbuf(rbfmodel s, real_1d_array x, real_1d_array &amp;y, real_1d_array &amp;dy, real_1d_array &amp;d2y);
+</pre>
 <a name=sub_rbfpeekprogress></a><h6 class=pageheader>rbfpeekprogress Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -20409,11 +20772,64 @@ ALGLIB: Copyright 02.02.2012 by Sergey Bochkanov
 <b>void</b> rbfserialize(rbfmodel &amp;obj, std::string &amp;s_out);
 <b>void</b> rbfserialize(rbfmodel &amp;obj, std::ostream &amp;s_out);
 </pre>
+<a name=sub_rbfsetalgobiharmonic></a><h6 class=pageheader>rbfsetalgobiharmonic Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This  function  chooses  a  biharmonic DDM-RBF solver, a fast  RBF  solver
+with f(r) == r as a basis function.
+
+This algorithm has following important features:
+* no tunable parameters
+* C0 continuous RBF model (the model has discontinuous derivatives at  the
+  interpolation nodes)
+* fast  model construction algorithm with O(N) memory and  O(N^2)  running
+  time requirements. Hundreds of thousands of points can be  handled  with
+  this algorithm.
+* controllable smoothing via optional nonlinearity penalty
+
+Inputs:
+    S       -   RBF model, initialized by rbfcreate() call
+    LambdaV -   smoothing parameter, LambdaV &ge; 0, defaults to 0.0:
+                * LambdaV == 0 means that no smoothing is applied,  i.e.  the
+                  spline tries to pass through all dataset points exactly
+                * LambdaV &gt; 0 means that a multiquadric spline is built with
+                  larger  LambdaV   corresponding   to  models  with  less
+                  nonlinearities.  Smoothing   spline   reproduces  target
+                  values at nodes with small error; from the  other  side,
+                  it is much more stable.
+                  Recommended values:
+                  * 0.000001 for minimal stability improving smoothing
+                  * 0.001 a good value to start experiments; first results
+                    are visible
+                  * 1.0 for strong smoothing
+
+IMPORTANT: this model construction algorithm was introduced in ALGLIB 3.19
+           and  produces  models  which  are  INCOMPATIBLE  with  previous
+           versions of ALGLIB. You can  not  unserialize  models  produced
+           with this function in ALGLIB 3.18 or earlier.
+
+NOTE:      polyharmonic RBFs, including thin plate splines,  are  somewhat
+           slower than compactly supported RBFs built with  HRBF algorithm
+           due to the fact that non-compact basis function does not vanish
+           far away from the nodes. From the other side, polyharmonic RBFs
+           often produce much better results than HRBFs.
+
+NOTE:      this algorithm supports specification of per-dimensional  radii
+           via scale vector, which is set by means of rbfsetpointsandscales()
+           function. This feature is useful if  you solve  spatio-temporal
+           interpolation problems where different radii are  required  for
+           spatial and temporal dimensions.
+ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfsetalgobiharmonic(rbfmodel s, <b>double</b> lambdav);
+<b>void</b> rbfsetalgobiharmonic(rbfmodel s);
+</pre>
 <a name=sub_rbfsetalgohierarchical></a><h6 class=pageheader>rbfsetalgohierarchical Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-This  function  sets  RBF interpolation algorithm. ALGLIB supports several
-RBF algorithms with different properties.
+This function chooses HRBF solver, a 2nd version of ALGLIB RBFs.
 
 This  algorithm is called Hierarchical RBF. It  similar  to  its  previous
 incarnation, RBF-ML, i.e.  it  also  builds  a  sequence  of  models  with
@@ -20424,22 +20840,16 @@ and evaluation, as well as smaller memory footprint during construction.
 This algorithm has following important features:
 * ability to handle millions of points
 * controllable smoothing via nonlinearity penalization
-* support for NX-dimensional models with NX == 1 or NX &gt; 3 (unlike QNN or RBF-ML)
 * support for specification of per-dimensional  radii  via  scale  vector,
   which is set by means of rbfsetpointsandscales() function. This  feature
   is useful if you solve  spatio-temporal  interpolation  problems,  where
   different radii are required for spatial and temporal dimensions.
 
 Running times are roughly proportional to:
-* N*log(N)*NLayers - for model construction
-* N*NLayers - for model evaluation
+* N*log(N)*NLayers - for the model construction
+* N*NLayers - for the model evaluation
 You may see that running time does not depend on search radius  or  points
-density, just on number of layers in the hierarchy.
-
-IMPORTANT: this model construction algorithm was introduced in ALGLIB 3.11
-           and  produces  models  which  are  INCOMPATIBLE  with  previous
-           versions of ALGLIB. You can  not  unserialize  models  produced
-           with this function in ALGLIB 3.10 or earlier.
+density, just on the number of layers in the hierarchy.
 
 Inputs:
     S       -   RBF model, initialized by rbfcreate() call
@@ -20508,97 +20918,9 @@ ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 <a name=sub_rbfsetalgomultilayer></a><h6 class=pageheader>rbfsetalgomultilayer Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-DEPRECATED:since version 3.11 ALGLIB includes new RBF  model  construction
-           algorithm, Hierarchical  RBF.  This  algorithm  is  faster  and
-           requires less memory than QNN and RBF-ML. It is especially good
-           for large-scale interpolation problems. So, we recommend you to
-           consider Hierarchical RBF as default option.
-
-This  function  sets  RBF interpolation algorithm. ALGLIB supports several
-RBF algorithms with different properties.
-
-This  algorithm is called RBF-ML. It builds  multilayer  RBF  model,  i.e.
-model with subsequently decreasing  radii,  which  allows  us  to  combine
-smoothness (due to  large radii of  the first layers) with  exactness (due
-to small radii of the last layers) and fast convergence.
-
-Internally RBF-ML uses many different  means  of acceleration, from sparse
-matrices  to  KD-trees,  which  results in algorithm whose working time is
-roughly proportional to N*log(N)*Density*RBase^2*NLayers,  where  N  is  a
-number of points, Density is an average density if points per unit of  the
-interpolation space, RBase is an initial radius, NLayers is  a  number  of
-layers.
-
-RBF-ML is good for following kinds of interpolation problems:
-1. &quot;exact&quot; problems (perfect fit) with well separated points
-2. least squares problems with arbitrary distribution of points (algorithm
-   gives  perfect  fit  where it is possible, and resorts to least squares
-   fit in the hard areas).
-3. noisy problems where  we  want  to  apply  some  controlled  amount  of
-   smoothing.
-
-Inputs:
-    S       -   RBF model, initialized by RBFCreate() call
-    RBase   -   RBase parameter, RBase &gt; 0
-    NLayers -   NLayers parameter, NLayers &gt; 0, recommended value  to  start
-                with - about 5.
-    LambdaV -   regularization value, can be useful when  solving  problem
-                in the least squares sense.  Optimal  lambda  is  problem-
-                dependent and require trial and error. In our  experience,
-                good lambda can be as large as 0.1, and you can use  0.001
-                as initial guess.
-                Default  value  - 0.01, which is used when LambdaV is  not
-                given.  You  can  specify  zero  value,  but  it  is   not
-                recommended to do so.
-
-TUNING ALGORITHM
-
-In order to use this algorithm you have to choose three parameters:
-* initial radius RBase
-* number of layers in the model NLayers
-* regularization coefficient LambdaV
-
-Initial radius is easy to choose - you can pick any number  several  times
-larger  than  the  average  distance between points. Algorithm won't break
-down if you choose radius which is too large (model construction time will
-increase, but model will be built correctly).
-
-Choose such number of layers that RLast == RBase/2^(NLayers-1)  (radius  used
-by  the  last  layer)  will  be  smaller than the typical distance between
-points.  In  case  model  error  is  too large, you can increase number of
-layers.  Having  more  layers  will make model construction and evaluation
-proportionally slower, but it will allow you to have model which precisely
-fits your data. From the other side, if you want to  suppress  noise,  you
-can DECREASE number of layers to make your model less flexible.
-
-Regularization coefficient LambdaV controls smoothness of  the  individual
-models built for each layer. We recommend you to use default value in case
-you don't want to tune this parameter,  because  having  non-zero  LambdaV
-accelerates and stabilizes internal iterative algorithm. In case you  want
-to suppress noise you can use  LambdaV  as  additional  parameter  (larger
-value = more smoothness) to tune.
-
-TYPICAL ERRORS
-
-1. Using  initial  radius  which is too large. Memory requirements  of the
-   RBF-ML are roughly proportional to N*Density*RBase^2 (where Density  is
-   an average density of points per unit of the interpolation  space).  In
-   the extreme case of the very large RBase we will need O(N^2)  units  of
-   memory - and many layers in order to decrease radius to some reasonably
-   small value.
-
-2. Using too small number of layers - RBF models with large radius are not
-   flexible enough to reproduce small variations in the  target  function.
-   You  need  many  layers  with  different radii, from large to small, in
-   order to have good model.
-
-3. Using  initial  radius  which  is  too  small.  You will get model with
-   &quot;holes&quot; in the areas which are too far away from interpolation centers.
-   However, algorithm will work correctly (and quickly) in this case.
-
-4. Using too many layers - you will get too large and too slow model. This
-   model  will  perfectly  reproduce  your function, but maybe you will be
-   able to achieve similar results with less layers (and less memory).
+DEPRECATED: this function is deprecated. ALGLIB  includes  new  RBF  model
+            construction algorithms: DDM-RBF (since version 3.19) and HRBF
+            (since version 3.11).
 ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -20606,68 +20928,203 @@ ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 <b>void</b> rbfsetalgomultilayer(rbfmodel s, <b>double</b> rbase, ae_int_t nlayers, <b>double</b> lambdav);
 <b>void</b> rbfsetalgomultilayer(rbfmodel s, <b>double</b> rbase, ae_int_t nlayers);
 </pre>
+<a name=sub_rbfsetalgomultiquadricauto></a><h6 class=pageheader>rbfsetalgomultiquadricauto Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function chooses a multiquadric DDM-RBF solver,  a  fast  RBF  solver
+with f(r) == sqrt(r^2+Alpha^2)  as  a  basis  function,  with   Alpha   being
+automatically determined.
+
+This algorithm has following important features:
+* easy setup - no need to tune Alpha, good value is automatically assigned
+* C2 continuous RBF model
+* fast  model construction algorithm with O(N) memory and  O(N^2)  running
+  time requirements. Hundreds of thousands of points can be  handled  with
+  this algorithm.
+* controllable smoothing via optional nonlinearity penalty
+
+This algorithm automatically selects Alpha  as  a  mean  distance  to  the
+nearest neighbor (ignoring neighbors that are too close).
+
+Inputs:
+    S       -   RBF model, initialized by rbfcreate() call
+    LambdaV -   smoothing parameter, LambdaV &ge; 0, defaults to 0.0:
+                * LambdaV == 0 means that no smoothing is applied,  i.e.  the
+                  spline tries to pass through all dataset points exactly
+                * LambdaV &gt; 0 means that a multiquadric spline is built with
+                  larger  LambdaV   corresponding   to  models  with  less
+                  nonlinearities.  Smoothing   spline   reproduces  target
+                  values at nodes with small error; from the  other  side,
+                  it is much more stable.
+                  Recommended values:
+                  * 0.000001 for minimal stability improving smoothing
+                  * 0.001 a good value to start experiments; first results
+                    are visible
+                  * 1.0 for strong smoothing
+
+IMPORTANT: this model construction algorithm was introduced in ALGLIB 3.19
+           and  produces  models  which  are  INCOMPATIBLE  with  previous
+           versions of ALGLIB. You can  not  unserialize  models  produced
+           with this function in ALGLIB 3.18 or earlier.
+
+NOTE:      polyharmonic RBFs, including thin plate splines,  are  somewhat
+           slower than compactly supported RBFs built with  HRBF algorithm
+           due to the fact that non-compact basis function does not vanish
+           far away from the nodes. From the other side, polyharmonic RBFs
+           often produce much better results than HRBFs.
+
+NOTE:      this algorithm supports specification of per-dimensional  radii
+           via scale vector, which is set by means of rbfsetpointsandscales()
+           function. This feature is useful if  you solve  spatio-temporal
+           interpolation problems where different radii are  required  for
+           spatial and temporal dimensions.
+ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfsetalgomultiquadricauto(rbfmodel s, <b>double</b> lambdav);
+<b>void</b> rbfsetalgomultiquadricauto(rbfmodel s);
+</pre>
+<a name=sub_rbfsetalgomultiquadricmanual></a><h6 class=pageheader>rbfsetalgomultiquadricmanual Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function chooses a multiquadric DDM-RBF solver,  a  fast  RBF  solver
+with f(r) == sqrt(r^2+Alpha^2) as a basis function,  with  manual  choice  of
+the scale parameter Alpha.
+
+This algorithm has following important features:
+* C2 continuous RBF model (when Alpha &gt; 0 is used; for Alpha == 0 the model
+  is merely C0 continuous)
+* fast  model construction algorithm with O(N) memory and  O(N^2)  running
+  time requirements. Hundreds of thousands of points can be  handled  with
+  this algorithm.
+* controllable smoothing via optional nonlinearity penalty
+
+One important point is that  this  algorithm  includes  tunable  parameter
+Alpha, which should be carefully chosen. Selecting too  large  value  will
+result in extremely badly  conditioned  problems  (interpolation  accuracy
+may degrade up to complete breakdown) whilst selecting too small value may
+produce models that are precise but nearly nonsmooth at the nodes.
+
+Good value to  start  from  is  mean  distance  between  nodes. Generally,
+choosing too small Alpha is better than choosing too large - in the former
+case you still have model that reproduces target values at the nodes.
+
+In most cases, better option is to choose good Alpha automatically - it is
+done by another version of the same algorithm that is activated by calling
+rbfsetalgomultiquadricauto() method.
+
+Inputs:
+    S       -   RBF model, initialized by rbfcreate() call
+    Alpha   -   basis function parameter, Alpha &ge; 0:
+                * Alpha &gt; 0  means that multiquadric algorithm is used which
+                  produces C2-continuous RBF model
+                * Alpha == 0 means that the multiquadric kernel  effectively
+                  becomes a biharmonic one: f == r. As a  result,  the  model
+                  becomes nonsmooth at nodes, and hence is C0 continuous
+    LambdaV -   smoothing parameter, LambdaV &ge; 0, defaults to 0.0:
+                * LambdaV == 0 means that no smoothing is applied,  i.e.  the
+                  spline tries to pass through all dataset points exactly
+                * LambdaV &gt; 0 means that a multiquadric spline is built with
+                  larger  LambdaV   corresponding   to  models  with  less
+                  nonlinearities.  Smoothing   spline   reproduces  target
+                  values at nodes with small error; from the  other  side,
+                  it is much more stable.
+                  Recommended values:
+                  * 0.000001 for minimal stability improving smoothing
+                  * 0.001 a good value to start experiments; first results
+                    are visible
+                  * 1.0 for strong smoothing
+
+IMPORTANT: this model construction algorithm was introduced in ALGLIB 3.19
+           and  produces  models  which  are  INCOMPATIBLE  with  previous
+           versions of ALGLIB. You can  not  unserialize  models  produced
+           with this function in ALGLIB 3.18 or earlier.
+
+NOTE:      polyharmonic RBFs, including thin plate splines,  are  somewhat
+           slower than compactly supported RBFs built with  HRBF algorithm
+           due to the fact that non-compact basis function does not vanish
+           far away from the nodes. From the other side, polyharmonic RBFs
+           often produce much better results than HRBFs.
+
+NOTE:      this algorithm supports specification of per-dimensional  radii
+           via scale vector, which is set by means of rbfsetpointsandscales()
+           function. This feature is useful if  you solve  spatio-temporal
+           interpolation problems where different radii are  required  for
+           spatial and temporal dimensions.
+ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfsetalgomultiquadricmanual(rbfmodel s, <b>double</b> alpha, <b>double</b> lambdav);
+<b>void</b> rbfsetalgomultiquadricmanual(rbfmodel s, <b>double</b> alpha);
+</pre>
 <a name=sub_rbfsetalgoqnn></a><h6 class=pageheader>rbfsetalgoqnn Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-DEPRECATED:since version 3.11 ALGLIB includes new RBF  model  construction
-           algorithm, Hierarchical  RBF.  This  algorithm  is  faster  and
-           requires less memory than QNN and RBF-ML. It is especially good
-           for large-scale interpolation problems. So, we recommend you to
-           consider Hierarchical RBF as default option.
-
-This  function  sets  RBF interpolation algorithm. ALGLIB supports several
-RBF algorithms with different properties.
-
-This algorithm is called RBF-QNN and  it  is  good  for  point  sets  with
-following properties:
-a) all points are distinct
-b) all points are well separated.
-c) points  distribution  is  approximately  uniform.  There is no &quot;contour
-   lines&quot;, clusters of points, or other small-scale structures.
-
-Algorithm description:
-1) interpolation centers are allocated to data points
-2) interpolation radii are calculated as distances to the  nearest centers
-   times Q coefficient (where Q is a value from [0.75,1.50]).
-3) after  performing (2) radii are transformed in order to avoid situation
-   when single outlier has very large radius and  influences  many  points
-   across all dataset. Transformation has following form:
-       new_r[i] = min(r[i],Z*median(r[]))
-   where r[i] is I-th radius, median()  is a median  radius across  entire
-   dataset, Z is user-specified value which controls amount  of  deviation
-   from median radius.
-
-When (a) is violated,  we  will  be unable to build RBF model. When (b) or
-(c) are violated, model will be built, but interpolation quality  will  be
-low. See http://www.alglib.net/interpolation/ for more information on this
-subject.
-
-This algorithm is used by default.
-
-Additional Q parameter controls smoothness properties of the RBF basis:
-* Q &lt; 0.75 will give perfectly conditioned basis,  but  terrible  smoothness
-  properties (RBF interpolant will have sharp peaks around function values)
-* Q around 1.0 gives good balance between smoothness and condition number
-* Q &gt; 1.5 will lead to badly conditioned systems and slow convergence of the
-  underlying linear solver (although smoothness will be very good)
-* Q &gt; 2.0 will effectively make optimizer useless because it won't  converge
-  within reasonable amount of iterations. It is possible to set such large
-  Q, but it is advised not to do so.
-
-Inputs:
-    S       -   RBF model, initialized by RBFCreate() call
-    Q       -   Q parameter, Q &gt; 0, recommended value - 1.0
-    Z       -   Z parameter, Z &gt; 0, recommended value - 5.0
-
-NOTE: this   function  has   some   serialization-related  subtleties.  We
-      recommend you to study serialization examples from ALGLIB  Reference
-      Manual if you want to perform serialization of your models.
+DEPRECATED: this function is deprecated. ALGLIB  includes  new  RBF  model
+            construction algorithms: DDM-RBF (since version 3.19) and HRBF
+            (since version 3.11).
 ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> rbfsetalgoqnn(rbfmodel s, <b>double</b> q, <b>double</b> z);
 <b>void</b> rbfsetalgoqnn(rbfmodel s);
+</pre>
+<a name=sub_rbfsetalgothinplatespline></a><h6 class=pageheader>rbfsetalgothinplatespline Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function chooses a thin plate  spline  DDM-RBF  solver,  a  fast  RBF
+solver with f(r) == r^2*ln(r) basis function.
+
+This algorithm has following important features:
+* easy setup - no tunable parameters
+* C1 continuous RBF model (gradient is defined everywhere, but Hessian  is
+  undefined at nodes), high-quality interpolation
+* fast  model construction algorithm with O(N) memory and  O(N^2)  running
+  time requirements. Hundreds of thousands of points can be  handled  with
+  this algorithm.
+* controllable smoothing via optional nonlinearity penalty
+
+Inputs:
+    S       -   RBF model, initialized by rbfcreate() call
+    LambdaV -   smoothing parameter, LambdaV &ge; 0, defaults to 0.0:
+                * LambdaV == 0 means that no smoothing is applied,  i.e.  the
+                  spline tries to pass through all dataset points exactly
+                * LambdaV &gt; 0 means that a smoothing thin  plate  spline  is
+                  built, with larger LambdaV corresponding to models  with
+                  less nonlinearities. Smoothing spline reproduces  target
+                  values at nodes with small error; from the  other  side,
+                  it is much more stable.
+                  Recommended values:
+                  * 0.000001 for minimal stability improving smoothing
+                  * 0.001 a good value to start experiments; first results
+                    are visible
+                  * 1.0 for strong smoothing
+
+IMPORTANT: this model construction algorithm was introduced in ALGLIB 3.19
+           and  produces  models  which  are  INCOMPATIBLE  with  previous
+           versions of ALGLIB. You can  not  unserialize  models  produced
+           with this function in ALGLIB 3.18 or earlier.
+
+NOTE:      polyharmonic RBFs, including thin plate splines,  are  somewhat
+           slower than compactly supported RBFs built with  HRBF algorithm
+           due to the fact that non-compact basis function does not vanish
+           far away from the nodes. From the other side, polyharmonic RBFs
+           often produce much better results than HRBFs.
+
+NOTE:      this algorithm supports specification of per-dimensional  radii
+           via scale vector, which is set by means of rbfsetpointsandscales()
+           function. This feature is useful if  you solve  spatio-temporal
+           interpolation problems where different radii are  required  for
+           spatial and temporal dimensions.
+ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfsetalgothinplatespline(rbfmodel s, <b>double</b> lambdav);
+<b>void</b> rbfsetalgothinplatespline(rbfmodel s);
 </pre>
 <a name=sub_rbfsetconstterm></a><h6 class=pageheader>rbfsetconstterm Function</h6>
 <hr width=600 align=left>
@@ -20676,12 +21133,14 @@ This function sets constant term (model is a sum of radial basis functions
 plus constant).  This  function  won't  have  effect  until  next  call to
 RBFBuildModel().
 
+IMPORTANT: thin plate splines require  polynomial term to be  linear,  not
+           constant,  in  order  to  provide   interpolation   guarantees.
+           Although  failures  are  exceptionally  rare,  some  small  toy
+           problems may result in degenerate linear systems. Thus,  it  is
+           advised to use linear term when one fits data with TPS.
+
 Inputs:
     S       -   RBF model, initialized by RBFCreate() call
-
-NOTE: this   function  has   some   serialization-related  subtleties.  We
-      recommend you to study serialization examples from ALGLIB  Reference
-      Manual if you want to perform serialization of your models.
 ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -20696,12 +21155,16 @@ This function sets linear term (model is a sum of radial  basis  functions
 plus linear polynomial). This function won't have effect until  next  call
 to RBFBuildModel().
 
+Using linear term is a default option and it is the best one - it provides
+best convergence guarantees for all RBF model  types: legacy  RBF-QNN  and
+RBF-ML, Gaussian HRBFs and all types of DDM-RBF models.
+
+Other options, like constant or zero term, work for HRBFs,  almost  always
+work for DDM-RBFs but provide no stability  guarantees  in the latter case
+(e.g. the solver may fail on some carefully prepared problems).
+
 Inputs:
     S       -   RBF model, initialized by RBFCreate() call
-
-NOTE: this   function  has   some   serialization-related  subtleties.  We
-      recommend you to study serialization examples from ALGLIB  Reference
-      Manual if you want to perform serialization of your models.
 ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -20769,14 +21232,9 @@ scale vector.
 This function overrides results of the previous calls, i.e. multiple calls
 of this function will result in only the last set being added.
 
-IMPORTANT: only HierarchicalRBF algorithm can work with scaled points. So,
-           using this function results in RBF models which can be used  in
-           ALGLIB 3.11 or later. Previous versions of the library will  be
-           unable  to unserialize models produced by HierarchicalRBF algo.
-
-           Any attempt to use this function with RBF-ML or QNN  algorithms
-           will result  in  -3  error  code   being   returned  (incorrect
-           algorithm).
+IMPORTANT: only modern RBF algorithms  support  variable  scaling.  Legacy
+           algorithms like RBF-ML or QNN algorithms  will  result  in   -3
+           completion code being returned (incorrect algorithm).
 
 Inputs:
     R       -   RBF model, initialized by rbfcreate() call.
@@ -20881,12 +21339,20 @@ This  function  sets  zero  term (model is a sum of radial basis functions
 without polynomial term). This function won't have effect until next  call
 to RBFBuildModel().
 
+IMPORTANT: only  Gaussian  RBFs  (HRBF  algorithm)  provide  interpolation
+           guarantees when no polynomial term is used.  Most  other  RBFs,
+           including   biharmonic  splines,   thin   plate   splines   and
+           multiquadrics, require at least constant term  (biharmonic  and
+           multiquadric) or linear one (thin plate splines)  in  order  to
+           guarantee non-degeneracy of linear systems being solved.
+
+           Although  failures  are  exceptionally  rare,  some  small  toy
+           problems still may result in degenerate linear systems. Thus,it
+           is advised to use constant/linear term, unless one is 100% sure
+           that he needs zero term.
+
 Inputs:
     S       -   RBF model, initialized by RBFCreate() call
-
-NOTE: this   function  has   some   serialization-related  subtleties.  We
-      recommend you to study serialization examples from ALGLIB  Reference
-      Manual if you want to perform serialization of your models.
 ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -20923,6 +21389,104 @@ ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 <pre class=declaration>
 <b>void</b> rbftscalcbuf(rbfmodel s, rbfcalcbuffer buf, real_1d_array x, real_1d_array &amp;y);
 </pre>
+<a name=sub_rbftsdiffbuf></a><h6 class=pageheader>rbftsdiffbuf Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates values of the RBF model and  its  derivatives  at
+the given point, using external buffer object (internal temporaries of the
+RBF model are not modified).
+
+This function allows to use same RBF model object  in  different  threads,
+assuming  that  different   threads  use different instances of the buffer
+structure.
+
+This function returns 0.0 in Y and/or DY in the following cases:
+* the model is not initialized (Y == 0, DY == 0)
+* the gradient is undefined at the trial point. Some basis  functions have
+  discontinuous derivatives at the interpolation nodes:
+  * biharmonic splines f == r have no Hessian and no gradient at the nodes
+  In these cases only DY is set to zero (Y is still returned)
+
+Inputs:
+    S       -   RBF model, may be shared between different threads
+    Buf     -   buffer object created for this particular instance of  RBF
+                model with rbfcreatecalcbuffer().
+    X       -   coordinates, array[NX].
+                X may have more than NX elements, in this case only
+                leading NX will be used.
+    Y, DY   -   possibly preallocated arrays; if array size is large enough
+                to store results, this function does not  reallocate  array
+                to fit output size exactly.
+
+Outputs:
+    Y       -   function value, array[NY].
+    DY      -   derivatives, array[NX*NY]:
+                * Y[I*NX+J] with 0 &le; I &lt; NY and 0 &le; J &lt; NX  stores derivative of
+                  function component I with respect to input J.
+                * for NY == 1 it is simply NX-dimensional gradient of the
+                  scalar NX-dimensional function
+                Zero is returned when the first derivative is undefined.
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbftsdiffbuf(rbfmodel s, rbfcalcbuffer buf, real_1d_array x, real_1d_array &amp;y, real_1d_array &amp;dy);
+</pre>
+<a name=sub_rbftshessbuf></a><h6 class=pageheader>rbftshessbuf Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates values of the RBF model and  its first and second
+derivatives (Hessian matrix) at the given  point,  using  external  buffer
+object (internal temporaries of the RBF  model  are  not  modified).
+
+This function allows to use same RBF model object  in  different  threads,
+assuming  that  different   threads  use different instances of the buffer
+structure.
+
+This function returns 0 in Y and/or DY and/or D2Y in the following cases:
+* the model is not initialized (Y == 0, DY == 0, D2Y == 0)
+* the gradient and/or Hessian is undefined at the trial point.  Some basis
+  functions have discontinuous derivatives at the interpolation nodes:
+  * thin plate splines have no Hessian at the nodes
+  * biharmonic splines f == r have no Hessian and no gradient at the  nodes
+  In these cases only corresponding derivative is set  to  zero,  and  the
+  rest of the derivatives is still returned.
+
+Inputs:
+    S       -   RBF model, may be shared between different threads
+    Buf     -   buffer object created for this particular instance of  RBF
+                model with rbfcreatecalcbuffer().
+    X       -   coordinates, array[NX].
+                X may have more than NX elements, in this case only
+                leading NX will be used.
+    Y,DY,D2Y-   possible preallocated output arrays. If these  arrays  are
+                smaller than  required  to  store  the  result,  they  are
+                automatically reallocated. If array is large enough, it is
+                not resized.
+
+Outputs:
+    Y       -   function value, array[NY].
+    DY      -   first derivatives, array[NY*NX]:
+                * Y[I*NX+J] with 0 &le; I &lt; NY and 0 &le; J &lt; NX  stores derivative of
+                  function component I with respect to input J.
+                * for NY == 1 it is simply NX-dimensional gradient of the
+                  scalar NX-dimensional function
+                Zero is returned when the first derivative is undefined.
+    D2Y     -   second derivatives, array[NY*NX*NX]:
+                * for NY == 1 it is NX*NX array that stores  Hessian  matrix,
+                  with Y[I*NX+J] == Y[J*NX+I].
+                * for  a  vector-valued  RBF  with  NY &gt; 1  it  contains  NY
+                  subsequently stored Hessians: an element Y[K*NX*NX+I*NX+J]
+                  with  0 &le; K &lt; NY,  0 &le; I &lt; NX  and  0 &le; J &lt; NX    stores   second
+                  derivative of the function #K  with  respect  to  inputs
+                  #I and #J.
+                Zero is returned when the second derivative is undefined.
+ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbftshessbuf(rbfmodel s, rbfcalcbuffer buf, real_1d_array x, real_1d_array &amp;y, real_1d_array &amp;dy, real_1d_array &amp;d2y);
+</pre>
 <a name=sub_rbfunpack></a><h6 class=pageheader>rbfunpack Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -20934,16 +21498,38 @@ Inputs:
 Outputs:
     NX      -   dimensionality of argument
     NY      -   dimensionality of the target function
-    XWR     -   model information, array[NC,NX+NY+1].
-                One row of the array corresponds to one basis function:
+    XWR     -   model  information ,  2D  array.  One  row  of  the  array
+                corresponds to one basis function.
+                For ModelVersion == 1 we have NX+NY+1 columns:
                 * first NX columns  - coordinates of the center
-                * next NY columns   - weights, one per dimension of the
-                                      function being modelled
-                For ModelVersion == 1:
+                * next  NY columns  - weights, one per dimension of the
+                                      function being modeled
                 * last column       - radius, same for all dimensions of
-                                      the function being modelled
-                For ModelVersion == 2:
+                                      the function being modeled
+                For ModelVersion == 2 we have NX+NY+NX columns:
+                * first NX columns  - coordinates of the center
+                * next  NY columns  - weights, one per dimension of the
+                                      function being modeled
                 * last NX columns   - radii, one per dimension
+                For ModelVersion == 3 we have NX+NY+NX+3 columns:
+                * first NX columns  - coordinates of the center
+                * next  NY columns  - weights, one per dimension of the
+                                      function being modeled
+                * next NX columns   - radii, one per dimension
+                * next column       - basis function type:
+                                      * 1  for f == r
+                                      * 2  for f == r^2*ln(r)
+                                      * 10 for multiquadric f == sqrt(r^2+alpha^2)
+                * next column       - basis function parameter:
+                                      * alpha, for basis function type 10
+                                      * ignored (zero) for other basis function types
+                * next column       - point index in the original dataset,
+                                      or -1 for an artificial node created
+                                      by the solver. The algorithm may reorder
+                                      the nodes, drop some nodes or add
+                                      artificial nodes. Thus, one parsing
+                                      this column should expect all these
+                                      kinds of alterations in the dataset.
     NC      -   number of the centers
     V       -   polynomial  term , array[NY,NX+1]. One row per one
                 dimension of the function being modelled. First NX
@@ -20954,6 +21540,8 @@ Outputs:
                   compatible with ALGLIB 3.10 or earlier.
                 * 2 - for models created by HierarchicalRBF, requires
                   ALGLIB 3.11 or later
+                * 3 - for models created by DDM-RBF, requires
+                  ALGLIB 3.19 or later
 ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23530,21 +24118,21 @@ Result:
                 Q-th row stores decomposition for T-th component of the
                 vector-valued function
 
-                Tbl[Q,0] = X[i]
-                Tbl[Q,1] = X[i+1]
-                Tbl[Q,2] = Y[j]
-                Tbl[Q,3] = Y[j+1]
-                Tbl[Q,4] = Z[k]
-                Tbl[Q,5] = Z[k+1]
+                Tbl[Q,0]  == X[i]
+                Tbl[Q,1]  == X[i+1]
+                Tbl[Q,2]  == Y[j]
+                Tbl[Q,3]  == Y[j+1]
+                Tbl[Q,4]  == Z[k]
+                Tbl[Q,5]  == Z[k+1]
 
-                Tbl[Q,6] = C000
-                Tbl[Q,7] = C100
-                Tbl[Q,8] = C010
-                Tbl[Q,9] = C110
-                Tbl[Q,10]= C001
-                Tbl[Q,11]= C101
-                Tbl[Q,12]= C011
-                Tbl[Q,13]= C111
+                Tbl[Q,6]  == C000
+                Tbl[Q,7]  == C100
+                Tbl[Q,8]  == C010
+                Tbl[Q,9]  == C110
+                Tbl[Q,10] == C001
+                Tbl[Q,11] == C101
+                Tbl[Q,12] == C011
+                Tbl[Q,13] == C111
             On each grid square spline is equals to:
                 S(x) = SUM(c[i,j,k]*(x^i)*(y^j)*(z^k), i = 0..1, j = 0..1, k = 0..1)
                 t = x-x[j]
@@ -42184,6 +42772,10 @@ ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 ]</font>
 <h5>Functions</h5><font size=2>[
 <a href=#sub_lptestproblemcreate class=toc>lptestproblemcreate</a> |
+<a href=#sub_lptestproblemgetm class=toc>lptestproblemgetm</a> |
+<a href=#sub_lptestproblemgetn class=toc>lptestproblemgetn</a> |
+<a href=#sub_lptestproblemgettargetf class=toc>lptestproblemgettargetf</a> |
+<a href=#sub_lptestproblemhasknowntarget class=toc>lptestproblemhasknowntarget</a> |
 <a href=#sub_lptestproblemserialize class=toc>lptestproblemserialize</a> |
 <a href=#sub_lptestproblemsetbc class=toc>lptestproblemsetbc</a> |
 <a href=#sub_lptestproblemsetcost class=toc>lptestproblemsetcost</a> |
@@ -42215,6 +42807,54 @@ ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> lptestproblemcreate(ae_int_t n, <b>bool</b> hasknowntarget, <b>double</b> targetf, lptestproblem &amp;p);
+</pre>
+<a name=sub_lptestproblemgetm></a><h6 class=pageheader>lptestproblemgetm Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Query test problem info
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+ae_int_t lptestproblemgetm(lptestproblem p);
+</pre>
+<a name=sub_lptestproblemgetn></a><h6 class=pageheader>lptestproblemgetn Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Query test problem info
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+ae_int_t lptestproblemgetn(lptestproblem p);
+</pre>
+<a name=sub_lptestproblemgettargetf></a><h6 class=pageheader>lptestproblemgettargetf Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Query test problem info
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>double</b> lptestproblemgettargetf(lptestproblem p);
+</pre>
+<a name=sub_lptestproblemhasknowntarget></a><h6 class=pageheader>lptestproblemhasknowntarget Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Query test problem info
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>bool</b> lptestproblemhasknowntarget(lptestproblem p);
 </pre>
 <a name=sub_lptestproblemserialize></a><h6 class=pageheader>lptestproblemserialize Function</h6>
 <hr width=600 align=left>

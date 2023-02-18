@@ -6592,7 +6592,7 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup) {
       return result;
    }
    *lambdav *= lambdaup * (*nu);
-   *nu *= 2;
+   *nu *= 2.0;
    result = true;
    return result;
 }

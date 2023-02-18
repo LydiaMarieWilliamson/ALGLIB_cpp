@@ -67,6 +67,10 @@ namespace alglib_impl {
 #define AE_SER_ENTRY_LENGTH	11
 #define AE_SER_ENTRIES_PER_ROW	5
 
+#if defined ALGLIB_REDZONE
+#   define _ALGLIB_REDZONE_VAL                 0x3c
+#endif
+
 // These declarations are used to ensure, at compile-time, that
 //	sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_uint64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
 // They are implemented by the following general method to verify the condition Cond:
@@ -79,6 +83,9 @@ ForceCond(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t) == 4);
 ForceCond(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t) == 8);
 ForceCond(_ae_uint64_t_must_be_64_bits_wide, (int)sizeof(ae_uint64_t) == 8);
 ForceCond(_ae_int_t_must_be_pointer_sized, (int)sizeof(ae_int_t) == (int)sizeof(void *));
+#if defined ALGLIB_REDZONE
+ForceCond(_ae_redzone_must_be_multiple_of_64, (ALGLIB_REDZONE) >= (AE_DATA_ALIGN) && (ALGLIB_REDZONE) % (AE_DATA_ALIGN) == 0);
+#endif
 #undef ForceCond
 
 // Allocation tracking, for debugging.
@@ -641,18 +648,30 @@ void *aligned_malloc(size_t size, size_t alignment) {
 #else
    if (size == 0 || _force_malloc_failure || _malloc_failure_after > 0 && _alloc_counter_total >= _malloc_failure_after) return NULL;
 // Allocate, making the appropriate padding adjustments for any alignment > 1.
-   size_t alloc_size = sizeof(void *) + size;
+   size_t alloc_size = 2 * sizeof(void *) + size;
    if (alignment > 1) alloc_size += alignment - 1;
+#   if defined ALGLIB_REDZONE
+   alloc_size += 2 * (ALGLIB_REDZONE);
+#   endif
    void *block = malloc(alloc_size); if (block == NULL) return NULL;
-   char *result = (char *)block + sizeof block;
-   if (alignment > 1) result = (char *)ae_align(result, alignment);
+   char *result = (char *)block + 2 * sizeof block;
+   result = (char *)ae_align(result, alignment);
    *(void **)(result - sizeof block) = block;
+#   if defined ALGLIB_REDZONE
+   char *redzone0 = result;
+   result = redzone0 + (ALGLIB_REDZONE);
+   char *redzone1 = result + size;
+   ae_assert(ae_misalignment(result, alignment) == 0, "ALGLIB: improperly configured red zone size - is not multiple of the current alignment", NULL);
+   *(void **)(redzone0 - 2 * sizeof block) = redzone1;
+   memset(redzone0, _ALGLIB_REDZONE_VAL, ALGLIB_REDZONE);
+   memset(redzone1, _ALGLIB_REDZONE_VAL, ALGLIB_REDZONE);
+#   endif
 // Update whichever counters the use-flags are set for.
    if (_use_alloc_counter) {
       ae_optional_atomic_add_i(&_alloc_counter, 1);
       ae_optional_atomic_add_i(&_alloc_counter_total, 1);
    }
-   if (_use_dbg_counters) ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t)size);
+   if (_use_dbg_counters) ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int_t)size);
 // Return the result as a generic pointer.
    return (void *)result;
 #endif
@@ -661,6 +680,8 @@ void *aligned_malloc(size_t size, size_t alignment) {
 static void *aligned_extract_ptr(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return NULL;
+#elif defined ALGLIB_REDZONE
+   return block == NULL ? NULL : *(void **)((char *)block - (ALGLIB_REDZONE) - sizeof block);
 #else
    return block == NULL ? NULL : *(void **)((char *)block - sizeof block);
 #endif
@@ -670,7 +691,26 @@ void aligned_free(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    ae_static_free(block);
 #else
+// Handle NULL input.
    if (block == NULL) return;
+// If red zone is activated, check it before deallocation.
+#   if defined ALGLIB_REDZONE
+   char *redzone0 = (char *)block - (ALGLIB_REDZONE);
+   char *redzone1 = (char *)*(void **)(redzone0 - 2 * sizeof block);
+   for (ae_int_t i = 0; i < (ALGLIB_REDZONE); i++) {
+      if (redzone0[i] != _ALGLIB_REDZONE_VAL) {
+         const char *msg = "ALGLIB: red zone corruption is detected (write prior to the block beginning?)";
+         fprintf(stderr, "%s\n", msg);
+         ae_assert(false, msg, NULL);
+      }
+      if (redzone1[i] != _ALGLIB_REDZONE_VAL) {
+         const char *msg = "ALGLIB: red zone corruption is detected (write past the end of the block?)";
+         fprintf(stderr, "%s\n", msg);
+         ae_assert(false, msg, NULL);
+      }
+   }
+#   endif
+// Free the memory and optionally update allocation counters.
    free(aligned_extract_ptr(block));
    if (_use_alloc_counter) ae_optional_atomic_sub_i(&_alloc_counter, 1);
 #endif
@@ -1984,7 +2024,7 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
 // *	The recycled object is KEPT in pool and ownership is NOT passed to pptr.
 // *	If there are no recycled objects left in pool or pool is not seeded, then NULL is stored into pptr.
 // *	Any non-NULL pointer owned by pptr is deallocated before storing the value retrieved from pool.
-// *	This function is NOT thread-safe
+// *	This function IS NOT thread-safe
 // *	You should NOT modify pool during enumeration (although you can modify the state of the objects retrieved from pool).
 void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Modify the internal enumeration counter.

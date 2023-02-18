@@ -17,6 +17,7 @@ struct ablasfplayground {
    ae_vector x0;
    ae_vector x1;
    ae_vector x2;
+   ae_vector x3;
    ae_vector ix0;
    ae_vector ix1;
    ae_vector bx0;
@@ -30,6 +31,7 @@ static void ablasfplayground_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->x0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->x1, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->x2, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x3, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->ix0, 0, DT_INT, make_automatic);
    ae_vector_init(&p->ix1, 0, DT_INT, make_automatic);
    ae_vector_init(&p->bx0, 0, DT_BOOL, make_automatic);
@@ -45,6 +47,7 @@ static void ablasfplayground_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->x0, &src->x0, make_automatic);
    ae_vector_copy(&dst->x1, &src->x1, make_automatic);
    ae_vector_copy(&dst->x2, &src->x2, make_automatic);
+   ae_vector_copy(&dst->x3, &src->x3, make_automatic);
    ae_vector_copy(&dst->ix0, &src->ix0, make_automatic);
    ae_vector_copy(&dst->ix1, &src->ix1, make_automatic);
    ae_vector_copy(&dst->bx0, &src->bx0, make_automatic);
@@ -58,6 +61,7 @@ static void ablasfplayground_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->x0, make_automatic);
    ae_vector_free(&p->x1, make_automatic);
    ae_vector_free(&p->x2, make_automatic);
+   ae_vector_free(&p->x3, make_automatic);
    ae_vector_free(&p->ix0, make_automatic);
    ae_vector_free(&p->ix1, make_automatic);
    ae_vector_free(&p->bx0, make_automatic);
@@ -307,6 +311,20 @@ static void refrmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx) {
    }
 }
 
+static void refrsqrtv(ae_int_t n, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] = sqrt(x->xR[i]);
+   }
+}
+
+static void refrsqrtr(ae_int_t n, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[rowidx][i] = sqrt(x->xyR[rowidx][i]);
+   }
+}
+
 static void refrmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
@@ -332,6 +350,27 @@ static void refrmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x) 
    ae_int_t i;
    for (i = 0; i < n; i++) {
       x->xR[i] *= y->xyR[rowidx][i];
+   }
+}
+
+static void refrmergedivv(ae_int_t n, RVector *y, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] /= y->xR[i];
+   }
+}
+
+static void refrmergedivvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[rowidx][i] /= y->xR[i];
+   }
+}
+
+static void refrmergedivrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] /= y->xyR[rowidx][i];
    }
 }
 
@@ -538,7 +577,7 @@ static void reftrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isup
             v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
-         if (v == 0) {
+         if (v == 0.0) {
             continue;
          }
          for (j = i + 1; j < n; j++) {
@@ -554,7 +593,7 @@ static void reftrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isup
             v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
-         if (v == 0) {
+         if (v == 0.0) {
             continue;
          }
          for (j = 0; j < i; j++) {
@@ -645,6 +684,8 @@ static void testablasfunit_initplayground(ae_int_t minlen, ae_int_t iseed, ablas
    k++;
    ae_vector_set_length(&s->x2, minlen + iround(maxpad * sqr(sin(k))));
    k++;
+   ae_vector_set_length(&s->x3, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
    ae_vector_set_length(&s->ix0, minlen + iround(maxpad * sqr(sin(k))));
    k++;
    ae_vector_set_length(&s->ix1, minlen + iround(maxpad * sqr(sin(k))));
@@ -661,6 +702,7 @@ static void testablasfunit_initplayground(ae_int_t minlen, ae_int_t iseed, ablas
    k = testablasfunit_pseudorandominit1(&s->x0, k);
    k = testablasfunit_pseudorandominit1(&s->x1, k);
    k = testablasfunit_pseudorandominit1(&s->x2, k);
+   k = testablasfunit_pseudorandominit1(&s->x3, k);
    k = testablasfunit_pseudorandominit1i(&s->ix0, k);
    k = testablasfunit_pseudorandominit1i(&s->ix1, k);
    k = testablasfunit_pseudorandominit1b(&s->bx0, k);
@@ -752,6 +794,7 @@ static double testablasfunit_compareplaygrounds(ablasfplayground *s0, ablasfplay
    result = rmax2(result, testablasfunit_bcmp1(&s0->bx0, &s1->bx0));
    result = rmax2(result, testablasfunit_bcmp1(&s0->bx1, &s1->bx1));
    result = rmax2(result, testablasfunit_rcmp1(&s0->x2, &s1->x2));
+   result = rmax2(result, testablasfunit_rcmp1(&s0->x3, &s1->x3));
    result = rmax2(result, testablasfunit_rcmp2(&s0->a0, &s1->a0));
    result = rmax2(result, testablasfunit_rcmp2(&s0->a1, &s1->a1));
    return result;
@@ -922,6 +965,75 @@ static bool testablasfunit_testxadd(ae_int_t maxn, double tol) {
    return Ok;
 }
 
+static void testablasfunit_refrmuladdv(ae_int_t n, RVector *y, RVector *z, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] += y->xR[i] * z->xR[i];
+   }
+}
+
+static void testablasfunit_refrnegmuladdv(ae_int_t n, RVector *y, RVector *z, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] -= y->xR[i] * z->xR[i];
+   }
+}
+
+static void testablasfunit_refrcopymuladdv(ae_int_t n, RVector *y, RVector *z, RVector *x, RVector *r) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      r->xR[i] = x->xR[i] + y->xR[i] * z->xR[i];
+   }
+}
+
+static void testablasfunit_refrcopynegmuladdv(ae_int_t n, RVector *y, RVector *z, RVector *x, RVector *r) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      r->xR[i] = x->xR[i] - y->xR[i] * z->xR[i];
+   }
+}
+
+static bool testablasfunit_testxmuladd(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xMulAddXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmuladdv(n, &s0.x0, &s0.x1, &s0.x2);
+      testablasfunit_refrmuladdv(n, &s1.x0, &s1.x1, &s1.x2);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rnegmuladdv(n, &s0.x0, &s0.x1, &s0.x2);
+      testablasfunit_refrnegmuladdv(n, &s1.x0, &s1.x1, &s1.x2);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopymuladdv(n, &s0.x0, &s0.x1, &s0.x2, &s0.x3);
+      testablasfunit_refrcopymuladdv(n, &s1.x0, &s1.x1, &s1.x2, &s1.x3);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopynegmuladdv(n, &s0.x0, &s0.x1, &s0.x2, &s0.x3);
+      testablasfunit_refrcopynegmuladdv(n, &s1.x0, &s1.x1, &s1.x2, &s1.x3);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 static bool testablasfunit_testxmul(ae_int_t maxn, double tol) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -956,6 +1068,39 @@ static bool testablasfunit_testxmul(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       rmulvx(n / 2, alpha, &s0.x0, offsx);
       refrmulvx(n / 2, alpha, &s1.x0, offsx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxsqrt(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   ae_int_t ridx;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xAddXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      ridx = randominteger(imax2(n, 1));
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rsqrtv(n, &s0.x0);
+      refrsqrtv(n, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rsqrtr(n, &s0.a0, ridx);
+      refrsqrtr(n, &s1.a0, ridx);
       Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
    // Increment seed
       iseed++;
@@ -1010,6 +1155,7 @@ static bool testablasfunit_testxmax(ae_int_t maxn, double tol) {
 static bool testablasfunit_testxmerge(ae_int_t maxn, double tol) {
    ae_frame _frame_block;
    ae_int_t n;
+   ae_int_t i;
    ae_int_t iseed;
    ae_int_t ridx;
    bool Ok;
@@ -1037,6 +1183,33 @@ static bool testablasfunit_testxmerge(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       rmergemulrv(n, &s0.a0, ridx, &s0.x0);
       refrmergemulrv(n, &s1.a0, ridx, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      for (i = 0; i < n; i++) {
+         s0.x0.xR[i] += 0.01 * possign(s0.x0.xR[i]);
+         s1.x0.xR[i] += 0.01 * possign(s1.x0.xR[i]);
+      }
+      rmergedivv(n, &s0.x0, &s0.x1);
+      refrmergedivv(n, &s1.x0, &s1.x1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      for (i = 0; i < n; i++) {
+         s0.x0.xR[i] += 0.01 * possign(s0.x0.xR[i]);
+         s1.x0.xR[i] += 0.01 * possign(s1.x0.xR[i]);
+      }
+      rmergedivvr(n, &s0.x0, &s0.a0, ridx);
+      refrmergedivvr(n, &s1.x0, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      for (i = 0; i < n; i++) {
+         s0.a0.xyR[ridx][i] += 0.01 * possign(s0.a0.xyR[ridx][i]);
+         s1.a0.xyR[ridx][i] += 0.01 * possign(s1.a0.xyR[ridx][i]);
+      }
+      rmergedivrv(n, &s0.a0, ridx, &s0.x0);
+      refrmergedivrv(n, &s1.a0, ridx, &s1.x0);
       Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
@@ -1325,8 +1498,10 @@ bool testablasf() {
    bool xaddOk;
    bool xmulOk;
    bool xmaxOk;
+   bool xsqrtOk;
    bool xmergeOk;
    bool xcopyOk;
+   bool xmuladdOk;
    bool xgemvOk;
    bool xgerOk;
    bool xtrsvOk;
@@ -1336,13 +1511,15 @@ bool testablasf() {
    xsetOk = testablasfunit_testxset(maxn, tol);
    xaddOk = testablasfunit_testxadd(maxn, tol);
    xmulOk = testablasfunit_testxmul(maxn, tol);
+   xsqrtOk = testablasfunit_testxsqrt(maxn, tol);
    xmaxOk = testablasfunit_testxmax(maxn, tol);
    xmergeOk = testablasfunit_testxmerge(maxn, tol);
    xcopyOk = testablasfunit_testxcopy(maxn, tol);
+   xmuladdOk = testablasfunit_testxmuladd(maxn, tol);
    xgemvOk = testablasfunit_testxgemv(maxn, tol);
    xgerOk = testablasfunit_testxger(maxn, tol);
    xtrsvOk = testablasfunit_testxtrsv(maxn, tol);
-   Ok = xdotOk && xsetOk && xaddOk && xmulOk && xmaxOk && xmergeOk && xcopyOk && xgemvOk && xgerOk && xtrsvOk;
+   Ok = xdotOk && xsetOk && xaddOk && xmulOk && xsqrtOk && xmaxOk && xmergeOk && xcopyOk && xmuladdOk && xgemvOk && xgerOk && xtrsvOk;
 // The final report.
    if (!Ok || !silent) {
       printf("ABLASF Tests\n");
@@ -1350,8 +1527,10 @@ bool testablasf() {
       printf("xSetXX:                                   %s\n", xsetOk ? "Ok" : "Failed");
       printf("xAddXX:                                   %s\n", xaddOk ? "Ok" : "Failed");
       printf("xMulXX:                                   %s\n", xmulOk ? "Ok" : "Failed");
+      printf("xSqrtXX:                                  %s\n", xsqrtOk ? "Ok" : "Failed");
       printf("xMaxXX:                                   %s\n", xmaxOk ? "Ok" : "Failed");
       printf("xMergeXX:                                 %s\n", xmergeOk ? "Ok" : "Failed");
+      printf("xMulAddXX:                                %s\n", xmuladdOk ? "Ok" : "Failed");
       printf("xCopyXX:                                  %s\n", xcopyOk ? "Ok" : "Failed");
       printf("xGEMVx:                                   %s\n", xgemvOk ? "Ok" : "Failed");
       printf("xGERx:                                    %s\n", xgerOk ? "Ok" : "Failed");
@@ -5658,7 +5837,7 @@ static bool testmatgenunit_testeult() {
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
    NewMatrix(b, 0, 0, DT_COMPLEX);
-   eps = 2 * machineepsilon;
+   eps = 2.0 * machineepsilon;
    range = 100.0 * randommid();
    for (n = 1; n <= 15; n++) {
       c = 900.0 * randomreal() + 100.0;
@@ -6623,10 +6802,12 @@ bool testtsort() {
    NewVector(i3, 0, DT_INT);
    NewVector(a4, 0, DT_INT);
    NewVector(a5, 0, DT_INT);
+   NewVector(a6, 0, DT_INT);
    NewVector(pa4, 0, DT_INT);
    NewVector(ar, 0, DT_REAL);
    NewVector(ar2, 0, DT_REAL);
    NewVector(ai, 0, DT_INT);
+   NewVector(ai2, 0, DT_INT);
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
    NewVector(bufr1, 0, DT_REAL);
@@ -6653,9 +6834,11 @@ bool testtsort() {
          ae_vector_set_length(&a3, n);
          ae_vector_set_length(&a4, n);
          ae_vector_set_length(&a5, n);
+         ae_vector_set_length(&a6, n);
          ae_vector_set_length(&ar, n);
          ae_vector_set_length(&ar2, n);
          ae_vector_set_length(&ai, n);
+         ae_vector_set_length(&ai2, n);
          for (i = 0; i < n; i++) {
             a.xR[i] = randominteger(100000000);
             a0.xR[i] = a.xR[i];
@@ -6664,9 +6847,11 @@ bool testtsort() {
             a3.xR[i] = a.xR[i];
             a4.xZ[i] = iround(a.xR[i]);
             a5.xZ[i] = iround(a.xR[i]);
+            a6.xZ[i] = iround(a.xR[i]);
             ar.xR[i] = i;
             ar2.xR[i] = i;
             ai.xZ[i] = i;
+            ai2.xZ[i] = i;
          }
          tagsort(&a0, n, &p1, &p2);
          Ok = Ok && testtsortunit_testsortresults(&a0, &p1, &p2, &a, n);
@@ -6695,6 +6880,10 @@ bool testtsort() {
             for (i = 0; i < n; i++) {
                Ok = Ok && a5.xZ[i] == a0.xR[i];
             }
+            tagsortmiddleii(&a6, &ai2, n);
+            for (i = 0; i < n; i++) {
+               Ok = Ok && a6.xZ[i] == a0.xR[i] && ai2.xZ[i] == p1.xZ[i];
+            }
          }
       // Non-distinct sort.
       // We test that keys are correctly reordered, but do NOT test order of values.
@@ -6707,9 +6896,11 @@ bool testtsort() {
          ae_vector_set_length(&a3, n);
          ae_vector_set_length(&a4, n);
          ae_vector_set_length(&a5, n);
+         ae_vector_set_length(&a6, n);
          ae_vector_set_length(&ar, n);
          ae_vector_set_length(&ar2, n);
          ae_vector_set_length(&ai, n);
+         ae_vector_set_length(&ai2, n);
          for (i = 0; i < n; i++) {
             a.xR[i] = (n - i) / 2;
             a0.xR[i] = a.xR[i];
@@ -6718,9 +6909,11 @@ bool testtsort() {
             a3.xR[i] = a.xR[i];
             a4.xZ[i] = iround(a.xR[i]);
             a5.xZ[i] = iround(a.xR[i]);
+            a6.xZ[i] = iround(a.xR[i]);
             ar.xR[i] = i;
             ar2.xR[i] = i;
             ai.xZ[i] = i;
+            ai2.xZ[i] = i;
          }
          tagsort(&a0, n, &p1, &p2);
          Ok = Ok && testtsortunit_testsortresults(&a0, &p1, &p2, &a, n);
@@ -6743,6 +6936,10 @@ bool testtsort() {
          tagsortmiddlei(&a5, n);
          for (i = 0; i < n; i++) {
             Ok = Ok && a5.xZ[i] == a0.xR[i];
+         }
+         tagsortmiddleii(&a6, &ai2, n);
+         for (i = 0; i < n; i++) {
+            Ok = Ok && a6.xZ[i] == a0.xR[i];
          }
       // 'All same' sort
       // We test that keys are correctly reordered, but do NOT test order of values.
@@ -6837,12 +7034,14 @@ bool testtsort() {
          ae_vector_set_length(&i3, m);
          ae_vector_set_length(&ar, m);
          ae_vector_set_length(&ar2, m);
+         ae_vector_set_length(&ai2, m);
          for (i = 0; i < m; i++) {
             i1.xZ[i] = randominteger(100000000);
             i2.xZ[i] = i1.xZ[i];
             i3.xZ[i] = i1.xZ[i];
             ar.xR[i] = i;
             ar2.xR[i] = i;
+            ai2.xZ[i] = i;
          }
          for (i = 0; i < n; i++) {
             i1.xZ[i] = i1.xZ[offs + i];
@@ -6852,11 +7051,15 @@ bool testtsort() {
          for (i = 1; i < n; i++) {
             distinctvals = distinctvals && i1.xZ[i] != i1.xZ[i - 1];
          }
-         if (distinctvals) {
-            tagsortmiddleir(&i2, &ar2, n, offs);
-            for (i = 0; i < n; i++) {
-               Ok = Ok && i2.xZ[offs + i] == i1.xZ[i] && ar2.xR[offs + i] == ar.xR[i];
-            }
+         tagsortmiddleir(&i2, &ar2, n, offs);
+         for (i = 0; i < n; i++) {
+            Ok = Ok && i2.xZ[offs + i] == i1.xZ[i];
+            Ok = Ok && (!distinctvals || ar2.xR[offs + i] == ar.xR[i]);
+         }
+         tagsortmiddleii(&i3, &ai2, n, offs);
+         for (i = 0; i < n; i++) {
+            Ok = Ok && i3.xZ[offs + i] == i1.xZ[i];
+            Ok = Ok && (!distinctvals || ai2.xZ[offs + i] == ar.xR[i]);
          }
       }
    }
@@ -14986,7 +15189,7 @@ bool testtrlinsolve() {
                      isunit = cntu == 0;
                      istrans = cntt == 0;
                   // Skip meaningless combinations of parameters:
-                  // (matrix is singular) AND (matrix is unit diagonal)
+                  // (matrix is singular) and (matrix is unit diagonal)
                      if (cntm == 2 && isunit) {
                         continue;
                      }
@@ -16657,7 +16860,7 @@ bool testxblas() {
       rx.xR[n - 1] = 0.0;
       xdot(&rx, &ry, n, &temp, &rv2, &rv2err);
       exactnessOk = exactnessOk && rv2err >= 0.0;
-      exactnessOk = exactnessOk && rv2err <= 4 * machineepsilon * fabs(ry.xR[0]);
+      exactnessOk = exactnessOk && rv2err <= 4.0 * machineepsilon * fabs(ry.xR[0]);
       exactnessOk = exactnessOk && NearAtR(rv2, ry.xR[0], rv2err);
    // First test: X + X + ... + X = N*X
       s = exp(imax2(pass, 50));
@@ -16673,7 +16876,7 @@ bool testxblas() {
       }
       xdot(&rx, &ry, n, &temp, &rv2, &rv2err);
       exactnessOk = exactnessOk && rv2err >= 0.0;
-      exactnessOk = exactnessOk && rv2err <= 4 * machineepsilon * fabs(ry.xR[0]) * n;
+      exactnessOk = exactnessOk && rv2err <= 4.0 * machineepsilon * fabs(ry.xR[0]) * n;
       exactnessOk = exactnessOk && NearAtR(rv2, n * ry.xR[0], rv2err);
    }
 // test of precision: complex
@@ -16701,7 +16904,7 @@ bool testxblas() {
       cx.xC[n - 1] = complex_from_i(0);
       xcdot(&cx, &cy, n, &temp, &cv2, &cv2err);
       exactnessOk = exactnessOk && cv2err >= 0.0;
-      exactnessOk = exactnessOk && cv2err <= 4 * machineepsilon * abscomplex(cy.xC[0]);
+      exactnessOk = exactnessOk && cv2err <= 4.0 * machineepsilon * abscomplex(cy.xC[0]);
       exactnessOk = exactnessOk && NearAtC(cv2, cy.xC[0], cv2err);
    // First test: X + X + ... + X = N*X
       s = exp(imax2(pass, 50));
@@ -16717,7 +16920,7 @@ bool testxblas() {
       }
       xcdot(&cx, &cy, n, &temp, &cv2, &cv2err);
       exactnessOk = exactnessOk && cv2err >= 0.0;
-      exactnessOk = exactnessOk && cv2err <= 4 * machineepsilon * abscomplex(cy.xC[0]) * n;
+      exactnessOk = exactnessOk && cv2err <= 4.0 * machineepsilon * abscomplex(cy.xC[0]) * n;
       exactnessOk = exactnessOk && NearAtC(cv2, ae_c_mul_d(cy.xC[0], 1.0 * n), cv2err);
    }
 // The final report.
@@ -25147,7 +25350,7 @@ static bool testminlbfgsunit_testoptguard() {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] *= 2;
+                  state.g.xR[varidx] *= 2.0;
                }
                for (i = 0; i < n; i++) {
                   state.g.xR[i] /= s.xR[i];
@@ -25185,7 +25388,7 @@ static bool testminlbfgsunit_testoptguard() {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] *= 2;
+            jacdefect.xyR[0][varidx] *= 2.0;
          }
          for (i = 0; i < n; i++) {
             jactrue.xyR[0][i] /= s.xR[i];
@@ -29742,7 +29945,7 @@ static bool testminbleicunit_testoptguard() {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] *= 2;
+                  state.g.xR[varidx] *= 2.0;
                }
                for (i = 0; i < n; i++) {
                   state.g.xR[i] /= s.xR[i];
@@ -29780,7 +29983,7 @@ static bool testminbleicunit_testoptguard() {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] *= 2;
+            jacdefect.xyR[0][varidx] *= 2.0;
          }
          for (i = 0; i < n; i++) {
             jactrue.xyR[0][i] /= s.xR[i];
@@ -35098,7 +35301,7 @@ static bool testminqpunit_generallcqptest() {
                   if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
                      tolconstr = 0.001;
                      if (akind == 3) {
-                        tolconstr *= 5;
+                        tolconstr *= 5.0;
                      }
                   } else {
                      ae_assert(false, "unexpected solver type");
@@ -39378,7 +39581,7 @@ static bool testminlmunit_testoptguard() {
                         state.j.xyR[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
-                        state.j.xyR[funcidx][varidx] *= 2;
+                        state.j.xyR[funcidx][varidx] *= 2.0;
                      }
                   }
                   if (state.needfij) {
@@ -39428,7 +39631,7 @@ static bool testminlmunit_testoptguard() {
                jacdefect.xyR[funcidx][varidx]++;
             }
             if (defecttype == 2) {
-               jacdefect.xyR[funcidx][varidx] *= 2;
+               jacdefect.xyR[funcidx][varidx] *= 2.0;
             }
             for (i = 0; i < n; i++) {
                jactrue.xyR[0][i] /= s.xR[i];
@@ -40585,7 +40788,7 @@ static bool testmincgunit_testoptguard() {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] *= 2;
+                  state.g.xR[varidx] *= 2.0;
                }
                for (i = 0; i < n; i++) {
                   state.g.xR[i] /= s.xR[i];
@@ -40623,7 +40826,7 @@ static bool testmincgunit_testoptguard() {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] *= 2;
+            jacdefect.xyR[0][varidx] *= 2.0;
          }
          for (i = 0; i < n; i++) {
             jactrue.xyR[0][i] /= s.xR[i];
@@ -44316,6 +44519,7 @@ static bool testminnlcunit_testnlc() {
    ae_int_t n;
    ae_int_t n2;
    double tolx;
+   double tolf;
    double tolg;
    ae_int_t aulits;
    double rho;
@@ -44324,6 +44528,7 @@ static bool testminnlcunit_testnlc() {
    ae_int_t cntlc;
    ae_int_t cntnlec;
    ae_int_t cntnlic;
+   ae_int_t cntactive;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -44337,6 +44542,8 @@ static bool testminnlcunit_testnlc() {
    double vy;
    double gnorm2;
    double rawgnorm2;
+   double fref;
+   double diffstep;
    ae_int_t prectype;
    ae_int_t solvertype;
    bool Ok = true;
@@ -44352,6 +44559,8 @@ static bool testminnlcunit_testnlc() {
    NewVector(s, 0, DT_REAL);
    NewVector(g, 0, DT_REAL);
    NewVector(rnlc, 0, DT_REAL);
+   NewVector(xref, 0, DT_REAL);
+   NewVector(lagmult, 0, DT_REAL);
    NewVector(ckind, 0, DT_INT);
    NewMatrix(fulla, 0, 0, DT_REAL);
    NewMatrix(c, 0, 0, DT_REAL);
@@ -44923,6 +45132,141 @@ static bool testminnlcunit_testnlc() {
                }
                ae_assert(false, "Assertion failed");
             }
+         }
+      }
+   }
+// Test a sequence of inequality constrained problems with varying N/NLIC and
+// known answer. The problem formulation is prepared as follows:
+// * first, we generate a solution point and active constraints with Lagrange
+//   multipliers of our choice; at least one constraint is active at the solution.
+// * then we select the target function to match our constraints
+// * finally, we add inactive constraints
+   rho = 1000.0;
+   tolf = 0.002;
+   aulits = 10;
+   diffstep = 0.0001;
+   for (solvertype = 0; solvertype <= testminnlcunit_maxsolvertype; solvertype++) {
+      for (n = 1; n <= 10; n++) {
+         for (cntnlic = 1; cntnlic <= 10; cntnlic++) {
+         // Create constraint matrix C that stores coefficients of quadratic
+         // constraints: first N columns store linear terms, next N columns
+         // store diagonal of the quadratic term, next column stores constant term.
+            hqrndnormalv(&rs, n, &xref);
+            cntactive = 1 + hqrnduniformi(&rs, n);
+            ae_matrix_set_length(&c, cntnlic, 2 * n + 1);
+            ae_vector_set_length(&lagmult, cntnlic);
+            rsetallocv(n, 0.0, &g);
+            for (i = 0; i < cntnlic; i++) {
+            // Generate linear and quadratic terms for a constraint, adjust its
+            // constant term depending on whether it is active or not
+               v = 0.0;
+               for (j = 0; j < n; j++) {
+                  c.xyR[i][j] = hqrndnormal(&rs);
+                  c.xyR[i][n + j] = pow(2.0, hqrndnormal(&rs));
+                  v += c.xyR[i][j] * xref.xR[j] + c.xyR[i][n + j] * sqr(xref.xR[j]);
+               }
+               c.xyR[i][2 * n] = -v;
+               if (i < cntactive) {
+               // Constraint is active, accumulate its gradient in G
+                  lagmult.xR[i] = 0.05 + pow(2.0, hqrndnormal(&rs));
+                  for (j = 0; j < n; j++) {
+                     g.xR[j] += lagmult.xR[i] * (c.xyR[i][j] + 2 * c.xyR[i][n + j] * xref.xR[j]);
+                  }
+               } else {
+               // Constraint is inactive, adjust its constant term
+                  lagmult.xR[i] = 0.0;
+                  c.xyR[i][2 * n] -= 0.1 + pow(2.0, hqrndnormal(&rs));
+               }
+            }
+            for (i = 0; i < cntnlic; i++) {
+               j = i + hqrnduniformi(&rs, cntnlic - i);
+               if (j != i) {
+                  swaprows(&c, i, j, 2 * n + 1);
+                  swapelements(&lagmult, i, j);
+               }
+            }
+         // Generate target function F that has gradient at XRef[] exactly equal to -G
+            allocv(n, &b);
+            rcopymulv(n, -1.0, &g, &b);
+            fref = rdotv(n, &b, &xref);
+         // Solve the problem
+            hqrndnormalv(&rs, n, &x0);
+            if (hqrndnormal(&rs) > 0.0) {
+               minnlccreate(n, &x0, &state);
+            } else {
+               minnlccreatef(n, &x0, diffstep, &state);
+            }
+            if (solvertype == 0) {
+               minnlcsetalgoaul(&state, rho, aulits);
+               minnlcsetcond(&state, 0.0000001, 0);
+               prectype = hqrnduniformi(&rs, 3);
+               if (prectype == 0) {
+                  minnlcsetprecinexact(&state);
+               }
+               if (prectype == 1) {
+                  minnlcsetprecexactlowrank(&state, 0);
+               }
+               if (prectype == 2) {
+                  minnlcsetprecexactrobust(&state, 0);
+               }
+            } else {
+               if (solvertype == 1) {
+                  minnlcsetalgoslp(&state);
+                  minnlcsetcond(&state, 0.000001, 0);
+               } else {
+                  if (solvertype == 2) {
+                     minnlcsetalgosqp(&state);
+                     minnlcsetcond(&state, 0.000001, 0);
+                  } else {
+                     ae_assert(false, "Assertion failed");
+                  }
+               }
+            }
+            minnlcsetnlc(&state, 0, cntnlic);
+            while (minnlciteration(&state))
+               if (state.needfi) {
+               // Evaluate target function
+                  state.fi.xR[0] = 0.0;
+                  for (i = 0; i < n; i++) {
+                     state.fi.xR[0] += b.xR[i] * state.x.xR[i];
+                  }
+               // Evaluate constraint functions
+                  k = 1;
+                  for (i = 0; i < cntnlic; i++) {
+                     state.fi.xR[k] = c.xyR[i][2 * n];
+                     for (j = 0; j < n; j++) {
+                        state.fi.xR[k] += c.xyR[i][j] * state.x.xR[j] + c.xyR[i][n + j] * sqr(state.x.xR[j]);
+                     }
+                     k++;
+                  }
+                  ae_assert(k == 1 + cntnlic, "Assertion failed");
+               } else if (state.needfij) {
+               // Evaluate target function
+                  state.fi.xR[0] = 0.0;
+                  for (i = 0; i < n; i++) {
+                     state.fi.xR[0] += b.xR[i] * state.x.xR[i];
+                     state.j.xyR[0][i] = b.xR[i];
+                  }
+               // Evaluate constraint functions
+                  k = 1;
+                  for (i = 0; i < cntnlic; i++) {
+                     state.fi.xR[k] = c.xyR[i][2 * n];
+                     for (j = 0; j < n; j++) {
+                        state.fi.xR[k] += c.xyR[i][j] * state.x.xR[j] + c.xyR[i][n + j] * sqr(state.x.xR[j]);
+                        state.j.xyR[k][j] = c.xyR[i][j] + 2 * c.xyR[i][n + j] * state.x.xR[j];
+                     }
+                     k++;
+                  }
+                  ae_assert(k == 1 + cntnlic, "Assertion failed");
+               } else ae_assert(false, "Assertion failed");
+            minnlcresults(&state, &x1, &rep);
+            Ok = Ok && isfinitevector(&x1, n);
+            Ok = Ok && rep.terminationtype > 0;
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+            Ok = Ok && NearAtR(fref, rdotv(n, &x1, &b), tolf * (rmaxabsv(n, &b) + 1.0));
          }
       }
    }
@@ -46618,7 +46962,7 @@ static bool testminnlcunit_testoptguard() {
                         state.j.xyR[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
-                        state.j.xyR[funcidx][varidx] *= 2;
+                        state.j.xyR[funcidx][varidx] *= 2.0;
                      }
                      for (i = 0; i < n; i++) {
                         state.j.xyR[0][i] /= s.xR[i];
@@ -46665,7 +47009,7 @@ static bool testminnlcunit_testoptguard() {
                   jacdefect.xyR[funcidx][varidx]++;
                }
                if (defecttype == 2) {
-                  jacdefect.xyR[funcidx][varidx] *= 2;
+                  jacdefect.xyR[funcidx][varidx] *= 2.0;
                }
                for (i = 0; i < n; i++) {
                   jactrue.xyR[0][i] /= s.xR[i];
@@ -50512,7 +50856,7 @@ static bool testminbcunit_testoptguard() {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] *= 2;
+                  state.g.xR[varidx] *= 2.0;
                }
                for (i = 0; i < n; i++) {
                   state.g.xR[i] /= s.xR[i];
@@ -50550,7 +50894,7 @@ static bool testminbcunit_testoptguard() {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] *= 2;
+            jacdefect.xyR[0][varidx] *= 2.0;
          }
          for (i = 0; i < n; i++) {
             jactrue.xyR[0][i] /= s.xR[i];
@@ -56790,7 +57134,7 @@ static bool testspline1dunit_testmonotonespline() {
    spline1dbuildmonotone(&x, &y, 3, &c);
    spline1dbuildhermite(&x, &y, &d, 3, &s2);
    for (i = 0; i <= 10; i++) {
-      v = x.xR[0] + i / 10.0 *(x.xR[2] - x.xR[0]);
+      v = x.xR[0] + i / 10.0 * (x.xR[2] - x.xR[0]);
       if (!NearAtR(spline1dcalc(&c, v), spline1dcalc(&s2, v), eps)) {
          Ok = false;
          ae_frame_leave();
@@ -56892,7 +57236,7 @@ static bool testspline1dunit_testmonotonespline() {
             y.xR[shift] = y.xR[shift - 1] + sign0 * randomreal();
          }
       }
-      delta *= 3;
+      delta *= 3.0;
       spline1dbuildmonotone(&x, &y, alln, &c);
    // Check that built function is monotone
       shift = 0;
@@ -57137,6 +57481,8 @@ static bool testspline1dunit_testsplinefitting() {
          a = rmin2(a, x.xR[i]);
          b = rmax2(b, x.xR[i]);
       }
+      mxd2 = maxrealnumber;
+      penalty = maxrealnumber;
       prevresiduals = 0.0;
       prevpenalty = maxrealnumber;
       rho = -3.0;
@@ -60716,7 +61062,7 @@ static bool testlsfitunit_testrdp() {
       y.xR[i] = sin(x.xR[i]) + 0.005 * hqrndmiduniformr(&rs);
    }
    lstfitpiecewiselinearrdpfixed(&x, &y, n, n, &x2, &y2, &nsections);
-   Ok = Ok && nsections <= n - 1;
+   Ok = Ok && nsections < n;
    ae_frame_leave();
    return Ok;
 }
@@ -65340,6 +65686,10 @@ bool testspline3d() {
 }
 
 // === rbf testing unit ===
+static const ae_int_t testrbfunit_algorithmscnt = 6;
+static const ae_int_t testrbfunit_xrbfalgocnt = 3;
+static const ae_int_t testrbfunit_xrbfc1algocnt = 2;
+static const ae_int_t testrbfunit_xrbfsmoothingalgocnt = 3;
 static const double testrbfunit_tol = 1.0E-10;
 static const ae_int_t testrbfunit_mxits = 0;
 static const double testrbfunit_heps = 1.0E-12;
@@ -65888,24 +66238,12 @@ static bool testrbfunit_specialtest() {
                return Ok;
             }
             for (i = 0; i < ny; i++) {
-               if (!NearAtR(y.xR[i], xy.xyR[0][nx + i], errtol)) {
-                  Ok = false;
-                  ae_frame_leave();
-                  return Ok;
-               }
-            }
-         // Second, test that model is constant
-            for (i = 0; i < nx; i++) {
-               x.xR[i] = randommid();
-            }
-            rbfcalc(&s, &x, &y);
-            if (y.cnt != ny) {
-               Ok = false;
-               ae_frame_leave();
-               return Ok;
-            }
-            for (i = 0; i < ny; i++) {
-               if (!NearAtR(y.xR[i], xy.xyR[0][nx + i], errtol)) {
+#if 0 //@@
+               if (!NearAtR(y.xR[i], xy.xyR[0][nx + i], errtol)) { //@@
+#else
+               if (fabs(y.xR[i] - xy.xyR[0][nx + i]) > errtol) { //@@
+#endif
+
                   Ok = false;
                   ae_frame_leave();
                   return Ok;
@@ -65965,7 +66303,7 @@ static bool testrbfunit_specialtest() {
          }
       }
    }
-// Generate a set of points (xi,yi) = (SX*i,0), and one
+// Generate a set of points (xi,yi) == (SX*i,0), and one
 // outlier (x_far,y_far) == (-1000*SX,0).
 //
 // Radii filtering should place a bound on the radius of outlier.
@@ -66219,71 +66557,184 @@ static bool testrbfunit_basicrbftest() {
 // * unpacked model containt correct radii
 // * linear term has correct form
    for (nx = 2; nx <= 3; nx++) {
-      for (ny = 1; ny <= 3; ny++) {
-         for (linterm = 1; linterm <= 3; linterm++) {
-         // prepare test problem
-            sx = pow(zx, px * (randominteger(3) - 1));
-            sy = pow(zy, py * (randominteger(3) - 1));
-            ae_vector_set_length(&x, nx);
-            ae_vector_set_length(&y, ny);
-            ae_vector_set_length(&point, nx);
-            rbfcreate(nx, ny, &s);
-            rbfsetcond(&s, testrbfunit_heps, testrbfunit_heps, testrbfunit_mxits);
-            q = 0.25 + randomreal();
-            z = 4.5 + randomreal();
-            rbfsetalgoqnn(&s, q, z);
-            if (linterm == 1) {
-               rbfsetlinterm(&s);
+      for (ny = 1; ny <= 2; ny++) {
+      // prepare test problem
+         linterm = randominteger(3) + 1;
+         sx = pow(zx, px * (randominteger(3) - 1));
+         sy = pow(zy, py * (randominteger(3) - 1));
+         ae_vector_set_length(&x, nx);
+         ae_vector_set_length(&y, ny);
+         ae_vector_set_length(&point, nx);
+         rbfcreate(nx, ny, &s);
+         rbfsetcond(&s, testrbfunit_heps, testrbfunit_heps, testrbfunit_mxits);
+         q = 0.25 + randomreal();
+         z = 4.5 + randomreal();
+         rbfsetalgoqnn(&s, q, z);
+         if (linterm == 1) {
+            rbfsetlinterm(&s);
+         }
+         if (linterm == 2) {
+            rbfsetconstterm(&s);
+         }
+         if (linterm == 3) {
+            rbfsetzeroterm(&s);
+         }
+      // start points for grid
+         for (i = 0; i < nx; i++) {
+            point.xR[i] = sx * randommid();
+         }
+      // 2-dimensional test problem
+         if (nx == 2) {
+            for (k0 = 2; k0 <= 4; k0++) {
+               for (k1 = 2; k1 <= 4; k1++) {
+                  np = k0 * k1;
+                  ae_matrix_set_length(&gp, np, nx + ny);
+               // create grid
+                  for (i = 0; i < k0; i++) {
+                     for (j = 0; j < k1; j++) {
+                        gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i;
+                        gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j;
+                        for (k = 0; k < ny; k++) {
+                           gp.xyR[i * k1 + j][nx + k] = sy * randommid();
+                        }
+                     }
+                  }
+                  rbfsetpoints(&s, &gp, np);
+                  rbfbuildmodel(&s, &rep);
+                  rbfcreatecalcbuffer(&s, &calcbuf);
+                  if (ny == 1) {
+                     ae_vector_set_length(&gpgx0, k0);
+                     ae_vector_set_length(&gpgx1, k1);
+                     for (i = 0; i < k0; i++) {
+                        gpgx0.xR[i] = point.xR[0] + sx * i;
+                     }
+                     for (i = 0; i < k1; i++) {
+                        gpgx1.xR[i] = point.xR[1] + sx * i;
+                     }
+                     rbfgridcalc2(&s, &gpgx0, k0, &gpgx1, k1, &gy);
+                     for (i = 0; i < k0; i++) {
+                        for (j = 0; j < k1; j++) {
+                           if (!NearAtR(gy.xyR[i][j], gp.xyR[i * k1 + j][nx], sy * eps)) {
+                              Ok = false;
+                              ae_frame_leave();
+                              return Ok;
+                           }
+                        }
+                     }
+                  }
+                  for (i = 0; i < np; i++) {
+                  // For each row we randomly choose a function to test
+                  // and call it. We do not call multiple functions per
+                  // row because carry-over effects may mask errors in
+                  // some function (say, it is possible that function
+                  // simply returns results from previous call of some
+                  // other function which were stored in the RBF model;
+                  // in this case, previous call with same parameters
+                  // may hide deficiencies in the function).
+                     x.xR[0] = gp.xyR[i][0];
+                     x.xR[1] = gp.xyR[i][1];
+                     fidx = randominteger(4);
+                     if (fidx == 0 && ny == 1) {
+                        y.xR[0] = rbfcalc2(&s, x.xR[0], x.xR[1]);
+                        if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
+                           Ok = false;
+                           ae_frame_leave();
+                           return Ok;
+                        }
+                     }
+                     if (fidx == 1) {
+                        rbfcalc(&s, &x, &y);
+                        for (j = 0; j < ny; j++) {
+                           if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
+                              Ok = false;
+                              ae_frame_leave();
+                              return Ok;
+                           }
+                        }
+                     }
+                     if (fidx == 2) {
+                        rbfcalcbuf(&s, &x, &y);
+                        for (j = 0; j < ny; j++) {
+                           if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
+                              Ok = false;
+                              ae_frame_leave();
+                              return Ok;
+                           }
+                        }
+                     }
+                     if (fidx == 3) {
+                        rbftscalcbuf(&s, &calcbuf, &x, &y);
+                        for (j = 0; j < ny; j++) {
+                           if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
+                              Ok = false;
+                              ae_frame_leave();
+                              return Ok;
+                           }
+                        }
+                     }
+                  }
+               // test for RBFUnpack
+                  rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
+                  if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+                  for (i = 0; i < np; i++) {
+                     if (!NearAtR(xwr.xyR[i][unx + uny], q * sx, sx * eps)) {
+                        Ok = false;
+                        ae_frame_leave();
+                        return Ok;
+                     }
+                  }
+                  if (linterm == 2) {
+                     for (i = 0; i < unx; i++) {
+                        for (j = 0; j < uny; j++) {
+                           if (v.xyR[j][i] != 0.0) {
+                              Ok = false;
+                              ae_frame_leave();
+                              return Ok;
+                           }
+                        }
+                     }
+                  }
+                  if (linterm == 3) {
+                     for (i = 0; i <= unx; i++) {
+                        for (j = 0; j < uny; j++) {
+                           if (v.xyR[j][i] != 0.0) {
+                              Ok = false;
+                              ae_frame_leave();
+                              return Ok;
+                           }
+                        }
+                     }
+                  }
+               }
             }
-            if (linterm == 2) {
-               rbfsetconstterm(&s);
-            }
-            if (linterm == 3) {
-               rbfsetzeroterm(&s);
-            }
-         // start points for grid
-            for (i = 0; i < nx; i++) {
-               point.xR[i] = sx * randommid();
-            }
-         // 2-dimensional test problem
-            if (nx == 2) {
-               for (k0 = 2; k0 <= 4; k0++) {
-                  for (k1 = 2; k1 <= 4; k1++) {
-                     np = k0 * k1;
+         }
+      // 3-dimensional test problems
+         if (nx == 3) {
+            for (k0 = 2; k0 <= 4; k0++) {
+               for (k1 = 2; k1 <= 4; k1++) {
+                  for (k2 = 2; k2 <= 4; k2++) {
+                     np = k0 * k1 * k2;
                      ae_matrix_set_length(&gp, np, nx + ny);
                   // create grid
                      for (i = 0; i < k0; i++) {
                         for (j = 0; j < k1; j++) {
-                           gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i;
-                           gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j;
-                           for (k = 0; k < ny; k++) {
-                              gp.xyR[i * k1 + j][nx + k] = sy * randommid();
+                           for (k = 0; k < k2; k++) {
+                              gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i;
+                              gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j;
+                              gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k;
+                              for (l = 0; l < ny; l++) {
+                                 gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * randommid();
+                              }
                            }
                         }
                      }
                      rbfsetpoints(&s, &gp, np);
                      rbfbuildmodel(&s, &rep);
                      rbfcreatecalcbuffer(&s, &calcbuf);
-                     if (ny == 1) {
-                        ae_vector_set_length(&gpgx0, k0);
-                        ae_vector_set_length(&gpgx1, k1);
-                        for (i = 0; i < k0; i++) {
-                           gpgx0.xR[i] = point.xR[0] + sx * i;
-                        }
-                        for (i = 0; i < k1; i++) {
-                           gpgx1.xR[i] = point.xR[1] + sx * i;
-                        }
-                        rbfgridcalc2(&s, &gpgx0, k0, &gpgx1, k1, &gy);
-                        for (i = 0; i < k0; i++) {
-                           for (j = 0; j < k1; j++) {
-                              if (!NearAtR(gy.xyR[i][j], gp.xyR[i * k1 + j][nx], sy * eps)) {
-                                 Ok = false;
-                                 ae_frame_leave();
-                                 return Ok;
-                              }
-                           }
-                        }
-                     }
                      for (i = 0; i < np; i++) {
                      // For each row we randomly choose a function to test
                      // and call it. We do not call multiple functions per
@@ -66295,9 +66746,10 @@ static bool testrbfunit_basicrbftest() {
                      // may hide deficiencies in the function).
                         x.xR[0] = gp.xyR[i][0];
                         x.xR[1] = gp.xyR[i][1];
+                        x.xR[2] = gp.xyR[i][2];
                         fidx = randominteger(4);
                         if (fidx == 0 && ny == 1) {
-                           y.xR[0] = rbfcalc2(&s, x.xR[0], x.xR[1]);
+                           y.xR[0] = rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]);
                            if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
                               Ok = false;
                               ae_frame_leave();
@@ -66374,121 +66826,6 @@ static bool testrbfunit_basicrbftest() {
                   }
                }
             }
-         // 3-dimensional test problems
-            if (nx == 3) {
-               for (k0 = 2; k0 <= 4; k0++) {
-                  for (k1 = 2; k1 <= 4; k1++) {
-                     for (k2 = 2; k2 <= 4; k2++) {
-                        np = k0 * k1 * k2;
-                        ae_matrix_set_length(&gp, np, nx + ny);
-                     // create grid
-                        for (i = 0; i < k0; i++) {
-                           for (j = 0; j < k1; j++) {
-                              for (k = 0; k < k2; k++) {
-                                 gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i;
-                                 gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j;
-                                 gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k;
-                                 for (l = 0; l < ny; l++) {
-                                    gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * randommid();
-                                 }
-                              }
-                           }
-                        }
-                        rbfsetpoints(&s, &gp, np);
-                        rbfbuildmodel(&s, &rep);
-                        rbfcreatecalcbuffer(&s, &calcbuf);
-                        for (i = 0; i < np; i++) {
-                        // For each row we randomly choose a function to test
-                        // and call it. We do not call multiple functions per
-                        // row because carry-over effects may mask errors in
-                        // some function (say, it is possible that function
-                        // simply returns results from previous call of some
-                        // other function which were stored in the RBF model;
-                        // in this case, previous call with same parameters
-                        // may hide deficiencies in the function).
-                           x.xR[0] = gp.xyR[i][0];
-                           x.xR[1] = gp.xyR[i][1];
-                           x.xR[2] = gp.xyR[i][2];
-                           fidx = randominteger(4);
-                           if (fidx == 0 && ny == 1) {
-                              y.xR[0] = rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]);
-                              if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
-                                 Ok = false;
-                                 ae_frame_leave();
-                                 return Ok;
-                              }
-                           }
-                           if (fidx == 1) {
-                              rbfcalc(&s, &x, &y);
-                              for (j = 0; j < ny; j++) {
-                                 if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
-                                    Ok = false;
-                                    ae_frame_leave();
-                                    return Ok;
-                                 }
-                              }
-                           }
-                           if (fidx == 2) {
-                              rbfcalcbuf(&s, &x, &y);
-                              for (j = 0; j < ny; j++) {
-                                 if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
-                                    Ok = false;
-                                    ae_frame_leave();
-                                    return Ok;
-                                 }
-                              }
-                           }
-                           if (fidx == 3) {
-                              rbftscalcbuf(&s, &calcbuf, &x, &y);
-                              for (j = 0; j < ny; j++) {
-                                 if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
-                                    Ok = false;
-                                    ae_frame_leave();
-                                    return Ok;
-                                 }
-                              }
-                           }
-                        }
-                     // test for RBFUnpack
-                        rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
-                        if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
-                           Ok = false;
-                           ae_frame_leave();
-                           return Ok;
-                        }
-                        for (i = 0; i < np; i++) {
-                           if (!NearAtR(xwr.xyR[i][unx + uny], q * sx, sx * eps)) {
-                              Ok = false;
-                              ae_frame_leave();
-                              return Ok;
-                           }
-                        }
-                        if (linterm == 2) {
-                           for (i = 0; i < unx; i++) {
-                              for (j = 0; j < uny; j++) {
-                                 if (v.xyR[j][i] != 0.0) {
-                                    Ok = false;
-                                    ae_frame_leave();
-                                    return Ok;
-                                 }
-                              }
-                           }
-                        }
-                        if (linterm == 3) {
-                           for (i = 0; i <= unx; i++) {
-                              for (j = 0; j < uny; j++) {
-                                 if (v.xyR[j][i] != 0.0) {
-                                    Ok = false;
-                                    ae_frame_leave();
-                                    return Ok;
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
          }
       }
    }
@@ -66548,131 +66885,129 @@ static bool testrbfunit_irregularrbftest() {
 // We check that:
 // * RBF model correctly reproduces function value (testes with different Calc() functions)
    for (nx = 2; nx <= 3; nx++) {
-      for (ny = 1; ny <= 3; ny++) {
-         for (linterm = 1; linterm <= 3; linterm++) {
-         // prepare test problem
-            sx = pow(zx, px * (randominteger(3) - 1));
-            sy = pow(zy, py * (randominteger(3) - 1));
-            ae_vector_set_length(&x, nx);
-            ae_vector_set_length(&y, ny);
-            ae_vector_set_length(&point, nx);
-            rbfcreate(nx, ny, &s);
-            rbfsetcond(&s, testrbfunit_heps, testrbfunit_heps, testrbfunit_mxits);
-            q = 0.25 + randomreal();
-            z = 4.5 + randomreal();
-            rbfsetalgoqnn(&s, q, z);
-            if (linterm == 1) {
-               rbfsetlinterm(&s);
-            }
-            if (linterm == 2) {
-               rbfsetconstterm(&s);
-            }
-            if (linterm == 3) {
-               rbfsetzeroterm(&s);
-            }
-         // start points for grid
-            for (i = 0; i < nx; i++) {
-               point.xR[i] = sx * randommid();
-            }
-         // 2-dimensional test problems
-            if (nx == 2) {
-               for (k0 = 2; k0 <= 4; k0++) {
-                  for (k1 = 2; k1 <= 4; k1++) {
-                     np = k0 * k1;
-                     ae_matrix_set_length(&gp, np, nx + ny);
-                  // create grid
-                     for (i = 0; i < k0; i++) {
-                        for (j = 0; j < k1; j++) {
-                           gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i + noiselevel * sx * randommid();
-                           gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j + noiselevel * sx * randommid();
-                           for (k = 0; k < ny; k++) {
-                              gp.xyR[i * k1 + j][nx + k] = sy * randommid();
-                           }
-                        }
+   // prepare test problem
+      linterm = randominteger(3) + 1;
+      ny = randominteger(2) + 1;
+      sx = pow(zx, px * (randominteger(3) - 1));
+      sy = pow(zy, py * (randominteger(3) - 1));
+      ae_vector_set_length(&x, nx);
+      ae_vector_set_length(&y, ny);
+      ae_vector_set_length(&point, nx);
+      rbfcreate(nx, ny, &s);
+      rbfsetcond(&s, testrbfunit_heps, testrbfunit_heps, testrbfunit_mxits);
+      q = 0.25 + randomreal();
+      z = 4.5 + randomreal();
+      rbfsetalgoqnn(&s, q, z);
+      if (linterm == 1) {
+         rbfsetlinterm(&s);
+      }
+      if (linterm == 2) {
+         rbfsetconstterm(&s);
+      }
+      if (linterm == 3) {
+         rbfsetzeroterm(&s);
+      }
+   // start points for grid
+      for (i = 0; i < nx; i++) {
+         point.xR[i] = sx * randommid();
+      }
+   // 2-dimensional test problems
+      if (nx == 2) {
+         for (k0 = 2; k0 <= 4; k0++) {
+            for (k1 = 2; k1 <= 4; k1++) {
+               np = k0 * k1;
+               ae_matrix_set_length(&gp, np, nx + ny);
+            // create grid
+               for (i = 0; i < k0; i++) {
+                  for (j = 0; j < k1; j++) {
+                     gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i + noiselevel * sx * randommid();
+                     gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j + noiselevel * sx * randommid();
+                     for (k = 0; k < ny; k++) {
+                        gp.xyR[i * k1 + j][nx + k] = sy * randommid();
                      }
-                     rbfsetpoints(&s, &gp, np);
-                     rbfbuildmodel(&s, &rep);
-                     for (i = 0; i < np; i++) {
-                        x.xR[0] = gp.xyR[i][0];
-                        x.xR[1] = gp.xyR[i][1];
-                        if (ny == 1) {
-                           y.xR[0] = rbfcalc2(&s, x.xR[0], x.xR[1]);
-                           if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
-                              Ok = false;
-                              ae_frame_leave();
-                              return Ok;
-                           }
-                        }
-                        rbfcalc(&s, &x, &y);
-                        for (j = 0; j < ny; j++) {
-                           if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
-                              Ok = false;
-                              ae_frame_leave();
-                              return Ok;
-                           }
-                        }
-                        rbfcalcbuf(&s, &x, &y);
-                        for (j = 0; j < ny; j++) {
-                           if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
-                              Ok = false;
-                              ae_frame_leave();
-                              return Ok;
-                           }
-                        }
+                  }
+               }
+               rbfsetpoints(&s, &gp, np);
+               rbfbuildmodel(&s, &rep);
+               for (i = 0; i < np; i++) {
+                  x.xR[0] = gp.xyR[i][0];
+                  x.xR[1] = gp.xyR[i][1];
+                  if (ny == 1) {
+                     y.xR[0] = rbfcalc2(&s, x.xR[0], x.xR[1]);
+                     if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
+                        Ok = false;
+                        ae_frame_leave();
+                        return Ok;
+                     }
+                  }
+                  rbfcalc(&s, &x, &y);
+                  for (j = 0; j < ny; j++) {
+                     if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
+                        Ok = false;
+                        ae_frame_leave();
+                        return Ok;
+                     }
+                  }
+                  rbfcalcbuf(&s, &x, &y);
+                  for (j = 0; j < ny; j++) {
+                     if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
+                        Ok = false;
+                        ae_frame_leave();
+                        return Ok;
                      }
                   }
                }
             }
-         // 2-dimensional test problems
-            if (nx == 3) {
-               for (k0 = 2; k0 <= 4; k0++) {
-                  for (k1 = 2; k1 <= 4; k1++) {
-                     for (k2 = 2; k2 <= 4; k2++) {
-                        np = k0 * k1 * k2;
-                        ae_matrix_set_length(&gp, np, nx + ny);
-                     // create grid
-                        for (i = 0; i < k0; i++) {
-                           for (j = 0; j < k1; j++) {
-                              for (k = 0; k < k2; k++) {
-                                 gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i + noiselevel * sx * randommid();
-                                 gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j + noiselevel * sx * randommid();
-                                 gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k + noiselevel * sx * randommid();
-                                 for (l = 0; l < ny; l++) {
-                                    gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * randommid();
-                                 }
-                              }
+         }
+      }
+   // 2-dimensional test problems
+      if (nx == 3) {
+         for (k0 = 2; k0 <= 4; k0++) {
+            for (k1 = 2; k1 <= 4; k1++) {
+               for (k2 = 2; k2 <= 4; k2++) {
+                  np = k0 * k1 * k2;
+                  ae_matrix_set_length(&gp, np, nx + ny);
+               // create grid
+                  for (i = 0; i < k0; i++) {
+                     for (j = 0; j < k1; j++) {
+                        for (k = 0; k < k2; k++) {
+                           gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i + noiselevel * sx * randommid();
+                           gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j + noiselevel * sx * randommid();
+                           gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k + noiselevel * sx * randommid();
+                           for (l = 0; l < ny; l++) {
+                              gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * randommid();
                            }
                         }
-                        rbfsetpoints(&s, &gp, np);
-                        rbfbuildmodel(&s, &rep);
-                        for (i = 0; i < np; i++) {
-                           x.xR[0] = gp.xyR[i][0];
-                           x.xR[1] = gp.xyR[i][1];
-                           x.xR[2] = gp.xyR[i][2];
-                           if (ny == 1) {
-                              y.xR[0] = rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]);
-                              if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
-                                 Ok = false;
-                                 ae_frame_leave();
-                                 return Ok;
-                              }
-                           }
-                           rbfcalc(&s, &x, &y);
-                           for (j = 0; j < ny; j++) {
-                              if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
-                                 Ok = false;
-                                 ae_frame_leave();
-                                 return Ok;
-                              }
-                           }
-                           rbfcalcbuf(&s, &x, &y);
-                           for (j = 0; j < ny; j++) {
-                              if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
-                                 Ok = false;
-                                 ae_frame_leave();
-                                 return Ok;
-                              }
-                           }
+                     }
+                  }
+                  rbfsetpoints(&s, &gp, np);
+                  rbfbuildmodel(&s, &rep);
+                  for (i = 0; i < np; i++) {
+                     x.xR[0] = gp.xyR[i][0];
+                     x.xR[1] = gp.xyR[i][1];
+                     x.xR[2] = gp.xyR[i][2];
+                     if (ny == 1) {
+                        y.xR[0] = rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]);
+                        if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
+                           Ok = false;
+                           ae_frame_leave();
+                           return Ok;
+                        }
+                     }
+                     rbfcalc(&s, &x, &y);
+                     for (j = 0; j < ny; j++) {
+                        if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
+                           Ok = false;
+                           ae_frame_leave();
+                           return Ok;
+                        }
+                     }
+                     rbfcalcbuf(&s, &x, &y);
+                     for (j = 0; j < ny; j++) {
+                        if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
+                           Ok = false;
+                           ae_frame_leave();
+                           return Ok;
                         }
                      }
                   }
@@ -66730,55 +67065,106 @@ static bool testrbfunit_linearitymodelrbftest() {
    py = 15.0;
    ny = 1;
    for (nx = 2; nx <= 3; nx++) {
-      for (linterm = 1; linterm <= 3; linterm++) {
-      // prepare test problem
-         sx = pow(zx, px * (randominteger(3) - 1));
-         sy = pow(zy, py * (randominteger(3) - 1));
-         ae_vector_set_length(&x, nx);
-         ae_vector_set_length(&y, ny);
-         ae_vector_set_length(&point, nx);
-         rbfcreate(nx, ny, &s);
-         q = 0.25 + randomreal();
-         z = 4.5 + randomreal();
-         rbfsetalgoqnn(&s, q, z);
-         ae_vector_set_length(&a, nx + 1);
-         if (linterm == 1) {
-            rbfsetlinterm(&s);
-            for (i = 0; i < nx; i++) {
-               a.xR[i] = sy * randommid() / sx;
-            }
-            a.xR[nx] = sy * randommid();
-         }
-         if (linterm == 2) {
-            rbfsetconstterm(&s);
-            for (i = 0; i < nx; i++) {
-               a.xR[i] = 0.0;
-            }
-            a.xR[nx] = sy * randommid();
-         }
-         if (linterm == 3) {
-            rbfsetzeroterm(&s);
-            for (i = 0; i <= nx; i++) {
-               a.xR[i] = 0.0;
-            }
-         }
-      // start points for grid
+   // prepare test problem
+      linterm = randominteger(3) + 1;
+      sx = pow(zx, px * (randominteger(3) - 1));
+      sy = pow(zy, py * (randominteger(3) - 1));
+      ae_vector_set_length(&x, nx);
+      ae_vector_set_length(&y, ny);
+      ae_vector_set_length(&point, nx);
+      rbfcreate(nx, ny, &s);
+      q = 0.25 + randomreal();
+      z = 4.5 + randomreal();
+      rbfsetalgoqnn(&s, q, z);
+      ae_vector_set_length(&a, nx + 1);
+      if (linterm == 1) {
+         rbfsetlinterm(&s);
          for (i = 0; i < nx; i++) {
-            point.xR[i] = sx * randommid();
+            a.xR[i] = sy * randommid() / sx;
          }
-         if (nx == 2) {
-            for (k0 = 2; k0 <= 4; k0++) {
-               for (k1 = 2; k1 <= 4; k1++) {
-                  np = k0 * k1;
+         a.xR[nx] = sy * randommid();
+      }
+      if (linterm == 2) {
+         rbfsetconstterm(&s);
+         for (i = 0; i < nx; i++) {
+            a.xR[i] = 0.0;
+         }
+         a.xR[nx] = sy * randommid();
+      }
+      if (linterm == 3) {
+         rbfsetzeroterm(&s);
+         for (i = 0; i <= nx; i++) {
+            a.xR[i] = 0.0;
+         }
+      }
+   // start points for grid
+      for (i = 0; i < nx; i++) {
+         point.xR[i] = sx * randommid();
+      }
+      if (nx == 2) {
+         for (k0 = 2; k0 <= 4; k0++) {
+            for (k1 = 2; k1 <= 4; k1++) {
+               np = k0 * k1;
+               ae_matrix_set_length(&gp, np, nx + ny);
+            // create grid
+               for (i = 0; i < k0; i++) {
+                  for (j = 0; j < k1; j++) {
+                     gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i;
+                     gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j;
+                     gp.xyR[i * k1 + j][nx] = a.xR[nx];
+                     for (k = 0; k < nx; k++) {
+                        gp.xyR[i * k1 + j][nx] += gp.xyR[i * k1 + j][k] * a.xR[k];
+                     }
+                  }
+               }
+               rbfsetpoints(&s, &gp, np);
+               rbfbuildmodel(&s, &rep);
+            // test for RBFUnpack
+               rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
+               if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (i = 0; i < nx; i++) {
+                  if (!NearAtR(v.xyR[0][i], a.xR[i], sy / sx * testrbfunit_tol)) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+               }
+               if (!NearAtR(v.xyR[0][nx], a.xR[nx], sy * testrbfunit_tol)) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (i = 0; i < np; i++) {
+                  if (!SmallAtR(xwr.xyR[i][unx], sy * testrbfunit_tol)) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+               }
+            }
+         }
+      }
+      if (nx == 3) {
+         for (k0 = 2; k0 <= 4; k0++) {
+            for (k1 = 2; k1 <= 4; k1++) {
+               for (k2 = 2; k2 <= 4; k2++) {
+                  np = k0 * k1 * k2;
                   ae_matrix_set_length(&gp, np, nx + ny);
                // create grid
                   for (i = 0; i < k0; i++) {
                      for (j = 0; j < k1; j++) {
-                        gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i;
-                        gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j;
-                        gp.xyR[i * k1 + j][nx] = a.xR[nx];
-                        for (k = 0; k < nx; k++) {
-                           gp.xyR[i * k1 + j][nx] += gp.xyR[i * k1 + j][k] * a.xR[k];
+                        for (k = 0; k < k2; k++) {
+                           gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i;
+                           gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j;
+                           gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k;
+                           gp.xyR[(i * k1 + j) * k2 + k][nx] = a.xR[nx];
+                           for (l = 0; l < nx; l++) {
+                              gp.xyR[(i * k1 + j) * k2 + k][nx] += gp.xyR[(i * k1 + j) * k2 + k][l] * a.xR[l];
+                           }
                         }
                      }
                   }
@@ -66813,63 +67199,89 @@ static bool testrbfunit_linearitymodelrbftest() {
                }
             }
          }
-         if (nx == 3) {
-            for (k0 = 2; k0 <= 4; k0++) {
-               for (k1 = 2; k1 <= 4; k1++) {
-                  for (k2 = 2; k2 <= 4; k2++) {
-                     np = k0 * k1 * k2;
-                     ae_matrix_set_length(&gp, np, nx + ny);
-                  // create grid
-                     for (i = 0; i < k0; i++) {
-                        for (j = 0; j < k1; j++) {
-                           for (k = 0; k < k2; k++) {
-                              gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i;
-                              gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j;
-                              gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k;
-                              gp.xyR[(i * k1 + j) * k2 + k][nx] = a.xR[nx];
-                              for (l = 0; l < nx; l++) {
-                                 gp.xyR[(i * k1 + j) * k2 + k][nx] += gp.xyR[(i * k1 + j) * k2 + k][l] * a.xR[l];
-                              }
-                           }
-                        }
-                     }
-                     rbfsetpoints(&s, &gp, np);
-                     rbfbuildmodel(&s, &rep);
-                  // test for RBFUnpack
-                     rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
-                     if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
-                        Ok = false;
-                        ae_frame_leave();
-                        return Ok;
-                     }
-                     for (i = 0; i < nx; i++) {
-                        if (!NearAtR(v.xyR[0][i], a.xR[i], sy / sx * testrbfunit_tol)) {
-                           Ok = false;
-                           ae_frame_leave();
-                           return Ok;
-                        }
-                     }
-                     if (!NearAtR(v.xyR[0][nx], a.xR[nx], sy * testrbfunit_tol)) {
-                        Ok = false;
-                        ae_frame_leave();
-                        return Ok;
-                     }
-                     for (i = 0; i < np; i++) {
-                        if (!SmallAtR(xwr.xyR[i][unx], sy * testrbfunit_tol)) {
-                           Ok = false;
-                           ae_frame_leave();
-                           return Ok;
-                        }
-                     }
-                  }
-               }
-            }
-         }
       }
    }
    Ok = true;
    ae_frame_leave();
    return Ok;
+}
+
+// Generates set of normally distributed points (mean == 0, sigma == 1)  with  good
+// separation between nodes.
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static void testrbfunit_generategoodrandomgrid(ae_int_t n, ae_int_t nx, ae_int_t ny, hqrndstate *rs, RMatrix *xy, double *meanseparation) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   double mindist;
+   double d;
+   double v;
+   SetMatrix(xy);
+   *meanseparation = 0;
+   ae_assert(n >= 0, "GenerateGoodRandomGrid: N < 1");
+   if (n == 0) {
+      *meanseparation = 1.0;
+      return;
+   }
+   ae_matrix_set_length(xy, n, nx + ny);
+   d = 1.0 / pow(n, 1.0 / nx);
+   for (i = 0; i < n; i++) {
+      do {
+         for (k = 0; k < nx + ny; k++) {
+            xy->xyR[i][k] = hqrndnormal(rs);
+         }
+         mindist = 1.0E50;
+         for (j = 0; j < i; j++) {
+            v = 0.0;
+            for (k = 0; k < nx; k++) {
+               v += sqr(xy->xyR[i][k] - xy->xyR[j][k]);
+            }
+            mindist = rmin2(mindist, sqrt(v));
+         }
+      } while (mindist <= d);
+   }
+   if (n > 1) {
+      *meanseparation = 0.0;
+      for (i = 0; i < n; i++) {
+         mindist = 1.0E50;
+         for (j = 0; j < n; j++) {
+            if (j != i) {
+               v = 0.0;
+               for (k = 0; k < nx; k++) {
+                  v += sqr(xy->xyR[i][k] - xy->xyR[j][k]);
+               }
+               mindist = rmin2(mindist, sqrt(v));
+            }
+         }
+         *meanseparation += mindist / n;
+      }
+      *meanseparation = coalesce(*meanseparation, 1.0);
+   } else {
+      *meanseparation = 1.0;
+   }
+}
+
+// Sets one of XRBF algorithms (version 3 RBFs introduced in 2022)  according
+// to its index.
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static void testrbfunit_setxrbfalgorithmexact(rbfmodel *s, ae_int_t algoidx, double meanpointsseparation) {
+   if (algoidx == 0) {
+      rbfsetalgothinplatespline(s, 0.0);
+      return;
+   }
+   if (algoidx == 1) {
+      if (randombool()) {
+         rbfsetalgomultiquadricmanual(s, meanpointsseparation * (0.5 + randomreal()), 0.0);
+      } else {
+         rbfsetalgomultiquadricauto(s, 0.0);
+      }
+      return;
+   }
+   if (algoidx == 2) {
+      rbfsetalgobiharmonic(s, 0.0);
+      return;
+   }
+   ae_assert(false, "SetXRBFAlgorithm: unknown AlgoIdx");
 }
 
 // This function tests serialization
@@ -66892,6 +67304,8 @@ static bool testrbfunit_serializationtest() {
    ae_int_t nlayers;
    ae_int_t bf;
    ae_int_t gridsize;
+   double meanseparation;
+   ae_int_t algoidx;
    bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(rbfmodel, s);
@@ -66902,6 +67316,8 @@ static bool testrbfunit_serializationtest() {
    NewVector(y0, 0, DT_REAL);
    NewVector(y1, 0, DT_REAL);
    NewVector(scalevec, 0, DT_REAL);
+   NewObj(hqrndstate, rs);
+   hqrndrandomize(&rs);
    Ok = true;
 // This function generates random 2 or 3 dimensional problem,
 // builds RBF model (QNN is used), serializes/unserializes it, then compares
@@ -67125,7 +67541,7 @@ static bool testrbfunit_serializationtest() {
       }
    }
 // This function generates random 1...4-dimensional problem,
-// builds model using RBF-H algo, serializes/unserializes it,
+// builds model using HRBF algo, serializes/unserializes it,
 // then compares models by calculating model value at some
 // random point.
 //
@@ -67227,6 +67643,113 @@ static bool testrbfunit_serializationtest() {
                Ok = false;
                ae_frame_leave();
                return Ok;
+            }
+         }
+      }
+   }
+// This function generates random 1...4-dimensional problem,
+// builds model using XRBF algo, serializes/unserializes it,
+// then compares models by calculating model value at some
+// random point.
+//
+// NOTE: we choose at random whether to use default scaling -
+//       or user-supplied one.
+//
+// Additionally we test that new model (one which was restored
+// after serialization) has lost all model construction settings,
+// i.e. if we call RBFBuildModel() on a NEW model, we will get
+// empty (zero) model.
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (ny = 1; ny <= 2; ny++) {
+         // problem setup
+            n = 150;
+            testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+            ae_vector_set_length(&testpoint, nx);
+            for (j = 0; j < nx; j++) {
+               testpoint.xR[j] = hqrndnormal(&rs);
+            }
+            ae_vector_set_length(&scalevec, nx);
+            for (j = 0; j < nx; j++) {
+               scalevec.xR[j] = pow(2.0, hqrndnormal(&rs));
+            }
+         // prepare test problem
+            rbfcreate(nx, ny, &s);
+            testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+            if (hqrndnormal(&rs) > 0.5) {
+               rbfsetpoints(&s, &xy, xy.rows);
+            } else {
+               rbfsetpointsandscales(&s, &xy, xy.rows, &scalevec);
+            }
+         // Clear target model
+            ae_vector_set_length(&y1, 0);
+            rbfcreate(1, 1, &s2);
+            rbfbuildmodel(&s2, &rep);
+            rbfcalc(&s2, &testpoint, &y1);
+            if (y1.cnt != 1) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            if (y1.xR[0] != 0.0) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+         // Build model, serialize, compare
+            ae_vector_set_length(&y0, 0);
+            ae_vector_set_length(&y1, 0);
+            rbfbuildmodel(&s, &rep);
+            {
+            // This code passes data structure through serializers
+            // (serializes it to string and loads back)
+               ae_frame _local_frame_block;
+               ae_frame_make(&_local_frame_block);
+               NewSerializer(_local_serializer);
+               ae_serializer_alloc_start(&_local_serializer);
+               rbfalloc(&_local_serializer, &s);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               NewBlock(_local_dynamic_block, _local_ssize + 1);
+               ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+               rbfserialize(&_local_serializer, &s);
+               ae_serializer_stop(&_local_serializer);
+               ae_serializer_init(&_local_serializer);
+               ae_serializer_ustart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+               rbfunserialize(&_local_serializer, &s2);
+               ae_serializer_stop(&_local_serializer);
+               ae_frame_leave();
+            }
+            rbfcalc(&s, &testpoint, &y0);
+            rbfcalc(&s2, &testpoint, &y1);
+            if (y0.cnt != ny || y1.cnt != ny) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            for (j = 0; j < ny; j++) {
+               if (y0.xR[j] != y1.xR[j]) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+            }
+         // Check that calling RBFBuildModel() on S2 (new model)
+         // will result in construction of zero model, i.e. test
+         // that serialization restores model, but not dataset
+         // which was used to build model.
+            rbfbuildmodel(&s2, &rep);
+            rbfcalc(&s2, &testpoint, &y1);
+            if (y1.cnt != ny) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            for (j = 0; j < ny; j++) {
+               if (y1.xR[j] != 0.0) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
             }
          }
       }
@@ -67669,6 +68192,1344 @@ static bool testrbfunit_gridcalc23test() {
    return Ok;
 }
 
+// Generates nearly regular grid
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static void testrbfunit_generatenearlyregulargrid(ae_int_t n, ae_int_t nx, ae_int_t ny, hqrndstate *rs, RMatrix *xy, double *meanseparation) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t griddim;
+   SetMatrix(xy);
+   *meanseparation = 0;
+   ae_assert(n >= pow(2.0, nx), "GenerateNearlyRegularGrid: N < 2^NX");
+   *meanseparation = 1.0;
+   griddim = iround(pow(n, 1.0 / nx)) + 1;
+   ae_matrix_set_length(xy, n, nx + ny);
+   for (i = 0; i < n; i++) {
+      k = i;
+      for (j = 0; j < nx; j++) {
+         xy->xyR[i][j] = k % griddim + 0.05 * hqrndnormal(rs);
+         k /= griddim;
+      }
+      for (k = nx; k < nx + ny; k++) {
+         xy->xyR[i][k] = hqrndnormal(rs);
+      }
+   }
+}
+
+// Sets one of smoothing XRBF algorithms (version 3 RBFs introduced in 2022)
+// according to its index.
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static void testrbfunit_setxrbfalgorithmsmoothing(rbfmodel *s, ae_int_t algoidx, double lambdav, double meanpointsseparation) {
+   if (algoidx == 0) {
+      rbfsetalgothinplatespline(s, lambdav);
+      return;
+   }
+   if (algoidx == 1) {
+      if (randombool()) {
+         rbfsetalgomultiquadricmanual(s, meanpointsseparation * (0.5 + randomreal()), lambdav);
+      } else {
+         rbfsetalgomultiquadricauto(s, lambdav);
+      }
+      return;
+   }
+   if (algoidx == 2) {
+      rbfsetalgobiharmonic(s, lambdav);
+      return;
+   }
+   ae_assert(false, "SetXRBFAlgorithmSmoothing: unknown AlgoIdx");
+}
+
+// Function for testing basic functionality of XRBF
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static bool testrbfunit_basicxrbftest() {
+   ae_frame _frame_block;
+   ae_int_t algoidx;
+   ae_int_t nx;
+   ae_int_t ny;
+   ae_int_t nduplicate;
+   double mx;
+   double errtol;
+   double meanseparation;
+   double lambdav;
+   ae_int_t n;
+   ae_int_t ntest;
+   ae_int_t gridsize;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   double delta;
+   double refrms;
+   double refmax;
+   double v;
+   ae_int_t functype;
+   ae_int_t densitytype;
+   double width;
+   double lowprec;
+   double highprec;
+   ae_int_t shaketype;
+   double maxerr;
+   bool fractionalerror;
+   ae_int_t unx;
+   ae_int_t uny;
+   ae_int_t unc;
+   ae_int_t modelversion;
+   bool hasscale;
+   ae_int_t nondistinctcnt;
+   ae_int_t termtype;
+   ae_int_t leadingzeros;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(rbfmodel, s);
+   NewObj(rbfmodel, s2);
+   NewObj(rbfreport, rep);
+   NewObj(rbfcalcbuffer, tsbuf);
+   NewMatrix(xy, 0, 0, DT_REAL);
+   NewMatrix(xytest, 0, 0, DT_REAL);
+   NewMatrix(uxwr, 0, 0, DT_REAL);
+   NewMatrix(uv, 0, 0, DT_REAL);
+   NewMatrix(xy2, 0, 0, DT_REAL);
+   NewVector(x, 0, DT_REAL);
+   NewVector(y, 0, DT_REAL);
+   NewVector(y2, 0, DT_REAL);
+   NewVector(xzero, 0, DT_REAL);
+   NewVector(yref, 0, DT_REAL);
+   NewVector(scalevec, 0, DT_REAL);
+   NewVector(bflags, 0, DT_BOOL);
+   NewObj(hqrndstate, rs);
+   hqrndrandomize(&rs);
+   Ok = true;
+// First test - random problem, ability to build model
+// which reproduces function value in all points with
+// good precision.
+//
+// All dataset points are located in unit cube on
+// regular grid. We do not use smoothing for this test.
+//
+// We use/test following functions:
+// * RBFCalc()
+// * RBFCalc2()
+// * RBFCalc3()
+// * RBFCalcBuf()
+// * RBFTsCalcBuf()
+   errtol = 0.00001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (ny = 1; ny <= 2; ny++) {
+         // problem setup
+            n = 150;
+            testrbfunit_generatenearlyregulargrid(n, nx, ny, &rs, &xy, &meanseparation);
+         // Build model
+            rbfcreate(nx, ny, &s);
+            testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+            rbfsetpoints(&s, &xy, n);
+            rbfbuildmodel(&s, &rep);
+            if (rep.terminationtype <= 0) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            rbfcreatecalcbuffer(&s, &tsbuf);
+         // Test ability to reproduce function value
+         //
+         // NOTE: we use RBFCalc(XZero) to guarantee that internal state of
+         //       RBF model is "reset" between subsequent calls of different
+         //       functions. It allows us to make sure that we have no bug
+         //       like function simply returning latest result
+            rsetallocv(nx, 0.0, &xzero);
+            ae_vector_set_length(&x, nx);
+            ae_vector_set_length(&y, ny);
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < nx; j++) {
+                  x.xR[j] = xy.xyR[i][j];
+               }
+               rbfcalc(&s, &xzero, &y);
+               if (randombool()) {
+                  ae_vector_set_length(&yref, ny + 1);
+               } else {
+                  ae_vector_set_length(&yref, 0);
+               }
+               rbfcalc(&s, &x, &yref);
+               Ok = Ok && yref.cnt == ny;
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol * n);
+               }
+               if (nx == 1 && ny == 1) {
+                  rbfcalc(&s, &xzero, &y);
+                  Ok = Ok && rbfcalc1(&s, x.xR[0]) == yref.xR[0];
+               } else {
+                  Ok = Ok && rbfcalc1(&s, 1.2) == 0.0;
+               }
+               if (nx == 2 && ny == 1) {
+                  rbfcalc(&s, &xzero, &y);
+                  Ok = Ok && rbfcalc2(&s, x.xR[0], x.xR[1]) == yref.xR[0];
+               } else {
+                  Ok = Ok && rbfcalc2(&s, 1.2, 3.4) == 0.0;
+               }
+               if (nx == 3 && ny == 1) {
+                  rbfcalc(&s, &xzero, &y);
+                  Ok = Ok && rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) == yref.xR[0];
+               } else {
+                  Ok = Ok && rbfcalc3(&s, 1.2, 3.4, 5.6) == 0.0;
+               }
+               rbfcalc(&s, &xzero, &y);
+               if (randombool()) {
+                  ae_vector_set_length(&y, ny + 1);
+                  rbfcalcbuf(&s, &x, &y);
+                  Ok = Ok && y.cnt == ny + 1;
+               } else {
+                  ae_vector_set_length(&y, ny - 1);
+                  rbfcalcbuf(&s, &x, &y);
+                  Ok = Ok && y.cnt == ny;
+               }
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && y.xR[j] == yref.xR[j];
+               }
+               rbfcalc(&s, &xzero, &y);
+               if (randombool()) {
+                  ae_vector_set_length(&y, ny + 1);
+                  rbftscalcbuf(&s, &tsbuf, &x, &y);
+                  Ok = Ok && y.cnt == ny + 1;
+               } else {
+                  ae_vector_set_length(&y, ny - 1);
+                  rbftscalcbuf(&s, &tsbuf, &x, &y);
+                  Ok = Ok && y.cnt == ny;
+               }
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && y.xR[j] == yref.xR[j];
+               }
+            }
+         }
+      }
+   }
+// Test ability to handle surface normal conditions
+   algoidx = hqrnduniformi(&rs, testrbfunit_xrbfc1algocnt);
+   nx = 2;
+   ny = hqrnduniformi(&rs, 4);
+// Test ability to handle all dataset sizes from 0 to 10
+   errtol = 0.00001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (ny = 1; ny <= 2; ny++) {
+            for (n = 0; n <= 10; n++) {
+               testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+               rbfcreate(nx, ny, &s);
+               testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+               if (n > 0) {
+                  if (hqrndnormal(&rs) > 0.0) {
+                     allocv(nx, &scalevec);
+                     for (i = 0; i < nx; i++) {
+                        scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
+                     }
+                     rbfsetpointsandscales(&s, &xy, n, &scalevec);
+                  } else {
+                     rbfsetpoints(&s, &xy, n);
+                  }
+               }
+               rbfbuildmodel(&s, &rep);
+               if (rep.terminationtype <= 0) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (i = 0; i < n; i++) {
+                  allocv(nx, &x);
+                  rcopyrv(nx, &xy, i, &x);
+                  rbfcalc(&s, &x, &y);
+                  Ok = Ok && y.cnt == ny;
+                  if (!Ok) {
+                     ae_frame_leave();
+                     return Ok;
+                  }
+                  for (j = 0; j < ny; j++) {
+#if 0 //@@
+                     Ok = Ok && NearAtR(y.xR[j], xy.xyR[i][nx + j], errtol); //@@
+#else
+                     Ok = Ok && !(fabs(y.xR[j] - xy.xyR[i][nx + j]) > errtol); //@@
+#endif
+                  }
+               }
+            }
+         }
+      }
+   }
+// Test ability to handle datasets with non-distinct points:
+// * the model correctly predicts mean value at non-distinct points
+// * Rep.RMSError and Rep.MaxError are correctly computed
+   errtol = 0.0001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (ny = 1; ny <= 2; ny++) {
+            n = 1 + hqrnduniformi(&rs, 20);
+            testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+            allocm(2 * n, nx + ny, &xy2);
+            for (i = 0; i < n; i++) {
+               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i);
+               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i + 1);
+               v = 0.001 + hqrnduniformr(&rs);
+               for (j = 0; j < ny; j++) {
+                  xy2.xyR[2 * i][nx + j] -= v;
+                  xy2.xyR[2 * i + 1][nx + j] += v;
+               }
+            }
+            rbfcreate(nx, ny, &s);
+            testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+            if (hqrndnormal(&rs) > 0.0) {
+               allocv(nx, &scalevec);
+               for (i = 0; i < nx; i++) {
+                  scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
+               }
+               rbfsetpointsandscales(&s, &xy2, 2 * n, &scalevec);
+            } else {
+               rsetallocv(nx, 1.0, &scalevec);
+               rbfsetpoints(&s, &xy2, 2 * n);
+            }
+            rbfbuildmodel(&s, &rep);
+            if (rep.terminationtype <= 0) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            refrms = 0.0;
+            refmax = 0.0;
+            for (i = 0; i < n; i++) {
+               allocv(nx, &x);
+               rcopyrv(nx, &xy, i, &x);
+               rbfcalc(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (j = 0; j < ny; j++) {
+#if 0 //@@
+                  Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol); //@@
+#else
+                  Ok = Ok && !(fabs(y.xR[j] - 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j])) > errtol); //@@
+#endif
+                  refrms += sqr(y.xR[j] - xy2.xyR[2 * i][nx + j]) + sqr(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]);
+                  refmax = rmax3(refmax, fabs(y.xR[j] - xy2.xyR[2 * i][nx + j]), fabs(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]));
+               }
+            }
+            refrms = sqrt(refrms / (2 * n * ny));
+#if 0 //@@
+            Ok = Ok && NearAtR(refrms, rep.rmserror, errtol); //@@
+            Ok = Ok && NearAtR(refmax, rep.maxerror, errtol); //@@
+#else
+            Ok = Ok && !(fabs(refrms - rep.rmserror) > errtol); //@@
+            Ok = Ok && !(fabs(refmax - rep.maxerror) > errtol); //@@
+#endif
+         }
+      }
+   }
+// Test ability of smoothing RBFs to handle datasets with nearly (but not exactly!) non-distinct points:
+// * the model correctly predicts mean value at these points
+// * Rep.RMSError and Rep.MaxError are correctly computed
+//
+// NOTE: at least NX+1 points are required for this test
+   errtol = 0.20;
+   lambdav = 0.0001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfsmoothingalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (ny = 1; ny <= 2; ny++) {
+            n = 1 + hqrnduniformi(&rs, 20);
+            n = imax2(n, iround(pow(2.0, nx)) + 1);
+            testrbfunit_generatenearlyregulargrid(n, nx, ny, &rs, &xy, &meanseparation);
+            allocm(2 * n, nx + ny, &xy2);
+            for (i = 0; i < n; i++) {
+               delta = 0.00001 * pow(10.0, -4.0 * hqrnduniformr(&rs));
+               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i);
+               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i + 1);
+               j = hqrnduniformi(&rs, nx);
+               xy2.xyR[2 * i + 1][j] += hqrndnormal(&rs) * delta;
+               v = hqrnduniformr(&rs) - 0.5;
+               for (j = 0; j < ny; j++) {
+                  xy2.xyR[2 * i][nx + j] -= v;
+                  xy2.xyR[2 * i + 1][nx + j] += v;
+               }
+            }
+            rbfcreate(nx, ny, &s);
+            testrbfunit_setxrbfalgorithmsmoothing(&s, algoidx, lambdav, meanseparation);
+            if (hqrndnormal(&rs) > 0.0) {
+               allocv(nx, &scalevec);
+               for (i = 0; i < nx; i++) {
+                  scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
+               }
+               rbfsetpointsandscales(&s, &xy2, 2 * n, &scalevec);
+            } else {
+               rsetallocv(nx, 1.0, &scalevec);
+               rbfsetpoints(&s, &xy2, 2 * n);
+            }
+            rbfbuildmodel(&s, &rep);
+            if (rep.terminationtype <= 0) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            for (i = 0; i < n; i++) {
+               allocv(nx, &x);
+               rcopyrv(nx, &xy2, 2 * i, &x);
+               rbfcalc(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol);
+               }
+               rcopyrv(nx, &xy2, 2 * i + 1, &x);
+               rbfcalc(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol);
+               }
+            }
+            refrms = 0.0;
+            refmax = 0.0;
+            for (i = 0; i < 2 * n; i++) {
+               allocv(nx, &x);
+               rcopyrv(nx, &xy2, i, &x);
+               rbfcalc(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (j = 0; j < ny; j++) {
+                  refrms += sqr(y.xR[j] - xy2.xyR[i][nx + j]);
+                  refmax = rmax2(refmax, fabs(y.xR[j] - xy2.xyR[i][nx + j]));
+               }
+            }
+            refrms = sqrt(refrms / (2 * n * ny));
+            Ok = Ok && NearAtR(refrms, rep.rmserror, 0.00001);
+            Ok = Ok && NearAtR(refmax, rep.maxerror, 0.00001);
+         }
+      }
+   }
+// Test ability to handle datasets consisting of several isolated "islands",
+// far away from each other
+   errtol = 0.001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         ny = 1;
+         n = 50;
+         testrbfunit_generategoodrandomgrid(n, nx, 1, &rs, &xy2, &meanseparation);
+         nduplicate = 2 * n;
+         allocm(nduplicate, nx + 1, &xy);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < nx; j++) {
+               xy.xyR[2 * i][j] = xy2.xyR[i][j];
+               xy.xyR[2 * i + 1][j] = xy2.xyR[i][j] + 1000;
+            }
+            xy.xyR[2 * i][nx] = hqrndnormal(&rs);
+            xy.xyR[2 * i + 1][nx] = hqrndnormal(&rs);
+         }
+         rbfcreate(nx, ny, &s);
+         testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+         rbfsetpoints(&s, &xy, nduplicate);
+         rbfbuildmodel(&s, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         if (rep.rmserror > errtol) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         v = 0.0;
+         for (i = 0; i < nduplicate; i++) {
+            rcopyrv(nx, &xy, i, &x);
+            rbfcalc(&s, &x, &y);
+            for (j = 0; j < ny; j++) {
+               v += sqr(y.xR[j] - xy.xyR[i][nx + j]);
+            }
+         }
+         v = sqrt(v / (nduplicate * ny));
+         Ok = Ok && v <= errtol;
+      }
+   }
+// Test ability to handle degenerate problems:
+// * we generate dataset with all points being well separated, except for a few
+//   that have neighbors that are close enough to ruin the multiquadric algorithm
+//   but not close enough to be merged
+// * we test that the model that was built actually uses Reg-QR
+// * we also test that small and easy model without degeneracies does not use Reg-QR
+//
+// The idea of this test is to check that the solver signals about bad condition numbers
+// by setting DbgRegQRUsedForDDM field.
+   for (nx = 1; nx <= 2; nx++) {
+   // Solve easy problem, test that Reg-QR solver was NOT used
+      ny = 1 + hqrnduniformi(&rs, 3);
+      n = 5;
+      testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+      rbfcreate(nx, ny, &s);
+      rbfsetpoints(&s, &xy, n);
+      rbfsetalgomultiquadricauto(&s, 0.0);
+      rbfbuildmodel(&s, &rep);
+      if (rep.terminationtype <= 0) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      Ok = Ok && !s.model3.dbgregqrusedforddm;
+      Ok = Ok && rep.rmserror <= 0.001;
+   // Solve badly conditioned problem, test that Reg-QR solver was used
+      ny = 1 + hqrnduniformi(&rs, 3);
+      n = 100;
+      nduplicate = 100;
+      testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+      rmatrixgrowrowsto(&xy, n + nduplicate, nx + ny);
+      for (i = 0; i < nduplicate; i++) {
+         rcopyrr(nx + ny, &xy, hqrnduniformi(&rs, n), &xy, n + i);
+         k = hqrnduniformi(&rs, nx);
+         xy.xyR[n + i][k] += 0.00001 * hqrndnormal(&rs);
+      }
+      rbfcreate(nx, ny, &s);
+      rbfsetpoints(&s, &xy, n + nduplicate);
+      rbfsetalgomultiquadricauto(&s, 0.0);
+      rbfbuildmodel(&s, &rep);
+      if (rep.terminationtype <= 0) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      Ok = Ok && s.model3.dbgregqrusedforddm;
+   }
+// Test that various polynomial term types are actually handled:
+// * we generate "good random" problem
+// * try various term types: linear, constant, zero
+// * directly access model term and check that corresponding entries are zero
+   errtol = 0.001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (ny = 1; ny <= 2; ny++) {
+            for (termtype = 0; termtype <= 2; termtype++) {
+               n = nx + 2 + hqrnduniformi(&rs, 10);
+               testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+               rbfcreate(nx, ny, &s);
+               testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+               if (hqrndnormal(&rs) > 0.0) {
+                  allocv(nx, &scalevec);
+                  for (i = 0; i < nx; i++) {
+                     scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
+                  }
+                  rbfsetpointsandscales(&s, &xy, n, &scalevec);
+               } else {
+                  rbfsetpoints(&s, &xy, n);
+               }
+               leadingzeros = 0;
+               if (termtype == 0) {
+                  if (hqrndnormal(&rs) > 0.0) {
+                     rbfsetlinterm(&s);
+                  }
+                  leadingzeros = 0;
+               }
+               if (termtype == 1) {
+                  rbfsetconstterm(&s);
+                  leadingzeros = nx;
+               }
+               if (termtype == 2) {
+                  rbfsetzeroterm(&s);
+                  leadingzeros = nx + 1;
+               }
+               rbfbuildmodel(&s, &rep);
+               if (rep.terminationtype <= 0) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               if (rep.maxerror > errtol) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (i = 0; i < n; i++) {
+                  allocv(nx, &x);
+                  ae_vector_set_length(&y, 0);
+                  rcopyrv(nx, &xy, i, &x);
+                  rbfcalc(&s, &x, &y);
+                  for (j = 0; j < ny; j++) {
+                     Ok = Ok && y.cnt == ny && NearAtR(y.xR[j], xy.xyR[i][nx + j], errtol);
+                  }
+               }
+               Ok = Ok && s.modelversion == 3;
+               Ok = Ok && s.model3.v.rows >= ny;
+               Ok = Ok && s.model3.v.cols > nx;
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (i = 0; i < ny; i++) {
+                  for (j = 0; j < leadingzeros; j++) {
+                     Ok = Ok && s.model3.v.xyR[i][j] == 0.0;
+                  }
+                  for (j = leadingzeros; j <= nx; j++) {
+                     Ok = Ok && s.model3.v.xyR[i][j] != 0.0;
+                  }
+               }
+            }
+         }
+      }
+   }
+// Test rbfunpack()
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (ny = 1; ny <= 2; ny++) {
+         // problem setup
+            n = 150;
+            gridsize = iround(pow(n, 1.0 / nx)) + 1;
+            n = iround(pow(gridsize, nx));
+            meanseparation = 1.0 / gridsize;
+            ae_matrix_set_length(&xy, n, nx + ny);
+            ae_assert(gridsize > 1, "Assertion failed");
+            ae_assert(n == pow(gridsize, nx), "Assertion failed");
+            for (i = 0; i < n; i++) {
+               k = i;
+               for (j = 0; j < nx; j++) {
+                  xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
+                  k /= gridsize;
+               }
+               for (j = 0; j < ny; j++) {
+                  xy.xyR[i][nx + j] = hqrndnormal(&rs);
+               }
+            }
+            hasscale = hqrndnormal(&rs) > 0.0;
+            if (hasscale) {
+               ae_vector_set_length(&scalevec, nx);
+               for (j = 0; j < nx; j++) {
+                  scalevec.xR[j] = pow(2.0, hqrndmiduniformr(&rs));
+               }
+            } else {
+               rsetallocv(nx, 1.0, &scalevec);
+            }
+            nondistinctcnt = hqrnduniformi(&rs, 2) * hqrnduniformi(&rs, 10);
+            if (nondistinctcnt > 0) {
+               rmatrixgrowrowsto(&xy, n + nondistinctcnt, nx + ny);
+               for (i = n; i < n + nondistinctcnt; i++) {
+                  rcopyrr(nx + ny, &xy, hqrnduniformi(&rs, n), &xy, i);
+               }
+               n += nondistinctcnt;
+            }
+         // Build model: either build directly in S, or build in S2 and serialize/unserialize it to S.
+            if (hqrndnormal(&rs) > 0.0) {
+            // Build in S directly
+               rbfcreate(nx, ny, &s);
+               testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+               if (hasscale) {
+                  rbfsetpointsandscales(&s, &xy, n, &scalevec);
+               } else {
+                  rbfsetpoints(&s, &xy, n);
+               }
+               rbfbuildmodel(&s, &rep);
+            } else {
+            // Build in S2, copy via serialization/unserialization.
+            // This branch tests our ability to correctly save the model state.
+               rbfcreate(nx, ny, &s2);
+               testrbfunit_setxrbfalgorithmexact(&s2, algoidx, meanseparation);
+               if (hasscale) {
+                  rbfsetpointsandscales(&s2, &xy, n, &scalevec);
+               } else {
+                  rbfsetpoints(&s2, &xy, n);
+               }
+               rbfbuildmodel(&s2, &rep);
+               {
+               // This code passes data structure through serializers
+               // (serializes it to string and loads back)
+                  ae_frame _local_frame_block;
+                  ae_frame_make(&_local_frame_block);
+                  NewSerializer(_local_serializer);
+                  ae_serializer_alloc_start(&_local_serializer);
+                  rbfalloc(&_local_serializer, &s2);
+                  ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                  NewBlock(_local_dynamic_block, _local_ssize + 1);
+                  ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                  rbfserialize(&_local_serializer, &s2);
+                  ae_serializer_stop(&_local_serializer);
+                  ae_serializer_init(&_local_serializer);
+                  ae_serializer_ustart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                  rbfunserialize(&_local_serializer, &s);
+                  ae_serializer_stop(&_local_serializer);
+                  ae_frame_leave();
+               }
+            }
+            if (rep.terminationtype <= 0) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+         // Test RBFUnpack()
+            rbfunpack(&s, &unx, &uny, &uxwr, &unc, &uv, &modelversion);
+            if (modelversion != 3) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            if (unx != nx || uny != ny || unc != n - nondistinctcnt) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            if (uv.cols != nx + 1 || uv.rows != ny) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            if (uxwr.cols != nx + ny + nx + 3 || uxwr.rows != unc) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            bsetallocv(n, false, &bflags);
+            for (i = 0; i < unc; i++) {
+            // Test center information stored in the model:
+            // * all center indexes are in [0,N)
+            // * all center indexes are distinct
+            // * compare centers with dataset points
+               Ok = Ok && uxwr.xyR[i][nx + ny + nx + 2] >= 0.0;
+               Ok = Ok && uxwr.xyR[i][nx + ny + nx + 2] <= n - 1;
+               k = iround(uxwr.xyR[i][nx + ny + nx + 2]);
+               if (k >= 0 && k < n) {
+                  Ok = Ok && !bflags.xB[k];
+                  bflags.xB[k] = true;
+                  for (j = 0; j < nx; j++) {
+                     Ok = Ok && NearAtR(uxwr.xyR[i][j], xy.xyR[k][j], 1.0E-9);
+                  }
+               }
+            }
+            ae_vector_set_length(&x, nx);
+            ae_vector_set_length(&y, ny);
+            for (i = 0; i <= 9; i++) {
+               for (j = 0; j < nx; j++) {
+                  x.xR[j] = hqrnduniformr(&rs);
+               }
+               rbfcalc(&s, &x, &yref);
+               mx = 1.0;
+               for (j = 0; j < ny; j++) {
+                  y.xR[j] = uv.xyR[j][nx];
+                  for (k = 0; k < nx; k++) {
+                     y.xR[j] += x.xR[k] * uv.xyR[j][k];
+                  }
+               }
+               for (k = 0; k < unc; k++) {
+                  v = 0.0;
+                  for (j = 0; j < nx; j++) {
+                     v += sqr(uxwr.xyR[k][j] - x.xR[j]) / sqr(uxwr.xyR[k][nx + ny + j]);
+                  }
+                  if (algoidx == 0) {
+                  // Thin plate spline
+                     Ok = Ok && uxwr.xyR[k][nx + ny + nx] == 2.0;
+                     Ok = Ok && uxwr.xyR[k][nx + ny + nx + 1] == 0.0;
+                     if (v != 0.0) {
+                        v *= log(sqrt(v));
+                     } else {
+                        v = 0.0;
+                     }
+                  }
+                  if (algoidx == 1) {
+                  // Multiquadric
+                     Ok = Ok && uxwr.xyR[k][nx + ny + nx] == 10.0;
+                     Ok = Ok && uxwr.xyR[k][nx + ny + nx + 1] > 0.0;
+                     v = sqrt(v + sqr(uxwr.xyR[k][nx + ny + nx + 1]));
+                  }
+                  if (algoidx == 2) {
+                  // Biharmonic
+                     Ok = Ok && uxwr.xyR[k][nx + ny + nx] == 1.0;
+                     Ok = Ok && uxwr.xyR[k][nx + ny + nx + 1] == 0.0;
+                     v = sqrt(v);
+                  }
+                  for (j = 0; j < ny; j++) {
+                     y.xR[j] += v * uxwr.xyR[k][nx + j];
+                     mx = rmax2(mx, fabs(uxwr.xyR[k][nx + j]));
+                  }
+               }
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && NearAtR(y.xR[j], yref.xR[j], 1.0E-9 * mx);
+               }
+            }
+         }
+      }
+   }
+// Test that smooth 1D function is reproduced (between nodes)
+// with good precision. We test two model types: model with
+// three layers and moderate initial radius, and model with
+// large initial radius and large number of layers.
+//
+// This test:
+// * generates test function on [-Width,+Width]. Two sets of
+//   nodes are generated - "model" ones and "test" ones.
+// * builds RBF model using "model" dataset
+// * test model using "test" dataset. Test points are more
+//   dense and are spread in [-0.9*Width, +0.9*Width] (reduced
+//   interval is used because RBF models are too bad near the
+//   boundaries).
+//
+// NOTE: we calculate maximum error for given function type
+//       and grid density over all modifications of the task,
+//       and only after that we perform comparison with tolerance
+//       level. It allows easier debugging.
+   for (functype = 0; functype <= 2; functype++) {
+      for (densitytype = 0; densitytype <= 1; densitytype++) {
+      // Select tolerance
+         lowprec = -999999.0;
+         highprec = -999999.0;
+         if (functype == 0) {
+            lowprec = 0.01;
+            highprec = 0.001;
+         } else {
+            if (functype == 1) {
+               lowprec = 0.1;
+               highprec = 0.01;
+            } else {
+               if (functype == 2) {
+                  lowprec = 0.001;
+                  highprec = 0.0001;
+               } else {
+                  ae_assert(false, "Assertion failed");
+               }
+            }
+         }
+         if (densitytype == 0) {
+            errtol = lowprec;
+         } else {
+            errtol = highprec;
+         }
+      // Test
+         maxerr = 0.0;
+         for (shaketype = 0; shaketype <= 1; shaketype++) {
+         // Generate grid
+            width = 1.0;
+            fractionalerror = false;
+            if (functype == 0) {
+            // sin(x) on [-2*pi,+2*pi]
+               n = 20 * iround(pow(4.0, densitytype));
+               width = pi;
+               fractionalerror = false;
+            } else {
+               if (functype == 1) {
+               // exp(x) on [-3,+3]
+                  n = 50 * iround(pow(4.0, densitytype));
+                  width = 3.0;
+                  fractionalerror = true;
+               } else {
+                  if (functype == 2) {
+                  // 1/(1+x^2) on [-3,+3]
+                     n = 50 * iround(pow(4.0, densitytype));
+                     width = 3.0;
+                     fractionalerror = false;
+                  } else {
+                     ae_assert(false, "Assertion failed");
+                  }
+               }
+            }
+            ae_matrix_set_length(&xy, n, 2);
+            for (i = 0; i < n; i++) {
+               v = shaketype * 0.125 * randommid();
+               v = (i + v) / (n - 1);
+               v = 2.0 * v - 1.0;
+               xy.xyR[i][0] = width * v;
+            }
+            ntest = 10 * n;
+            ae_matrix_set_length(&xytest, ntest, 2);
+            for (i = 0; i < ntest; i++) {
+               xytest.xyR[i][0] = 0.9 * width * ((2.0 * i) / (ntest - 1) - 1);
+            }
+         // Evaluate function
+            if (functype == 0) {
+            // sin(x)
+               for (i = 0; i < n; i++) {
+                  xy.xyR[i][1] = sin(xy.xyR[i][0]);
+               }
+               for (i = 0; i < ntest; i++) {
+                  xytest.xyR[i][1] = sin(xytest.xyR[i][0]);
+               }
+            } else {
+               if (functype == 1) {
+               // exp(x)
+                  for (i = 0; i < n; i++) {
+                     xy.xyR[i][1] = exp(xy.xyR[i][0]);
+                  }
+                  for (i = 0; i < ntest; i++) {
+                     xytest.xyR[i][1] = exp(xytest.xyR[i][0]);
+                  }
+               } else {
+                  if (functype == 2) {
+                  // 1/(1+x^2)
+                     for (i = 0; i < n; i++) {
+                        xy.xyR[i][1] = 1.0 / (1.0 + sqr(xy.xyR[i][0]));
+                     }
+                     for (i = 0; i < ntest; i++) {
+                        xytest.xyR[i][1] = 1.0 / (1.0 + sqr(xytest.xyR[i][0]));
+                     }
+                  } else {
+                     ae_assert(false, "Assertion failed");
+                  }
+               }
+            }
+         // Build model
+            rbfcreate(1, 1, &s);
+            rbfsetalgothinplatespline(&s, 0.0);
+            rbfsetpoints(&s, &xy, n);
+            rbfbuildmodel(&s, &rep);
+            if (rep.terminationtype <= 0) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+         // Check
+            ae_vector_set_length(&x, 1);
+            for (i = 0; i < ntest; i++) {
+               x.xR[0] = xytest.xyR[i][0];
+               rbfcalc(&s, &x, &y);
+               if (fractionalerror) {
+                  maxerr = rmax2(maxerr, fabs(y.xR[0] - xytest.xyR[i][1]) / fabs(xytest.xyR[i][1]));
+               } else {
+                  maxerr = rmax2(maxerr, fabs(y.xR[0] - xytest.xyR[i][1]));
+               }
+            }
+         }
+      // Check error
+         Ok = Ok && maxerr <= errtol;
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+// Function for testing scaling-related functionality of XRBF
+// ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
+static bool testrbfunit_scaledxrbftest() {
+   ae_frame _frame_block;
+   ae_int_t nx;
+   ae_int_t ny;
+   double nodetol;
+   double randtol;
+   ae_int_t n;
+   ae_int_t gridsize;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(rbfmodel, s);
+   NewObj(rbfmodel, s2);
+   NewObj(rbfreport, rep);
+   NewObj(rbfcalcbuffer, tsbuf);
+   NewMatrix(xy, 0, 0, DT_REAL);
+   NewMatrix(xy2, 0, 0, DT_REAL);
+   NewVector(x, 0, DT_REAL);
+   NewVector(y, 0, DT_REAL);
+   NewVector(y2, 0, DT_REAL);
+   NewVector(xzero, 0, DT_REAL);
+   NewVector(yref, 0, DT_REAL);
+   NewVector(scalex, 0, DT_REAL);
+   NewVector(scaley, 0, DT_REAL);
+   NewVector(c0, 0, DT_REAL);
+   NewVector(c1, 0, DT_REAL);
+   NewObj(hqrndstate, rs);
+   hqrndrandomize(&rs);
+   Ok = true;
+// First test - random problem, test that using scaling
+// does not change model significantly (except for
+// rounding-related errors).
+//
+// We also apply scaling to Y, in order to test that it
+// is correctly handled too.
+   for (nx = 1; nx <= 2; nx++) {
+      for (ny = 1; ny <= 2; ny++) {
+      // problem setup
+         nodetol = 0.001;
+         randtol = 0.010;
+         ae_vector_set_length(&scalex, nx);
+         for (i = 0; i < nx; i++) {
+            scalex.xR[i] = pow(4.0, hqrndnormal(&rs));
+         }
+         ae_vector_set_length(&scaley, ny);
+         for (i = 0; i < ny; i++) {
+            scaley.xR[i] = pow(4.0, hqrndnormal(&rs));
+         }
+         n = 150;
+         gridsize = iround(pow(n, 1.0 / nx)) + 1;
+         n = iround(pow(gridsize, nx));
+         ae_matrix_set_length(&xy, n, nx + ny);
+         ae_assert(gridsize > 1, "Assertion failed");
+         ae_assert(n == pow(gridsize, nx), "Assertion failed");
+         ae_vector_set_length(&c0, nx);
+         for (j = 0; j < nx; j++) {
+            c0.xR[j] = randomreal() - 0.5;
+         }
+         ae_vector_set_length(&c1, ny);
+         for (j = 0; j < ny; j++) {
+            c1.xR[j] = randomreal() - 0.5;
+         }
+         for (i = 0; i < n; i++) {
+            k = i;
+            for (j = 0; j < nx; j++) {
+               xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
+               k /= gridsize;
+            }
+            for (j = 0; j < ny; j++) {
+               xy.xyR[i][nx + j] = 0.0;
+               for (k = 0; k < nx; k++) {
+                  xy.xyR[i][nx + j] += c0.xR[k] * cos(pi * (1 + k) * xy.xyR[i][k]);
+               }
+               xy.xyR[i][nx + j] *= c1.xR[j];
+            }
+         }
+         ae_matrix_set_length(&xy2, n, nx + ny);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < nx; j++) {
+               xy2.xyR[i][j] = xy.xyR[i][j] * scalex.xR[j];
+            }
+            for (j = 0; j < ny; j++) {
+               xy2.xyR[i][nx + j] = xy.xyR[i][nx + j] * scaley.xR[j];
+            }
+         }
+      // Build models
+         rbfcreate(nx, ny, &s);
+         rbfsetalgothinplatespline(&s, 0.0);
+         rbfsetpoints(&s, &xy, n);
+         rbfbuildmodel(&s, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         rbfcreate(nx, ny, &s2);
+         rbfsetalgothinplatespline(&s2, 0.0);
+         rbfsetpointsandscales(&s2, &xy2, n, &scalex);
+         rbfbuildmodel(&s2, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+      // Compare model values in grid points
+         ae_vector_set_length(&x, nx);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < nx; j++) {
+               x.xR[j] = xy.xyR[i][j];
+            }
+            rbfcalc(&s, &x, &y);
+            for (j = 0; j < nx; j++) {
+               x.xR[j] = xy2.xyR[i][j];
+            }
+            rbfcalc(&s2, &x, &y2);
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], nodetol);
+            }
+         }
+      // Compare model values in random points
+         ae_vector_set_length(&x, nx);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < nx; j++) {
+               x.xR[j] = randomreal();
+            }
+            rbfcalc(&s, &x, &y);
+            for (j = 0; j < nx; j++) {
+               x.xR[j] *= scalex.xR[j];
+            }
+            rbfcalc(&s2, &x, &y2);
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], randtol);
+            }
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+// Test gridded evaluation of XRBFs.
+// ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
+static bool testrbfunit_gridxrbftest() {
+   ae_frame _frame_block;
+   ae_int_t nx;
+   ae_int_t ny;
+   bool hasscale;
+   double errtol;
+   ae_int_t n;
+   ae_int_t n0;
+   ae_int_t n1;
+   ae_int_t n2;
+   ae_int_t nkind;
+   double v;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t i0;
+   ae_int_t i1;
+   ae_int_t i2;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(rbfmodel, s);
+   NewObj(rbfreport, rep);
+   NewMatrix(xy, 0, 0, DT_REAL);
+   NewMatrix(xy2, 0, 0, DT_REAL);
+   NewMatrix(y2, 0, 0, DT_REAL);
+   NewVector(x0, 0, DT_REAL);
+   NewVector(x1, 0, DT_REAL);
+   NewVector(x2, 0, DT_REAL);
+   NewVector(x02, 0, DT_REAL);
+   NewVector(x12, 0, DT_REAL);
+   NewVector(x22, 0, DT_REAL);
+   NewVector(scalevec, 0, DT_REAL);
+   NewVector(scalevec2, 0, DT_REAL);
+   NewVector(needy, 0, DT_BOOL);
+   NewVector(rowflags, 0, DT_BOOL);
+   NewVector(x, 0, DT_REAL);
+   NewVector(y, 0, DT_REAL);
+   NewVector(yv, 0, DT_REAL);
+   NewVector(yv2, 0, DT_REAL);
+   Ok = true;
+// Test 2-dimensional grid calculation
+   errtol = 1.0E-12;
+   nx = 2;
+   for (ny = 1; ny <= 4; ny++) {
+      for (nkind = 0; nkind <= 2; nkind++) {
+      // problem setup
+         n = 150;
+         ae_matrix_set_length(&xy, n, nx + ny);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < nx; j++) {
+               xy.xyR[i][j] = randomreal();
+            }
+            for (j = 0; j < ny; j++) {
+               xy.xyR[i][nx + j] = randomreal() - 0.5;
+            }
+         }
+         hasscale = randominteger(2) == 0;
+         if (hasscale) {
+            ae_vector_set_length(&scalevec, nx);
+            for (j = 0; j < nx; j++) {
+               scalevec.xR[j] = pow(2.0, randommid());
+            }
+         }
+      // Build model
+         rbfcreate(nx, ny, &s);
+         rbfsetalgothinplatespline(&s, 0.0);
+         if (hasscale) {
+            rbfsetpointsandscales(&s, &xy, n, &scalevec);
+         } else {
+            rbfsetpoints(&s, &xy, n);
+         }
+         rbfbuildmodel(&s, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+      // Prepare grid to test
+         n0 = 1 + randominteger(50);
+         n1 = 1 + randominteger(50);
+         if (nkind == 1) {
+            k = randominteger(2);
+            if (k == 0) {
+               n0 = 1;
+            }
+            if (k == 1) {
+               n1 = 1;
+            }
+         } else {
+            if (nkind == 2) {
+               n0 = 1;
+               n1 = 1;
+            } else {
+               ae_assert(nkind == 0, "Assertion failed");
+            }
+         }
+         ae_vector_set_length(&x0, n0);
+         x0.xR[0] = randomreal();
+         for (i = 1; i < n0; i++) {
+            x0.xR[i] = x0.xR[i - 1] + randomreal() / n0;
+         }
+         ae_vector_set_length(&x1, n1);
+         x1.xR[0] = randomreal();
+         for (i = 1; i < n1; i++) {
+            x1.xR[i] = x1.xR[i - 1] + randomreal() / n1;
+         }
+         ae_vector_set_length(&needy, n0 * n1);
+         v = pow(10.0, -3.0 * randomreal());
+         for (i = 0; i < n0 * n1; i++) {
+            needy.xB[i] = randombool(v);
+         }
+      // Test at grid
+         ae_vector_set_length(&x, nx);
+         rbfgridcalc2v(&s, &x0, n0, &x1, n1, &yv);
+         for (i0 = 0; i0 < n0; i0++) {
+            for (i1 = 0; i1 < n1; i1++) {
+               x.xR[0] = x0.xR[i0];
+               x.xR[1] = x1.xR[i1];
+               rbfcalc(&s, &x, &y);
+               for (i = 0; i < ny; i++) {
+                  Ok = Ok && NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0)], errtol);
+               }
+            }
+         }
+      // Test calculation on subset of regular grid:
+      // * Test 1: compare full and subset versions
+      // * Test 2: check sparsity. Subset function may perform additional
+      //   evaluations because it processes data micro-row by micro-row.
+      //   So, we can't check that all elements which were not flagged
+      //   are zero - some of them may become non-zero. However, if entire
+      //   row is empty, we can reasonably expect (informal guarantee)
+      //   that it is not processed. So, we check empty (completely
+      //   unflagged) rows
+      //
+         SetVector(&yv2);
+         rbfgridcalc2vsubset(&s, &x0, n0, &x1, n1, &needy, &yv2);
+         for (i = 0; i < ny * n0 * n1; i++) {
+            Ok = Ok && (!needy.xB[i / ny] || NearAtR(yv.xR[i], yv2.xR[i], errtol));
+         }
+      // Test legacy function
+         rbfgridcalc2(&s, &x0, n0, &x1, n1, &y2);
+         for (i = 0; i < n0 * n1; i++) {
+            if (ny == 1) {
+               Ok = Ok && NearAtR(yv.xR[i], y2.xyR[i % n0][i / n0], errtol);
+            } else {
+               Ok = Ok && y2.xyR[i % n0][i / n0] == 0.0;
+            }
+         }
+      }
+   }
+// Test 3-dimensional grid calculation
+   errtol = 1.0E-12;
+   nx = 3;
+   for (ny = 1; ny <= 4; ny++) {
+      for (nkind = 0; nkind <= 2; nkind++) {
+      // problem setup
+         n = 150;
+         ae_matrix_set_length(&xy, n, nx + ny);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < nx; j++) {
+               xy.xyR[i][j] = randomreal();
+            }
+            for (j = 0; j < ny; j++) {
+               xy.xyR[i][nx + j] = randomreal() - 0.5;
+            }
+         }
+         hasscale = randominteger(2) == 0;
+         if (hasscale) {
+            ae_vector_set_length(&scalevec, nx);
+            for (j = 0; j < nx; j++) {
+               scalevec.xR[j] = pow(2.0, randommid());
+            }
+         }
+      // Build model
+         rbfcreate(nx, ny, &s);
+         rbfsetalgothinplatespline(&s, 0.0);
+         if (hasscale) {
+            rbfsetpointsandscales(&s, &xy, n, &scalevec);
+         } else {
+            rbfsetpoints(&s, &xy, n);
+         }
+         rbfbuildmodel(&s, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+      // Prepare grid to test
+         n0 = 1 + randominteger(50);
+         n1 = 1 + randominteger(50);
+         n2 = 1 + randominteger(50);
+         if (nkind == 1) {
+            k = randominteger(3);
+            if (k == 0) {
+               n0 = 1;
+            }
+            if (k == 1) {
+               n1 = 1;
+            }
+            if (k == 2) {
+               n2 = 1;
+            }
+         } else {
+            if (nkind == 2) {
+               n0 = 1;
+               n1 = 1;
+               n2 = 1;
+            } else {
+               ae_assert(nkind == 0, "Assertion failed");
+            }
+         }
+         ae_vector_set_length(&x0, n0);
+         x0.xR[0] = randomreal();
+         for (i = 1; i < n0; i++) {
+            x0.xR[i] = x0.xR[i - 1] + randomreal() / n0;
+         }
+         ae_vector_set_length(&x1, n1);
+         x1.xR[0] = randomreal();
+         for (i = 1; i < n1; i++) {
+            x1.xR[i] = x1.xR[i - 1] + randomreal() / n1;
+         }
+         ae_vector_set_length(&x2, n2);
+         x2.xR[0] = randomreal();
+         for (i = 1; i < n2; i++) {
+            x2.xR[i] = x2.xR[i - 1] + randomreal() / n2;
+         }
+         ae_vector_set_length(&needy, n0 * n1 * n2);
+         v = pow(10.0, -3.0 * randomreal());
+         for (i = 0; i < n0 * n1 * n2; i++) {
+            needy.xB[i] = randombool(v);
+         }
+      // Test at grid
+         ae_vector_set_length(&x, nx);
+         rbfgridcalc3v(&s, &x0, n0, &x1, n1, &x2, n2, &yv);
+         for (i0 = 0; i0 < n0; i0++) {
+            for (i1 = 0; i1 < n1; i1++) {
+               for (i2 = 0; i2 < n2; i2++) {
+                  x.xR[0] = x0.xR[i0];
+                  x.xR[1] = x1.xR[i1];
+                  x.xR[2] = x2.xR[i2];
+                  rbfcalc(&s, &x, &y);
+                  for (i = 0; i < ny; i++) {
+                     Ok = Ok && NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0 + i2 * n0 * n1)], errtol);
+                  }
+               }
+            }
+         }
+      // Test calculation on subset of regular grid:
+      // * Test 1: compare full and subset versions
+      // * Test 2: check sparsity. Subset function may perform additional
+      //   evaluations because it processes data micro-row by micro-row.
+      //   So, we can't check that all elements which were not flagged
+      //   are zero - some of them may become non-zero. However, if entire
+      //   row is empty, we can reasonably expect (informal guarantee)
+      //   that it is not processed. So, we check empty (completely
+      //   unflagged) rows
+      //
+         ae_vector_set_length(&rowflags, n1 * n2);
+         for (i = 0; i < n1 * n2; i++) {
+            rowflags.xB[i] = false;
+         }
+         for (i = 0; i < n0 * n1 * n2; i++) {
+            if (needy.xB[i]) {
+               rowflags.xB[i / n0] = true;
+            }
+         }
+         SetVector(&yv2);
+         rbfgridcalc3vsubset(&s, &x0, n0, &x1, n1, &x2, n2, &needy, &yv2);
+         for (i = 0; i < ny * n0 * n1 * n2; i++) {
+            Ok = Ok && (!needy.xB[i / ny] || NearAtR(yv.xR[i], yv2.xR[i], errtol));
+            Ok = Ok && (rowflags.xB[i / (ny * n0)] || yv2.xR[i] == 0.0);
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 // Function for testing basic functionality of RBF module with hierarchical
 // algorithm.
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
@@ -67746,150 +69607,149 @@ static bool testrbfunit_basichrbftest() {
 // * RBFTsCalcBuf()
    errtol = 0.000001;
    for (nx = 1; nx <= 4; nx++) {
-      for (ny = 1; ny <= 3; ny++) {
-      // problem setup
-         n = 150;
-         rbase = 0.33;
-         nlayers = 10;
-         gridsize = iround(pow(n, 1.0 / nx)) + 1;
-         linterm = 1 + randominteger(3);
-         bf = randominteger(2);
-         n = iround(pow(gridsize, nx));
-         ae_matrix_set_length(&xy, n, nx + ny);
-         ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert(n == pow(gridsize, nx), "Assertion failed");
-         for (i = 0; i < n; i++) {
-            k = i;
-            for (j = 0; j < nx; j++) {
-               xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
-               k /= gridsize;
-            }
-            for (j = 0; j < ny; j++) {
-               xy.xyR[i][nx + j] = randomreal() - 0.5;
-            }
-         }
-      // Build model
-         rbfcreate(nx, ny, &s);
-         rbfsetv2bf(&s, bf);
-         rbfsetalgohierarchical(&s, rbase, nlayers, 0.0);
-         if (linterm == 1) {
-            rbfsetlinterm(&s);
-         }
-         if (linterm == 2) {
-            rbfsetconstterm(&s);
-         }
-         if (linterm == 3) {
-            rbfsetzeroterm(&s);
-         }
-         rbfsetpoints(&s, &xy, n);
-         rbfbuildmodel(&s, &rep);
-         if (rep.terminationtype <= 0) {
-            Ok = false;
-            ae_frame_leave();
-            return Ok;
-         }
-         rbfcreatecalcbuffer(&s, &tsbuf);
-      // Test ability to reproduce function value
-      //
-      // NOTE: we use RBFCalc(XZero) to guarantee that internal state of
-      //       RBF model is "reset" between subsequent calls of different
-      //       functions. It allows us to make sure that we have no bug
-      //       like function simply returning latest result
-         ae_vector_set_length(&x, nx);
-         ae_vector_set_length(&xzero, nx);
-         ae_vector_set_length(&y, ny);
+   // problem setup
+      n = 150;
+      rbase = 3.0;
+      nlayers = 10;
+      gridsize = iround(pow(n, 1.0 / nx)) + 1;
+      linterm = 1 + randominteger(3);
+      ny = 1 + randominteger(2);
+      bf = randominteger(2);
+      n = iround(pow(gridsize, nx));
+      ae_matrix_set_length(&xy, n, nx + ny);
+      ae_assert(gridsize > 1, "Assertion failed");
+      ae_assert(n == pow(gridsize, nx), "Assertion failed");
+      for (i = 0; i < n; i++) {
+         k = i;
          for (j = 0; j < nx; j++) {
-            xzero.xR[j] = 0.0;
+            xy.xyR[i][j] = k % gridsize;
+            k /= gridsize;
          }
-         for (i = 0; i < n; i++) {
-            for (j = 0; j < nx; j++) {
-               x.xR[j] = xy.xyR[i][j];
-            }
+         for (j = 0; j < ny; j++) {
+            xy.xyR[i][nx + j] = randomreal() - 0.5;
+         }
+      }
+   // Build model
+      rbfcreate(nx, ny, &s);
+      rbfsetv2bf(&s, bf);
+      rbfsetalgohierarchical(&s, rbase, nlayers, 0.0);
+      if (linterm == 1) {
+         rbfsetlinterm(&s);
+      }
+      if (linterm == 2) {
+         rbfsetconstterm(&s);
+      }
+      if (linterm == 3) {
+         rbfsetzeroterm(&s);
+      }
+      rbfsetpoints(&s, &xy, n);
+      rbfbuildmodel(&s, &rep);
+      if (rep.terminationtype <= 0) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      rbfcreatecalcbuffer(&s, &tsbuf);
+   // Test ability to reproduce function value
+   //
+   // NOTE: we use RBFCalc(XZero) to guarantee that internal state of
+   //       RBF model is "reset" between subsequent calls of different
+   //       functions. It allows us to make sure that we have no bug
+   //       like function simply returning latest result
+      ae_vector_set_length(&x, nx);
+      ae_vector_set_length(&xzero, nx);
+      ae_vector_set_length(&y, ny);
+      for (j = 0; j < nx; j++) {
+         xzero.xR[j] = 0.0;
+      }
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < nx; j++) {
+            x.xR[j] = xy.xyR[i][j];
+         }
+         rbfcalc(&s, &xzero, &y);
+         if (randombool()) {
+            ae_vector_set_length(&yref, ny + 1);
+         }
+         rbfcalc(&s, &x, &yref);
+         for (j = 0; j < ny; j++) {
+            Ok = Ok && NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol);
+         }
+         Ok = Ok && yref.cnt == ny;
+         if (nx == 1 && ny == 1) {
             rbfcalc(&s, &xzero, &y);
-            if (randombool()) {
-               ae_vector_set_length(&yref, ny + 1);
-            }
-            rbfcalc(&s, &x, &yref);
-            for (j = 0; j < ny; j++) {
-               Ok = Ok && NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol);
-            }
-            Ok = Ok && yref.cnt == ny;
-            if (nx == 1 && ny == 1) {
-               rbfcalc(&s, &xzero, &y);
-               Ok = Ok && rbfcalc1(&s, x.xR[0]) == yref.xR[0];
-            }
-            if (nx == 2 && ny == 1) {
-               rbfcalc(&s, &xzero, &y);
-               Ok = Ok && rbfcalc2(&s, x.xR[0], x.xR[1]) == yref.xR[0];
-            }
-            if (nx == 3 && ny == 1) {
-               rbfcalc(&s, &xzero, &y);
-               Ok = Ok && rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) == yref.xR[0];
-            }
+            Ok = Ok && rbfcalc1(&s, x.xR[0]) == yref.xR[0];
+         }
+         if (nx == 2 && ny == 1) {
             rbfcalc(&s, &xzero, &y);
+            Ok = Ok && rbfcalc2(&s, x.xR[0], x.xR[1]) == yref.xR[0];
+         }
+         if (nx == 3 && ny == 1) {
+            rbfcalc(&s, &xzero, &y);
+            Ok = Ok && rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) == yref.xR[0];
+         }
+         rbfcalc(&s, &xzero, &y);
+         if (randombool()) {
+            ae_vector_set_length(&y, ny + 1);
+            rbfcalcbuf(&s, &x, &y);
+            Ok = Ok && y.cnt == ny + 1;
+         } else {
+            ae_vector_set_length(&y, ny - 1);
+            rbfcalcbuf(&s, &x, &y);
+            Ok = Ok && y.cnt == ny;
+         }
+         for (j = 0; j < ny; j++) {
+            Ok = Ok && y.xR[j] == yref.xR[j];
+         }
+         rbfcalc(&s, &xzero, &y);
+         if (randombool()) {
+            ae_vector_set_length(&y, ny + 1);
+            rbftscalcbuf(&s, &tsbuf, &x, &y);
+            Ok = Ok && y.cnt == ny + 1;
+         } else {
+            ae_vector_set_length(&y, ny - 1);
+            rbftscalcbuf(&s, &tsbuf, &x, &y);
+            Ok = Ok && y.cnt == ny;
+         }
+         for (j = 0; j < ny; j++) {
+            Ok = Ok && y.xR[j] == yref.xR[j];
+         }
+      }
+   // Test that:
+   // a) model with zero linear term is zero far away from dataset
+   // b) model with constant linear term is constant far away from dataset
+      ae_vector_set_length(&x, nx);
+      if (linterm == 2) {
+         for (j = 0; j < nx; j++) {
             if (randombool()) {
-               ae_vector_set_length(&y, ny + 1);
-               rbfcalcbuf(&s, &x, &y);
-               Ok = Ok && y.cnt == ny + 1;
+               x.xR[j] = gridsize + 1000.0 * rbase;
             } else {
-               ae_vector_set_length(&y, ny - 1);
-               rbfcalcbuf(&s, &x, &y);
-               Ok = Ok && y.cnt == ny;
+               x.xR[j] = -1000.0 * rbase;
             }
-            for (j = 0; j < ny; j++) {
-               Ok = Ok && y.xR[j] == yref.xR[j];
-            }
-            rbfcalc(&s, &xzero, &y);
+         }
+         rbfcalc(&s, &x, &y);
+         for (j = 0; j < nx; j++) {
             if (randombool()) {
-               ae_vector_set_length(&y, ny + 1);
-               rbftscalcbuf(&s, &tsbuf, &x, &y);
-               Ok = Ok && y.cnt == ny + 1;
+               x.xR[j] = gridsize + 1000.0 * rbase;
             } else {
-               ae_vector_set_length(&y, ny - 1);
-               rbftscalcbuf(&s, &tsbuf, &x, &y);
-               Ok = Ok && y.cnt == ny;
-            }
-            for (j = 0; j < ny; j++) {
-               Ok = Ok && y.xR[j] == yref.xR[j];
+               x.xR[j] = -1000.0 * rbase;
             }
          }
-      // Test that:
-      // a) model with zero linear term is zero far away from dataset
-      // b) model with constant linear term is constant far away from dataset
-         ae_vector_set_length(&x, nx);
-         if (linterm == 2) {
-            for (j = 0; j < nx; j++) {
-               if (randombool()) {
-                  x.xR[j] = 1.0 + 1000.0 * rbase;
-               } else {
-                  x.xR[j] = -1000.0 * rbase;
-               }
-            }
-            rbfcalc(&s, &x, &y);
-            for (j = 0; j < nx; j++) {
-               if (randombool()) {
-                  x.xR[j] = 1.0 + 1000.0 * rbase;
-               } else {
-                  x.xR[j] = -1000.0 * rbase;
-               }
-            }
-            rbfcalc(&s, &x, &y2);
-            for (j = 0; j < ny; j++) {
-               Ok = Ok && y.xR[j] == y2.xR[j];
+         rbfcalc(&s, &x, &y2);
+         for (j = 0; j < ny; j++) {
+            Ok = Ok && y.xR[j] == y2.xR[j];
+         }
+      }
+      if (linterm == 3) {
+         for (j = 0; j < nx; j++) {
+            if (randombool()) {
+               x.xR[j] = gridsize + 1000.0 * rbase;
+            } else {
+               x.xR[j] = -1000.0 * rbase;
             }
          }
-         if (linterm == 3) {
-            for (j = 0; j < nx; j++) {
-               if (randombool()) {
-                  x.xR[j] = 1.0 + 1000.0 * rbase;
-               } else {
-                  x.xR[j] = -1000.0 * rbase;
-               }
-            }
-            rbfcalc(&s, &x, &y);
-            for (j = 0; j < ny; j++) {
-               Ok = Ok && y.xR[j] == 0.0;
-            }
+         rbfcalc(&s, &x, &y);
+         for (j = 0; j < ny; j++) {
+            Ok = Ok && y.xR[j] == 0.0;
          }
       }
    }
@@ -68092,7 +69952,7 @@ static bool testrbfunit_basichrbftest() {
                   v = 2.0 * v - 1.0;
                   xy.xyR[i][0] = width * v;
                }
-               ntest = n * 10;
+               ntest = 10 * n;
                ae_matrix_set_length(&xytest, ntest, 2);
                for (i = 0; i < ntest; i++) {
                   xytest.xyR[i][0] = 0.9 * width * ((2.0 * i) / (ntest - 1) - 1);
@@ -68275,35 +70135,6 @@ static bool testrbfunit_basichrbftest() {
          }
       }
    }
-// Test that passing scaled dataset automatically results in V2 model
-// being built (even when algorithm type is not set explicitly).
-   for (nx = 1; nx <= 4; nx++) {
-      for (ny = 1; ny <= 3; ny++) {
-      // problem setup
-         n = 10;
-         ae_matrix_set_length(&xy, n, nx + ny);
-         for (i = 0; i < n; i++) {
-            for (j = 0; j < nx + ny; j++) {
-               xy.xyR[i][j] = randomreal() - 0.5;
-            }
-         }
-         ae_vector_set_length(&scalevec, nx);
-         for (j = 0; j < nx; j++) {
-            scalevec.xR[j] = pow(2.0, randommid());
-         }
-      // prepare test problem
-         rbfcreate(nx, ny, &s);
-         rbfsetpointsandscales(&s, &xy, xy.rows, &scalevec);
-      // Build model, check model version
-         rbfbuildmodel(&s, &rep);
-         if (rep.terminationtype <= 0) {
-            Ok = false;
-            ae_frame_leave();
-            return Ok;
-         }
-         Ok = Ok && rbfgetmodelversion(&s) == 2;
-      }
-   }
 // Test smoothing properties of RBF model: model with just one layer
 // and large initial radius will produce "average" value of neighbors.
 //
@@ -68315,9 +70146,9 @@ static bool testrbfunit_basichrbftest() {
 // We perform test for 2D model, because same behavior is expected
 // regardless of dimensionality.
    r0 = 6.0;
-   margin = 10;
-   threshold = 0.005;
-   gridsize = 2 * margin + 10;
+   margin = 5;
+   threshold = 0.05;
+   gridsize = 2 * margin + 5;
    nx = 2;
    ny = 1;
    for (bf = 0; bf <= 1; bf++) {
@@ -69132,6 +70963,553 @@ static bool testrbfunit_gridhrbftest() {
    return Ok;
 }
 
+// Generates random point within box surrounding dataset, with good separation
+// from dataset points.
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static void testrbfunit_generateseparatedwithinbox(RMatrix *xy, ae_int_t n, ae_int_t nx, double mindist, hqrndstate *rs, RVector *x) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   double d;
+   double mind;
+   ae_frame_make(&_frame_block);
+   SetVector(x);
+   NewVector(minx, 0, DT_REAL);
+   NewVector(maxx, 0, DT_REAL);
+   if (n < 1) {
+      hqrndnormalv(rs, nx, x);
+      ae_frame_leave();
+      return;
+   }
+   allocv(nx, &minx);
+   allocv(nx, &maxx);
+   allocv(nx, x);
+   rcopyrv(nx, xy, 0, &minx);
+   rcopyrv(nx, xy, 0, &maxx);
+   for (i = 1; i < n; i++) {
+      rmergeminrv(nx, xy, i, &minx);
+      rmergemaxrv(nx, xy, i, &maxx);
+   }
+   for (i = 0; i < nx; i++) {
+      minx.xR[i] -= 2.0 * mindist;
+      maxx.xR[i] += 2.0 * mindist;
+   }
+   do {
+      for (j = 0; j < nx; j++) {
+         x->xR[j] = minx.xR[j] + (maxx.xR[j] - minx.xR[j]) * hqrnduniformr(rs);
+      }
+      mind = 1.0E50 + mindist;
+      for (i = 0; i < n; i++) {
+         d = 0.0;
+         for (j = 0; j < nx; j++) {
+            d += sqr(xy->xyR[i][j] - x->xR[j]);
+         }
+         d = sqrt(d);
+         if (d < mind) {
+            mind = d;
+         }
+      }
+   } while (mind < mindist);
+   ae_frame_leave();
+}
+
+// Sets algorithm according to its index. If problem has unsupported dimensions
+// or other properties (e.g. variable scales vector is present), this function
+// assigns some other algorithm.
+//
+// This function outputs information about properties of the  algorithm  that
+// was actually chosen:
+// * whether second derivatives are defined at the nodes
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static void testrbfunit_setalgorithm(rbfmodel *s, ae_int_t n, ae_int_t nx, ae_int_t ny, bool hasscale, ae_int_t algoidx, double meanpointsseparation, bool *hasgradientatnodes, bool *hashessianatnodes) {
+   *hasgradientatnodes = false;
+   *hashessianatnodes = false;
+   *hasgradientatnodes = true;
+   *hashessianatnodes = true;
+   if (algoidx == 0) {
+      if (nx >= 2 && nx <= 3 && !hasscale) {
+         rbfsetalgoqnn(s, meanpointsseparation, 5.0);
+      } else {
+         rbfsetalgohierarchical(s, 16.0 * meanpointsseparation, 8, 0.0);
+      }
+      return;
+   }
+   if (algoidx == 1) {
+      if (nx >= 2 && nx <= 3 && !hasscale) {
+         rbfsetalgomultilayer(s, 16.0 * meanpointsseparation, 8, 0.0);
+      } else {
+         rbfsetalgohierarchical(s, 16.0 * meanpointsseparation, 8, 0.0);
+      }
+      return;
+   }
+   if (algoidx == 2) {
+      rbfsetalgohierarchical(s, 16.0 * meanpointsseparation, 8, 0.0);
+      return;
+   }
+   if (algoidx == 3) {
+      rbfsetalgothinplatespline(s, randominteger(2) * pow(10.0, -6.0 * randomreal()));
+      *hashessianatnodes = false;
+      return;
+   }
+   if (algoidx == 4) {
+      if (randombool()) {
+         rbfsetalgomultiquadricmanual(s, meanpointsseparation * (0.5 + randomreal()), randominteger(2) * pow(10.0, -6.0 * randomreal()));
+      } else {
+         rbfsetalgomultiquadricauto(s, randominteger(2) * pow(10.0, -6.0 * randomreal()));
+      }
+      return;
+   }
+   if (algoidx == 5) {
+      rbfsetalgobiharmonic(s, randominteger(2) * pow(10.0, -6.0 * randomreal()));
+      *hasgradientatnodes = false;
+      *hashessianatnodes = false;
+      return;
+   }
+   ae_assert(false, "SetAlgorithm: unknown AlgoIdx");
+}
+
+// Function for testing gradient evaluation
+// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
+static bool testrbfunit_gradtest() {
+   ae_frame _frame_block;
+   ae_int_t algoidx;
+   ae_int_t nkind;
+   ae_int_t n;
+   ae_int_t nx;
+   ae_int_t ny;
+   bool hasscale;
+   double errtol;
+   double errtol2;
+   double stp;
+   double stp2;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t trialidx;
+   double v0;
+   double v1;
+   double v3;
+   double v4;
+   double df;
+   double d2f;
+   double vy;
+   double vdy0;
+   double vdy1;
+   double vdy2;
+   bool islonger;
+   bool hasgradientatnodes;
+   bool hashessianatnodes;
+   bool trialatnode;
+   double meanseparation;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewMatrix(xy, 0, 0, DT_REAL);
+   NewVector(scalevec, 0, DT_REAL);
+   NewVector(x, 0, DT_REAL);
+   NewVector(x1, 0, DT_REAL);
+   NewVector(yref, 0, DT_REAL);
+   NewVector(y, 0, DT_REAL);
+   NewVector(y1, 0, DT_REAL);
+   NewVector(dy, 0, DT_REAL);
+   NewVector(d2y, 0, DT_REAL);
+   NewVector(dyref, 0, DT_REAL);
+   NewVector(d2yref, 0, DT_REAL);
+   NewVector(dy0, 0, DT_REAL);
+   NewVector(dy1, 0, DT_REAL);
+   NewVector(dy2, 0, DT_REAL);
+   NewVector(dy3, 0, DT_REAL);
+   NewVector(dy4, 0, DT_REAL);
+   NewObj(rbfmodel, s);
+   NewObj(rbfreport, rep);
+   NewObj(rbfcalcbuffer, tsbuf);
+   NewObj(hqrndstate, rs);
+   hqrndrandomize(&rs);
+// Generate good random grid, build model, check derivatives at random points and at grid nodes
+   stp = 0.000001;
+   stp2 = 0.000001;
+   errtol = 0.005;
+   errtol2 = 0.005;
+   for (algoidx = 0; algoidx < testrbfunit_algorithmscnt; algoidx++) {
+      for (nx = 1; nx <= 4; nx++) {
+         for (nkind = 0; nkind <= 1; nkind++) {
+         // problem setup
+            ae_assert(nkind == 0 || nkind == 1, "rbf: nkind");
+            ny = 1 + hqrnduniformi(&rs, 2);
+            n = 100 * nkind;
+            hasscale = hqrndnormal(&rs) > 0.0;
+            rbfcreate(nx, ny, &s);
+            if (n != 0) {
+               testrbfunit_generatenearlyregulargrid(n, nx, ny, &rs, &xy, &meanseparation);
+               if (hasscale) {
+                  ae_vector_set_length(&scalevec, nx);
+                  for (i = 0; i < nx; i++) {
+                     scalevec.xR[i] = pow(2.0, 0.5 * hqrndnormal(&rs));
+                  }
+                  rbfsetpointsandscales(&s, &xy, n, &scalevec);
+               } else {
+                  rbfsetpoints(&s, &xy, n);
+               }
+            } else {
+               meanseparation = 1.0;
+            }
+            testrbfunit_setalgorithm(&s, n, nx, ny, hasscale, algoidx, meanseparation, &hasgradientatnodes, &hashessianatnodes);
+            rbfbuildmodel(&s, &rep);
+            if (rep.terminationtype <= 0) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            rbfcreatecalcbuffer(&s, &tsbuf);
+         // Check first derivatives - perform N randomized trials
+            for (trialidx = 0; trialidx <= n; trialidx++) {
+            // Check RBFDiff vs numerical derivatives. RBFCalc() is used to provide reference values.
+            //
+            // After this block we assume that RBFDiff is correct reference implementation.
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+                  trialatnode = true;
+               } else {
+                  testrbfunit_generateseparatedwithinbox(&xy, n, nx, rmax3(100.0 * stp, 100.0 * stp2, 0.01 / n), &rs, &x);
+                  trialatnode = false;
+               }
+               ae_vector_set_length(&yref, 0);
+               ae_vector_set_length(&y, 0);
+               ae_vector_set_length(&dy, 0);
+               if (hqrndnormal(&rs) > 0.0) {
+                  ae_vector_set_length(&yref, ny + 1);
+                  ae_vector_set_length(&y, ny + 1);
+                  ae_vector_set_length(&dy, ny * nx + 1);
+               }
+               rcopyallocv(nx, &x, &x1);
+               rbfcalc(&s, &x1, &yref);
+               rcopyallocv(nx, &x, &x1);
+               rbfdiff(&s, &x1, &y, &dy);
+               Ok = Ok && yref.cnt == ny;
+               Ok = Ok && y.cnt == ny;
+               Ok = Ok && dy.cnt == ny * nx;
+               if (hasgradientatnodes || !trialatnode) {
+               // Gradient is well defined, check
+                  for (j = 0; j < ny; j++) {
+                     Ok = Ok && NearAtR(y.xR[j], yref.xR[j], errtol);
+                     for (k = 0; k < nx; k++) {
+                        rcopyallocv(nx, &x, &x1);
+                        x1.xR[k] -= 2.0 * stp;
+                        rbfcalc(&s, &x1, &y1);
+                        v0 = y1.xR[j];
+                        rcopyallocv(nx, &x, &x1);
+                        x1.xR[k] -= stp;
+                        rbfcalc(&s, &x1, &y1);
+                        v1 = y1.xR[j];
+                        rcopyallocv(nx, &x, &x1);
+                        rbfcalc(&s, &x1, &y1);
+                        rcopyallocv(nx, &x, &x1);
+                        x1.xR[k] += stp;
+                        rbfcalc(&s, &x1, &y1);
+                        v3 = y1.xR[j];
+                        rcopyallocv(nx, &x, &x1);
+                        x1.xR[k] += 2.0 * stp;
+                        rbfcalc(&s, &x1, &y1);
+                        v4 = y1.xR[j];
+                        df = (-v4 + 8.0 * v3 - 8.0 * v1 + v0) / (12.0 * stp);
+                        Ok = Ok && NearAtR(dy.xR[j * nx + k], df, (1.0 + fabs(df)) * errtol);
+                     }
+                  }
+               } else {
+               // Gradient is undefined at the trial point, zero must be returned
+                  Ok = Ok && rmaxabsv(ny * nx, &dy) == 0.0;
+               }
+            // Check RBFDiffBuf vs RBFDiff.
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+               } else {
+                  hqrndnormalv(&rs, nx, &x);
+               }
+               ae_vector_set_length(&yref, 0);
+               ae_vector_set_length(&dyref, 0);
+               ae_vector_set_length(&y, 0);
+               ae_vector_set_length(&dy, 0);
+               islonger = false;
+               if (hqrndnormal(&rs) > 0.0) {
+                  ae_vector_set_length(&yref, ny + 1);
+                  ae_vector_set_length(&y, ny + 1);
+                  ae_vector_set_length(&dy, ny * nx + 1);
+                  ae_vector_set_length(&dyref, ny * nx + 1);
+                  islonger = true;
+               }
+               rcopyallocv(nx, &x, &x1);
+               rbfdiff(&s, &x1, &yref, &dyref);
+               rcopyallocv(nx, &x, &x1);
+               rbfdiffbuf(&s, &x1, &y, &dy);
+               Ok = Ok && yref.cnt == ny;
+               Ok = Ok && dyref.cnt == ny * nx;
+               Ok = Ok && (islonger ? y.cnt > ny : y.cnt == ny);
+               Ok = Ok && (islonger ? dy.cnt > ny * nx : dy.cnt == ny * nx);
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && NearAtR(y.xR[j], yref.xR[j], errtol);
+                  for (k = 0; k < nx; k++) {
+                     Ok = Ok && NearAtR(dy.xR[j * nx + k], dyref.xR[j * nx + k], errtol);
+                  }
+               }
+            // Check RBFTsDiffBuf vs RBFDiff.
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+               } else {
+                  hqrndnormalv(&rs, nx, &x);
+               }
+               ae_vector_set_length(&yref, 0);
+               ae_vector_set_length(&dyref, 0);
+               ae_vector_set_length(&y, 0);
+               ae_vector_set_length(&dy, 0);
+               islonger = false;
+               if (hqrndnormal(&rs) > 0.0) {
+                  ae_vector_set_length(&yref, ny + 1);
+                  ae_vector_set_length(&y, ny + 1);
+                  ae_vector_set_length(&dy, ny * nx + 1);
+                  ae_vector_set_length(&dyref, ny * nx + 1);
+                  islonger = true;
+               }
+               rcopyallocv(nx, &x, &x1);
+               rbfdiff(&s, &x1, &yref, &dyref);
+               rcopyallocv(nx, &x, &x1);
+               rbftsdiffbuf(&s, &tsbuf, &x1, &y, &dy);
+               Ok = Ok && yref.cnt == ny;
+               Ok = Ok && dyref.cnt == ny * nx;
+               Ok = Ok && (islonger ? y.cnt > ny : y.cnt == ny);
+               Ok = Ok && (islonger ? dy.cnt > ny * nx : dy.cnt == ny * nx);
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && NearAtR(y.xR[j], yref.xR[j], errtol);
+                  for (k = 0; k < nx; k++) {
+                     Ok = Ok && NearAtR(dy.xR[j * nx + k], dyref.xR[j * nx + k], errtol);
+                  }
+               }
+            // Check RBFDiff1/RBFDiff2/RBFDiff3 vs RBFDiff.
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+               } else {
+                  hqrndnormalv(&rs, nx, &x);
+               }
+               ae_vector_set_length(&yref, 0);
+               ae_vector_set_length(&dyref, 0);
+               if (nx == 1 && ny == 1) {
+                  rcopyallocv(nx, &x, &x1);
+                  rbfdiff(&s, &x1, &yref, &dyref);
+                  rbfdiff1(&s, x.xR[0], &vy, &vdy0);
+                  Ok = Ok && yref.cnt == ny;
+                  Ok = Ok && dyref.cnt == ny * nx;
+                  Ok = Ok && NearAtR(vy, yref.xR[0], errtol);
+                  Ok = Ok && NearAtR(vdy0, dyref.xR[0], errtol);
+               } else {
+                  rbfdiff1(&s, 1.2, &vy, &vdy0);
+                  Ok = Ok && vy == 0.0;
+                  Ok = Ok && vdy0 == 0.0;
+               }
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+               } else {
+                  hqrndnormalv(&rs, nx, &x);
+               }
+               if (nx == 2 && ny == 1) {
+                  rcopyallocv(nx, &x, &x1);
+                  rbfdiff(&s, &x1, &yref, &dyref);
+                  rbfdiff2(&s, x.xR[0], x.xR[1], &vy, &vdy0, &vdy1);
+                  Ok = Ok && yref.cnt == ny;
+                  Ok = Ok && dyref.cnt == ny * nx;
+                  Ok = Ok && NearAtR(vy, yref.xR[0], errtol);
+                  Ok = Ok && NearAtR(vdy0, dyref.xR[0], errtol);
+                  Ok = Ok && NearAtR(vdy1, dyref.xR[1], errtol);
+               } else {
+                  rbfdiff2(&s, 1.2, 3.4, &vy, &vdy0, &vdy1);
+                  Ok = Ok && vy == 0.0;
+                  Ok = Ok && vdy0 == 0.0;
+                  Ok = Ok && vdy1 == 0.0;
+               }
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+               } else {
+                  hqrndnormalv(&rs, nx, &x);
+               }
+               if (nx == 3 && ny == 1) {
+                  rcopyallocv(nx, &x, &x1);
+                  rbfdiff(&s, &x1, &yref, &dyref);
+                  rbfdiff3(&s, x.xR[0], x.xR[1], x.xR[2], &vy, &vdy0, &vdy1, &vdy2);
+                  Ok = Ok && yref.cnt == ny;
+                  Ok = Ok && dyref.cnt == ny * nx;
+                  Ok = Ok && NearAtR(vy, yref.xR[0], errtol);
+                  Ok = Ok && NearAtR(vdy0, dyref.xR[0], errtol);
+                  Ok = Ok && NearAtR(vdy1, dyref.xR[1], errtol);
+                  Ok = Ok && NearAtR(vdy2, dyref.xR[2], errtol);
+               } else {
+                  rbfdiff3(&s, 1.2, 3.4, 5.6, &vy, &vdy0, &vdy1, &vdy2);
+                  Ok = Ok && vy == 0.0;
+                  Ok = Ok && vdy0 == 0.0;
+                  Ok = Ok && vdy1 == 0.0;
+                  Ok = Ok && vdy2 == 0.0;
+               }
+            }
+         // Check second derivatives - perform N randomized trials
+            for (trialidx = 0; trialidx <= n; trialidx++) {
+            // Check RBFHess vs numerical derivatives.
+            // RBFDiff() is assumed to be already tested and is used to provide exact first derivatives.
+            // In this test we have to handle situation when the Hessian is undefined at the trial node.
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+                  trialatnode = true;
+               } else {
+                  testrbfunit_generateseparatedwithinbox(&xy, n, nx, rmax3(100.0 * stp, 100.0 * stp2, 0.01 / n), &rs, &x);
+                  trialatnode = false;
+               }
+               ae_vector_set_length(&dyref, 0);
+               ae_vector_set_length(&yref, 0);
+               ae_vector_set_length(&y, 0);
+               ae_vector_set_length(&dy, 0);
+               ae_vector_set_length(&d2y, 0);
+               if (hqrndnormal(&rs) > 0.0) {
+                  ae_vector_set_length(&dyref, ny + 1);
+                  ae_vector_set_length(&yref, ny + 1);
+                  ae_vector_set_length(&y, ny + 1);
+                  ae_vector_set_length(&dy, ny * nx + 1);
+                  ae_vector_set_length(&d2y, ny * nx * nx + 1);
+               }
+               rcopyallocv(nx, &x, &x1);
+               rbfdiff(&s, &x1, &yref, &dyref);
+               rcopyallocv(nx, &x, &x1);
+               rbfhess(&s, &x1, &y, &dy, &d2y);
+               Ok = Ok && yref.cnt == ny;
+               Ok = Ok && dyref.cnt == ny * nx;
+               Ok = Ok && y.cnt == ny;
+               Ok = Ok && dy.cnt == ny * nx;
+               Ok = Ok && d2y.cnt == ny * nx * nx;
+               for (k = 0; k < nx; k++) {
+                  Ok = Ok && NearAtR(dy.xR[k], dyref.xR[k], (1.0 + fabs(dyref.xR[k])) * errtol);
+               }
+               if (hashessianatnodes || !trialatnode) {
+               // The Hessian is well defined at the trial point.
+                  for (k = 0; k < nx; k++) {
+                  // Test K-th column of the Hessian, using RBFDiff() as a reference function for the first derivatives
+                     rcopyallocv(nx, &x, &x1);
+                     x1.xR[k] -= 2.0 * stp2;
+                     rbfdiff(&s, &x1, &y1, &dy0);
+                     rcopyallocv(nx, &x, &x1);
+                     x1.xR[k] -= stp2;
+                     rbfdiff(&s, &x1, &y1, &dy1);
+                     rcopyallocv(nx, &x, &x1);
+                     rbfdiff(&s, &x1, &y1, &dy2);
+                     rcopyallocv(nx, &x, &x1);
+                     x1.xR[k] += stp2;
+                     rbfdiff(&s, &x1, &y1, &dy3);
+                     rcopyallocv(nx, &x, &x1);
+                     x1.xR[k] += 2.0 * stp2;
+                     rbfdiff(&s, &x1, &y1, &dy4);
+                     for (i = 0; i < ny; i++) {
+                        for (j = 0; j < nx; j++) {
+                           d2f = (-dy4.xR[i * nx + j] + 8.0 * dy3.xR[i * nx + j] - 8.0 * dy1.xR[i * nx + j] + dy0.xR[i * nx + j]) / (12.0 * stp2);
+                           Ok = Ok && NearAtR(d2y.xR[i * nx * nx + j * nx + k], d2f, (1.0 + fabs(d2f)) * errtol2);
+                        }
+                     }
+                  }
+               } else {
+               // The Hessian is undefined at the trial point, exact zero must be returned
+                  Ok = Ok && rmaxabsv(ny * nx * nx, &d2y) == 0.0;
+               }
+            // Check RBFHessBuf vs RBFHess
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+               } else {
+                  testrbfunit_generateseparatedwithinbox(&xy, n, nx, 1.0 / n, &rs, &x);
+               }
+               ae_vector_set_length(&yref, 0);
+               ae_vector_set_length(&dyref, 0);
+               ae_vector_set_length(&d2yref, 0);
+               ae_vector_set_length(&y, 0);
+               ae_vector_set_length(&dy, 0);
+               ae_vector_set_length(&d2y, 0);
+               islonger = false;
+               if (hqrndnormal(&rs) > 0.0) {
+                  ae_vector_set_length(&y, ny + 1);
+                  ae_vector_set_length(&yref, ny + 1);
+                  ae_vector_set_length(&dy, ny * nx + 1);
+                  ae_vector_set_length(&dyref, ny * nx + 1);
+                  ae_vector_set_length(&d2y, ny * nx * nx + 1);
+                  ae_vector_set_length(&d2yref, ny * nx * nx + 1);
+                  islonger = true;
+               }
+               rcopyallocv(nx, &x, &x1);
+               rbfhess(&s, &x1, &yref, &dyref, &d2yref);
+               rcopyallocv(nx, &x, &x1);
+               rbfhessbuf(&s, &x1, &y, &dy, &d2y);
+               Ok = Ok && yref.cnt == ny;
+               Ok = Ok && dyref.cnt == ny * nx;
+               Ok = Ok && d2yref.cnt == ny * nx * nx;
+               Ok = Ok && (islonger ? y.cnt > ny : y.cnt == ny);
+               Ok = Ok && (islonger ? dy.cnt > ny * nx : dy.cnt == ny * nx);
+               Ok = Ok && (islonger ? d2y.cnt > ny * nx * nx : d2y.cnt == ny * nx * nx);
+               for (k = 0; k < ny; k++) {
+                  Ok = Ok && y.xR[k] == yref.xR[k];
+               }
+               for (k = 0; k < ny * nx; k++) {
+                  Ok = Ok && dy.xR[k] == dyref.xR[k];
+               }
+               for (k = 0; k < ny * nx * nx; k++) {
+                  Ok = Ok && d2y.xR[k] == d2yref.xR[k];
+               }
+            // Check RBFTsHessBuf vs RBFHess
+               ae_vector_set_length(&x, nx);
+               if (n > 0 && hqrndnormal(&rs) > 0.0) {
+                  rcopyrv(nx, &xy, hqrnduniformi(&rs, n), &x);
+               } else {
+                  testrbfunit_generateseparatedwithinbox(&xy, n, nx, 1.0 / n, &rs, &x);
+               }
+               ae_vector_set_length(&yref, 0);
+               ae_vector_set_length(&dyref, 0);
+               ae_vector_set_length(&d2yref, 0);
+               ae_vector_set_length(&y, 0);
+               ae_vector_set_length(&dy, 0);
+               ae_vector_set_length(&d2y, 0);
+               islonger = false;
+               if (hqrndnormal(&rs) > 0.0) {
+                  ae_vector_set_length(&y, ny + 1);
+                  ae_vector_set_length(&yref, ny + 1);
+                  ae_vector_set_length(&dy, ny * nx + 1);
+                  ae_vector_set_length(&dyref, ny * nx + 1);
+                  ae_vector_set_length(&d2y, ny * nx * nx + 1);
+                  ae_vector_set_length(&d2yref, ny * nx * nx + 1);
+                  islonger = true;
+               }
+               rcopyallocv(nx, &x, &x1);
+               rbfhess(&s, &x1, &yref, &dyref, &d2yref);
+               rcopyallocv(nx, &x, &x1);
+               rbftshessbuf(&s, &tsbuf, &x1, &y, &dy, &d2y);
+               Ok = Ok && yref.cnt == ny;
+               Ok = Ok && dyref.cnt == ny * nx;
+               Ok = Ok && d2yref.cnt == ny * nx * nx;
+               Ok = Ok && (islonger ? y.cnt > ny : y.cnt == ny);
+               Ok = Ok && (islonger ? dy.cnt > ny * nx : dy.cnt == ny * nx);
+               Ok = Ok && (islonger ? d2y.cnt > ny * nx * nx : d2y.cnt == ny * nx * nx);
+               for (k = 0; k < ny; k++) {
+                  Ok = Ok && y.xR[k] == yref.xR[k];
+               }
+               for (k = 0; k < ny * nx; k++) {
+                  Ok = Ok && dy.xR[k] == dyref.xR[k];
+               }
+               for (k = 0; k < ny * nx * nx; k++) {
+                  Ok = Ok && d2y.xR[k] == d2yref.xR[k];
+               }
+            }
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 bool testrbf() {
    bool specialOk;
    bool basicrbfOk;
@@ -69142,12 +71520,25 @@ bool testrbf() {
    bool multilayerrbf1dOk;
    bool multilayerrbfOk;
    bool gridcalc23Ok;
+   bool gradOk;
    bool hrbfbasicOk;
    bool hrbfscaleOk;
    bool hrbfspecOk;
    bool hrbfgridOk;
    bool hrbfOk;
+   bool xrbfbasicOk;
+   bool xrbfscaleOk;
+   bool xrbfgridOk;
+   bool xrbfOk;
    bool Ok;
+   gradOk = true;
+// Shared tests.
+   gradOk = gradOk && testrbfunit_gradtest();
+// XRBF tests.
+   xrbfbasicOk = testrbfunit_basicxrbftest();
+   xrbfscaleOk = testrbfunit_scaledxrbftest();
+   xrbfgridOk = testrbfunit_gridxrbftest();
+   xrbfOk = xrbfbasicOk && xrbfscaleOk && xrbfgridOk;
 // HRBF tests.
    hrbfbasicOk = testrbfunit_basichrbftest();
    hrbfspecOk = testrbfunit_spechrbftest();
@@ -69166,12 +71557,17 @@ bool testrbf() {
    gridcalc23Ok = true;
    gridcalc23Ok = gridcalc23Ok && testrbfunit_gridcalc23test();
 // The final report.
-   Ok = specialOk && basicrbfOk && irregularrbfOk && linearitymodelrbfOk && sqrdegmatrixrbfOk && serOk && multilayerrbf1dOk && multilayerrbfOk && gridcalc23Ok && hrbfOk;
+   Ok = gradOk && specialOk && basicrbfOk && irregularrbfOk && linearitymodelrbfOk && sqrdegmatrixrbfOk && serOk && multilayerrbf1dOk && multilayerrbfOk && gridcalc23Ok && hrbfOk && xrbfOk;
    if (!Ok || !silent) {
       printf("RBF Tests\n");
       printf("General Tests:\n");
+      printf("* Differentiation Test:                   %s\n", gradOk ? "Ok" : "Failed");
       printf("* Serialization Test:                     %s\n", serOk ? "Ok" : "Failed");
       printf("* Special Properties:                     %s\n", specialOk ? "Ok" : "Failed");
+      printf("RBF-V3:\n");
+      printf("* Basic XRBF Test:                        %s\n", xrbfbasicOk ? "Ok" : "Failed");
+      printf("* Scale-Related Tests:                    %s\n", xrbfscaleOk ? "Ok" : "Failed");
+      printf("* Grid Calculation Tests:                 %s\n", xrbfgridOk ? "Ok" : "Failed");
       printf("RBF-V2:\n");
       printf("* Basic HRBF Test:                        %s\n", hrbfbasicOk ? "Ok" : "Failed");
       printf("* Scale-Related Tests:                    %s\n", hrbfscaleOk ? "Ok" : "Failed");
@@ -69384,7 +71780,7 @@ bool testfft() {
    NewVector(buf, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
    maxsmalln = 128;
-   errtol = 100000 * pow(maxsmalln, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000.0 * pow(maxsmalln, 3.0 / 2.0) * machineepsilon;
    bidiOk = true;
    refOk = true;
    bidirOk = true;
@@ -69619,7 +72015,7 @@ bool testfht() {
    NewVector(r2, 0, DT_REAL);
    NewVector(r3, 0, DT_REAL);
    maxn = 128;
-   errtol = 100000 * pow(maxn, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000.0 * pow(maxn, 3.0 / 2.0) * machineepsilon;
    bidiOk = true;
    refOk = true;
    Ok = true;
@@ -69790,7 +72186,7 @@ bool testconv() {
    NewVector(cr1, 0, DT_COMPLEX);
    NewVector(cr2, 0, DT_COMPLEX);
    maxn = 32;
-   errtol = 100000 * pow(maxn, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000.0 * pow(maxn, 3.0 / 2.0) * machineepsilon;
    refOk = true;
    refrOk = true;
    invOk = true;
@@ -70097,7 +72493,7 @@ bool testcorr() {
    NewVector(cr1, 0, DT_COMPLEX);
    NewVector(cr2, 0, DT_COMPLEX);
    maxn = 32;
-   errtol = 100000 * pow(maxn, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000.0 * pow(maxn, 3.0 / 2.0) * machineepsilon;
    refOk = true;
    refrOk = true;
    Ok = true;
@@ -81438,7 +83834,7 @@ static bool testldaunit_testwn(RMatrix *xy, RMatrix *wn, ae_int_t ns, ae_int_t n
    for (i = 1; i < nf - ndeg; i++) {
       Ok = Ok && jp.xR[i - 1] / jq.xR[i - 1] >= (1 - tol * machineepsilon) * jp.xR[i] / jq.xR[i];
    }
-   for (i = nf - 1 - ndeg + 1; i < nf; i++) {
+   for (i = nf - ndeg; i < nf; i++) {
       Ok = Ok && jp.xR[i] <= tol * machineepsilon * jp.xR[0];
    }
 // Test for J optimality
@@ -83909,10 +86305,10 @@ static bool testmlptrainunit_testmlpzeroweights() {
       }
       n = randominteger(2) - 1;
       if (n == 0) {
-         if (!issparse) {
-            mlpsetdataset(&trainer, &dds, n);
-         } else {
+         if (issparse) {
             mlpsetsparsedataset(&trainer, &sds, n);
+         } else {
+            mlpsetdataset(&trainer, &dds, n);
          }
       }
       mlpsetdecay(&trainer, vdecay);
@@ -84092,7 +86488,7 @@ static bool testmlptrainunit_testmlpcverror() {
    ae_int_t xp;
    ae_int_t nxp;
    bool isregr;
-   ae_int_t issparse;
+   bool issparse;
    ae_int_t i;
    ae_int_t j;
    bool Ok;
@@ -84149,7 +86545,7 @@ static bool testmlptrainunit_testmlpcverror() {
    mean = nxp / 2.0;
    numsigma = 3.0 * sqrt(nxp / 4.0);
    diffms = mean - numsigma;
-   issparse = randominteger(2);
+   issparse = randombool();
    if (isregr) {
       mlpcreate0(nin, nout, &net);
       mlpcreatetrainer(nin, nout, &trainer);
@@ -84170,32 +86566,7 @@ static bool testmlptrainunit_testmlpcverror() {
    r3 = 0;
    r4 = 0;
    for (xp = 1; xp <= nxp; xp++) {
-   // Dense matrix
-      if (issparse == 0) {
-         matrixsetlengthatleast(&trainingset, npoints, rowsz);
-      // Create training set
-         for (i = 0; i < npoints; i++) {
-            for (j = 0; j < nin; j++) {
-               trainingset.xyR[i][j] = randommid();
-            }
-         }
-         if (isregr) {
-            for (i = 0; i < npoints; i++) {
-               for (j = nin; j < rowsz; j++) {
-                  trainingset.xyR[i][j] = 2.0 * randomreal() + 1.0;
-               }
-            }
-         } else {
-            for (i = 0; i < npoints; i++) {
-               for (j = nin; j < rowsz; j++) {
-                  trainingset.xyR[i][j] = randominteger(nout);
-               }
-            }
-         }
-         mlpsetdataset(&trainer, &trainingset, npoints);
-      }
-   // Sparse matrix
-      if (issparse == 1) {
+      if (issparse) { // Sparse matrix
          sparsecreate(npoints, rowsz, npoints * rowsz, &sptrainingset);
       // Create training set
          for (i = 0; i < npoints; i++) {
@@ -84218,6 +86589,28 @@ static bool testmlptrainunit_testmlpcverror() {
          }
          sparseconverttocrs(&sptrainingset);
          mlpsetsparsedataset(&trainer, &sptrainingset, npoints);
+      } else { // Dense matrix
+         matrixsetlengthatleast(&trainingset, npoints, rowsz);
+      // Create training set
+         for (i = 0; i < npoints; i++) {
+            for (j = 0; j < nin; j++) {
+               trainingset.xyR[i][j] = randommid();
+            }
+         }
+         if (isregr) {
+            for (i = 0; i < npoints; i++) {
+               for (j = nin; j < rowsz; j++) {
+                  trainingset.xyR[i][j] = 2.0 * randomreal() + 1.0;
+               }
+            }
+         } else {
+            for (i = 0; i < npoints; i++) {
+               for (j = nin; j < rowsz; j++) {
+                  trainingset.xyR[i][j] = randominteger(nout);
+               }
+            }
+         }
+         mlpsetdataset(&trainer, &trainingset, npoints);
       }
       matrixsetlengthatleast(&testset, ntstpoints, rowsz);
    // Create test set
@@ -84299,11 +86692,10 @@ static bool testmlptrainunit_testmlpcverror() {
          mlpcreatetrainercls(nin, nout, &trainer);
       }
       if (npoints > -1) {
-         if (issparse == 0) {
-            mlpsetdataset(&trainer, &trainingset, npoints);
-         }
-         if (issparse == 1) {
+         if (issparse) {
             mlpsetsparsedataset(&trainer, &sptrainingset, npoints);
+         } else {
+            mlpsetdataset(&trainer, &trainingset, npoints);
          }
       }
       mlpkfoldcv(&trainer, &net, nneedrest, foldscount, &cvrep);
@@ -84436,8 +86828,8 @@ static bool testmlptrainunit_testmlptrainensregr() {
    ae_int_t ntrain;
    ae_int_t ntest;
    double avgerr;
-   ae_int_t issparse;
-   ae_int_t withtrainer;
+   bool issparse;
+   bool withtrainer;
    double eps;
    ae_int_t xp;
    ae_int_t i;
@@ -84476,14 +86868,8 @@ static bool testmlptrainunit_testmlptrainensregr() {
       mlpsetcond(&trainer, wstep, maxits);
       matrixsetlengthatleast(&xytrain, ntrain, nin + nout);
       matrixsetlengthatleast(&xytest, ntest, nin + nout);
-      withtrainer = randominteger(2);
-      issparse = 0;
-      if (withtrainer == 0) {
-         issparse = 0;
-      }
-      if (withtrainer == 1) {
-         issparse = randominteger(2);
-      }
+      withtrainer = randombool();
+      issparse = withtrainer && randombool();
    // Training set
       for (i = 0; i < ntrain; i++) {
          for (j = 0; j < nin; j++) {
@@ -84494,13 +86880,8 @@ static bool testmlptrainunit_testmlptrainensregr() {
             xytrain.xyR[i][nin] += xytrain.xyR[i][j];
          }
       }
-      if (withtrainer == 1) {
-      // Dense matrix
-         if (issparse == 0) {
-            mlpsetdataset(&trainer, &xytrain, ntrain);
-         }
-      // Sparse matrix
-         if (issparse == 1) {
+      if (withtrainer) {
+         if (issparse) { // Sparse matrix
             sparsecreate(ntrain, nin + nout, ntrain * (nin + nout), &xytrainsp);
          // Just copy dense matrix to sparse matrix(using SparseGet() is too expensive).
             for (i = 0; i < ntrain; i++) {
@@ -84510,6 +86891,8 @@ static bool testmlptrainunit_testmlptrainensregr() {
             }
             sparseconverttocrs(&xytrainsp);
             mlpsetsparsedataset(&trainer, &xytrainsp, ntrain);
+         } else { // Dense matrix
+            mlpsetdataset(&trainer, &xytrain, ntrain);
          }
       }
    // Test set
@@ -84525,13 +86908,10 @@ static bool testmlptrainunit_testmlptrainensregr() {
    // Create ensemble
       mlpecreate1(nin, nneurons, nout, enssize, &netens);
    // Train ensembles:
-   // * without trainer;
-      if (withtrainer == 0) {
-         mlpetraines(&netens, &xytrain, ntrain, decay, nneedrest, &info, &rep);
-      }
-   // * with trainer.
-      if (withtrainer == 1) {
+      if (withtrainer) { // * with trainer.
          mlptrainensemblees(&trainer, &netens, nneedrest, &rep);
+      } else { // * without trainer;
+         mlpetraines(&netens, &xytrain, ntrain, decay, nneedrest, &info, &rep);
       }
    // Test that Rep contains correct error values
       mlpeallerrorsx(&netens, &xytrain, &xytrainsp, ntrain, 0, &netens.network.dummyidx, 0, ntrain, 0, &netens.network.buf, &repx);
@@ -84546,11 +86926,10 @@ static bool testmlptrainunit_testmlptrainensregr() {
    //   requirements - average error is compared with 2*Eps).
       avgerr = 0.0;
       for (i = 0; i < ntrain; i++) {
-         if (issparse == 0) {
-            ae_v_move(x.xR, 1, xytrain.xyR[i], 1, nin);
-         }
-         if (issparse == 1) {
+         if (issparse) {
             sparsegetrow(&xytrainsp, i, &x);
+         } else {
+            ae_v_move(x.xR, 1, xytrain.xyR[i], 1, nin);
          }
          mlpeprocess(&netens, &x, &y);
          avgerr += fabs(y.xR[0] - xytrain.xyR[i][nin]);
@@ -84604,8 +86983,8 @@ static bool testmlptrainunit_testmlptrainenscls() {
    double avgerr;
    double eps;
    double delta;
-   ae_int_t issparse;
-   ae_int_t withtrainer;
+   bool issparse;
+   bool withtrainer;
    ae_int_t xp;
    ae_int_t nxp;
    ae_int_t i;
@@ -84639,14 +87018,8 @@ static bool testmlptrainunit_testmlptrainenscls() {
    nxp = 5;
    for (xp = 1; xp <= nxp; xp++) {
       enssize = iround(pow(10.0, randominteger(2) + 1.0));
-      withtrainer = randominteger(2);
-      issparse = 0;
-      if (withtrainer == 0) {
-         issparse = 0;
-      }
-      if (withtrainer == 1) {
-         issparse = randominteger(2);
-      }
+      withtrainer = randombool();
+      issparse = withtrainer && randombool();
       for (i = 0; i < ntrain; i++) {
          val = i % nin;
          for (j = 0; j < nin; j++) {
@@ -84655,12 +87028,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          xytrain.xyR[i][val]++;
          xytrain.xyR[i][nin] = val;
       }
-   // Set dense dataset in trainer
-      if (issparse == 0) {
-         mlpsetdataset(&trainer, &xytrain, ntrain);
-      }
-   // * Sparse dataset(create it with using dense dataset).
-      if (issparse == 1) {
+      if (issparse) { // * Sparse dataset(create it with using dense dataset).
          sparsecreate(ntrain, nin + 1, ntrain * (nin + 1), &xytrainsp);
          for (i = 0; i < ntrain; i++) {
             for (j = 0; j < nin; j++) {
@@ -84671,6 +87039,8 @@ static bool testmlptrainunit_testmlptrainenscls() {
          sparseconverttocrs(&xytrainsp);
       // Set sparse dataset in trainer
          mlpsetsparsedataset(&trainer, &xytrainsp, ntrain);
+      } else { // Set dense dataset in trainer
+         mlpsetdataset(&trainer, &xytrain, ntrain);
       }
    // Create test set
       for (i = 0; i < ntest; i++) {
@@ -84684,23 +87054,19 @@ static bool testmlptrainunit_testmlptrainenscls() {
    // Create ensemble
       mlpecreatec0(nin, nout, enssize, &netens);
    // Train ensembles:
-   // * without trainer;
-      if (withtrainer == 0) {
-         mlpetraines(&netens, &xytrain, ntrain, decay, nneedrest, &info, &rep);
-      }
-   // * with trainer.
-      if (withtrainer == 1) {
+      if (withtrainer) { // * with trainer.
          mlptrainensemblees(&trainer, &netens, nneedrest, &rep);
+      } else { // * without trainer;
+         mlpetraines(&netens, &xytrain, ntrain, decay, nneedrest, &info, &rep);
       }
    // Calculate average error:
    // * on training dataset;
       avgerr = 0.0;
       for (i = 0; i < ntrain; i++) {
-         if (issparse == 0) {
-            ae_v_move(x.xR, 1, xytrain.xyR[i], 1, nin);
-         }
-         if (issparse == 1) {
+         if (issparse) {
             sparsegetrow(&xytrainsp, i, &x);
+         } else {
+            ae_v_move(x.xR, 1, xytrain.xyR[i], 1, nin);
          }
          mlpeprocess(&netens, &x, &y);
          for (j = 0; j < nout; j++) {
@@ -86306,6 +88672,7 @@ const ThRet_t ThNoRet = (ThRet_t)NULL;
 typedef ThRet_t (*ThOp_t)(ThArg_t);
 typedef pthread_t Thread_t;
 inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { return pthread_create(Th, Attr, Op, Arg); }
+// inline void join_thread(Thread_t Th) { for (long T = 0; T < N; T++) pthread_join(Th, NULL); }
 inline void join_threads(long N, Thread_t *Bundle) { for (long T = 0; T < N; T++) pthread_join(Bundle[T], NULL); }
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 #   include <windows.h>
@@ -86321,6 +88688,7 @@ const ThRet_t ThNoRet = (ThRet_t)0;
 typedef LPTHREAD_START_ROUTINE ThOp_t;
 typedef HANDLE Thread_t;
 inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { *Th = CreateThread(Attr, 0, Op, Arg, 0, NULL); return *Th != NULL; }
+// inline void join_thread(Thread_t Th) { WaitForSingleObject(Th, INFINITE), CloseHandle(Th); }
 inline void join_threads(long N, Thread_t *Bundle) { WaitForMultipleObjects(N, Bundle, TRUE, INFINITE); }
 #else
 // These are totally bogus stubs.
@@ -86337,7 +88705,8 @@ const ThRet_t ThNoRet = (ThRet_t)NULL;
 typedef ThRet_t (*ThOp_t)(ThArg_t);
 struct Thread_t { ThAttr_t Attr; ThOp_t Op; ThArg_t Arg; };
 inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { Th->Attr = Attr, Th->Op = Op, Th->Arg = Arg; return 0; }
-inline void join_threads(long N, Thread_t *Bundle) { for (long T = 0; T < N; T++) Bundle->Op(Bundle_Arg); }
+// inline void join_thread(Thread_t Th) { Th.Op(Th.Arg); }
+inline void join_threads(long N, Thread_t *Bundle) { for (long T = 0; T < N; T++) Bundle->Op(Bundle->Arg); }
 #endif
 
 static const enum {

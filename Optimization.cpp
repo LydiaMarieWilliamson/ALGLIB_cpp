@@ -1897,7 +1897,7 @@ void estimateparabolicmodel(double absasum, double absasum2, double mx, double m
 // * ENORM_WORST(A) = SUM(|A[i,j]|)         error in N-term sum grows as O(N)
 // * ENORM_MEAN(A)  = SQRT(SUM(A[i,j]^2))   error in N-term sum grows as O(sqrt(N))
 // * ENORM(A)       = SQRT(ENORM_WORST(A),ENORM_MEAN(A))
-   eps = 4 * machineepsilon;
+   eps = 4.0 * machineepsilon;
    e1 = eps * md * (mx * absasum + mb);
    e2 = eps * md * (mx * sqrt(absasum2) + mb);
    d1esterror = sqrt(e1 * e2);
@@ -3732,9 +3732,7 @@ void minlbfgssetpreccholesky(minlbfgsstate *state, RMatrix *p, bool isupper) {
       mx = rmax2(mx, fabs(p->xyR[i][i]));
    }
    ae_assert(mx > 0.0, "MinLBFGSSetPrecCholesky: P is strictly singular!");
-   if (state->denseh.rows < state->n || state->denseh.cols < state->n) {
-      ae_matrix_set_length(&state->denseh, state->n, state->n);
-   }
+   matrixsetlengthatleast(&state->denseh, state->n, state->n);
    state->prectype = 1;
    if (isupper) {
       rmatrixcopy(state->n, state->n, p, 0, 0, &state->denseh, 0, 0);
@@ -4510,9 +4508,7 @@ void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1r
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
 // API: void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep);
 void minlbfgsresultsbuf(minlbfgsstate *state, RVector *x, minlbfgsreport *rep) {
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    ae_v_move(x->xR, 1, state->x.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nfev = state->repnfev;
@@ -5277,7 +5273,7 @@ void cqmevalx(convexquadraticmodel *s, RVector *x, double *r, double *noise) {
    ae_assert(isfinitevector(x, n), "CQMEval: X is not finite vector");
    *r = 0.0;
    *noise = 0.0;
-   eps = 2 * machineepsilon;
+   eps = 2.0 * machineepsilon;
    mxq = 0.0;
 // Main quadratic term.
 //
@@ -7412,7 +7408,7 @@ void snnlssolve(snnlssolver *s, RVector *x) {
          }
          dnrm = sqrt(dnrm);
          actidx = -1;
-         stpmax = 1.0E50;
+         stpmax = 100000.0;
          for (i = 0; i < ns + nd; i++) {
             if (s->nnc.xB[i] && s->d.xR[i] < 0.0) {
                v = stpmax;
@@ -8732,7 +8728,7 @@ void sasrebuildbasis(sactiveset *state) {
 //     G       -   array[N], gradient
 //     H       -   array[N], Hessian matrix
 //     HA      -   active constraints orthogonalized in such way
-//                 that HA*inv(H)*HA'= I.
+//                 that HA*inv(H)*HA' == I.
 //     Normalize-  whether we need normalized descent or not
 //     D       -   possibly preallocated buffer; automatically resized.
 //
@@ -8760,7 +8756,7 @@ static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVecto
 //
 // Formula above always gives direction which is orthogonal to rows of HA.
 // You can verify it by multiplication of both sides by HA[i] (I-th row),
-// taking into account that HA*inv(H)*HA'= I (by definition of HA - it is
+// taking into account that HA*inv(H)*HA' == I (by definition of HA - it is
 // orthogonal basis with inner product given by inv(H)).
    for (i = 0; i < n; i++) {
       d->xR[i] = g->xR[i];
@@ -12941,7 +12937,7 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep) 
       return;
    }
    if (newstep > *estimate * 100) {
-      *estimate *= 100;
+      *estimate *= 100.0;
       return;
    }
    *estimate = newstep;
@@ -13899,9 +13895,7 @@ void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1r
 // API: void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep);
 void minbleicresultsbuf(minbleicstate *state, RVector *x, minbleicreport *rep) {
    ae_int_t i;
-   if (x->cnt < state->nmain) {
-      ae_vector_set_length(x, state->nmain);
-   }
+   vectorsetlengthatleast(x, state->nmain);
    rep->iterationscount = state->repinneriterationscount;
    rep->inneriterationscount = state->repinneriterationscount;
    rep->outeriterationscount = state->repouteriterationscount;
@@ -14694,8 +14688,8 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
                }
             // Stopping condition #1 - relative function improvement is small:
             //
-            // 1. calculate steepest descent step:   V = -D1/(2*D2)
-            // 2. calculate function change:         V1= D2*V^2 + D1*V
+            // 1. calculate steepest descent step:   V  == -D1/(2*D2)
+            // 2. calculate function change:         V1 == D2*V^2 + D1*V
             // 3. stop if function change is small enough
                v = -d1 / (2 * d2);
                v1 = d2 * v * v + d1 * v;
@@ -14934,11 +14928,12 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
       ae_assert(isfinite(vv), "VIPMSetQuadraticLinear: DenseH contains infinite or NaN values!");
       scaledenseqpinplace(&state->denseh, false, nmain, &state->c, n, &state->scl);
       state->targetscale = normalizedenseqpinplace(&state->denseh, false, nmain, &state->c, n);
+      state->isdiagonalh = false;
    }
    if (state->factorizationtype == 1) {
       ae_assert(nmain == n, "VIPMSetQuadraticLinear: critical integrity check failed, NMain != N");
    // Quadratic term is stored in sparse format: either sparsify dense
-   // term of copy sparse one
+   // term or copy the sparse one
       state->hkind = 1;
       state->sparseh.matrixtype = 1;
       state->sparseh.m = n;
@@ -14956,7 +14951,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
                j1 = i - 1;
             }
             for (j = j0; j <= j1; j++) {
-               if (denseh->xyR[i][j] != 0) {
+               if (denseh->xyR[i][j] != 0.0) {
                   nnz++;
                }
             }
@@ -14971,7 +14966,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
          // Off-diagonal elements are copied only when nonzero
             if (!isupper) {
                for (j = 0; j < i; j++) {
-                  if (denseh->xyR[i][j] != 0) {
+                  if (denseh->xyR[i][j] != 0.0) {
                      v = denseh->xyR[i][j];
                      state->sparseh.idx.xZ[offs] = j;
                      state->sparseh.vals.xR[offs] = v;
@@ -14989,7 +14984,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
          // Off-diagonal elements are copied only when nonzero
             if (isupper) {
                for (j = i + 1; j < n; j++) {
-                  if (denseh->xyR[i][j] != 0) {
+                  if (denseh->xyR[i][j] != 0.0) {
                      v = denseh->xyR[i][j];
                      state->sparseh.idx.xZ[offs] = j;
                      state->sparseh.vals.xR[offs] = v;
@@ -15064,6 +15059,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
       }
       scalesparseqpinplace(&state->scl, n, &state->sparseh, &state->c);
       state->targetscale = normalizesparseqpinplace(&state->sparseh, false, &state->c, n);
+      state->isdiagonalh = state->sparseh.ridx.xZ[n] == n;
    }
    ae_assert(state->hkind >= 0, "VIPMSetQuadraticLinear: integrity check failed");
 }
@@ -15278,7 +15274,7 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
       for (i = 0; i < mdense; i++) {
          offscombined = state->combinedaslack.ridx.xZ[msparse + i];
          for (k = nmain; k < n; k++) {
-            if (state->denseafull.xyR[i][k] != 0) {
+            if (state->denseafull.xyR[i][k] != 0.0) {
                ae_assert(state->tmpi.xZ[k - nmain] == 0, "VIPMSetConstraints: slack column contains more than one nonzero element");
                state->combinedaslack.idx.xZ[offscombined] = k - nmain;
                state->combinedaslack.vals.xR[offscombined] = state->denseafull.xyR[i][k];
@@ -15396,6 +15392,7 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
          }
       }
       state->hkind = 0;
+      state->isdiagonalh = false;
    }
    if (ftype == 1) {
    // Sparse quadratic term
@@ -15414,6 +15411,7 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
       state->sparseh.ridx.xZ[n] = n;
       sparsecreatecrsinplace(&state->sparseh);
       state->hkind = 1;
+      state->isdiagonalh = true;
    }
    ae_assert(state->hkind >= 0, "VIPMInit: integrity check failed");
 // Box constraints - default values
@@ -15561,7 +15559,6 @@ static void vipmsolver_varsinitbyzero(vipmvars *vstate, ae_int_t n, ae_int_t m) 
 // the source
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 static void vipmsolver_varsinitfrom(vipmvars *vstate, vipmvars *vsrc) {
-   ae_int_t i;
    ae_int_t n;
    ae_int_t m;
    n = vsrc->n;
@@ -15570,30 +15567,16 @@ static void vipmsolver_varsinitfrom(vipmvars *vstate, vipmvars *vsrc) {
    ae_assert(m >= 0, "VarsInitFrom: M < 0");
    vstate->n = n;
    vstate->m = m;
-   vectorsetlengthatleast(&vstate->x, n);
-   vectorsetlengthatleast(&vstate->g, n);
-   vectorsetlengthatleast(&vstate->t, n);
-   vectorsetlengthatleast(&vstate->w, m);
-   vectorsetlengthatleast(&vstate->p, m);
-   vectorsetlengthatleast(&vstate->z, n);
-   vectorsetlengthatleast(&vstate->s, n);
-   vectorsetlengthatleast(&vstate->y, m);
-   vectorsetlengthatleast(&vstate->v, m);
-   vectorsetlengthatleast(&vstate->q, m);
-   for (i = 0; i < n; i++) {
-      vstate->x.xR[i] = vsrc->x.xR[i];
-      vstate->g.xR[i] = vsrc->g.xR[i];
-      vstate->t.xR[i] = vsrc->t.xR[i];
-      vstate->z.xR[i] = vsrc->z.xR[i];
-      vstate->s.xR[i] = vsrc->s.xR[i];
-   }
-   for (i = 0; i < m; i++) {
-      vstate->w.xR[i] = vsrc->w.xR[i];
-      vstate->p.xR[i] = vsrc->p.xR[i];
-      vstate->y.xR[i] = vsrc->y.xR[i];
-      vstate->v.xR[i] = vsrc->v.xR[i];
-      vstate->q.xR[i] = vsrc->q.xR[i];
-   }
+   rcopyallocv(n, &vsrc->x, &vstate->x);
+   rcopyallocv(n, &vsrc->g, &vstate->g);
+   rcopyallocv(n, &vsrc->t, &vstate->t);
+   rcopyallocv(n, &vsrc->z, &vstate->z);
+   rcopyallocv(n, &vsrc->s, &vstate->s);
+   rcopyallocv(m, &vsrc->y, &vstate->y);
+   rcopyallocv(m, &vsrc->w, &vstate->w);
+   rcopyallocv(m, &vsrc->p, &vstate->p);
+   rcopyallocv(m, &vsrc->v, &vstate->v);
+   rcopyallocv(m, &vsrc->q, &vstate->q);
 }
 
 // Adds to variables direction vector times step length. Different
@@ -15646,32 +15629,197 @@ static double vipmsolver_varscomputecomplementaritygap(vipmvars *vstate) {
 
 // Computes empirical value of the barrier parameter Mu
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-static double vipmsolver_varscomputemu(vipmvars *vstate) {
-   ae_int_t i;
-   ae_int_t k;
+static double vipmsolver_varscomputemu(vipmstate *state, vipmvars *vstate) {
    double result;
-   k = 0;
    result = 0.0;
-   for (i = 0; i < vstate->n; i++) {
-      result += vstate->z.xR[i] * vstate->g.xR[i] + vstate->s.xR[i] * vstate->t.xR[i];
-      if (!(vstate->z.xR[i] * vstate->g.xR[i] == 0.0)) {
-         k++;
-      }
-      if (!(vstate->s.xR[i] * vstate->t.xR[i] == 0.0)) {
-         k++;
-      }
-   }
-   for (i = 0; i < vstate->m; i++) {
-      result += vstate->v.xR[i] * vstate->w.xR[i] + vstate->p.xR[i] * vstate->q.xR[i];
-      if (!(vstate->v.xR[i] * vstate->w.xR[i] == 0.0)) {
-         k++;
-      }
-      if (!(vstate->p.xR[i] * vstate->q.xR[i] == 0.0)) {
-         k++;
-      }
-   }
-   result /= coalesce(k, 1.0);
+   result += rdotv(vstate->n, &vstate->z, &vstate->g) + rdotv(vstate->n, &vstate->s, &vstate->t);
+   result += rdotv(vstate->m, &vstate->v, &vstate->w) + rdotv(vstate->m, &vstate->p, &vstate->q);
+   result /= coalesce(state->cntgz + state->cntts + state->cntwv + state->cntpq, 1.0);
    return result;
+}
+
+// Initializes reduced sparse system.
+//
+// Works only for sparse IPM.
+// ALGLIB: Copyright 15.11.2021 by Sergey Bochkanov
+static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *solver) {
+   const double muquasidense = 2.0;
+   ae_int_t ntotal;
+   ae_int_t nnzmax;
+   ae_int_t factldlt;
+   ae_int_t permpriorityamd;
+   ae_int_t offs;
+   ae_int_t rowoffs;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t k0;
+   ae_int_t k1;
+   ae_int_t sumdeg;
+   ae_int_t colthreshold;
+   ae_int_t rowthreshold;
+   ae_int_t eligiblecols;
+   ae_int_t eligiblerows;
+   ae_assert(solver->factorizationtype == 1, "ReducedSystemInit: unexpected factorization type");
+   ae_assert(solver->hkind == 1, "ReducedSystemInit: unexpected HKind");
+   ntotal = solver->n + solver->mdense + solver->msparse;
+   s->ntotal = ntotal;
+   allocv(ntotal, &s->effectivediag);
+// Determine maximum amount of memory required to store sparse matrices
+   nnzmax = solver->sparseh.ridx.xZ[solver->n];
+   if (solver->msparse > 0) {
+      nnzmax += solver->sparseafull.ridx.xZ[solver->msparse];
+   }
+   if (solver->mdense > 0) {
+      nnzmax += solver->n * solver->mdense;
+   }
+   nnzmax += ntotal;
+// Prepare strictly lower triangle of template KKT matrix (KKT system without D and E
+// terms being added to diagonals)
+   s->rawsystem.m = ntotal;
+   s->rawsystem.n = ntotal;
+   vectorsetlengthatleast(&s->rawsystem.idx, nnzmax);
+   vectorsetlengthatleast(&s->rawsystem.vals, nnzmax);
+   vectorsetlengthatleast(&s->rawsystem.ridx, ntotal + 1);
+   s->rawsystem.ridx.xZ[0] = 0;
+   offs = 0;
+   rowoffs = 0;
+   sumdeg = 0;
+   isetallocv(solver->n, 0, &s->coldegrees);
+   isetallocv(solver->msparse + solver->mdense, 0, &s->rowdegrees);
+   bsetallocv(solver->n, true, &s->isdiagonal);
+   for (i = 0; i < solver->n; i++) {
+      ae_assert(solver->sparseh.didx.xZ[i] + 1 == solver->sparseh.uidx.xZ[i], "ReducedSystemInit: critical integrity check failed for diagonal of H");
+      if (!solver->isfrozen.xB[i]) {
+      // Entire row is not frozen, but some of its entries can be.
+      // Output non-frozen offdiagonal entries.
+         k0 = solver->sparseh.ridx.xZ[i];
+         k1 = solver->sparseh.didx.xZ[i] - 1;
+         for (k = k0; k <= k1; k++) {
+            j = solver->sparseh.idx.xZ[k];
+            if (!solver->isfrozen.xB[j]) {
+               s->rawsystem.idx.xZ[offs] = j;
+               s->rawsystem.vals.xR[offs] = -solver->sparseh.vals.xR[k];
+               s->isdiagonal.xB[i] = false;
+               s->isdiagonal.xB[j] = false;
+               offs++;
+            }
+         }
+      // Output diagonal entry (it is always not frozen)
+         s->rawsystem.idx.xZ[offs] = i;
+         s->rawsystem.vals.xR[offs] = -solver->sparseh.vals.xR[solver->sparseh.didx.xZ[i]];
+         offs++;
+      } else {
+      // Entire row is frozen, output just -1
+         s->rawsystem.idx.xZ[offs] = i;
+         s->rawsystem.vals.xR[offs] = -1.0;
+         offs++;
+      }
+      rowoffs++;
+      s->rawsystem.ridx.xZ[rowoffs] = offs;
+   }
+   for (i = 0; i < solver->msparse; i++) {
+      k0 = solver->sparseafull.ridx.xZ[i];
+      k1 = solver->sparseafull.ridx.xZ[i + 1] - 1;
+      for (k = k0; k <= k1; k++) {
+         j = solver->sparseafull.idx.xZ[k];
+         if (!solver->isfrozen.xB[j]) {
+            s->rawsystem.idx.xZ[offs] = j;
+            s->rawsystem.vals.xR[offs] = solver->sparseafull.vals.xR[k];
+            s->rowdegrees.xZ[i]++;
+            s->coldegrees.xZ[j]++;
+            sumdeg++;
+            offs++;
+         }
+      }
+      s->rawsystem.idx.xZ[offs] = rowoffs;
+      s->rawsystem.vals.xR[offs] = 0.0;
+      offs++;
+      rowoffs++;
+      s->rawsystem.ridx.xZ[rowoffs] = offs;
+   }
+   for (i = 0; i < solver->mdense; i++) {
+      for (k = 0; k < solver->n; k++) {
+         if (solver->denseafull.xyR[i][k] != 0.0 && !solver->isfrozen.xB[k]) {
+            s->rawsystem.idx.xZ[offs] = k;
+            s->rawsystem.vals.xR[offs] = solver->denseafull.xyR[i][k];
+            s->rowdegrees.xZ[solver->msparse + i]++;
+            s->coldegrees.xZ[k]++;
+            sumdeg++;
+            offs++;
+         }
+      }
+      s->rawsystem.idx.xZ[offs] = rowoffs;
+      s->rawsystem.vals.xR[offs] = 0.0;
+      offs++;
+      rowoffs++;
+      s->rawsystem.ridx.xZ[rowoffs] = offs;
+   }
+   ae_assert(rowoffs == ntotal, "ReducedSystemInit: critical integrity check failed");
+   ae_assert(offs <= nnzmax, "ReducedSystemInit: critical integrity check failed");
+   sparsecreatecrsinplace(&s->rawsystem);
+// Prepare reordering
+   colthreshold = iround(muquasidense * sumdeg / solver->n) + 2;
+   rowthreshold = iround(muquasidense * sumdeg / (solver->msparse + solver->mdense + 1)) + 2;
+   eligiblecols = 0;
+   eligiblerows = 0;
+   isetallocv(ntotal, 0, &s->priorities);
+   for (i = 0; i < solver->n; i++) {
+      if (s->isdiagonal.xB[i] && s->coldegrees.xZ[i] <= colthreshold) {
+         eligiblecols++;
+      }
+   }
+   for (i = 0; i < solver->mdense + solver->msparse; i++) {
+      if (s->rowdegrees.xZ[i] <= rowthreshold) {
+         eligiblerows++;
+      }
+   }
+// Perform factorization analysis using sparsity pattern (but not numerical values)
+   factldlt = 1;
+   permpriorityamd = 3;
+   if (!spsymmanalyze(&s->rawsystem, &s->priorities, factldlt, permpriorityamd, &s->analysis)) {
+      ae_assert(false, "ReducedSystemInit: critical integrity check failed, symbolically degenerate KKT system encountered");
+   }
+}
+
+// Computes factorization of A+D, where A is  internally  stored  KKT  matrix
+// and D is user-supplied diagonal term. The factorization is stored internally
+// and should never be accessed directly.
+//
+// ModEps and BadChol are user supplied tolerances for modified Cholesky/LDLT.
+//
+// Returns True on success, False on LDLT failure.
+//
+// On success outputs diagonal reproduction error ErrSq, and sum of squared
+// diagonal elements SumSq
+// ALGLIB: Copyright 15.11.2021 by Sergey Bochkanov
+static bool vipmsolver_reducedsystemfactorizewithaddend(vipmreducedsparsesystem *s, RVector *d, double modeps, double badchol, double *sumsq, double *errsq) {
+   ae_int_t ntotal;
+   ae_int_t i;
+   bool result;
+   *sumsq = 0;
+   *errsq = 0;
+   ntotal = s->ntotal;
+   for (i = 0; i < ntotal; i++) {
+      s->effectivediag.xR[i] = s->rawsystem.vals.xR[s->rawsystem.didx.xZ[i]] + d->xR[i];
+   }
+   spsymmreloaddiagonal(&s->analysis, &s->effectivediag);
+   result = true;
+   spsymmsetmodificationstrategy(&s->analysis, 1, modeps, badchol, 0.0, 0.0);
+   if (spsymmfactorize(&s->analysis)) {
+      spsymmdiagerr(&s->analysis, sumsq, errsq);
+   } else {
+      *sumsq = 0.0;
+      *errsq = 0.0;
+      result = false;
+   }
+   return result;
+}
+
+// Solve reduced KKT system, replacing right part by its solution.
+// ALGLIB: Copyright 15.11.2021 by Sergey Bochkanov
+static void vipmsolver_reducedsystemsolve(vipmreducedsparsesystem *s, RVector *b) {
+   spsymmsolve(&s->analysis, b);
 }
 
 // Computes target function 0.5*x'*H*x+c'*x
@@ -15801,13 +15949,24 @@ static void vipmsolver_multiplyhx(vipmstate *state, RVector *x, RVector *hx) {
       for (i = nmain; i < n; i++) {
          hx->xR[i] = 0.0;
       }
+      for (i = 0; i < n; i++) {
+         hx->xR[i] += x->xR[i] * state->diagr.xR[i];
+      }
    }
    if (state->hkind == 1) {
       ae_assert(state->sparseh.n == n && state->sparseh.m == n, "VIPMMultiplyHX: sparse H has incorrect size");
-      sparsesmv(&state->sparseh, false, x, hx);
-   }
-   for (i = 0; i < n; i++) {
-      hx->xR[i] += x->xR[i] * state->diagr.xR[i];
+      if (state->isdiagonalh) {
+      // H is known to be diagonal, much faster code can be used
+         rcopyv(n, &state->diagr, hx);
+         raddv(n, 1.0, &state->sparseh.vals, hx);
+         rmergemulv(n, x, hx);
+      } else {
+      // H is a general sparse matrix, use generic sparse matrix-vector multiply
+         sparsesmv(&state->sparseh, false, x, hx);
+         for (i = 0; i < n; i++) {
+            hx->xR[i] += x->xR[i] * state->diagr.xR[i];
+         }
+      }
    }
 }
 
@@ -16069,8 +16228,6 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
    // Generate reduced KKT matrix
       allocv(n + m, &state->facttmpdiag);
       for (i = 0; i < n; i++) {
-         ae_assert(state->factsparsekkttmpl.didx.xZ[i] + 1 == state->factsparsekkttmpl.uidx.xZ[i], "VIPMFactorize: integrity check failed, no diagonal element");
-         v = state->factsparsekkttmpl.vals.xR[state->factsparsekkttmpl.didx.xZ[i]];
          vv = 0.0;
          if (alpha0 > 0.0) {
             vv += alpha0 * d->xR[i];
@@ -16080,13 +16237,10 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
          }
          vv += state->diagr.xR[i];
          vv += dampeps;
-         v -= vv;
-         state->facttmpdiag.xR[i] = v;
-         ae_assert(v < 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
+         state->facttmpdiag.xR[i] = -vv;
+         ae_assert(vv > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
       }
       for (i = 0; i < msparse + mdense; i++) {
-         ae_assert(state->factsparsekkttmpl.didx.xZ[n + i] + 1 == state->factsparsekkttmpl.uidx.xZ[n + i], "VIPMFactorize: integrity check failed, no diagonal element");
-         v = state->factsparsekkttmpl.vals.xR[state->factsparsekkttmpl.didx.xZ[n + i]];
          vv = 0.0;
          if (beta0 > 0.0) {
             vv += beta0 * e->xR[i];
@@ -16095,19 +16249,15 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
             vv += beta11;
          }
          vv += dampeps;
-         v += vv;
-         state->facttmpdiag.xR[n + i] = v;
-         ae_assert(v > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
+         state->facttmpdiag.xR[n + i] = vv;
+         ae_assert(vv > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
       }
    // Perform factorization
    // Perform additional integrity check: LDLT should reproduce diagonal of initial KKT system with good precision
-      spsymmreloaddiagonal(&state->ldltanalysis, &state->facttmpdiag);
-      spsymmsetmodificationstrategy(&state->ldltanalysis, 1, modeps, badchol, 0.0, 0.0);
-      if (!spsymmfactorize(&state->ldltanalysis)) {
+      if (!vipmsolver_reducedsystemfactorizewithaddend(&state->reducedsparsesystem, &state->facttmpdiag, modeps, badchol, &sumsq, &errsq)) {
          result = false;
          return result;
       }
-      spsymmdiagerr(&state->ldltanalysis, &sumsq, &errsq);
       if (sqrt(errsq / (1 + sumsq)) > sqrt(machineepsilon)) {
          result = false;
          return result;
@@ -16192,7 +16342,7 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy)
    }
 // Sparse solving
    if (state->factorizationtype == 1) {
-      spsymmsolve(&state->ldltanalysis, deltaxy);
+      vipmsolver_reducedsystemsolve(&state->reducedsparsesystem, deltaxy);
       for (i = 0; i < n; i++) {
          if (state->isfrozen.xB[i]) {
             deltaxy->xR[i] = 0.0;
@@ -16216,23 +16366,14 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
    const double initslackval = 100.0;
    ae_int_t n;
    ae_int_t m;
-   ae_int_t nnzmax;
-   ae_int_t offs;
-   ae_int_t rowoffs;
    ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t k0;
-   ae_int_t k1;
    double v;
    double vrhs;
-   ae_int_t factldlt;
-   ae_int_t permauto;
-   double maxinitialnoncentrality;
-   double maxinitialimbalance;
    double priorcoeff;
    double initprimslack;
    double initdualslack;
+   double maxinitialnoncentrality;
+   double maxinitialimbalance;
    double mu0;
    double mumin;
    bool success;
@@ -16267,94 +16408,29 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
       state->haswv.xB[i] = state->slacksforequalityconstraints || !state->hasr.xB[i] || state->r.xR[i] > 0.0;
       state->haspq.xB[i] = state->hasr.xB[i] && state->haswv.xB[i];
    }
-// Only sparse factorization needs special powering up
+   state->cntgz = 0;
+   state->cntts = 0;
+   state->cntwv = 0;
+   state->cntpq = 0;
+   for (i = 0; i < n; i++) {
+      if (state->hasgz.xB[i]) {
+         state->cntgz++;
+      }
+      if (state->hasts.xB[i]) {
+         state->cntts++;
+      }
+   }
+   for (i = 0; i < m; i++) {
+      if (state->haswv.xB[i]) {
+         state->cntwv++;
+      }
+      if (state->haspq.xB[i]) {
+         state->cntpq++;
+      }
+   }
+// Special initialization for sparse version
    if (state->factorizationtype == 1) {
-      ae_assert(state->hkind == 1, "VIPMPowerUp: unexpected HKind");
-      nnzmax = state->sparseh.ridx.xZ[n];
-      if (state->msparse > 0) {
-         nnzmax += state->sparseafull.ridx.xZ[state->msparse];
-      }
-      if (state->mdense > 0) {
-         nnzmax += n * state->mdense;
-      }
-      nnzmax += n + m;
-   // Prepare strictly lower triangle of template KKT matrix (KKT system without D and E
-   // terms being added to diagonals)
-      state->factsparsekkttmpl.m = n + m;
-      state->factsparsekkttmpl.n = n + m;
-      vectorsetlengthatleast(&state->factsparsekkttmpl.idx, nnzmax);
-      vectorsetlengthatleast(&state->factsparsekkttmpl.vals, nnzmax);
-      vectorsetlengthatleast(&state->factsparsekkttmpl.ridx, n + m + 1);
-      state->factsparsekkttmpl.ridx.xZ[0] = 0;
-      offs = 0;
-      rowoffs = 0;
-      for (i = 0; i < n; i++) {
-         ae_assert(state->sparseh.didx.xZ[i] + 1 == state->sparseh.uidx.xZ[i], "VIPMPowerUp: critical integrity check failed for diagonal of H");
-         if (!state->isfrozen.xB[i]) {
-         // Entire row is not frozen, but some of its entries can be.
-         // Output non-frozen offdiagonal entries.
-            k0 = state->sparseh.ridx.xZ[i];
-            k1 = state->sparseh.didx.xZ[i] - 1;
-            for (k = k0; k <= k1; k++) {
-               j = state->sparseh.idx.xZ[k];
-               if (!state->isfrozen.xB[j]) {
-                  state->factsparsekkttmpl.idx.xZ[offs] = j;
-                  state->factsparsekkttmpl.vals.xR[offs] = -state->sparseh.vals.xR[k];
-                  offs++;
-               }
-            }
-         // Output diagonal entry (it is always not frozen)
-            state->factsparsekkttmpl.idx.xZ[offs] = i;
-            state->factsparsekkttmpl.vals.xR[offs] = -state->sparseh.vals.xR[state->sparseh.didx.xZ[i]];
-            offs++;
-         } else {
-         // Entire row is frozen, output just -1
-            state->factsparsekkttmpl.idx.xZ[offs] = i;
-            state->factsparsekkttmpl.vals.xR[offs] = -1.0;
-            offs++;
-         }
-         rowoffs++;
-         state->factsparsekkttmpl.ridx.xZ[rowoffs] = offs;
-      }
-      for (i = 0; i < state->msparse; i++) {
-         k0 = state->sparseafull.ridx.xZ[i];
-         k1 = state->sparseafull.ridx.xZ[i + 1] - 1;
-         for (k = k0; k <= k1; k++) {
-            j = state->sparseafull.idx.xZ[k];
-            if (!state->isfrozen.xB[j]) {
-               state->factsparsekkttmpl.idx.xZ[offs] = j;
-               state->factsparsekkttmpl.vals.xR[offs] = state->sparseafull.vals.xR[k];
-               offs++;
-            }
-         }
-         state->factsparsekkttmpl.idx.xZ[offs] = rowoffs;
-         state->factsparsekkttmpl.vals.xR[offs] = 0.0;
-         offs++;
-         rowoffs++;
-         state->factsparsekkttmpl.ridx.xZ[rowoffs] = offs;
-      }
-      for (i = 0; i < state->mdense; i++) {
-         for (k = 0; k < n; k++) {
-            if (state->denseafull.xyR[i][k] != 0.0 && !state->isfrozen.xB[k]) {
-               state->factsparsekkttmpl.idx.xZ[offs] = k;
-               state->factsparsekkttmpl.vals.xR[offs] = state->denseafull.xyR[i][k];
-               offs++;
-            }
-         }
-         state->factsparsekkttmpl.idx.xZ[offs] = rowoffs;
-         state->factsparsekkttmpl.vals.xR[offs] = 0.0;
-         offs++;
-         rowoffs++;
-         state->factsparsekkttmpl.ridx.xZ[rowoffs] = offs;
-      }
-      ae_assert(rowoffs == m + n, "VIPMPowerUp: critical integrity check failed");
-      ae_assert(offs <= nnzmax, "VIPMPowerUp: critical integrity check failed");
-      sparsecreatecrsinplace(&state->factsparsekkttmpl);
-      factldlt = 1;
-      permauto = 0;
-      if (!spsymmanalyze(&state->factsparsekkttmpl, factldlt, permauto, &state->ldltanalysis)) {
-         ae_assert(false, "VIPMPowerUp: critical integrity check failed, symbolically degenerate KKT system encountered");
-      }
+      vipmsolver_reducedsysteminit(&state->reducedsparsesystem, state);
    }
    state->factorizationpoweredup = true;
 // Set up initial values of primal and dual variables X and Y by solving
@@ -16499,12 +16575,12 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
 // This linear system is actually  symmetric  indefinite  one,  that  can  be
 // regularized by modifying equations (5), (6),  (7), (8), (9), (10):
 //
-//     (5)       -I*deltaY - I*deltaQ + I*deltaV -REG*deltaW= y+q-v+REG*w          =  Beta
-//     (6) -(H+REG)*deltaX +A'*deltaY + I*deltaZ - I*deltaS = c-A'*y-z+s+(H+REG)*x =  Sigma
-//     (7)        A*deltaX - I*deltaW            +REG*deltaY= b-A*x+w-REG*y        =  Rho
-//     (8)        I*deltaX - I*deltaG            +REG*deltaZ= l-x+g-REG*z          =  Nu
-//     (9)       -I*deltaX - I*deltaT            +REG*deltaS= -u+x+t-REG*s         = -Tau
-//     (10)      -I*deltaW - I*deltaP            +REG*deltaQ= -r+w+p-REG*q         = -Alpha
+//     (5)       -I*deltaY - I*deltaQ + I*deltaV -REG*deltaW == y+q-v+REG*w          ==  Beta
+//     (6) -(H+REG)*deltaX +A'*deltaY + I*deltaZ - I*deltaS  == c-A'*y-z+s+(H+REG)*x ==  Sigma
+//     (7)        A*deltaX - I*deltaW            +REG*deltaY == b-A*x+w-REG*y        ==  Rho
+//     (8)        I*deltaX - I*deltaG            +REG*deltaZ == l-x+g-REG*z          ==  Nu
+//     (9)       -I*deltaX - I*deltaT            +REG*deltaS == -u+x+t-REG*s         == -Tau
+//     (10)      -I*deltaW - I*deltaP            +REG*deltaQ == -r+w+p-REG*q         == -Alpha
 //
 // NOTE: regularizing equations (5)-(10) seems to be beneficial because their
 //       coefficients are well-normalized, usually having unit scale. Contrary
@@ -16639,8 +16715,8 @@ static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmv
    return result;
 }
 
-// Solves KKT system stored in VIPMState with user-passed RHS.  The  solution
-// X is either copied to Sol (AlphaSol == 0) or added Sol = AlphaSol*Sol+X.
+// Solves KKT system stored in VIPMState with user-passed RHS.
+// Sol must be preallocated VIPMVars object whose initial values are ignored.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, vipmvars *sol) {
    ae_int_t n;
@@ -16658,18 +16734,10 @@ static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, 
    allocv(n, &state->rhstaucap);
    allocv(m, &state->rhsbetacap);
    allocv(m, &state->rhsalphacap);
-   for (i = 0; i < m; i++) {
-      state->rhsalphacap.xR[i] = rhs->alpha.xR[i] - state->diagdqi.xR[i] * rhs->gammaq.xR[i];
-   }
-   for (i = 0; i < n; i++) {
-      state->rhsnucap.xR[i] = rhs->nu.xR[i] + state->diagdzi.xR[i] * rhs->gammaz.xR[i];
-   }
-   for (i = 0; i < n; i++) {
-      state->rhstaucap.xR[i] = rhs->tau.xR[i] - state->diagdsi.xR[i] * rhs->gammas.xR[i];
-   }
-   for (i = 0; i < m; i++) {
-      state->rhsbetacap.xR[i] = rhs->beta.xR[i] - state->diagdwi.xR[i] * rhs->gammaw.xR[i];
-   }
+   rcopynegmuladdv(m, &state->diagdqi, &rhs->gammaq, &rhs->alpha, &state->rhsalphacap);
+   rcopymuladdv(n, &state->diagdzi, &rhs->gammaz, &rhs->nu, &state->rhsnucap);
+   rcopynegmuladdv(n, &state->diagdsi, &rhs->gammas, &rhs->tau, &state->rhstaucap);
+   rcopynegmuladdv(m, &state->diagdwi, &rhs->gammaw, &rhs->beta, &state->rhsbetacap);
 // Solve reduced KKT system
    vectorsetlengthatleast(&state->deltaxy, n + m);
    for (i = 0; i < n; i++) {
@@ -17023,6 +17091,9 @@ static double vipmsolver_rhscompl2(vipmrighthandside *rhs, ae_int_t n, ae_int_t 
 
 // Compute VIPM step by solving KKT system.
 //
+// VDResult must be preallocated VIPMVars object  whose  initial  values  are
+// ignored.
+//
 // Returns False on failure to compute step direction with reasonable accuracy
 // (it is advised to terminate iterations immediately).
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
@@ -17053,7 +17124,6 @@ static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
 // Solve KKT system with right-hand sides coming from primal, dual
 // and complementary slackness conditions. Analyze solution,
 // terminate immediately if primal/dual residuals are way too high.
-   vipmsolver_varsinitbyzero(vdresult, n, m);
    vipmsolver_rhscompute(state, v0, muestimate, vdestimate, &state->rhs, reg);
    vrhsprim2 = vipmsolver_rhsprimal2(&state->rhs, n, m);
    vrhsdual2 = vipmsolver_rhsdual2(&state->rhs, n, m);
@@ -17489,9 +17559,10 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    mustop = (100 + sqrt(n)) * machineepsilon;
    mumin = 0.01 * mustop;
    vipmsolver_vipmpowerup(state, regfree);
-   vipmsolver_varsinitfrom(&state->x0, &state->current);
    vipmsolver_varsinitfrom(&state->best, &state->current);
    vipmsolver_varsinitbyzero(&state->zerovars, n, m);
+   vipmsolver_varsinitbyzero(&state->deltaaff, n, m);
+   vipmsolver_varsinitbyzero(&state->deltacorr, n, m);
    bestiteridx = -1;
    besterr = maxrealnumber;
    besteprimal = maxrealnumber;
@@ -17510,7 +17581,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    errp2 = maxrealnumber;
    errd2 = maxrealnumber;
    for (iteridx = 0; iteridx < maxipmits; iteridx++) {
-      vipmsolver_varsinitfrom(&state->x0, &state->current);
    // Check regularization status, terminate if overregularized
       if (dampeps >= maxdampeps) {
          *terminationtype = 7;
@@ -17522,39 +17592,37 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       if (!vipmsolver_vipmprecomputenewtonfactorization(state, &state->current, regeps, modeps, dampeps, dampfree)) {
       // KKT factorization failed.
       // Increase regularization parameter and skip this iteration.
-         dampeps *= 10;
+         dampeps *= 10.0;
          continue;
       }
    // Compute Mu
-      mu = vipmsolver_varscomputemu(&state->current);
+      mu = vipmsolver_varscomputemu(state, &state->current);
    // Compute affine scaling step for Mehrotra's predictor-corrector algorithm
-      vipmsolver_varsinitbyzero(&state->deltaaff, n, m);
       if (!vipmsolver_vipmcomputestepdirection(state, &state->current, 0.0, &state->zerovars, &state->deltaaff, regeps, dampeps >= safedampeps)) {
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
-         dampeps *= 10;
+         dampeps *= 10.0;
          continue;
       }
       vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltaaff, steplengthdecay, &alphaaffp, &alphaaffd);
    // Compute MuAff and centering parameter
       vipmsolver_varsinitfrom(&state->trial, &state->current);
       vipmsolver_varsaddstep(&state->trial, &state->deltaaff, alphaaffp, alphaaffd);
-      muaff = vipmsolver_varscomputemu(&state->trial);
+      muaff = vipmsolver_varscomputemu(state, &state->trial);
       sigma = rmin2(pow((muaff + mumin) / (mu + mumin), 3.0), 1.0);
       ae_assert(isfinite(sigma) && sigma <= 1.0, "VIPMOptimize: critical integrity check failed for Sigma (infinite or greater than 1)");
    // Compute corrector step
-      vipmsolver_varsinitbyzero(&state->deltacorr, n, m);
       if (!vipmsolver_vipmcomputestepdirection(state, &state->current, sigma * mu + mumin, &state->deltaaff, &state->deltacorr, regeps, dampeps >= safedampeps)) {
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
-         dampeps *= 10;
+         dampeps *= 10.0;
          continue;
       }
       vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltacorr, steplengthdecay, &alphap, &alphad);
       if (iteridx >= minitersbeforesafeguards && (alphap <= badsteplength || alphad <= badsteplength)) {
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
-         dampeps *= 10;
+         dampeps *= 10.0;
          continue;
       }
    // Perform a step
@@ -17589,12 +17657,14 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
                   state->hasgz.xB[i] = false;
                   state->current.g.xR[i] = 0.0;
                   state->current.z.xR[i] = 0.0;
+                  state->cntgz--;
                   droppedbounds++;
                }
                if (state->hasbndu.xB[i] && state->hasts.xB[i] && !SmallAtR(state->bndu.xR[i], bigconstrmag * primalxscale)) {
                   state->hasts.xB[i] = false;
                   state->current.t.xR[i] = 0.0;
                   state->current.s.xR[i] = 0.0;
+                  state->cntts--;
                   droppedbounds++;
                }
             }
@@ -17616,6 +17686,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
                   state->haspq.xB[i] = false;
                   state->current.p.xR[i] = 0.0;
                   state->current.q.xR[i] = 0.0;
+                  state->cntpq--;
                   droppedbounds++;
                }
             }
@@ -17628,7 +17699,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       preverrp2 = errp2;
       preverrd2 = errd2;
       vipmsolver_computeerrors(state, &errp2, &errd2, &errpinf, &errdinf, &errgap);
-      mu = vipmsolver_varscomputemu(&state->current);
+      mu = vipmsolver_varscomputemu(state, &state->current);
       egap = errgap;
       eprimal = errpinf;
       edual = errdinf;
@@ -17780,6 +17851,41 @@ void vipmvars_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->q, make_automatic);
 }
 
+void vipmreducedsparsesystem_init(void *_p, bool make_automatic) {
+   vipmreducedsparsesystem *p = (vipmreducedsparsesystem *)_p;
+   sparsematrix_init(&p->rawsystem, make_automatic);
+   ae_vector_init(&p->effectivediag, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->isdiagonal, 0, DT_BOOL, make_automatic);
+   ae_vector_init(&p->rowdegrees, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->coldegrees, 0, DT_INT, make_automatic);
+   spcholanalysis_init(&p->analysis, make_automatic);
+   ae_vector_init(&p->priorities, 0, DT_INT, make_automatic);
+}
+
+void vipmreducedsparsesystem_copy(void *_dst, void *_src, bool make_automatic) {
+   vipmreducedsparsesystem *dst = (vipmreducedsparsesystem *)_dst;
+   vipmreducedsparsesystem *src = (vipmreducedsparsesystem *)_src;
+   sparsematrix_copy(&dst->rawsystem, &src->rawsystem, make_automatic);
+   ae_vector_copy(&dst->effectivediag, &src->effectivediag, make_automatic);
+   ae_vector_copy(&dst->isdiagonal, &src->isdiagonal, make_automatic);
+   ae_vector_copy(&dst->rowdegrees, &src->rowdegrees, make_automatic);
+   ae_vector_copy(&dst->coldegrees, &src->coldegrees, make_automatic);
+   dst->ntotal = src->ntotal;
+   spcholanalysis_copy(&dst->analysis, &src->analysis, make_automatic);
+   ae_vector_copy(&dst->priorities, &src->priorities, make_automatic);
+}
+
+void vipmreducedsparsesystem_free(void *_p, bool make_automatic) {
+   vipmreducedsparsesystem *p = (vipmreducedsparsesystem *)_p;
+   sparsematrix_free(&p->rawsystem, make_automatic);
+   ae_vector_free(&p->effectivediag, make_automatic);
+   ae_vector_free(&p->isdiagonal, make_automatic);
+   ae_vector_free(&p->rowdegrees, make_automatic);
+   ae_vector_free(&p->coldegrees, make_automatic);
+   spcholanalysis_free(&p->analysis, make_automatic);
+   ae_vector_free(&p->priorities, make_automatic);
+}
+
 void vipmrighthandside_init(void *_p, bool make_automatic) {
    vipmrighthandside *p = (vipmrighthandside *)_p;
    ae_vector_init(&p->sigma, 0, DT_REAL, make_automatic);
@@ -17848,7 +17954,6 @@ void vipmstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->b, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->r, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->hasr, 0, DT_BOOL, make_automatic);
-   vipmvars_init(&p->x0, make_automatic);
    vipmvars_init(&p->current, make_automatic);
    vipmvars_init(&p->best, make_automatic);
    vipmvars_init(&p->trial, make_automatic);
@@ -17878,12 +17983,8 @@ void vipmstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->factregdhrh, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->factinvregdzrz, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->factregewave, 0, DT_REAL, make_automatic);
-   sparsematrix_init(&p->factsparsekkttmpl, make_automatic);
-   sparsematrix_init(&p->factsparsekkt, make_automatic);
-   ae_vector_init(&p->factsparsekktpivp, 0, DT_INT, make_automatic);
    ae_vector_init(&p->facttmpdiag, 0, DT_REAL, make_automatic);
-   spcholanalysis_init(&p->ldltanalysis, make_automatic);
-   ae_vector_init(&p->factsparsediagd, 0, DT_REAL, make_automatic);
+   vipmreducedsparsesystem_init(&p->reducedsparsesystem, make_automatic);
    vipmrighthandside_init(&p->rhs, make_automatic);
    ae_vector_init(&p->rhsalphacap, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->rhsbetacap, 0, DT_REAL, make_automatic);
@@ -17924,6 +18025,7 @@ void vipmstate_copy(void *_dst, void *_src, bool make_automatic) {
    sparsematrix_copy(&dst->sparseh, &src->sparseh, make_automatic);
    ae_vector_copy(&dst->diagr, &src->diagr, make_automatic);
    dst->hkind = src->hkind;
+   dst->isdiagonalh = src->isdiagonalh;
    ae_vector_copy(&dst->bndl, &src->bndl, make_automatic);
    ae_vector_copy(&dst->bndu, &src->bndu, make_automatic);
    ae_vector_copy(&dst->rawbndl, &src->rawbndl, make_automatic);
@@ -17942,7 +18044,6 @@ void vipmstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->hasr, &src->hasr, make_automatic);
    dst->mdense = src->mdense;
    dst->msparse = src->msparse;
-   vipmvars_copy(&dst->x0, &src->x0, make_automatic);
    vipmvars_copy(&dst->current, &src->current, make_automatic);
    vipmvars_copy(&dst->best, &src->best, make_automatic);
    vipmvars_copy(&dst->trial, &src->trial, make_automatic);
@@ -17953,6 +18054,10 @@ void vipmstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->hasts, &src->hasts, make_automatic);
    ae_vector_copy(&dst->haswv, &src->haswv, make_automatic);
    ae_vector_copy(&dst->haspq, &src->haspq, make_automatic);
+   dst->cntgz = src->cntgz;
+   dst->cntts = src->cntts;
+   dst->cntwv = src->cntwv;
+   dst->cntpq = src->cntpq;
    dst->repiterationscount = src->repiterationscount;
    dst->repncholesky = src->repncholesky;
    dst->factorizationtype = src->factorizationtype;
@@ -17977,12 +18082,8 @@ void vipmstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->factregdhrh, &src->factregdhrh, make_automatic);
    ae_vector_copy(&dst->factinvregdzrz, &src->factinvregdzrz, make_automatic);
    ae_vector_copy(&dst->factregewave, &src->factregewave, make_automatic);
-   sparsematrix_copy(&dst->factsparsekkttmpl, &src->factsparsekkttmpl, make_automatic);
-   sparsematrix_copy(&dst->factsparsekkt, &src->factsparsekkt, make_automatic);
-   ae_vector_copy(&dst->factsparsekktpivp, &src->factsparsekktpivp, make_automatic);
    ae_vector_copy(&dst->facttmpdiag, &src->facttmpdiag, make_automatic);
-   spcholanalysis_copy(&dst->ldltanalysis, &src->ldltanalysis, make_automatic);
-   ae_vector_copy(&dst->factsparsediagd, &src->factsparsediagd, make_automatic);
+   vipmreducedsparsesystem_copy(&dst->reducedsparsesystem, &src->reducedsparsesystem, make_automatic);
    vipmrighthandside_copy(&dst->rhs, &src->rhs, make_automatic);
    ae_vector_copy(&dst->rhsalphacap, &src->rhsalphacap, make_automatic);
    ae_vector_copy(&dst->rhsbetacap, &src->rhsbetacap, make_automatic);
@@ -18029,7 +18130,6 @@ void vipmstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->b, make_automatic);
    ae_vector_free(&p->r, make_automatic);
    ae_vector_free(&p->hasr, make_automatic);
-   vipmvars_free(&p->x0, make_automatic);
    vipmvars_free(&p->current, make_automatic);
    vipmvars_free(&p->best, make_automatic);
    vipmvars_free(&p->trial, make_automatic);
@@ -18059,12 +18159,8 @@ void vipmstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->factregdhrh, make_automatic);
    ae_vector_free(&p->factinvregdzrz, make_automatic);
    ae_vector_free(&p->factregewave, make_automatic);
-   sparsematrix_free(&p->factsparsekkttmpl, make_automatic);
-   sparsematrix_free(&p->factsparsekkt, make_automatic);
-   ae_vector_free(&p->factsparsekktpivp, make_automatic);
    ae_vector_free(&p->facttmpdiag, make_automatic);
-   spcholanalysis_free(&p->ldltanalysis, make_automatic);
-   ae_vector_free(&p->factsparsediagd, make_automatic);
+   vipmreducedsparsesystem_free(&p->reducedsparsesystem, make_automatic);
    vipmrighthandside_free(&p->rhs, make_automatic);
    ae_vector_free(&p->rhsalphacap, make_automatic);
    ae_vector_free(&p->rhsbetacap, make_automatic);
@@ -21349,7 +21445,7 @@ static bool minlm_increaselambda(double *lambdav, double *nu) {
       return result;
    }
    *lambdav *= lambdaup * *nu;
-   *nu *= 2;
+   *nu *= 2.0;
    result = true;
    return result;
 }
@@ -21547,13 +21643,13 @@ static void minlm_minlmstepfinderstart(minlmstepfinder *state, RMatrix *quadrati
 // // * generates step which decreases function value
 // //
 // // After this block IFlag is set to:
-// // * -8, if infinities/NANs were detected in function values/gradient
-// // * -3, if constraints are infeasible
-// // * -2, if model update is needed (either Lambda growth is too large
-// //       or step is too short, but we can't rely on model and stop iterations)
-// // * -1, if model is fresh, Lambda have grown too large, termination is needed
-// // *  0, if everything is OK, continue iterations
-// // * >0  - successful completion (step size is small enough)
+// // * -8:	if infinities/NANs were detected in function values/gradient
+// // * -3:	if constraints are infeasible
+// // * -2:	if model update is needed (either Lambda growth is too large
+// //		or step is too short, but we can't rely on model and stop iterations)
+// // * -1:	if model is fresh, Lambda have grown too large, termination is needed
+// // *  0:	if everything is OK, continue iterations
+// // * > 0:	successful completion (step size is small enough)
 // //
 // // State.Nu can have any value on enter, but after exit it is set to 1.0
 // //
@@ -21991,13 +22087,13 @@ Spawn:
       // * generates step which decreases function value
       //
       // After this block IFlag is set to:
-      // * -8, if internal integrity control detected NAN/INF in function values
-      // * -3, if constraints are infeasible
-      // * -2, if model update is needed (either Lambda growth is too large
-      //       or step is too short, but we can't rely on model and stop iterations)
-      // * -1, if model is fresh, Lambda have grown too large, termination is needed
-      // *  0, if everything is OK, continue iterations
-      // * >0, successful termination, step is less than EpsX
+      // * -8:	if internal integrity control detected NAN/INF in function values
+      // * -3:	if constraints are infeasible
+      // * -2:	if model update is needed (either Lambda growth is too large
+      //	or step is too short, but we can't rely on model and stop iterations)
+      // * -1:	if model is fresh, Lambda have grown too large, termination is needed
+      // *  0:	if everything is OK, continue iterations
+      // * > 0:	successful termination, step is less than EpsX
       //
       // State.Nu can have any value on enter, but after exit it is set to 1.0
          iflag = -99;
@@ -22633,9 +22729,7 @@ void minlmoptguardresults(minlmstate *state, optguardreport *rep) {
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 // API: void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep);
 void minlmresultsbuf(minlmstate *state, RVector *x, minlmreport *rep) {
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    ae_v_move(x->xR, 1, state->x.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->terminationtype = state->repterminationtype;
@@ -24602,9 +24696,7 @@ void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report 
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
 // API: void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep);
 void mincgresultsbuf(mincgstate *state, RVector *x, mincgreport *rep) {
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    ae_v_move(x->xR, 1, state->xn.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nfev = state->repnfev;
@@ -25080,6 +25172,7 @@ void mincgrequesttermination(const mincgstate &state) {
 namespace alglib_impl {
 static const double nlcsqp_sqpdeltadecrease = 0.20;
 static const double nlcsqp_sqpdeltaincrease = 0.80;
+static const double nlcsqp_maxbigc = 100000.0;
 static const double nlcsqp_augmentationfactor = 10.0;
 static const ae_int_t nlcsqp_penaltymemlen = 5;
 
@@ -25483,7 +25576,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          v = subsolver->tmp0.xR[j];
          vv = subsolver->sparserawlc.vals.xR[k];
          vright += vv * v;
-         if (vv >= 0) {
+         if (vv >= 0.0) {
             vmax += vv * (v + subsolver->curbndu.xR[j]);
          } else {
             vmax += vv * (v + subsolver->curbndl.xR[j]);
@@ -25833,7 +25926,7 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad,
          *f += vlag * vact;
          tmp->sclagtmp1.xR[i] += vlag * vd;
       // Quadratic augmentation term
-         if (i < nec || v > 0) {
+         if (i < nec || v > 0.0) {
             vact = v;
          } else {
             vact = 0.0;
@@ -25862,7 +25955,7 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad,
       *f += vlag * vact;
       tmp->sclagtmp1.xR[i] += vlag * vd;
    // Augmentation term
-      if (i < nlec || v > 0) {
+      if (i < nlec || v > 0.0) {
          vact = v;
       } else {
          vact = 0.0;
@@ -25991,10 +26084,12 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    AutoS double f1;
    AutoS double nu;
    AutoS double localstp;
+   AutoS double tol;
    AutoS double stepklagval;
    AutoS double stepknlagval;
    AutoS bool hessianupdateperformed;
    AutoS double stp;
+   AutoS double expandedrad;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
@@ -26010,8 +26105,10 @@ Spawn:
    vv = -1011;
    f1 = 88;
    nu = -861;
-   stepklagval = -731;
-   stepknlagval = -675;
+   tol = -731;
+   stepklagval = -675;
+   stepknlagval = -763;
+   expandedrad = -936;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -26128,40 +26225,44 @@ Spawn:
 // QP subproblem) or not.
 //
 // An increase is NOT needed if at least one of the following holds:
+// * present value of BigC is already nearly maximum
 // * a long step was performed
-// * any single constraint can be made feasible within trust region
+// * any single constraint can be made feasible within box with radius slightly larger max|D|
 //
 // Thus, BigC is requested to be increased if a short step was made, but there are some
-// constraints that are infeasible within trust region.
-   if (rmaxabsv(n, &meritstate->d) < 0.9 * state->trustrad) {
+// constraints that are infeasible within max|D|-sized box
+   if (rmaxabsv(n, &meritstate->d) < 0.9 * state->trustrad && state->bigc < 0.9 * nlcsqp_maxbigc) {
+      expandedrad = 1.1 * rmaxabsv(n, &meritstate->d);
+      tol = rmax2(sqrt(machineepsilon) * state->trustrad, 1000.0 * machineepsilon);
       for (i = 0; i < nec + nic; i++) {
          v = 0.0;
          vv = 0.0;
          for (j = 0; j < n; j++) {
             v += state->scaledcleic.xyR[i][j] * state->stepkx.xR[j];
-            vv += fabs(state->scaledcleic.xyR[i][j] * state->trustrad);
+            vv += fabs(state->scaledcleic.xyR[i][j] * expandedrad);
          }
          v -= state->scaledcleic.xyR[i][n];
          if (i >= nec) {
             v = rmax2(v, 0.0);
          }
-         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv);
+         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv + tol);
       }
-      for (i = 1; i < nlec + nlic; i++) {
+      for (i = 1; i <= nlec + nlic; i++) {
          v = state->stepkfi.xR[i];
          vv = 0.0;
          for (j = 0; j < n; j++) {
-            vv += fabs(state->stepkj.xyR[i][j] * state->trustrad);
+            vv += fabs(state->stepkj.xyR[i][j] * expandedrad);
          }
          if (i > nlec) {
             v = rmax2(v, 0.0);
          }
-         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv);
+         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv + tol);
       }
    }
 #if 0 //(@) Not used.
 // Perform aggressive probing of the search direction - additional function evaluations
 // which help us to determine possible discontinuity and nonsmoothness of the problem
+#   if 0
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
    smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
    while (smoothnessmonitorprobe(smonitor)) {
@@ -26184,6 +26285,7 @@ Spawn:
       smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, smonitor->probingstp, &meritstate->stepkxc, &meritstate->stepkfic, &meritstate->stepkjc);
    }
    smoothnessmonitorfinalizelinesearch(smonitor);
+#   endif
 // Update debug curvature information - TraceGamma[]
    v = 0.0;
    double mx = 0.0;
@@ -26411,7 +26513,7 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 // NOTE: SMonitor is expected to be correctly initialized smoothness monitor.
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
 bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded) {
-   const double maxtrustraddecay = 0.1, maxtrustradgrowth = 1.333, maxbigc = 100000.0;
+   const double maxtrustraddecay = 0.1, maxtrustradgrowth = 1.333;
    const double inittrustrad = 0.1, stagnationepsf = 1.0E-12;
    const ae_int_t fstagnationlimit = 20, trustradstagnationlimit = 10;
    const double sqpbigscale = 5.0, sqpsmallscale = 0.2;
@@ -26573,7 +26675,7 @@ Spawn:
       }
    // Caller requested to update BigC - L1 penalty coefficient for linearized constraint violation
       if (increasebigc) {
-         state->bigc = rmin2(10 * state->bigc, maxbigc);
+         state->bigc = rmin2(10 * state->bigc, nlcsqp_maxbigc);
       }
    // Update trust region.
    //
@@ -27302,7 +27404,7 @@ static void reviseddualsimplex_subprobleminferinitialxn(dualsimplexstate *state,
       i = state->basis.nidx.xZ[ii];
       bndt = s->bndt.xZ[i];
       if (bndt == reviseddualsimplex_ccfixed || bndt == reviseddualsimplex_ccrange) {
-         if (s->effc.xR[i] >= 0) {
+         if (s->effc.xR[i] >= 0.0) {
             s->xa.xR[i] = s->bndl.xR[i];
          } else {
             s->xa.xR[i] = s->bndu.xR[i];
@@ -27532,7 +27634,7 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
          d = s->dk.xZ[k];
          vm = x->xR[m - 1];
          v = s->densemu.xR[k * m + (m - 1)] * vm;
-         if (vm != 0) {
+         if (vm != 0.0) {
          // X[M-1] is non-zero, apply update
             for (i = m - 2; i >= d; i--) {
                x->xR[i + 1] = x->xR[i] + s->densemu.xR[k * m + i] * vm;
@@ -27697,7 +27799,7 @@ static double reviseddualsimplex_basisminimumdiagonalelement(dualsimplexbasis *s
       if (s->trftype == 2 || s->trftype == 3) {
          vv = sparsegetdiagonal(&s->sparseu, i);
       }
-      if (vv < 0) {
+      if (vv < 0.0) {
          vv = -vv;
       }
       if (vv < v) {
@@ -28079,12 +28181,12 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
       if (bndt == reviseddualsimplex_ccrange) {
          dj = s->d.xR[j];
          xj = s->xa.xR[j];
-         if (xj == s->bndl.xR[j] && dj < 0) {
+         if (xj == s->bndl.xR[j] && dj < 0.0) {
             s->xa.xR[j] = s->bndu.xR[j];
             flipped = true;
             continue;
          }
-         if (xj == s->bndu.xR[j] && dj > 0) {
+         if (xj == s->bndu.xR[j] && dj > 0.0) {
             s->xa.xR[j] = s->bndl.xR[j];
             flipped = true;
             continue;
@@ -28189,7 +28291,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
       // Handle variables at lower bound
          if (bndt == reviseddualsimplex_cclower || bndt == reviseddualsimplex_ccrange && s->xa.xR[j] == s->bndl.xR[j]) {
             sft -= settings->dtolabs;
-            if (sft > 0) {
+            if (sft > 0.0) {
                s->effc.xR[j] += sft;
                s->d.xR[j] += sft;
             }
@@ -28197,7 +28299,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
          }
          if (bndt == reviseddualsimplex_ccupper || bndt == reviseddualsimplex_ccrange && s->xa.xR[j] == s->bndu.xR[j]) {
             sft += settings->dtolabs;
-            if (sft < 0) {
+            if (sft < 0.0) {
                s->effc.xR[j] += sft;
                s->d.xR[j] += sft;
             }
@@ -28950,7 +29052,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          }
          for (i = idxd + 1; i < m; i++) {
             j = s->sparsel.ridx.xZ[i + 1] - 1;
-            if (s->sparsel.idx.xZ[j] != i || s->sparsel.vals.xR[j] != 1) {
+            if (s->sparsel.idx.xZ[j] != i || s->sparsel.vals.xR[j] != 1.0) {
                ae_assert(false, "UpdateTrf: integrity check failed for sparse L");
             }
             dstoffs = s->sparsel.ridx.xZ[i - 1];
@@ -28998,7 +29100,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          dstoffs = s->sparsel.ridx.xZ[m - 1];
          for (j = 0; j < idxd; j++) {
             v = alphaqim->xR[j];
-            if (v != 0) {
+            if (v != 0.0) {
                s->sparsel.idx.xZ[dstoffs] = j;
                s->sparsel.vals.xR[dstoffs] = v;
                dstoffs++;
@@ -29007,7 +29109,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          vcorner = alphaqim->xR[idxd];
          for (j = idxd + 1; j < m; j++) {
             v = alphaqim->xR[j];
-            if (v != 0) {
+            if (v != 0.0) {
                s->sparsel.idx.xZ[dstoffs] = j - 1;
                s->sparsel.vals.xR[dstoffs] = v;
                dstoffs++;
@@ -29204,11 +29306,11 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
       bndl = s->bndl.xR[j];
       bndu = s->bndu.xR[j];
       flipped = false;
-      if (s->xa.xR[j] == bndl && dj < 0) {
+      if (s->xa.xR[j] == bndl && dj < 0.0) {
          flip = bndu - bndl;
          flipped = true;
       } else {
-         if (s->xa.xR[j] == bndu && dj > 0) {
+         if (s->xa.xR[j] == bndu && dj > 0.0) {
             flip = bndl - bndu;
             flipped = true;
          }
@@ -31815,6 +31917,7 @@ void minlpoptimize(minlpstate *state) {
          presolvebwd(&state->presolver, &state->xs, &state->cs, &state->lagbc, &state->laglc);
          state->repn = n;
          state->repm = m;
+         state->repiterationscount = state->ipm.repiterationscount;
       }
    // Compute F, primal and dual errors
       state->repf = rdotv(n, &state->xs, &state->c);
@@ -31871,9 +31974,7 @@ void minlpresultsbuf(minlpstate *state, RVector *x, minlpreport *rep) {
    ae_int_t repm;
    repn = state->repn;
    repm = state->repm;
-   if (x->cnt < repn) {
-      ae_vector_set_length(x, repn);
-   }
+   vectorsetlengthatleast(x, repn);
    ae_vector_set_length(&rep->y, repm);
    ae_vector_set_length(&rep->stats, repn + repm);
    rep->f = state->repf;
@@ -32249,6 +32350,7 @@ static const double nlcslp_slpstpclosetoone = 0.95;
 static const double nlcslp_slpdeltadecrease = 0.20;
 static const double nlcslp_slpdeltaincrease = 0.80;
 static const double nlcslp_bfgstol = 0.00001;
+static const double nlcslp_defaultl1penalty = 0.1;
 static const ae_int_t nlcslp_nonmonotonicphase2limit = 5;
 
 // This function initializes SLP subproblem.
@@ -32421,7 +32523,6 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
 // you have to use LPSubproblemAppendConjugacyConstraint().
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
 static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, ae_int_t innerk, RVector *d, RVector *lagmult) {
-   const double bigc = 500.0;
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -32481,7 +32582,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
    }
    v = coalesce(sqrt(v), 1.0);
    for (i = n; i < nslack; i++) {
-      subsolver->curb.xR[i] = (bigc + 1.0 / (1 + i)) * v;
+      subsolver->curb.xR[i] = (state->bigc + 1.0 / (1 + i)) * v;
    }
 // Trust radius constraints for primary variables
    for (i = 0; i < n; i++) {
@@ -32539,7 +32640,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          v = subsolver->tmp0.xR[j];
          vv = subsolver->sparserawlc.vals.xR[k];
          vright += vv * v;
-         if (vv >= 0) {
+         if (vv >= 0.0) {
             vmax += vv * (v + subsolver->curbndu.xR[j]);
          } else {
             vmax += vv * (v + subsolver->curbndl.xR[j]);
@@ -32759,36 +32860,6 @@ static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, min
    }
 }
 
-// This function initializes Phase13  temporaries. It should be called before
-// beginning of each new iteration. You may call it multiple  times  for  the
-// same instance of Phase13 temporaries.
-//
-// Inputs:
-//     State13             -   instance to be initialized.
-//     N                   -   problem dimensionality
-//     NEC, NIC            -   linear equality/inequality constraint count
-//     NLEC, NLIC          -   nonlinear equality/inequality constraint count
-//     UseCorrection       -   True if we want to perform second order correction
-//
-// Outputs:
-//     State13     -   instance being initialized
-// ALGLIB: Copyright 05.02.2019 by Sergey Bochkanov
-static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, bool usecorrection) {
-   ae_int_t nslack;
-   nslack = n + 2 * (nec + nlec) + (nic + nlic);
-   state13->usecorrection = usecorrection;
-   vectorsetlengthatleast(&state13->d, nslack);
-   vectorsetlengthatleast(&state13->dx, nslack);
-   vectorsetlengthatleast(&state13->stepkxc, n);
-   vectorsetlengthatleast(&state13->stepkxn, n);
-   vectorsetlengthatleast(&state13->stepkfic, 1 + nlec + nlic);
-   vectorsetlengthatleast(&state13->stepkfin, 1 + nlec + nlic);
-   matrixsetlengthatleast(&state13->stepkjc, 1 + nlec + nlic, n);
-   matrixsetlengthatleast(&state13->stepkjn, 1 + nlec + nlic, n);
-   vectorsetlengthatleast(&state13->dummylagmult, nec + nic + nlec + nlic);
-   state13->Ph13PQ = -1;
-}
-
 // Copies X to State.X
 static void nlcslp_slpsendx(minslpstate *state, RVector *xs) {
    ae_int_t i;
@@ -32913,7 +32984,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
       //
       // NOTE: here we expect that scaledCLEIC[] has normalized rows
          v = tmp->sclagtmp0.xR[i] - state->scaledcleic.xyR[i][n];
-         if (i < nec || v > 0) {
+         if (i < nec || v > 0.0) {
          // Either equality constraint or violated inequality one.
          // Update violation report.
             vviolate = fabs(v);
@@ -32926,7 +32997,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
          vlag = lagmult->xR[i];
          tmp->sclagtmp1.xR[i] = 0.0;
       // Primary Lagrangian term
-         if (i < nec || v > 0) {
+         if (i < nec || v > 0.0) {
             vact = v;
             vd = 1.0;
          } else {
@@ -32937,7 +33008,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
          *f += vlag * vact;
          tmp->sclagtmp1.xR[i] += vlag * vd;
       // Quadratic augmentation term
-         if (i < nec || v > 0) {
+         if (i < nec || v > 0.0) {
             vact = v;
          } else {
             vact = 0.0;
@@ -32958,7 +33029,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
    vectorsetlengthatleast(&tmp->sclagtmp1, nlec + nlic);
    for (i = 0; i < nlec + nlic; i++) {
       v = fi->xR[1 + i];
-      if (i < nlec || v > 0) {
+      if (i < nlec || v > 0.0) {
       // Either equality constraint or violated inequality one.
       // Update violation report.
          vviolate = fabs(v) * state->fscales.xR[1 + i];
@@ -32970,7 +33041,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
       vlag = lagmult->xR[nec + nic + i];
       tmp->sclagtmp1.xR[i] = 0.0;
    // Lagrangian term
-      if (i < nlec || v > 0) {
+      if (i < nlec || v > 0.0) {
          vact = v;
          vd = 1.0;
       } else {
@@ -32981,7 +33052,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
       *f += vlag * vact;
       tmp->sclagtmp1.xR[i] += vlag * vd;
    // Augmentation term
-      if (i < nlec || v > 0) {
+      if (i < nlec || v > 0.0) {
          vact = v;
       } else {
          vact = 0.0;
@@ -33069,6 +33140,36 @@ static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, 
 }
 #endif
 
+// This function initializes Phase13  temporaries. It should be called before
+// beginning of each new iteration. You may call it multiple  times  for  the
+// same instance of Phase13 temporaries.
+//
+// Inputs:
+//     State13             -   instance to be initialized.
+//     N                   -   problem dimensionality
+//     NEC, NIC            -   linear equality/inequality constraint count
+//     NLEC, NLIC          -   nonlinear equality/inequality constraint count
+//     UseCorrection       -   True if we want to perform second order correction
+//
+// Outputs:
+//     State13     -   instance being initialized
+// ALGLIB: Copyright 05.02.2019 by Sergey Bochkanov
+static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, bool usecorrection) {
+   ae_int_t nslack;
+   nslack = n + 2 * (nec + nlec) + (nic + nlic);
+   state13->usecorrection = usecorrection;
+   vectorsetlengthatleast(&state13->d, nslack);
+   vectorsetlengthatleast(&state13->dx, nslack);
+   vectorsetlengthatleast(&state13->stepkxc, n);
+   vectorsetlengthatleast(&state13->stepkxn, n);
+   vectorsetlengthatleast(&state13->stepkfic, 1 + nlec + nlic);
+   vectorsetlengthatleast(&state13->stepkfin, 1 + nlec + nlic);
+   matrixsetlengthatleast(&state13->stepkjc, 1 + nlec + nlic, n);
+   matrixsetlengthatleast(&state13->stepkjn, 1 + nlec + nlic, n);
+   vectorsetlengthatleast(&state13->dummylagmult, nec + nic + nlec + nlic);
+   state13->Ph13PQ = -1;
+}
+
 // This function tries to perform either phase #1 or phase #3 step.
 //
 // Former corresponds to linear model step (without conjugacy constraints) with
@@ -33100,9 +33201,10 @@ static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, 
 //                       of the outer iteration
 //                     * zero, if algorithm is terminated (RepTerminationType
 //                       is set to appropriate value)
-//     Stp         -   step length, in [0,1]
+//     DNrm        -   inf-norm of the proposed step vector D
+//     Stp         -   step length (multiplier for D), in [0,1]
 // ALGLIB: Copyright 05.02.2019 by Sergey Bochkanov
-static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *stp) {
+static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *dnrm, double *stp) {
    const ae_int_t lpfailureslimit = 20;
    AutoS ae_int_t n;
    AutoS ae_int_t nslack;
@@ -33129,14 +33231,14 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       default: goto Exit;
    }
 Spawn:
-   i = -154;
-   j = 306;
-   v = 88;
-   f0 = -678;
-   f1 = -731;
-   nu = -675;
-   localstp = -763;
-   mu = -233;
+   i = -861;
+   j = -678;
+   v = -233;
+   f0 = -279;
+   f1 = 94;
+   nu = -812;
+   localstp = 427;
+   mu = 178;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33148,6 +33250,7 @@ Spawn:
 // Default decision is to continue algorithm
    *status = 1;
    *stp = 0.0;
+   *dnrm = 0.0;
 // Determine step direction using linearized model with no conjugacy terms
    nlcslp_lpsubproblemrestart(state, &state->subsolver);
    if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, curx, curfi, curj, innerk, &state13->d, lagmult)) {
@@ -33169,8 +33272,8 @@ Spawn:
       }
       goto Exit;
    }
-   nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d);
    mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, lagmult));
+   mu = coalesce(mu, nlcslp_defaultl1penalty);
 // Compute second order correction if required. The issue we address here
 // is a tendency of L1 penalized function to reject steps built using simple
 // linearized model when nonlinear constraints change faster than the target.
@@ -33220,8 +33323,13 @@ Spawn:
             state13->d.xR[i] = state13->dx.xR[i];
          }
       }
-      nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d);
    }
+// Now we have search direction in D:
+// * compute DNrm
+// * append D to the list of the conjugacy constraints, so next time when we use the solver we will
+//   automatically produce conjugate direction
+   *dnrm = rmaxabsv(n, &state13->d);
+   nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d);
 // Perform merit function backtracking line search, with trial point being
 // computed as XN = XK + Stp*D, with Stp in [0,1]
 //
@@ -33277,6 +33385,7 @@ Spawn:
       goto Exit;
    }
 #if 0 //(@) Not used.
+#   if 0
    for (smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad); smoothnessmonitorprobe(smonitor); ) {
       for (j = 0; j < n; j++) {
          state13->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state13->d.xR[j];
@@ -33295,6 +33404,7 @@ Spawn:
       smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state13->stepkxc, &state13->stepkfic, lagmult, &state13->tmpmerit);
       smonitor->probingf.xR[1] = state13->stepkfic.xR[0];
    }
+#   endif
    double mx = 0.0;
    for (i = 0; i < n; i++) {
       mx = rmax2(mx, fabs(state13->d.xR[i]) / state->trustrad);
@@ -33427,21 +33537,20 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
       default: goto Exit;
    }
 Spawn:
-   mcinfo = -819;
-   mcnfev = -826;
-   mcstage = 667;
-   i = 692;
-   j = 84;
-   stp = 289;
-   v = 317;
-   vv = 476;
-   mx = -889;
-   stepklagval = -400;
-   stepknlagval = 489;
-   gammaprev = -962;
-   f0 = 161;
-   f1 = -447;
-   mu = -799;
+   mcinfo = 14;
+   mcnfev = 386;
+   mcstage = -908;
+   i = 577;
+   j = 289;
+   stp = -962;
+   v = 161;
+   vv = -447;
+   mx = -799;
+   stepklagval = 508;
+   stepknlagval = -153;
+   gammaprev = -450;
+   f0 = 769;
+   f1 = 638;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33463,6 +33572,7 @@ Spawn:
 // * function vector Fi (target function + nonlinear constraints)
 // * scaled Jacobian J
    mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult));
+   mu = coalesce(mu, nlcslp_defaultl1penalty);
    nondescentcnt = 0;
    nlcslp_lpsubproblemrestart(state, &state->subsolver);
    for (innerk = 1; innerk <= n; innerk++) {
@@ -33470,11 +33580,6 @@ Spawn:
       if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, curx, curfi, curj, innerk, &state2->d, lagmult)) {
       // LP solver failed due to numerical errors; exit.
       // It may happen when we solve problem with LOTS of conjugacy constraints.
-         if (innerk == 1) {
-         // The very first iteration failed, really strange.
-         } else {
-         // Quite a normal, the problem is overconstrained by conjugacy constraints now
-         }
          goto Exit;
       }
       mx = 0.0;
@@ -33561,8 +33666,6 @@ Spawn:
                state->repterminationtype = 2;
                *status = 0;
             }
-         } else {
-         // Well, it can be normal
          }
          goto Exit;
       }
@@ -33788,9 +33891,11 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
 bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded) {
    const double maxtrustraddecay = 0.1, maxtrustradgrowth = 1.333;
+   const double initbigc = 500.0, maxbigc = 100000.0;
    const double inittrustrad = 0.1, stagnationepsf = 1.0E-12;
    const ae_int_t fstagnationlimit = 20;
    const double slpbigscale = 5.0, slpsmallscale = 0.2;
+   const double defaultmaglagdecay = 0.85;
    AutoS ae_int_t n;
    AutoS ae_int_t nslack;
    AutoS ae_int_t nec;
@@ -33813,7 +33918,13 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
    AutoS double multiplyby;
    AutoS double setscaleto;
    AutoS double prevtrustrad;
+   AutoS bool increasebigc;
+   AutoS double d1nrm;
    AutoS double mu;
+   AutoS double expandedrad;
+   AutoS double tol;
+   AutoS double maxlag;
+   AutoS double maxhist;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
@@ -33828,16 +33939,22 @@ Spawn:
    j = -788;
    innerk = 809;
    lpstagesuccess = false;
-   v = 763;
-   vv = -541;
-   mx = -698;
-   f1 = -318;
-   f2 = -940;
-   deltamax = -229;
-   multiplyby = -536;
-   setscaleto = 487;
-   prevtrustrad = -115;
-   mu = 886;
+   increasebigc = true;
+   v = -541;
+   vv = -698;
+   mx = -900;
+   f1 = -940;
+   f2 = 1016;
+   deltamax = -536;
+   multiplyby = 487;
+   setscaleto = -115;
+   prevtrustrad = 886;
+   d1nrm = 346;
+   mu = -722;
+   expandedrad = -413;
+   tol = -461;
+   maxlag = 927;
+   maxhist = 201;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33855,6 +33972,7 @@ Spawn:
 // * initial violation of linear/nonlinear constraints
    state->lpfailurecnt = 0;
    state->fstagnationcnt = 0;
+   state->bigc = initbigc;
    state->trustrad = inittrustrad;
    for (i = 0; i <= nlec + nlic; i++) {
       state->fscales.xR[i] = 1.0;
@@ -33941,8 +34059,8 @@ Spawn:
    //       is to perform one look-ahead step and use updated constraint values
    //       back at the initial point.
       for (
-         nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, true);
-         nlcslp_phase13iteration(state, &state->state13, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &status, &stp);
+         nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, false);
+         nlcslp_phase13iteration(state, &state->state13, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &status, &d1nrm, &stp);
       ) {
          state->PQ = 2; goto Pause; Resume2: ;
       }
@@ -33951,14 +34069,54 @@ Spawn:
       } else if (status == 0) {
          break;
       }
-      mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult));
+      maxlag = rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult);
+      maxhist = rmaxabsv(state->historylen, &state->maxlaghistory);
+      mu = coalesce(rmax2(maxhist, maxlag), nlcslp_defaultl1penalty);
       for (i = state->historylen; i >= 1; i--) {
          state->meritfunctionhistory.xR[i] = state->meritfunctionhistory.xR[i - 1];
          state->maxlaghistory.xR[i] = state->maxlaghistory.xR[i - 1];
       }
       state->meritfunctionhistory.xR[0] = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit);
-      state->maxlaghistory.xR[0] = rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult);
+      state->maxlaghistory.xR[0] = coalesce(maxlag, defaultmaglagdecay * maxhist);
       state->historylen = imin2(state->historylen + 1, nlcslp_nonmonotonicphase2limit);
+   // Decide whether we need to increase BigC (penalty for the constraint violation that
+   // is used by the linear subsolver) or not. BigC is increased if all of the following
+   // holds true:
+   // * BigC can be increased (it is below upper limit)
+   // * a short step was performed (shorter than the current trust region)
+   // * at least one of the constraints is infeasible within current trust region
+      if (d1nrm * stp < 0.99 * state->trustrad && state->bigc < 0.9 * maxbigc) {
+         increasebigc = false;
+         expandedrad = 1.1 * state->trustrad;
+         tol = rmax2(sqrt(machineepsilon) * state->trustrad, 1000.0 * machineepsilon);
+         for (i = 0; i < nec + nic; i++) {
+            v = 0.0;
+            vv = 0.0;
+            for (j = 0; j < n; j++) {
+               v += state->scaledcleic.xyR[i][j] * state->stepkx.xR[j];
+               vv += fabs(state->scaledcleic.xyR[i][j] * expandedrad);
+            }
+            v -= state->scaledcleic.xyR[i][n];
+            if (i >= nec) {
+               v = rmax2(v, 0.0);
+            }
+            increasebigc = increasebigc || !SmallAtR(v, vv + tol);
+         }
+         for (i = 1; i <= nlec + nlic; i++) {
+            v = state->stepkfi.xR[i];
+            vv = 0.0;
+            for (j = 0; j < n; j++) {
+               vv += fabs(state->stepkj.xyR[i][j] * expandedrad);
+            }
+            if (i > nlec) {
+               v = rmax2(v, 0.0);
+            }
+            increasebigc = increasebigc || !SmallAtR(v, vv + tol);
+         }
+         if (increasebigc) {
+            state->bigc = rmin2(10 * state->bigc, maxbigc);
+         }
+      }
    // PHASE 2: conjugate subiterations
    //
    // If step with second order correction is shorter than 1.0, it means
@@ -33990,6 +34148,7 @@ Spawn:
       //
       // Settings NonmonotonicPhase2Limit to 0 will result in strictly monotonic line search,
       // whilst having nonzero limits means that we perform more robust nonmonotonic search.
+         ae_assert(state->historylen >= 1, "SLP: integrity check 6559 failed");
          f1 = state->meritfunctionhistory.xR[0];
          for (i = 1; i <= state->historylen; i++) {
             f1 = rmax2(f1, state->meritfunctionhistory.xR[i]);
@@ -34341,6 +34500,7 @@ void minslpstate_copy(void *_dst, void *_src, bool make_automatic) {
    minslpphase13state_copy(&dst->state13, &src->state13, make_automatic);
    minslpphase2state_copy(&dst->state2, &src->state2, make_automatic);
    dst->trustrad = src->trustrad;
+   dst->bigc = src->bigc;
    dst->lpfailurecnt = src->lpfailurecnt;
    dst->fstagnationcnt = src->fstagnationcnt;
    ae_vector_copy(&dst->step0x, &src->step0x, make_automatic);
@@ -36310,7 +36470,7 @@ Spawn:
                state->PQ = 4; goto Pause; Resume04:
                ae_v_move(state->fp2.xR, 1, state->fi.xR, 1, ng + nh + 1);
                for (i = 0; i <= ng + nh; i++) {
-                  state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[i]);
+                  state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[k]);
                }
             }
             ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
@@ -36867,9 +37027,7 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 // API: void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep);
 void minnlcresultsbuf(minnlcstate *state, RVector *x, minnlcreport *rep) {
    ae_int_t i;
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    rep->iterationscount = state->repinneriterationscount;
    rep->nfev = state->repnfev;
    rep->terminationtype = state->repterminationtype;
@@ -38435,7 +38593,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
          // Cholesky decomposition failed.
          // Increase LambdaV and repeat iteration.
          // Do not increase outer iterations counter.
-            lambdav *= 10;
+            lambdav *= 10.0;
             continue;
          }
          break;
@@ -39264,9 +39422,7 @@ Pause:
 // API: void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep);
 void minnsresultsbuf(minnsstate *state, RVector *x, minnsreport *rep) {
    ae_int_t i;
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    rep->iterationscount = state->repinneriterationscount;
    rep->nfev = state->repnfev;
    rep->varidx = state->repvaridx;
@@ -39945,8 +40101,8 @@ void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasast
 // Bounded antigradient is a vector obtained from  anti-gradient  by  zeroing
 // components which point outwards:
 //     result = norm(v)
-//     v[i] == 0     if ((-g[i] < 0)and(x[i] == bndl[i])) or
-//                      ((-g[i] > 0)and(x[i] == bndu[i]))
+//     v[i] == 0     if -g[i] < 0 and x[i] == bndl[i] or
+//                      -g[i] > 0 and x[i] == bndu[i]
 //     v[i] == -g[i] otherwise
 //
 // This function may be used to check a stopping criterion.
@@ -40444,9 +40600,7 @@ Pause:
 // API: void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep);
 void minasaresultsbuf(minasastate *state, RVector *x, minasareport *rep) {
    ae_int_t i;
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    ae_v_move(x->xR, 1, state->x.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nfev = state->repnfev;
@@ -41145,7 +41299,7 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep) {
       return;
    }
    if (newstep > *estimate * 100) {
-      *estimate *= 100;
+      *estimate *= 100.0;
       return;
    }
    *estimate = newstep;
@@ -42179,9 +42333,7 @@ void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report 
 // API: void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep);
 void minbcresultsbuf(minbcstate *state, RVector *x, minbcreport *rep) {
    ae_int_t i;
-   if (x->cnt < state->nmain) {
-      ae_vector_set_length(x, state->nmain);
-   }
+   vectorsetlengthatleast(x, state->nmain);
    rep->iterationscount = state->repiterationscount;
    rep->nfev = state->repnfev;
    rep->varidx = state->repvaridx;
@@ -42703,6 +42855,50 @@ void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptest
    ae_vector_set_length(&p->au, 0);
 }
 
+// Query test problem info
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: bool lptestproblemhasknowntarget(const lptestproblem &p);
+bool lptestproblemhasknowntarget(lptestproblem *p) {
+   bool result;
+   result = p->hasknowntarget;
+   return result;
+}
+
+// Query test problem info
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: double lptestproblemgettargetf(const lptestproblem &p);
+double lptestproblemgettargetf(lptestproblem *p) {
+   double result;
+   result = p->targetf;
+   return result;
+}
+
+// Query test problem info
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: ae_int_t lptestproblemgetn(const lptestproblem &p);
+ae_int_t lptestproblemgetn(lptestproblem *p) {
+   ae_int_t result;
+   result = p->n;
+   return result;
+}
+
+// Query test problem info
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: ae_int_t lptestproblemgetm(const lptestproblem &p);
+ae_int_t lptestproblemgetm(lptestproblem *p) {
+   ae_int_t result;
+   result = p->m;
+   return result;
+}
+
 // Set scale for test LP problem
 //
 // This function is intended for internal use by ALGLIB.
@@ -42945,6 +43141,38 @@ void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const doub
    TryCatch()
    alglib_impl::lptestproblemcreate(n, hasknowntarget, targetf, ConstT(lptestproblem, p));
    alglib_impl::ae_state_clear();
+}
+
+bool lptestproblemhasknowntarget(const lptestproblem &p) {
+   alglib_impl::ae_state_init();
+   TryCatch(false)
+   bool Ok = alglib_impl::lptestproblemhasknowntarget(ConstT(lptestproblem, p));
+   alglib_impl::ae_state_clear();
+   return Ok;
+}
+
+double lptestproblemgettargetf(const lptestproblem &p) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::lptestproblemgettargetf(ConstT(lptestproblem, p));
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+ae_int_t lptestproblemgetn(const lptestproblem &p) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::lptestproblemgetn(ConstT(lptestproblem, p));
+   alglib_impl::ae_state_clear();
+   return Z;
+}
+
+ae_int_t lptestproblemgetm(const lptestproblem &p) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::lptestproblemgetm(ConstT(lptestproblem, p));
+   alglib_impl::ae_state_clear();
+   return Z;
 }
 
 void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s) {

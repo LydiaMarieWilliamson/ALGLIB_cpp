@@ -635,7 +635,7 @@ void amdbuffer_init(void *_p, bool make_automatic);
 void amdbuffer_copy(void *_dst, void *_src, bool make_automatic);
 void amdbuffer_free(void *_p, bool make_automatic);
 
-ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf);
+ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf);
 void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, amdbuffer *buf);
 } // end of namespace alglib_impl
 
@@ -652,6 +652,7 @@ struct spcholanalysis {
    double modparam1;
    double modparam2;
    double modparam3;
+   ae_vector referenceridx;
    ae_int_t nsuper;
    ae_vector parentsupernode;
    ae_vector supercolrange;
@@ -675,6 +676,8 @@ struct spcholanalysis {
    ae_vector diagd;
    ae_vector wrkrows;
    ae_vector flagarray;
+   ae_vector eligible;
+   ae_vector curpriorities;
    ae_vector tmpparent;
    ae_vector node2supernode;
    ae_vector u2smap;
@@ -702,7 +705,7 @@ void spcholanalysis_copy(void *_dst, void *_src, bool make_automatic);
 void spcholanalysis_free(void *_p, bool make_automatic);
 
 ae_int_t spsymmgetmaxfastkernel();
-bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis);
+bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis);
 void spsymmsetmodificationstrategy(spcholanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3);
 void spsymmreload(spcholanalysis *analysis, sparsematrix *a);
 void spsymmreloaddiagonal(spcholanalysis *analysis, RVector *d);
@@ -886,6 +889,7 @@ struct fblsgmresstate {
    double epsdiag;
    ae_int_t itsperformed;
    ae_int_t retcode;
+   double reprelres;
    ae_int_t PQ;
 };
 void fblsgmresstate_init(void *_p, bool make_automatic);

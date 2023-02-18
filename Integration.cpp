@@ -715,7 +715,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       ae_frame_leave();
       return;
    }
-   for (i = 0; i <= iceil((3 * (n / 2)) / 2.0); i++) {
+   for (i = 0; i <= (3 * (n / 2) + 1) / 2; i++) {
       if (beta->xR[i] <= 0.0) {
          *info = -2;
          ae_frame_leave();
@@ -1357,7 +1357,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       ae_frame_leave();
       return;
    }
-   clen = iceil((3 * (n / 2)) / 2.0) + 1;
+   clen = (3 * (n / 2) + 1) / 2 + 1;
    ae_vector_set_length(&a, clen);
    ae_vector_set_length(&b, clen);
    for (i = 0; i < clen; i++) {

@@ -2161,7 +2161,7 @@ double invincompletegammac(double a, double y0) {
          x = 1.0;
       }
       while (x0 == iinvgammabignumber) {
-         x *= 1 + d;
+         x *= 1.0 + d;
          y = incompletegammac(a, x);
          if (y < y0) {
             x0 = x;
@@ -2981,7 +2981,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    *ph = 0;
    NewVector(a, 0, DT_REAL);
    NewVector(c, 0, DT_REAL);
-   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in JacobianEllipticFunctions: m<0 or m>1");
+   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in JacobianEllipticFunctions: m < 0 or m > 1");
    ae_vector_set_length(&a, 9);
    ae_vector_set_length(&c, 9);
    if (m < 1.0E-9) {
@@ -5776,7 +5776,7 @@ double ellipticintegrale(double m) {
    double p;
    double q;
    double result;
-   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in EllipticIntegralE: m<0 or m>1");
+   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in EllipticIntegralE: m < 0 or m > 1");
    m = 1 - m;
    if (m == 0.0) {
       result = 1.0;

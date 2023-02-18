@@ -613,7 +613,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = iceil((double)m / p) * (2 * ftbasegetflopestimate(ptotal) + 8 * ptotal);
+         flopcand = (m + p - 1) / p * (2 * ftbasegetflopestimate(ptotal) + 8 * ptotal);
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
@@ -1211,7 +1211,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = iceil((double)m / p) * (2 * ftbasegetflopestimate(ptotal / 2) + 1 * (ptotal / 2));
+         flopcand = (m + p - 1) / p * (2 * ftbasegetflopestimate(ptotal / 2) + 1 * (ptotal / 2));
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;

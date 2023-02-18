@@ -403,7 +403,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 
 #if 0 //(@) Not used anywhere.
-// X-strings (zero-terminated): members are ae_int64_t aligned to avoid alignment problems.
+// x-strings (zero-terminated): members are ae_int64_t aligned to avoid alignment problems.
 // Compiler-specific alignment definitions.
 #   if AE_COMPILER == AE_GNUC
 #      define ALIGNED __attribute__((aligned(8)))
@@ -428,7 +428,7 @@ struct x_string {
 };
 #endif
 
-// X-vectors: members are ae_int64_t aligned to avoid alignment problems.
+// x-vectors: members are ae_int64_t aligned to avoid alignment problems.
 struct x_vector {
 // The vector size; i.e., the number of elements.
    ae_int64_t cnt;		// ae_int_t cnt;
@@ -456,7 +456,7 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src);
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
 void x_vector_free(x_vector *dst, bool make_automatic);
 
-// X-matrices: members are ae_int64_t aligned to avoid alignment problems.
+// x-matrices: members are ae_int64_t aligned to avoid alignment problems.
 struct x_matrix {
 // The matrix size.
 // If either dimension is 0, then they both must be.
@@ -801,6 +801,8 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
 #   define KerFunAvx2Fma(Op) { _KerFunFma(Op) _KerFunAvx2(Op) }
 #   define KerSubAvx2(Op) { _KerSubAvx2(Op) }
 #   define KerFunAvx2(Op) { _KerFunAvx2(Op) }
+#   define KerSubFma(Op) { _KerSubFma(Op) }
+#   define KerFunFma(Op) { _KerFunFma(Op) }
 #   ifdef FP_FAST_FMA
 #      define APPROX_FMA(x, y, z) fma((x), (y), (z))
 #   else
@@ -1106,8 +1108,8 @@ protected:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
 // *	The X-object at new_ptr is used only once;
 //	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
-//	So, you can pass pointers to temporary X-structures which are deallocated immediately after you call attach_to().
-// *	The frame state structure is used for error-handling/reporting purposes (longjmp on errors).
+//	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
+// *	The state structure is used for error-handling/reporting purposes (longjmp on errors).
    void attach_to(alglib_impl::x_vector *new_ptr);
 // Assign rhs to the current object and return *this.
 // It has several branches depending on the target object's status:
@@ -1252,8 +1254,8 @@ protected:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
 // *	The X-object at new_ptr is used only once;
 //	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
-//	So, you can pass pointers to temporary X-structures which are deallocated immediately after you call attach_to().
-// *	The frame state structure is used for error-handling/reporting purposes (longjmp on errors).
+//	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
+// *	The state structure is used for error-handling/reporting purposes (longjmp on errors).
 //	All previously allocated memory is correctly freed on error.
    void attach_to(alglib_impl::x_matrix *new_ptr);
 #if 0 //(@) Not implemented.

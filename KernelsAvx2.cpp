@@ -328,6 +328,17 @@ void avx2_rmulv(const ae_int_t n, const double v, double *__restrict x) {
    }
 }
 
+void avx2_rsqrtv(const ae_int_t n, double *__restrict x) {
+   ae_int_t i;
+   const ae_int_t avx2len = n >> 2;
+   const ae_int_t tail = avx2len << 2;
+   __m256d *__restrict pDest = (__m256d *)x;
+   for (i = 0; i < avx2len; i++)
+      pDest[i] = _mm256_sqrt_pd(pDest[i]);
+   for (i = tail; i < n; i++)
+      x[i] = sqrt(x[i]);
+}
+
 void avx2_rmulvx(const ae_int_t n, const double v, double *__restrict x) {
    const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (n <= 4) {
@@ -448,6 +459,29 @@ void avx2_rmergemulv(const ae_int_t n, const Real *__restrict y, Real *__restric
       case 3:
          *(__m128d *)(pDest + i) = _mm_mul_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
          ((double *)(pDest + i))[2] *= ((const double *)(pSrc + i))[2];
+      break;
+   }
+}
+
+void avx2_rmergedivv(const ae_int_t n, const Real *__restrict y, Real *__restrict x) {
+   ae_int_t i;
+   const ae_int_t avx2len = n >> 2;
+   const __m256d *__restrict pSrc = (const __m256d *)y;
+   __m256d *__restrict pDest = (__m256d *)x;
+   for (i = 0; i < avx2len; i++) {
+      pDest[i] = _mm256_div_pd(pDest[i], pSrc[i]);
+   }
+   const ae_int_t tail = avx2len << 2;
+   switch (n - tail) {
+      case 1:
+         *(double *)(pDest + i) = *(const double *)(pDest + i) / *(const double *)(pSrc + i);
+      break;
+      case 2:
+         *(__m128d *)(pDest + i) = _mm_div_pd(*(const __m128d *)(pDest + i), *(const __m128d *)(pSrc + i));
+      break;
+      case 3:
+         *(__m128d *)(pDest + i) = _mm_div_pd(*(const __m128d *)(pDest + i), *(const __m128d *)(pSrc + i));
+         ((double *)(pDest + i))[2] /= ((const double *)(pSrc + i))[2];
       break;
    }
 }

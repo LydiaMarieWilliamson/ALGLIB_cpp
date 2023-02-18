@@ -1004,6 +1004,12 @@ double possign(double x) {
    return result;
 }
 
+// Return ceil(a/b).
+// It expects that a > 0, b > 0, but does not check it.
+ae_int_t idivup(ae_int_t a, ae_int_t b) {
+   return (a + b - 1) / b;
+}
+
 // Allocation of serializer: complex value
 void alloccomplex(ae_serializer *s, complex v) {
    ae_serializer_alloc_entry(s);
@@ -1715,6 +1721,59 @@ void rmergemulrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
    for (ae_int_t i = 0; i < n; i++) y->xR[i] *= x->xyR[ix][i];
 }
 
+// Component-wise divide elements [0,n) of vector y by vector x.
+// Inputs:
+//	n:	The vector length.
+//	x:	The vector to divide by.
+//	y:	The target vector.
+// Result:
+//	y[i] /= x[i], for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergedivv(ae_int_t n, RVector *x, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubAvx2(rmergedivv(n, x->xR, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] /= x->xR[i];
+}
+
+// Component-wise divide elements [0,n) of the vector y[iy,_] by x.
+// Inputs:
+//	n:	The vector length.
+//	x:	The vector divide by.
+//	y:	The target matrix.
+//	iy:	The row index in y.
+// Result:
+//	y[iy,i] /= x[i], for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergedivvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubAvx2(rmergedivv(n, x->xR, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] /= x->xR[i];
+}
+
+// Component-wise divide elements [0,n) of vector x[ix,_] by y.
+// Inputs:
+//	n:	The vector length.
+//	x:	The source matrix.
+//	ix:	The row index in x.
+//	y:	The target vector.
+// Result:
+//	y[i] /= x[ix,i], for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergedivrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubAvx2(rmergedivv(n, x->xyR[ix], y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] /= x->xyR[ix][i];
+}
+
 // Component-wise max elements [0,n) of the vector x into y.
 // Inputs:
 //	n:	The vector length.
@@ -1821,6 +1880,39 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
    for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmin2(y->xR[i], x->xyR[ix][i]);
 }
 
+// Square root elements [0,n) of vector y.
+// Inputs:
+//	n:	The vector length.
+//	y:	An n-vector to process.
+// Output:
+//	y:	Elements [0,n) of y square root'ed.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsqrtv(ae_int_t n, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubAvx2(rsqrtv(n, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = sqrt(y->xR[i]);
+}
+
+// Square root elements [0,n) of vector y[iy,_].
+// Inputs:
+//	n:	The vector length.
+//	y:	A ? y n matrix to process.
+//	iy:	A row index in y.
+// Output:
+//	y:	Elements [0,n) of y[iy,_] square root'ed.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsqrtr(ae_int_t n, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubAvx2(rsqrtv(n, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] = sqrt(y->xyR[iy][i]);
+}
+
 // Multiply elements [0,n) of the vector y by the scalar v.
 // Inputs:
 //	n:	The vector length.
@@ -1872,6 +1964,42 @@ void rmulvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmulvx(n, v, y->xR + y0))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[y0 + i] *= v;
+}
+
+// Component-wise multiply elements [0,n) of the vectors x and y and add into z.
+// Inputs:
+//	n:	The vector length.
+//	x:	An n-vector to process.
+//	y:	An n-vector to process.
+//	z:	An n-vector to process.
+// Result:
+//	z[i] += x[i] y[i], for i in [0,n).
+// ALGLIB: Copyright 29.10.2021 by Sergey Bochkanov
+void rmuladdv(ae_int_t n, RVector *x, RVector *y, RVector *z) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubFma(rmuladdv(n, x->xR, y->xR, z->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) z->xR[i] += x->xR[i] * y->xR[i];
+}
+
+// Component-wise multiply elements [0,n) of the vectors x and y and subtract into z.
+// Inputs:
+//	n:	The vector length.
+//	x:	An n-vector to process.
+//	y:	An n-vector to process.
+//	z:	An n-vector to process.
+// Result:
+//	z[i] -= x[i] y[i], for i in [0,n).
+// ALGLIB: Copyright 29.10.2021 by Sergey Bochkanov
+void rnegmuladdv(ae_int_t n, RVector *x, RVector *y, RVector *z) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubFma(rnegmuladdv(n, x->xR, y->xR, z->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) z->xR[i] -= x->xR[i] * y->xR[i];
 }
 
 // The maximum over elements [0,n) of the vector x.
@@ -2349,6 +2477,44 @@ void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t iy) {
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t jy) {
    for (ae_int_t i = 0; i < n; i++) y->xyR[i][jy] = v * x->xR[i];
+}
+
+// Component-wise multiply elements [0,n) of the vectors x and y adding to z into w.
+// Inputs:
+//	n:	The vector length.
+//	x:	An n-vector to process.
+//	y:	An n-vector to process.
+//	z:	An n-vector to process.
+//	w:	An n-vector to process.
+// Result:
+//	w[i] = z[i] + x[i] y[i], for i in [0,n).
+// ALGLIB: Copyright 29.10.2021 by Sergey Bochkanov
+void rcopymuladdv(ae_int_t n, RVector *x, RVector *y, RVector *z, RVector *w) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubFma(rcopymuladdv(n, x->xR, y->xR, z->xR, w->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) w->xR[i] = z->xR[i] + x->xR[i] * y->xR[i];
+}
+
+// Component-wise multiply elements [0,n) of the vectors x and y subtracting from z into w.
+// Inputs:
+//	n:	The vector length.
+//	x:	An n-vector to process.
+//	y:	An n-vector to process.
+//	z:	An n-vector to process.
+//	w:	An n-vector to process.
+// Result:
+//	w[i] = z[i] - x[i] y[i], for i in [0,n).
+// ALGLIB: Copyright 29.10.2021 by Sergey Bochkanov
+void rcopynegmuladdv(ae_int_t n, RVector *x, RVector *y, RVector *z, RVector *w) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubFma(rcopynegmuladdv(n, x->xR, y->xR, z->xR, w->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) w->xR[i] = z->xR[i] - x->xR[i] * y->xR[i];
 }
 
 // Copy elements [0,n) of the vector x into y, resizing y if needed.
@@ -4312,12 +4478,36 @@ void tagsortfast(RVector *a, RVector *bufa, ae_int_t n) {
    }
 }
 
-// Versions of tagsort*(), optimized for integer keys optionally with real labels, suitable for sorting the middle of the vector.
+// Versions of tagsort*(), optimized for integer keys optionally with integer or real labels,
+// suitable for sorting the middle of the vector.
 // Sort the vector a, starting at offset, and apply the same permutations to the vector b, if it is specified.
 // NOTE:
 //	These functions assume that the vector a is finite
 //	and do not check for it or for other conditions (size of input arrays, etc.).
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void tagsortmiddleii(ZVector *a, ZVector *b, ae_int_t n, ae_int_t offset/* = 0*/) {
+// Special case.
+   if (n <= 1) return;
+// General case, n > 1: sort, update bp.
+   ae_int_t *ap = a->xZ + offset;
+   ae_int_t *bp = b->xZ + offset;
+   for (ae_int_t nh = 1; nh < n; nh++)
+      for (ae_int_t nm = nh, nl = (nh - 1) / 2; nm > 0 && ap[nl] < ap[nm]; nm = nl, nl = (nl - 1) / 2) {
+         swapi(ap + nl, ap + nm);
+         swapi(bp + nl, bp + nm);
+      }
+   for (ae_int_t nh = n - 1; nh > 0; nh--) {
+      swapi(ap, ap + nh);
+      swapi(bp, bp + nh);
+      for (ae_int_t nl = 0, nm = 1; nm < nh; nl = nm, nm = 2 * nm + 1) {
+         if (nm + 1 < nh && ap[nm + 1] > ap[nm]) nm++;
+         if (ap[nl] >= ap[nm]) break;
+         swapi(ap + nl, ap + nm);
+         swapi(bp + nl, bp + nm);
+      }
+   }
+}
+
 void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset/* = 0*/) {
 // Special case.
    if (n <= 1) return;
@@ -6394,7 +6584,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
       s *= 0.5;
    }
    while (s * mx < 0.5) {
-      s *= 2;
+      s *= 2.0;
    }
    ae_v_muld(w->xR, 1, n, s);
    s = 1.0 / s;
