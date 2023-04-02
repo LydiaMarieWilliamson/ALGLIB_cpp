@@ -10880,9 +10880,9 @@ void sparseserialize(sparsematrix &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::sparsealloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::sparseserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);

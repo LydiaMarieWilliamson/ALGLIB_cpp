@@ -308,7 +308,7 @@ struct ae_dyn_block {
 // The argument for deallocator(); or NULL for 0-sized blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
    void *volatile ptr;
 };
-void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
+void ae_db_init(ae_dyn_block *block, size_t size, bool make_automatic);
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size);
 void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
@@ -541,7 +541,7 @@ struct ae_shared_pool {
 // The enumeration pointer, points to the current recycled object.
    ae_shared_pool_entry *volatile enumeration_counter;
 // The size of the object; used when we call malloc() for new objects.
-   ae_int_t size_of_object;
+   size_t size_of_object;
 // The initializer function; accepts a pointer to the malloc'ed object, initializes its fields.
    ae_init_op init;
 // The copy constructor; accepts a pointer to the malloc'ed object, but not to the initialized object.
@@ -613,7 +613,7 @@ void ae_serializer_init(ae_serializer *serializer);
 
 void ae_serializer_alloc_start(ae_serializer *serializer);
 void ae_serializer_alloc_entry(ae_serializer *serializer);
-ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer);
+size_t ae_serializer_get_alloc_size(ae_serializer *serializer);
 
 #ifdef AE_USE_CPP_SERIALIZATION
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf);

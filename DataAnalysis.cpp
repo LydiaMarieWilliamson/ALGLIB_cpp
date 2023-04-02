@@ -6926,9 +6926,9 @@ void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpalloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::mlpserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -8083,9 +8083,9 @@ void mlpeserialize(mlpensemble &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpealloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::mlpeserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -14689,9 +14689,9 @@ void dfserialize(decisionforest &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::dfalloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::dfserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -22218,9 +22218,9 @@ void knnserialize(knnmodel &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::knnalloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::knnserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);

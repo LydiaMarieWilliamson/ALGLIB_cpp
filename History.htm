@@ -497,6 +497,11 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 		―	ae_free_op: inherited from ae_destructor in ALGLIB 3.20.0, and redefined as void (*ae_free_op)(void *, bool).
 		―       ae_deallocator: defined as void (*ae_deallocator)(void *), retained in place of ae_destructor for ae_dyn_block and ae_db_swap().
 		―       The source pointer in all the *_copy constructors has been made const.
+	∙	Conversions of declared types to size_t
+		―	size_of_object in ae_shared_pool and ae_shared_pool_set_seed() redeclared as size_t.
+		―	size_of_object in ae_smart_ptr and obj_size in ae_smart_ptr_assign redeclared as size_t.
+		―	ae_serializer_get_alloc_size() redeclared with return type size_t.
+		―	size in ae_db_init() redeclared as size_t.
 </pre>
 </p>
 <p>

@@ -744,14 +744,14 @@ static void ae_db_attach(ae_dyn_block *block) { block->p_next = TopFr, TopFr = b
 // *	Avoid calling it for blocks which are already in the list.
 //	Use ae_db_realloc() for already-allocated blocks.
 // *	No memory allocation is performed for initialization with size == 0.
-void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
+void ae_db_init(ae_dyn_block *block, size_t size, bool make_automatic) {
 //(@) TopFr != NULL check and zero-check removed.
 // NOTE:
 // *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
    ae_assert(size >= 0, "ae_db_init: negative size");
    block->ptr = NULL;
    if (make_automatic) ae_db_attach(block); else block->p_next = NULL;
-   if (size != 0) block->ptr = ae_malloc((size_t)size);
+   if (size != 0) block->ptr = ae_malloc(size);
    block->deallocator = ae_free;
 }
 
@@ -818,7 +818,7 @@ void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool ma
    dst->cnt = 0;
    dst->xX = NULL;
 // Initialize.
-   ae_db_init(&dst->data, size * ae_sizeof(datatype), make_automatic);
+   ae_db_init(&dst->data, (size_t)(size * ae_sizeof(datatype)), make_automatic);
    dst->cnt = size;
    dst->datatype = datatype;
    dst->xX = dst->data.ptr;
@@ -932,7 +932,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
    if (cols == 0 || rows == 0) { ae_db_init(&dst->data, 0, make_automatic); return; }
 // Initialize, preparing for possible errors during allocation.
    for (; dst->stride * ae_sizeof(datatype) % AE_DATA_ALIGN != 0; dst->stride++);
-   ae_db_init(&dst->data, rows * ((ae_int_t)sizeof(void *) + dst->stride * ae_sizeof(datatype)) + AE_DATA_ALIGN - 1, make_automatic);
+   ae_db_init(&dst->data, (size_t)(rows * (sizeof(void *) + dst->stride * ae_sizeof(datatype)) + AE_DATA_ALIGN - 1), make_automatic);
    dst->cols = cols;
    dst->rows = rows;
 // Set the pointers to the matrix rows.
@@ -1215,7 +1215,7 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automat
 // Prepare for possible errors during allocation.
    dst->rows = dst->cols = 0;
    dst->xyX = NULL;
-   ae_db_init(&dst->data, rows * (ae_int_t)sizeof(void *), make_automatic);
+   ae_db_init(&dst->data, (size_t)rows * sizeof(void *), make_automatic);
    dst->cols = cols;
    dst->rows = rows;
    if (dst->cols > 0 && dst->rows > 0) {
@@ -2146,7 +2146,7 @@ void ae_serializer_alloc_entry(ae_serializer *serializer) {
 
 // After the allocation is done, return the required size of the output string buffer (including the trailing '\0').
 // The actual size of the data being stored can be a few characters smaller than requested.
-ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
+size_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
    serializer->mode = AE_SM_READY2S;
 // If no entries are needed (the degenerate case).
    if (serializer->entries_needed == 0)
@@ -5945,7 +5945,7 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
          return false;
       *new_s = s;
    // Finite value conversion.
-      if (*new_s - p >= (int)sizeof buf)
+      if (*new_s - p >= sizeof buf)
          return false;
       strncpy(buf, p, (size_t)(*new_s - p));
       buf[*new_s - p] = '\0';

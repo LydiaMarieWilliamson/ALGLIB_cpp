@@ -1992,9 +1992,9 @@ void idwserialize(idwmodel &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::idwserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -25827,9 +25827,9 @@ void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::spline2dserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -32821,9 +32821,9 @@ void rbfserialize(rbfmodel &obj, std::string &s_out) {
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr());
-   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   size_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
+   s_out.reserve(ssize + 1);
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::rbfserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
