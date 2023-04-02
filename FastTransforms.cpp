@@ -182,7 +182,7 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
          hn = complex_from_d(buf.xR[idx], buf.xR[idx + 1]);
          idx = 2 * ((n2 - i) % n2);
          hmnc = complex_from_d(buf.xR[idx], -buf.xR[idx + 1]);
-         v = complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
+         v = complex_from_d(-sin(-2.0 * pi * i / n), cos(-2.0 * pi * i / n));
          f->xC[i] = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
          f->xC[i].x *= 0.5;
          f->xC[i].y *= 0.5;
@@ -317,7 +317,7 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
       hn = complex_from_d(buf->xR[idx], buf->xR[idx + 1]);
       idx = 2 * (n2 - i);
       hmnc = complex_from_d(buf->xR[idx], -buf->xR[idx + 1]);
-      v = complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
+      v = complex_from_d(-sin(-2.0 * pi * i / n), cos(-2.0 * pi * i / n));
       v = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
       a->xR[2 * i] = 0.5 * v.x;
       a->xR[2 * i + 1] = 0.5 * v.y;
@@ -590,7 +590,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          if (circular && ftbaseissmooth(m)) {
          // special code for circular convolution of a sequence with a smooth length
-            flopcand = 3 * ftbasegetflopestimate(m) + 6 * m;
+            flopcand = 3.0 * ftbasegetflopestimate(m) + 6.0 * m;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
@@ -598,7 +598,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          } else {
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmooth(m + n - 1);
-            flopcand = 3 * ftbasegetflopestimate(p) + 6 * p;
+            flopcand = 3.0 * ftbasegetflopestimate(p) + 6.0 * p;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
@@ -613,7 +613,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = (m + p - 1) / p * (2 * ftbasegetflopestimate(ptotal) + 8 * ptotal);
+         flopcand = (m + p - 1) / p * (2.0 * ftbasegetflopestimate(ptotal) + 8.0 * ptotal);
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
@@ -1188,7 +1188,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          if (circular && ftbaseissmooth(m) && m % 2 == 0) {
          // special code for circular convolution of a sequence with a smooth length
-            flopcand = 3 * ftbasegetflopestimate(m / 2) + (6 * m) / 2.0;
+            flopcand = 3.0 * ftbasegetflopestimate(m / 2) + 6.0 * m / 2.0;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
@@ -1196,7 +1196,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          } else {
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmootheven(m + n - 1);
-            flopcand = 3 * ftbasegetflopestimate(p / 2) + (6 * p) / 2.0;
+            flopcand = 3.0 * ftbasegetflopestimate(p / 2) + 6.0 * p / 2.0;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;

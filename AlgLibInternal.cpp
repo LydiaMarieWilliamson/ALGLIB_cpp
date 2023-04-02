@@ -258,7 +258,7 @@ void bvectorgrowto(BVector *x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = imax2(n, iround(1.8 * x->cnt + 1));
+   n = imax2(n, iround(1.8 * x->cnt + 1.0));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -291,7 +291,7 @@ void ivectorgrowto(ZVector *x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = imax2(n, iround(1.8 * x->cnt + 1));
+   n = imax2(n, iround(1.8 * x->cnt + 1.0));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -324,7 +324,7 @@ void rvectorgrowto(RVector *x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = imax2(n, iround(1.8 * x->cnt + 1));
+   n = imax2(n, iround(1.8 * x->cnt + 1.0));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -363,7 +363,7 @@ void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows) {
    }
 // Sizes and metrics
    if (a->cols < n) {
-      n = imax2(n, iround(1.8 * a->cols + 1));
+      n = imax2(n, iround(1.8 * a->cols + 1.0));
    }
    n2 = imin2(a->cols, n);
    m = a->rows;
@@ -402,7 +402,7 @@ void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
    }
 // Sizes and metrics
    if (a->rows < n) {
-      n = imax2(n, iround(1.8 * a->rows + 1));
+      n = imax2(n, iround(1.8 * a->rows + 1.0));
    }
    n2 = imin2(a->rows, n);
    m = a->cols;
@@ -710,7 +710,7 @@ double safepythag2(double x, double y) {
    if (z == 0.0) {
       result = w;
    } else {
-      result = w * sqrt(1 + sqr(z / w));
+      result = w * sqrt(1.0 + sqr(z / w));
    }
    return result;
 }
@@ -748,7 +748,7 @@ double safepythag3(double x, double y, double z) {
 // ALGLIB: Copyright by Sergey Bochkanov
 ae_int_t saferdiv(double x, double y, double *r) {
    ae_int_t result;
-   *r = 0;
+   *r = 0.0;
 // Two special cases:
 // * Y == 0
 // * X == 0 and Y != 0
@@ -837,7 +837,7 @@ double safeminposrv(double x, double y, double v) {
 // * T replaces X
 // ALGLIB: Copyright by Sergey Bochkanov
 void apperiodicmap(double *x, double a, double b, double *k) {
-   *k = 0;
+   *k = 0.0;
    ae_assert(a < b, "apperiodicmap: internal error!");
    *k = floor((*x - a) / (b - a));
    *x -= *k * (b - a);
@@ -867,7 +867,7 @@ double randomnormal() {
       if (s > 0.0 && s < 1.0) {
       // two sqrt's instead of one to
       // avoid overflow when S is too small
-         s = sqrt(-2 * log(s)) / sqrt(s);
+         s = sqrt(-2.0 * log(s)) / sqrt(s);
          result = u * s;
          break;
       }
@@ -1395,7 +1395,7 @@ double smpactivationlevel() {
    double nn;
    double result;
    nn = 2.0 * matrixtilesizeb();
-   result = rmax2(0.95 * 2 * nn * nn * nn, 10000000.0);
+   result = rmax2(0.95 * 2.0 * nn * nn * nn, 10000000.0);
    return result;
 }
 
@@ -1408,7 +1408,7 @@ double spawnlevel() {
    double nn;
    double result;
    nn = 2.0 * matrixtilesizea();
-   result = 0.95 * 2 * nn * nn * nn;
+   result = 0.95 * 2.0 * nn * nn * nn;
    return result;
 }
 
@@ -2571,7 +2571,7 @@ void igrowv(ae_int_t newn, ZVector *x) {
       return;
    }
    ae_int_t oldn = x->cnt;
-   newn = imax2(newn, iround(1.8 * oldn + 1));
+   newn = imax2(newn, iround(1.8 * oldn + 1.0));
    NewVector(oldx, 0, DT_INT);
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, newn);
@@ -2587,7 +2587,7 @@ void rgrowv(ae_int_t newn, RVector *x) {
       return;
    }
    ae_int_t oldn = x->cnt;
-   newn = imax2(newn, iround(1.8 * oldn + 1));
+   newn = imax2(newn, iround(1.8 * oldn + 1.0));
    NewVector(oldx, 0, DT_REAL);
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, newn);
@@ -3493,8 +3493,8 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
    complex t;
    double s;
    complex v;
-   tau->x = 0;
-   tau->y = 0;
+   tau->x = 0.0;
+   tau->y = 0.0;
    if (n <= 0) {
       *tau = complex_from_i(0);
       return;
@@ -3546,7 +3546,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
    }
    tau->x = (beta - alphr) / beta;
    tau->y = -alphi / beta;
-   alpha = ae_c_d_div(1, ae_c_sub_d(alpha, beta));
+   alpha = ae_c_d_div(1.0, ae_c_sub_d(alpha, beta));
    if (n > 1) {
       ae_v_cmulc(&x->xC[2], 1, n - 1, alpha);
    }
@@ -4902,7 +4902,7 @@ double vectornorm2(RVector *x, ae_int_t i1, ae_int_t i2) {
       if (x->xR[ix] != 0.0) {
          absxi = fabs(x->xR[ix]);
          if (scl < absxi) {
-            ssq = 1 + ssq * sqr(scl / absxi);
+            ssq = 1.0 + ssq * sqr(scl / absxi);
             scl = absxi;
          } else {
             ssq += sqr(absxi / scl);
@@ -5374,9 +5374,9 @@ void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int
 void generaterotation(double f, double g, double *cs, double *sn, double *r) {
    double f1;
    double g1;
-   *cs = 0;
-   *sn = 0;
-   *r = 0;
+   *cs = 0.0;
+   *sn = 0.0;
+   *r = 0.0;
    if (g == 0.0) {
       *cs = 1.0;
       *sn = 0.0;
@@ -5390,9 +5390,9 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r) {
          f1 = f;
          g1 = g;
          if (fabs(f1) > fabs(g1)) {
-            *r = fabs(f1) * sqrt(1 + sqr(g1 / f1));
+            *r = fabs(f1) * sqrt(1.0 + sqr(g1 / f1));
          } else {
-            *r = fabs(g1) * sqrt(1 + sqr(f1 / g1));
+            *r = fabs(g1) * sqrt(1.0 + sqr(f1 / g1));
          }
          *cs = f1 / *r;
          *sn = g1 / *r;
@@ -5556,7 +5556,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
    bool notran;
    bool upper;
    bool nounit;
-   *s = 0;
+   *s = 0.0;
    upper = isupper;
    notran = !istrans;
    nounit = !isunit;
@@ -5568,7 +5568,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
       return;
    }
 // Determine machine dependent parameters to control overflow.
-   smlnum = minrealnumber / (machineepsilon * 2);
+   smlnum = minrealnumber / (machineepsilon * 2.0);
    bignum = 1.0 / smlnum;
    *s = 1.0;
    if (!normin) {
@@ -5674,7 +5674,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
                   break;
                }
             // G(j) = G(j-1)*( 1 + CNORM(j) )
-               grow /= 1 + cnorm->xR[j];
+               grow /= 1.0 + cnorm->xR[j];
                j += jinc;
             }
          }
@@ -5707,7 +5707,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
                   break;
                }
             // G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) )
-               xj = 1 + cnorm->xR[j];
+               xj = 1.0 + cnorm->xR[j];
                grow = rmin2(grow, xbnd / xj);
             // M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j))
                tjj = fabs(a->xyR[j][j]);
@@ -5731,7 +5731,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
                   break;
                }
             // G(j) = ( 1 + CNORM(j) )*G(j-1)
-               xj = 1 + cnorm->xR[j];
+               xj = 1.0 + cnorm->xR[j];
                grow /= xj;
                j += jinc;
             }
@@ -6080,7 +6080,7 @@ void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isup
    bool normin;
    ae_int_t i;
    ae_frame_make(&_frame_block);
-   *s = 0;
+   *s = 0.0;
    NewVector(cnorm, 0, DT_REAL);
    NewMatrix(a1, 0, 0, DT_REAL);
    NewVector(x1, 0, DT_REAL);
@@ -6122,8 +6122,8 @@ namespace alglib_impl {
 static bool safesolve_cbasicsolveandupdate(complex alpha, complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, complex *x) {
    double v;
    bool result;
-   x->x = 0;
-   x->y = 0;
+   x->x = 0.0;
+   x->y = 0.0;
    result = false;
    if (ae_c_eq_d(alpha, 0.0)) {
       return result;
@@ -6547,8 +6547,8 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
    double chunk;
    double invchunk;
    bool allzeros;
-   *r = 0;
-   *rerr = 0;
+   *r = 0.0;
+   *rerr = 0.0;
 // special cases:
 // * N == 0
 // * N is too large to use integer arithmetics
@@ -6646,8 +6646,8 @@ void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *
    ae_int_t i;
    double mx;
    double v;
-   *r = 0;
-   *rerr = 0;
+   *r = 0.0;
+   *rerr = 0.0;
 // special cases:
 // * N == 0
    if (n == 0) {
@@ -6692,9 +6692,9 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
    double v;
    double rerrx;
    double rerry;
-   r->x = 0;
-   r->y = 0;
-   *rerr = 0;
+   r->x = 0.0;
+   r->y = 0.0;
+   *rerr = 0.0;
 // special cases:
 // * N == 0
    if (n == 0) {
@@ -6738,7 +6738,7 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
    if (rerrx == 0.0 && rerry == 0.0) {
       *rerr = 0.0;
    } else {
-      *rerr = rmax2(rerrx, rerry) * sqrt(1 + sqr(rmin2(rerrx, rerry) / rmax2(rerrx, rerry)));
+      *rerr = rmax2(rerrx, rerry) * sqrt(1.0 + sqr(rmin2(rerrx, rerry) / rmax2(rerrx, rerry)));
    }
 }
 } // end of namespace alglib_impl
@@ -7409,7 +7409,7 @@ double nucosm1(double x) {
    double c;
    double result;
    if (x < -0.25 * pi || x > 0.25 * pi) {
-      result = cos(x) - 1;
+      result = cos(x) - 1.0;
       return result;
    }
    xx = x * x;
@@ -7817,7 +7817,7 @@ static void ftbase_ftapplycomplexcodeletfft(double *ap, ae_int_t args, ae_int_t 
 static void ftbase_ftapplycomplexcodelettwfft(double *ap, ae_int_t args, ae_int_t n, ae_int_t mun) {
    const double twopi = 2.0 * pi;
    const double sin30 = 0.5, sin60 = sqrt(0.75);
-   const double root5 = sqrt(5.0), sin36 = sqrt((5.0 - root5)/8.0), sin72 = sqrt((5.0 + root5)/8.0);
+   const double root5 = sqrt(5.0), sin36 = sqrt((5.0 - root5) / 8.0), sin72 = sqrt((5.0 + root5) / 8.0);
    const double ca = 0.25, cb = 0.25 * root5, cc = sin72 + sin36, cd = sin72 - sin36;
    ae_assert(args >= 1, "ftbase_ftapplycomplexcodelettwfft: args < 1");
    ae_assert(n >= 1, "ftbase_ftapplycomplexcodelettwfft: n < 1");
@@ -8051,7 +8051,7 @@ static void ftbase_ffttwcalc(double *ap, ae_int_t n1, ae_int_t n2) {
       // Conditionally update tw.
          if ((j2 + 1) % updatetw2 == 0 && j2 < n1q - 1) {
          // Re-twiddle: tw = 1^{-(2 k (j2 + 1)/n)};
-            double omega = -twopi * 2 * k * (j2 + 1) / n;
+            double omega = -twopi * 2.0 * k * (j2 + 1) / n;
             twx = cos(omega), twy = sin(omega);
          } else {
          // Update: tw *= twrow;

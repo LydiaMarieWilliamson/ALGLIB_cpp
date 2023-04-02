@@ -31,7 +31,7 @@ static double gammafunc_gammastirf(double x) {
    stir = -2.68132617805781232825E-3 + w * stir;
    stir = 3.47222221605458667310E-3 + w * stir;
    stir = 8.33333333333482257126E-2 + w * stir;
-   w = 1 + w * stir;
+   w = 1.0 + w * stir;
    y = exp(x);
    if (x > 143.01608) {
       v = pow(x, 0.5 * x - 0.25);
@@ -192,7 +192,7 @@ double lngamma(double x, double *sgngam) {
    double ls2pi;
    double tmp;
    double result;
-   *sgngam = 0;
+   *sgngam = 0.0;
    *sgngam = 1.0;
    logpi = 1.14472988584940017414;
    ls2pi = 0.91893853320467274178;
@@ -239,7 +239,7 @@ double lngamma(double x, double *sgngam) {
          result = log(z);
          return result;
       }
-      p -= 2;
+      p -= 2.0;
       x += p;
       b = -1378.25152569120859100;
       b = -38801.6315134637840924 + x * b;
@@ -408,7 +408,7 @@ double normaldistribution(double x) {
 // API: double normalpdf(const double x);
 double normalpdf(double x) {
    ae_assert(isfinite(x), "NormalPDF: X is infinite");
-   return exp(-x * x / 2) / sqrt(2 * pi);
+   return exp(-x * x / 2.0) / sqrt(2.0 * pi);
 }
 
 // Normal distribution CDF
@@ -530,7 +530,7 @@ double invnormaldistribution(double y0) {
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 // API: double inverf(const double e);
 double inverf(double e) {
-   return invnormaldistribution(0.5 * (e + 1)) / Root2;
+   return invnormaldistribution(0.5 * (e + 1.0)) / Root2;
 }
 
 // Bivariate normal PDF
@@ -554,8 +554,8 @@ double bivariatenormalpdf(double x, double y, double rho) {
    ae_assert(isfinite(y), "BivariateNormalCDF: Y is infinite");
    ae_assert(isfinite(rho), "BivariateNormalCDF: Rho is infinite");
    ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range");
-   onerho2 = (1 - rho) * (1 + rho);
-   result = exp(-(x * x + y * y - 2 * rho * x * y) / (2 * onerho2)) / (2 * pi * sqrt(onerho2));
+   onerho2 = (1.0 - rho) * (1.0 + rho);
+   result = exp(-(x * x + y * y - 2.0 * rho * x * y) / (2.0 * onerho2)) / (2.0 * pi * sqrt(onerho2));
    return result;
 }
 
@@ -571,10 +571,10 @@ static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, 
    double result;
    r = (rangeb - rangea) * 0.5 * gx + (rangeb + rangea) * 0.5;
    t2 = tan(0.5 * r);
-   dd = 1.0 / (1 + t2 * t2);
-   sinr = 2 * t2 * dd;
-   cosr = (1 - t2 * t2) * dd;
-   result = gw * exp(-(x * x + y * y - 2 * x * y * sinr) / (2 * cosr * cosr));
+   dd = 1.0 / (1.0 + t2 * t2);
+   sinr = 2.0 * t2 * dd;
+   cosr = (1.0 - t2 * t2) * dd;
+   result = gw * exp(-(x * x + y * y - 2.0 * x * y * sinr) / (2.0 * cosr * cosr));
    return result;
 }
 
@@ -589,11 +589,11 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
    double exphsk1sqrt1x2;
    double result;
    r = (rangeb - rangea) * 0.5 * gx + (rangeb + rangea) * 0.5;
-   exphsk22x2 = exp(-(x - s * y) * (x - s * y) / (2 * r * r));
-   exphsk2 = exp(-x * s * y / 2);
-   sqrt1x2 = sqrt((1 - r) * (1 + r));
-   exphsk1sqrt1x2 = exp(-x * s * y / (1 + sqrt1x2));
-   result = gw * exphsk22x2 * (exphsk1sqrt1x2 / sqrt1x2 - exphsk2 * (1 + (4 - x * y * s) * r * r / 8));
+   exphsk22x2 = exp(-(x - s * y) * (x - s * y) / (2.0 * r * r));
+   exphsk2 = exp(-x * s * y / 2.0);
+   sqrt1x2 = sqrt((1.0 - r) * (1.0 + r));
+   exphsk1sqrt1x2 = exp(-x * s * y / (1.0 + sqrt1x2));
+   result = gw * exphsk22x2 * (exphsk1sqrt1x2 / sqrt1x2 - exphsk2 * (1.0 + (4.0 - x * y * s) * r * r / 8.0));
    return result;
 }
 
@@ -664,7 +664,7 @@ double bivariatenormalcdf(double x, double y, double rho) {
       v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, 0.9041172563704749);
       v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, -0.9815606342467192);
       v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, 0.9815606342467192);
-      v = v * 0.5 * (rangeb - rangea) / (2 * pi);
+      v = v * 0.5 * (rangeb - rangea) / (2.0 * pi);
       result = normalcdf(x) * normalcdf(y) + v;
    } else {
    // Rho is large, compute integral using using formula (6) by Alan Genz, integrated
@@ -678,13 +678,13 @@ double bivariatenormalcdf(double x, double y, double rho) {
          fxys = rmax2(0.0, normalcdf(-x) - normalcdf(y));
       }
       rangea = 0.0;
-      rangeb = sqrt((1 - rho) * (1 + rho));
+      rangeb = sqrt((1.0 - rho) * (1.0 + rho));
    // Compute first term (analytic integral) from formula (6)
       ta = rangeb;
       tb = fabs(x - s * y);
-      tc = (4 - s * x * y) / 8;
-      v0 = ta * (1 - tc * (tb * tb - ta * ta) / 3) * exp(-tb * tb / (2 * ta * ta)) - tb * (1 - tc * tb * tb / 3) * sqrt(2 * pi) * normalcdf(-tb / ta);
-      v0 = v0 * exp(-s * x * y / 2) / (2 * pi);
+      tc = (4.0 - s * x * y) / 8.0;
+      v0 = ta * (1.0 - tc * (tb * tb - ta * ta) / 3) * exp(-tb * tb / (2.0 * ta * ta)) - tb * (1.0 - tc * tb * tb / 3) * sqrt(2.0 * pi) * normalcdf(-tb / ta);
+      v0 = v0 * exp(-s * x * y / 2.0) / (2.0 * pi);
    // Compute second term (numerical integral, 20-point Gauss-Legendre rule) from formula (6)
       v1 = 0.0;
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, -0.0765265211334973);
@@ -707,7 +707,7 @@ double bivariatenormalcdf(double x, double y, double rho) {
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, 0.9639719272779138);
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, -0.9931285991850949);
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, 0.9931285991850949);
-      v1 = v1 * 0.5 * (rangeb - rangea) / (2 * pi);
+      v1 = v1 * 0.5 * (rangeb - rangea) / (2.0 * pi);
       result = fxys - s * (v0 + v1);
    }
    result = rmax2(result, 0.0);
@@ -1937,7 +1937,7 @@ double incompletegamma(double a, double x) {
       return result;
    }
    if (x > 1.0 && x > a) {
-      result = 1 - incompletegammac(a, x);
+      result = 1.0 - incompletegammac(a, x);
       return result;
    }
    ax = a * log(x) - x - lngamma(a, &tmp);
@@ -2016,7 +2016,7 @@ double incompletegammac(double a, double x) {
       return result;
    }
    if (x < 1.0 || x < a) {
-      result = 1 - incompletegamma(a, x);
+      result = 1.0 - incompletegamma(a, x);
       return result;
    }
    ax = a * log(x) - x - lngamma(a, &tmp);
@@ -2025,18 +2025,18 @@ double incompletegammac(double a, double x) {
       return result;
    }
    ax = exp(ax);
-   y = 1 - a;
-   z = x + y + 1;
+   y = 1.0 - a;
+   z = x + y + 1.0;
    c = 0.0;
    pkm2 = 1.0;
    qkm2 = x;
-   pkm1 = x + 1;
+   pkm1 = x + 1.0;
    qkm1 = z * x;
    ans = pkm1 / qkm1;
    do {
       c++;
       y++;
-      z += 2;
+      z += 2.0;
       yc = y * c;
       pk = pkm1 * z - pkm2 * yc;
       qk = qkm1 * z - qkm2 * yc;
@@ -2119,9 +2119,9 @@ double invincompletegammac(double a, double y0) {
    yl = 0.0;
    x1 = 0.0;
    yh = 1.0;
-   dithresh = 5 * igammaepsilon;
-   d = 1.0 / (9 * a);
-   y = 1 - d - invnormaldistribution(y0) * sqrt(d);
+   dithresh = 5.0 * igammaepsilon;
+   d = 1.0 / (9.0 * a);
+   y = 1.0 - d - invnormaldistribution(y0) * sqrt(d);
    x = a * y * y * y;
    lgm = lngamma(a, &tmp);
    i = 0;
@@ -2142,7 +2142,7 @@ double invincompletegammac(double a, double y0) {
          x1 = x;
          yh = y;
       }
-      d = (a - 1) * log(x) - x - lgm;
+      d = (a - 1.0) * log(x) - x - lgm;
       if (d < -709.78271289338399) {
          d = 0.0625;
          break;
@@ -2348,7 +2348,7 @@ double chisquarecdistribution(double v, double x) {
 double invchisquaredistribution(double v, double y) {
    double result;
    ae_assert(y >= 0.0 && y <= 1.0 && v >= 1.0, "Domain error in InvChiSquareDistribution");
-   result = 2 * invincompletegammac(0.5 * v, y);
+   result = 2.0 * invincompletegammac(0.5 * v, y);
    return result;
 }
 } // end of namespace alglib_impl
@@ -2650,7 +2650,7 @@ double exponentialintegralei(double x) {
       f2 = f2 * w + 1.727439612206521482874E-4;
       f2 = f2 * w + 3.953167195549672482304E-5;
       f = f1 / f2;
-      result = exp(x) * w * (1 + w * f);
+      result = exp(x) * w * (1.0 + w * f);
       return result;
    }
    if (x < 8.0) {
@@ -2673,7 +2673,7 @@ double exponentialintegralei(double x) {
       f2 = f2 * w + (-4.729848351866523044863E-6);
       f2 = f2 * w + 2.665195537390710170105E-6;
       f = f1 / f2;
-      result = exp(x) * w * (1 + w * f);
+      result = exp(x) * w * (1.0 + w * f);
       return result;
    }
    if (x < 16.0) {
@@ -2699,7 +2699,7 @@ double exponentialintegralei(double x) {
       f2 = f2 * w + 1.394634930353847498145E-8;
       f2 = f2 * w + 6.150865933977338354138E-10;
       f = f1 / f2;
-      result = exp(x) * w * (1 + w * f);
+      result = exp(x) * w * (1.0 + w * f);
       return result;
    }
    if (x < 32.0) {
@@ -2722,7 +2722,7 @@ double exponentialintegralei(double x) {
       f2 = f2 * w + 2.728938403476726394024E-6;
       f2 = f2 * w - 4.239462431819542051337E-8;
       f = f1 / f2;
-      result = exp(x) * w * (1 + w * f);
+      result = exp(x) * w * (1.0 + w * f);
       return result;
    }
    if (x < 64.0) {
@@ -2740,7 +2740,7 @@ double exponentialintegralei(double x) {
       f2 = f2 * w + 1.560544881127388842819E-3;
       f2 = f2 * w - 2.523137093603234562648E-5;
       f = f1 / f2;
-      result = exp(x) * w * (1 + w * f);
+      result = exp(x) * w * (1.0 + w * f);
       return result;
    }
    w = 1.0 / x;
@@ -2764,7 +2764,7 @@ double exponentialintegralei(double x) {
    f2 = f2 * w + 1.239754287483206878024E-7;
    f2 = f2 * w - 1.086076102793126632978E-9;
    f = f1 / f2;
-   result = exp(x) * w * (1 + w * f);
+   result = exp(x) * w * (1.0 + w * f);
    return result;
 }
 
@@ -2831,10 +2831,10 @@ double exponentialintegralen(double x, ae_int_t n) {
       xk = x + n;
       yk = 1.0 / (xk * xk);
       t = n;
-      result = yk * t * (6 * x * x - 8 * t * x + t * t);
+      result = yk * t * (6.0 * x * x - 8.0 * t * x + t * t);
       result = yk * (result + t * (t - 2.0 * x));
       result = yk * (result + t);
-      result = (result + 1) * exp(-x) / xk;
+      result = (result + 1.0) * exp(-x) / xk;
       return result;
    }
    if (x <= 1.0) {
@@ -2845,7 +2845,7 @@ double exponentialintegralen(double x, ae_int_t n) {
       z = -x;
       xk = 0.0;
       yk = 1.0;
-      pk = 1.0 - n;
+      pk = 1 - n;
       if (n == 1) {
          result = 0.0;
       } else {
@@ -2975,10 +2975,10 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    double twon;
    ae_int_t i;
    ae_frame_make(&_frame_block);
-   *sn = 0;
-   *cn = 0;
-   *dn = 0;
-   *ph = 0;
+   *sn = 0.0;
+   *cn = 0.0;
+   *dn = 0.0;
+   *ph = 0.0;
    NewVector(a, 0, DT_REAL);
    NewVector(c, 0, DT_REAL);
    ae_assert(m >= 0.0 && m <= 1.0, "Domain error in JacobianEllipticFunctions: m < 0 or m > 1");
@@ -3092,8 +3092,8 @@ namespace alglib_impl {
 // Copyright 1984, 1987, 1989 by Stephen L. Moshier
 // API: void sinecosineintegrals(const double x, double &si, double &ci);
 void sinecosineintegrals(double x, double *si, double *ci) {
-   *si = 0;
-   *ci = 0;
+   *si = 0.0;
+   *ci = 0.0;
    bool neg = x < 0.0;
    if (neg) x = -x;
    if (x == 0.0) {
@@ -3355,7 +3355,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x) {
       b = x;
    } else {
       a = 1.0;
-      b = 2 * x;
+      b = 2.0 * x;
    }
 // Special cases: N = 0 or N = 1
    if (n == 0) {
@@ -3368,7 +3368,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x) {
    }
 // General case: N >= 2
    for (i = 2; i <= n; i++) {
-      result = 2 * x * b - a;
+      result = 2.0 * x * b - a;
       a = b;
       b = result;
    }
@@ -3399,14 +3399,14 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x) {
    b1 = 0.0;
    b2 = 0.0;
    for (i = n; i >= 1; i--) {
-      result = 2 * x * b1 - b2 + c->xR[i];
+      result = 2.0 * x * b1 - b2 + c->xR[i];
       b2 = b1;
       b1 = result;
    }
    if (r == 1) {
       result = -b2 + x * b1 + c->xR[0];
    } else {
-      result = -b2 + 2 * x * b1 + c->xR[0];
+      result = -b2 + 2.0 * x * b1 + c->xR[0];
    }
    return result;
 }
@@ -3431,7 +3431,7 @@ void chebyshevcoefficients(ae_int_t n, RVector *c) {
    } else {
       c->xR[n] = exp((n - 1) * log(2.0));
       for (i = 0; i < n / 2; i++) {
-         c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1) / (n - i - 1);
+         c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4.0 / (i + 1) / (n - i - 1);
       }
    }
 }
@@ -3471,7 +3471,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b) {
             b->xR[k] = 1.0;
          } else {
             if (i != 0) {
-               b->xR[k] = 2 * d;
+               b->xR[k] = 2.0 * d;
             }
             if (k > i + 1) {
                b->xR[k] -= b->xR[k - 2];
@@ -3856,7 +3856,7 @@ void fresnelintegral(double x, double *c, double *s) {
    gd = gd * u + 1.38796531259578871258E-15;
    gd = gd * u + 8.39158816283118707363E-19;
    gd = gd * u + 1.86958710162783236342E-22;
-   f = 1 - u * fn / fd;
+   f = 1.0 - u * fn / fd;
    g = t * gn / gd;
    t = HalfPi * x2;
    cc = cos(t);
@@ -4065,10 +4065,10 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    double bd16;
    double bppn;
    double bppd;
-   *ai = 0;
-   *aip = 0;
-   *bi = 0;
-   *bip = 0;
+   *ai = 0.0;
+   *aip = 0.0;
+   *bi = 0.0;
+   *bip = 0.0;
    sqpii = 5.64189583547756286948E-1;
    c1 = 0.35502805388781723926;
    c2 = 0.258819403792806798405;
@@ -4478,7 +4478,7 @@ double hermitecalculate(ae_int_t n, double x) {
    result = 0.0;
 // Prepare A and B
    a = 1.0;
-   b = 2 * x;
+   b = 2.0 * x;
 // Special cases: N = 0 or N = 1
    if (n == 0) {
       result = a;
@@ -4490,7 +4490,7 @@ double hermitecalculate(ae_int_t n, double x) {
    }
 // General case: N >= 2
    for (i = 2; i <= n; i++) {
-      result = 2 * x * b - 2 * (i - 1) * a;
+      result = 2.0 * x * b - 2.0 * (i - 1) * a;
       a = b;
       b = result;
    }
@@ -4518,7 +4518,7 @@ double hermitesum(RVector *c, ae_int_t n, double x) {
    b2 = 0.0;
    result = 0.0;
    for (i = n; i >= 0; i--) {
-      result = 2 * (x * b1 - (i + 1) * b2) + c->xR[i];
+      result = 2.0 * (x * b1 - (i + 1) * b2) + c->xR[i];
       b2 = b1;
       b1 = result;
    }
@@ -4542,7 +4542,7 @@ void hermitecoefficients(ae_int_t n, RVector *c) {
    }
    c->xR[n] = exp(n * log(2.0));
    for (i = 0; i < n / 2; i++) {
-      c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1);
+      c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4.0 / (i + 1);
    }
 }
 } // end of namespace alglib_impl
@@ -4652,10 +4652,10 @@ void legendrecoefficients(ae_int_t n, RVector *c) {
    }
    c->xR[n] = 1.0;
    for (i = 1; i <= n; i++) {
-      c->xR[n] = c->xR[n] * (n + i) / 2 / i;
+      c->xR[n] = c->xR[n] * (n + i) / 2.0 / i;
    }
    for (i = 0; i < n / 2; i++) {
-      c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 2 / (i + 1) / (2 * (n - i) - 1);
+      c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 2.0 / (i + 1) / (2 * (n - i) - 1);
    }
 }
 } // end of namespace alglib_impl
@@ -4989,7 +4989,7 @@ double besselyn(ae_int_t n, double x) {
    double a = bessely0(x), b = bessely1(x);
    for (ae_int_t i = 1; i < n; i++) {
       double tmp = b;
-      b = 2 * i / x * b - a;
+      b = 2.0 * i / x * b - a;
       a = tmp;
    }
    return s * b;
@@ -5454,13 +5454,13 @@ double laguerrecalculate(ae_int_t n, double x) {
    double result;
    result = 1.0;
    a = 1.0;
-   b = 1 - x;
+   b = 1.0 - x;
    if (n == 1) {
       result = b;
    }
    i = 2.0;
    while (i <= n) {
-      result = ((2 * i - 1 - x) * b - (i - 1) * a) / i;
+      result = ((2.0 * i - 1.0 - x) * b - (i - 1.0) * a) / i;
       a = b;
       b = result;
       i++;
@@ -5488,7 +5488,7 @@ double laguerresum(RVector *c, ae_int_t n, double x) {
    b2 = 0.0;
    result = 0.0;
    for (i = n; i >= 0; i--) {
-      result = (2 * i + 1 - x) * b1 / (i + 1) - (i + 1) * b2 / (i + 2) + c->xR[i];
+      result = (2.0 * i + 1.0 - x) * b1 / (i + 1) - (i + 1) * b2 / (i + 2) + c->xR[i];
       b2 = b1;
       b1 = result;
    }
@@ -5686,7 +5686,7 @@ double incompleteellipticintegralk(double phi, double m) {
       result = phi;
       return result;
    }
-   a = 1 - m;
+   a = 1.0 - m;
    if (a == 0.0) {
       result = log(tan(0.5 * (HalfPi + phi)));
       return result;
@@ -5696,7 +5696,7 @@ double incompleteellipticintegralk(double phi, double m) {
       npio2++;
    }
    if (npio2 != 0) {
-      k = ellipticintegralk(1 - a);
+      k = ellipticintegralk(1.0 - a);
       phi -= npio2 * HalfPi;
    } else {
       k = 0.0;
@@ -5714,7 +5714,7 @@ double incompleteellipticintegralk(double phi, double m) {
       if (SmallR(e, 10.0)) {
          e = atan(e);
          if (npio2 == 0) {
-            k = ellipticintegralk(1 - a);
+            k = ellipticintegralk(1.0 - a);
          }
          temp = k - incompleteellipticintegralk(e, m);
          if (s < 0) {
@@ -5777,7 +5777,7 @@ double ellipticintegrale(double m) {
    double q;
    double result;
    ae_assert(m >= 0.0 && m <= 1.0, "Domain error in EllipticIntegralE: m < 0 or m > 1");
-   m = 1 - m;
+   m = 1.0 - m;
    if (m == 0.0) {
       result = 1.0;
       return result;

@@ -371,7 +371,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w)
    }
    beta.xR[0] = 2.0;
    for (i = 1; i < n; i++) {
-      beta.xR[i] = 1.0 / (4 - 1.0 / sqr(i));
+      beta.xR[i] = 1.0 / (4.0 - 1.0 / sqr(i));
    }
    gqgeneraterec(&alpha, &beta, beta.xR[0], n, info, x, w);
 // test basic properties to detect errors
@@ -433,8 +433,8 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    ae_vector_set_length(&a, n);
    ae_vector_set_length(&b, n);
    apb = alpha + beta;
-   a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
+   a.xR[0] = (beta - alpha) / (apb + 2.0);
+   t = (apb + 1.0) * log(2.0) + lngamma(alpha + 1.0, &s) + lngamma(beta + 1.0, &s) - lngamma(apb + 2.0, &s);
    if (t > log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave();
@@ -444,11 +444,11 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    if (n > 1) {
       alpha2 = sqr(alpha);
       beta2 = sqr(beta);
-      a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
+      a.xR[1] = (beta2 - alpha2) / ((apb + 2.0) * (apb + 4.0));
+      b.xR[1] = 4.0 * (alpha + 1.0) * (beta + 1.0) / ((apb + 3.0) * sqr(apb + 2.0));
       for (i = 2; i < n; i++) {
-         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
+         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1.0 + 0.5 * apb / i) * (1.0 + 0.5 * (apb + 2.0) / i));
+         b.xR[i] = 0.25 * (1.0 + alpha / i) * (1.0 + beta / i) * (1.0 + apb / i) / ((1.0 + 0.5 * (apb + 1.0) / i) * (1.0 + 0.5 * (apb - 1.0) / i) * sqr(1.0 + 0.5 * apb / i));
       }
    }
    gqgeneraterec(&a, &b, b.xR[0], n, info, x, w);
@@ -506,8 +506,8 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    }
    ae_vector_set_length(&a, n);
    ae_vector_set_length(&b, n);
-   a.xR[0] = alpha + 1;
-   t = lngamma(alpha + 1, &s);
+   a.xR[0] = alpha + 1.0;
+   t = lngamma(alpha + 1.0, &s);
    if (t >= log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave();
@@ -516,7 +516,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    b.xR[0] = exp(t);
    if (n > 1) {
       for (i = 1; i < n; i++) {
-         a.xR[i] = 2 * i + alpha + 1;
+         a.xR[i] = 2.0 * i + alpha + 1.0;
          b.xR[i] = i * (i + alpha);
       }
    }
@@ -573,7 +573,7 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w) 
    for (i = 0; i < n; i++) {
       a.xR[i] = 0.0;
    }
-   b.xR[0] = sqrt(4 * atan(1.0));
+   b.xR[0] = sqrt(4.0 * atan(1.0));
    if (n > 1) {
       for (i = 1; i < n; i++) {
          b.xR[i] = 0.5 * i;
@@ -876,7 +876,7 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    }
    beta.xR[0] = 2.0;
    for (k = 1; k < blen; k++) {
-      beta.xR[k] = 1.0 / (4 - 1.0 / sqr(k));
+      beta.xR[k] = 1.0 / (4.0 - 1.0 / sqr(k));
    }
    gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss);
 // test basic properties to detect errors
@@ -919,7 +919,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   *eps = 0;
+   *eps = 0.0;
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // these initializers are not really necessary,
@@ -1364,8 +1364,8 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       a.xR[i] = 0.0;
    }
    apb = alpha + beta;
-   a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
+   a.xR[0] = (beta - alpha) / (apb + 2.0);
+   t = (apb + 1.0) * log(2.0) + lngamma(alpha + 1.0, &s) + lngamma(beta + 1.0, &s) - lngamma(apb + 2.0, &s);
    if (t > log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave();
@@ -1375,11 +1375,11 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    if (clen > 1) {
       alpha2 = sqr(alpha);
       beta2 = sqr(beta);
-      a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
+      a.xR[1] = (beta2 - alpha2) / ((apb + 2.0) * (apb + 4.0));
+      b.xR[1] = 4.0 * (alpha + 1.0) * (beta + 1.0) / ((apb + 3.0) * sqr(apb + 2.0));
       for (i = 2; i < clen; i++) {
-         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
+         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1.0 + 0.5 * apb / i) * (1.0 + 0.5 * (apb + 2.0) / i));
+         b.xR[i] = 0.25 * (1.0 + alpha / i) * (1.0 + beta / i) * (1.0 + apb / i) / ((1.0 + 0.5 * (apb + 1.0) / i) * (1.0 + 0.5 * (apb - 1.0) / i) * sqr(1.0 + 0.5 * apb / i));
       }
    }
    gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss);
@@ -1876,11 +1876,11 @@ bool autogkiteration(autogkstate *state) {
       default: goto Exit;
    }
 Spawn:
-   s = 359;
-   x = 255;
-   t = 74;
-   v1 = 205;
-   v2 = -838;
+   s = 359.0;
+   x = 255.0;
+   t = 74.0;
+   v1 = 205.0;
+   v2 = -838.0;
    eps = 0.0;
    a = state->a;
    b = state->b;
@@ -1935,11 +1935,11 @@ Spawn:
    // first, integrate left half of [a,b]:
    //     integral(f(x)dx, a, (b+a)/2) =
    //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5 * (b-a))^(1+alpha))
-      for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
+      for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1.0 + alpha), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
       // Fill State.X, State.XMinusA, State.BMinusX.
       // Latter two are filled correctly even if B < A.
          x = state->internalstate.x;
-         t = pow(x, 1.0 / (1 + alpha));
+         t = pow(x, 1.0 / (1.0 + alpha));
          state->x = a + t;
          if (s > 0.0) {
             state->xminusa = t;
@@ -1950,7 +1950,7 @@ Spawn:
          }
          state->needf = true, state->PQ = 1; goto Pause; Resume1: state->needf = false, state->nfev++;
          if (alpha != 0.0) {
-            state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
+            state->internalstate.f = state->f * pow(x, -alpha / (1.0 + alpha)) / (1.0 + alpha);
          } else {
             state->internalstate.f = state->f;
          }
@@ -1960,11 +1960,11 @@ Spawn:
    // then, integrate right half of [a,b]:
    //     integral(f(x)dx, (b+a)/2, b) =
    //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5 * (b-a))^(1+beta))
-      for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
+      for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1.0 + beta), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
       // Fill State.X, State.XMinusA, State.BMinusX.
       // Latter two are filled correctly (X-A, B-X) even if B < A.
          x = state->internalstate.x;
-         t = pow(x, 1.0 / (1 + beta));
+         t = pow(x, 1.0 / (1.0 + beta));
          state->x = b - t;
          if (s > 0.0) {
             state->xminusa = b - t - a;
@@ -1975,7 +1975,7 @@ Spawn:
          }
          state->needf = true, state->PQ = 2; goto Pause; Resume2: state->needf = false, state->nfev++;
          if (beta != 0.0) {
-            state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
+            state->internalstate.f = state->f * pow(x, -beta / (1.0 + beta)) / (1.0 + beta);
          } else {
             state->internalstate.f = state->f;
          }
@@ -2006,7 +2006,7 @@ Pause:
 // ALGLIB: Copyright 14.11.2007 by Sergey Bochkanov
 // API: void autogkresults(const autogkstate &state, double &v, autogkreport &rep);
 void autogkresults(autogkstate *state, double *v, autogkreport *rep) {
-   *v = 0;
+   *v = 0.0;
    SetObj(autogkreport, rep);
    *v = state->v;
    rep->terminationtype = state->terminationtype;
@@ -2179,3 +2179,4 @@ void autogkresults(const autogkstate &state, double &v, autogkreport &rep) {
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
+   const double polyharmonic2scale = 4.0;

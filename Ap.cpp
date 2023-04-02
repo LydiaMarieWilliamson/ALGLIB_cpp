@@ -1315,7 +1315,7 @@ static double x_safepythag2(double x, double y) {
    if (z == 0.0) return w;
    else {
       double t = z / w;
-      return w * sqrt(1 + t * t);
+      return w * sqrt(1.0 + t * t);
    }
 }
 
@@ -2772,7 +2772,7 @@ ae_int_t imax3(ae_int_t x, ae_int_t y, ae_int_t z) {
 }
 
 ae_int_t ae_iabs(ae_int_t x) { return x >= 0 ? x : -x; }
-ae_int_t sign(double x) { return x > 0 ? +1 : x < 0 ? -1 : 0; }
+ae_int_t sign(double x) { return x > 0.0 ? +1 : x < 0.0 ? -1 : 0; }
 ae_int_t iround(double x) { return (ae_int_t)round(x); }
 ae_int_t itrunc(double x) { return (ae_int_t)trunc(x); }
 ae_int_t ifloor(double x) { return (ae_int_t)floor(x); }
@@ -5180,7 +5180,7 @@ bool isposinf(double x) { return isinf(x) && !signbit(x); }
 
 int minint(int x, int y) { return x > y ? y : x; }
 int maxint(int x, int y) { return x > y ? x : y; }
-int sign(double x) { return x > 0 ? +1 : x < 0 ? -1 : 0; }
+int sign(double x) { return x > 0.0 ? +1 : x < 0.0 ? -1 : 0; }
 int iround(double x) { return int(round(x)); }
 int itrunc(double x) { return int(trunc(x)); }
 int ifloor(double x) { return int(floor(x)); }
@@ -5261,11 +5261,11 @@ std::string complex::tostring(int _dps) const {
       ThrowError("complex::tostring: buffer overflow");
 // Different zero/non-zero patterns.
    if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) != 0)
-      return std::string(x > 0 ? "" : "-") + buf_x + (y > 0 ? "+" : "-") + buf_y + "i";
+      return std::string(x > 0.0 ? "" : "-") + buf_x + (y > 0.0 ? "+" : "-") + buf_y + "i";
    else if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) == 0)
-      return std::string(x > 0 ? "" : "-") + buf_x;
+      return std::string(x > 0.0 ? "" : "-") + buf_x;
    else if (strcmp(buf_x, buf_zero) == 0 && strcmp(buf_y, buf_zero) != 0)
-      return std::string(y > 0 ? "" : "-") + buf_y + "i";
+      return std::string(y > 0.0 ? "" : "-") + buf_y + "i";
    else
       return std::string("0");
 }

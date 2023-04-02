@@ -74,7 +74,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
       state->xscale = 1.0;
    } else {
       state->xscale = -1.0;
-      ae_v_muld(state->xg.xR, 1, m, -1);
+      ae_v_muld(state->xg.xR, 1, m, -1.0);
    }
    ae_vector_set_length(&state->yc, n);
    ae_v_move(state->yc.xR, 1, y->xR, 1, n);

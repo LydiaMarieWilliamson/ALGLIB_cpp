@@ -112,8 +112,8 @@ void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df
    double xscale2;
    double xoffs2;
    double xprev;
-   *f = 0;
-   *df = 0;
+   *f = 0.0;
+   *df = 0.0;
    ae_assert(!isinf(t), "BarycentricDiff1: infinite T!");
 // special case: NaN
    if (isnan(t)) {
@@ -151,7 +151,7 @@ void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df
    }
 // pivot point found, calculate dNumerator and dDenominator
    xscale1 = 1.0 / (xmax - xmin);
-   xoffs1 = -xmin / (xmax - xmin) + 1;
+   xoffs1 = -xmin / (xmax - xmin) + 1.0;
    xscale2 = 2.0;
    xoffs2 = -3.0;
    t = t * xscale1 + xoffs1;
@@ -226,9 +226,9 @@ void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df
    double s2;
    double xk;
    double xi;
-   *f = 0;
-   *df = 0;
-   *d2f = 0;
+   *f = 0.0;
+   *df = 0.0;
+   *d2f = 0.0;
    ae_assert(!isinf(t), "BarycentricDiff1: infinite T!");
 // special case: NaN
    if (isnan(t)) {
@@ -281,7 +281,7 @@ void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df
          vv = sqr(t - xi);
          s0 = (t - xk) / (t - xi);
          s1 = (xk - xi) / vv;
-         s2 = -2 * (xk - xi) / (vv * (t - xi));
+         s2 = -2.0 * (xk - xi) / (vv * (t - xi));
       } else {
          s0 = 1.0;
          s1 = 0.0;
@@ -298,7 +298,7 @@ void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df
    }
    *f = b->sy * n0 / d0;
    *df = b->sy * (n1 * d0 - n0 * d1) / sqr(d0);
-   *d2f = b->sy * ((n2 * d0 - n0 * d2) * sqr(d0) - (n1 * d0 - n0 * d1) * 2 * d0 * d1) / sqr(sqr(d0));
+   *d2f = b->sy * ((n2 * d0 - n0 * d2) * sqr(d0) - (n1 * d0 - n0 * d1) * 2.0 * d0 * d1) / sqr(sqr(d0));
 }
 
 // This subroutine performs linear transformation of the argument.
@@ -1171,7 +1171,7 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y) {
          if (fastcalcpossible) {
          // Important special case, fast evaluation possible
             v = vv * vv;
-            v = (1 - v) * (1 - v) / (v + lambdacur);
+            v = (1.0 - v) * (1.0 - v) / (v + lambdacur);
             f = buf->tsxy.xyR[i][nx];
             wf0 += v * f;
             ws0 += v;
@@ -1180,7 +1180,7 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y) {
                continue;
             }
             v = vv * vv;
-            v = (1 - v) * (1 - v) / (v + lambdacur);
+            v = (1.0 - v) * (1.0 - v) / (v + lambdacur);
             f = buf->tsxy.xyR[i][nx + 1];
             wf1 += v * f;
             ws1 += v;
@@ -1193,7 +1193,7 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y) {
                   lambdacur = s->lambdalast;
                }
                v = vv * vv;
-               v = (1 - v) * (1 - v) / (v + lambdacur);
+               v = (1.0 - v) * (1.0 - v) / (v + lambdacur);
                f = buf->tsxy.xyR[i][nx + layeridx];
                buf->tsyw.xR[layeridx] += v * f;
                buf->tsw.xR[layeridx] += v;
@@ -1212,7 +1212,7 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y) {
                   break;
                }
                v = vv * vv;
-               v = (1 - v) * (1 - v) / (v + lambdacur);
+               v = (1.0 - v) * (1.0 - v) / (v + lambdacur);
                for (j = 0; j < ny; j++) {
                   f = buf->tsxy.xyR[i][nx + layeridx * ny + j];
                   buf->tsyw.xR[layeridx * ny + j] += v * f;
@@ -1659,7 +1659,7 @@ void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep) {
             for (i0 = 0; i0 < k; i0++) {
                vv = state->tmpdist.xR[i0] / rcur;
                vv *= vv;
-               v = (1 - vv) * (1 - vv) / (vv + lambdacur);
+               v = (1.0 - vv) * (1.0 - vv) / (vv + lambdacur);
                srcidx = state->tmptags.xZ[i0];
                for (j = 0; j < ny; j++) {
                   state->tmpwy.xR[j] += v * state->tmplayers.xyR[srcidx][nx + layeridx * ny + j];
@@ -2188,10 +2188,10 @@ void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, R
    double xmax;
    ae_int_t i;
    double mx;
-   *xa = 0;
-   *xb = 0;
-   *sa = 0;
-   *sb = 0;
+   *xa = 0.0;
+   *xb = 0.0;
+   *sa = 0.0;
+   *sb = 0.0;
    SetVector(xoriginal);
    SetVector(yoriginal);
    ae_assert(n >= 1, "LSFitScaleXY: incorrect N");
@@ -2223,11 +2223,11 @@ void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, R
    *xa = xmin;
    *xb = xmax;
    for (i = 0; i < n; i++) {
-      x->xR[i] = 2 * (x->xR[i] - 0.5 * (*xa + *xb)) / (*xb - *xa);
+      x->xR[i] = 2.0 * (x->xR[i] - 0.5 * (*xa + *xb)) / (*xb - *xa);
    }
    for (i = 0; i < k; i++) {
       ae_assert(dc->xZ[i] >= 0, "LSFitScaleXY: internal error!");
-      xc->xR[i] = 2 * (xc->xR[i] - 0.5 * (*xa + *xb)) / (*xb - *xa);
+      xc->xR[i] = 2.0 * (xc->xR[i] - 0.5 * (*xa + *xb)) / (*xb - *xa);
       yc->xR[i] *= pow(0.5 * (*xb - *xa), dc->xZ[i]);
    }
    ae_vector_set_length(yoriginal, n);
@@ -2243,10 +2243,10 @@ void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, R
    }
    *sb = sqrt(*sb / n) + *sa;
    if (*sb == *sa) {
-      *sb = 2 * *sa;
+      *sb = 2.0 * *sa;
    }
    if (*sb == *sa) {
-      *sb = *sa + 1;
+      *sb = *sa + 1.0;
    }
    for (i = 0; i < n; i++) {
       y->xR[i] = (y->xR[i] - *sa) / (*sb - *sa);
@@ -2401,7 +2401,7 @@ void buildpriorterm(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t 
          if (spdmatrixcholesky(&amod, nx + 1, true)) {
             break;
          }
-         lambdareg = coalesce(10 * lambdareg, 1.0E-12);
+         lambdareg = coalesce(10.0 * lambdareg, 1.0E-12);
       }
       rmatrixlefttrsm(nx + 1, ny, &amod, 0, 0, true, false, 1, &braw, 0, 0);
       rmatrixlefttrsm(nx + 1, ny, &amod, 0, 0, true, false, 0, &braw, 0, 0);
@@ -2561,7 +2561,7 @@ void buildpriorterm1(RVector *xy1, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_
          if (spdmatrixcholesky(&amod, nx + 1, true)) {
             break;
          }
-         lambdareg = coalesce(10 * lambdareg, 1.0E-12);
+         lambdareg = coalesce(10.0 * lambdareg, 1.0E-12);
       }
       rmatrixlefttrsm(nx + 1, ny, &amod, 0, 0, true, false, 1, &braw, 0, 0);
       rmatrixlefttrsm(nx + 1, ny, &amod, 0, 0, true, false, 0, &braw, 0, 0);
@@ -2765,8 +2765,8 @@ void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentri
    v = 1.0;
    for (i = 0; i < n; i++) {
       t = tan(0.5 * pi * (2 * i + 1) / (2 * n));
-      w.xR[i] = 2 * v * t / (1 + sqr(t));
-      x.xR[i] = 0.5 * (b + a) + 0.5 * (b - a) * (1 - sqr(t)) / (1 + sqr(t));
+      w.xR[i] = 2.0 * v * t / (1.0 + sqr(t));
+      x.xR[i] = 0.5 * (b + a) + 0.5 * (b - a) * (1.0 - sqr(t)) / (1.0 + sqr(t));
       v = -v;
    }
    barycentricbuildxyw(&x, y, &w, n, p);
@@ -2873,7 +2873,7 @@ void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *
    ae_vector_set_length(&vx, p->n);
    for (i = 0; i < p->n; i++) {
       vx.xR[i] = cos(pi * (i + 0.5) / p->n);
-      vp.xR[i] = barycentriccalc(p, 0.5 * (vx.xR[i] + 1) * (b - a) + a);
+      vp.xR[i] = barycentriccalc(p, 0.5 * (vx.xR[i] + 1.0) * (b - a) + a);
    }
 // T[0]
    ae_vector_set_length(t, p->n);
@@ -2903,7 +2903,7 @@ void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *
          t->xR[k] = v / (0.5 * p->n);
       // Update TK and TK1
          for (i = 0; i < p->n; i++) {
-            v = 2 * vx.xR[i] * tk.xR[i] - tk1.xR[i];
+            v = 2.0 * vx.xR[i] * tk.xR[i] - tk1.xR[i];
             tk1.xR[i] = tk.xR[i];
             tk.xR[i] = v;
          }
@@ -2958,7 +2958,7 @@ void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentrici
       tk = vx;
       for (k = 1; k < n; k++) {
          vy += t->xR[k] * tk;
-         v = 2 * vx * tk - tk1;
+         v = 2.0 * vx * tk - tk1;
          tk1 = tk;
          tk = v;
       }
@@ -3106,7 +3106,7 @@ void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a
          t.xR[k] = v / (0.5 * p->n);
       // Update TK and TK1
          for (i = 0; i < p->n; i++) {
-            v = 2 * vx.xR[i] * tk.xR[i] - tk1.xR[i];
+            v = 2.0 * vx.xR[i] * tk.xR[i] - tk1.xR[i];
             tk1.xR[i] = tk.xR[i];
             tk.xR[i] = v;
          }
@@ -3126,7 +3126,7 @@ void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a
             a->xR[k] = 1.0;
          } else {
             if (i != 0) {
-               a->xR[k] = 2 * d;
+               a->xR[k] = 2.0 * d;
             }
             if (k > i + 1) {
                a->xR[k] -= a->xR[k - 2];
@@ -3310,7 +3310,7 @@ double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t
    j = 0;
    s = t - a;
    for (i = 1; i < n; i++) {
-      x = a + i / (n - 1.0) * (b - a);
+      x = a + (double)i / (n - 1) * (b - a);
       if (fabs(t - x) < fabs(s)) {
          s = t - x;
          j = i;
@@ -3427,8 +3427,8 @@ double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t)
    threshold = sqrt(minrealnumber);
    t = (t - 0.5 * (a + b)) / (0.5 * (b - a));
    a0 = pi / (2 * (n - 1) + 2);
-   delta = 2 * pi / (2 * (n - 1) + 2);
-   alpha = 2 * sqr(sin(delta / 2));
+   delta = 2.0 * pi / (2 * (n - 1) + 2);
+   alpha = 2.0 * sqr(sin(delta / 2.0));
    beta = sin(delta);
 // First, decide: should we use "safe" formula (guarded
 // against overflow) or fast one?
@@ -3571,7 +3571,7 @@ double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t)
    t = (t - 0.5 * (a + b)) / (0.5 * (b - a));
    a0 = 0.0;
    delta = pi / (n - 1);
-   alpha = 2 * sqr(sin(delta / 2));
+   alpha = 2.0 * sqr(sin(delta / 2.0));
    beta = sin(delta);
 // First, decide: should we use "safe" formula (guarded
 // against overflow) or fast one?
@@ -3952,7 +3952,7 @@ static void spline1d_solvecyclictridiagonal(RVector *a, RVector *b, RVector *c, 
    spline1d_solvetridiagonal(a, b, c, d, n, &y);
    spline1d_solvetridiagonal(a, b, c, &u, n, &z);
    for (k = 0; k < n; k++) {
-      x->xR[k] = y.xR[k] - (y.xR[0] + beta / gamma * y.xR[n - 1]) / (1 + z.xR[0] + beta / gamma * z.xR[n - 1]) * z.xR[k];
+      x->xR[k] = y.xR[k] - (y.xR[0] + beta / gamma * y.xR[n - 1]) / (1.0 + z.xR[0] + beta / gamma * z.xR[n - 1]) * z.xR[k];
    }
    ae_frame_leave();
 }
@@ -3995,16 +3995,16 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
    // Boundary conditions at N-1 points
    // (one point less because last point is the same as first point).
       a1->xR[0] = x->xR[1] - x->xR[0];
-      a2->xR[0] = 2 * (x->xR[1] - x->xR[0] + x->xR[n - 1] - x->xR[n - 2]);
+      a2->xR[0] = 2.0 * (x->xR[1] - x->xR[0] + x->xR[n - 1] - x->xR[n - 2]);
       a3->xR[0] = x->xR[n - 1] - x->xR[n - 2];
-      b->xR[0] = 3 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]) * (x->xR[1] - x->xR[0]) + 3 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]) * (x->xR[n - 1] - x->xR[n - 2]);
+      b->xR[0] = 3.0 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]) * (x->xR[1] - x->xR[0]) + 3.0 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]) * (x->xR[n - 1] - x->xR[n - 2]);
       for (i = 1; i < n - 1; i++) {
       // Altough last point is [N-2], we use X[N-1] and Y[N-1]
       // (because of periodicity)
          a1->xR[i] = x->xR[i + 1] - x->xR[i];
-         a2->xR[i] = 2 * (x->xR[i + 1] - x->xR[i - 1]);
+         a2->xR[i] = 2.0 * (x->xR[i + 1] - x->xR[i - 1]);
          a3->xR[i] = x->xR[i] - x->xR[i - 1];
-         b->xR[i] = 3 * (y->xR[i] - y->xR[i - 1]) / (x->xR[i] - x->xR[i - 1]) * (x->xR[i + 1] - x->xR[i]) + 3 * (y->xR[i + 1] - y->xR[i]) / (x->xR[i + 1] - x->xR[i]) * (x->xR[i] - x->xR[i - 1]);
+         b->xR[i] = 3.0 * (y->xR[i] - y->xR[i - 1]) / (x->xR[i] - x->xR[i - 1]) * (x->xR[i + 1] - x->xR[i]) + 3.0 * (y->xR[i + 1] - y->xR[i]) / (x->xR[i + 1] - x->xR[i]) * (x->xR[i] - x->xR[i - 1]);
       }
    // Solve, add last point (with index N-1)
       spline1d_solvecyclictridiagonal(a1, a2, a3, b, n - 1, d);
@@ -4016,7 +4016,7 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
          a1->xR[0] = 0.0;
          a2->xR[0] = 1.0;
          a3->xR[0] = 1.0;
-         b->xR[0] = 2 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]);
+         b->xR[0] = 2.0 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]);
       }
       if (boundltype == 1) {
          a1->xR[0] = 0.0;
@@ -4028,21 +4028,21 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
          a1->xR[0] = 0.0;
          a2->xR[0] = 2.0;
          a3->xR[0] = 1.0;
-         b->xR[0] = 3 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]) - 0.5 * boundl * (x->xR[1] - x->xR[0]);
+         b->xR[0] = 3.0 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]) - 0.5 * boundl * (x->xR[1] - x->xR[0]);
       }
    // Central conditions
       for (i = 1; i < n - 1; i++) {
          a1->xR[i] = x->xR[i + 1] - x->xR[i];
-         a2->xR[i] = 2 * (x->xR[i + 1] - x->xR[i - 1]);
+         a2->xR[i] = 2.0 * (x->xR[i + 1] - x->xR[i - 1]);
          a3->xR[i] = x->xR[i] - x->xR[i - 1];
-         b->xR[i] = 3 * (y->xR[i] - y->xR[i - 1]) / (x->xR[i] - x->xR[i - 1]) * (x->xR[i + 1] - x->xR[i]) + 3 * (y->xR[i + 1] - y->xR[i]) / (x->xR[i + 1] - x->xR[i]) * (x->xR[i] - x->xR[i - 1]);
+         b->xR[i] = 3.0 * (y->xR[i] - y->xR[i - 1]) / (x->xR[i] - x->xR[i - 1]) * (x->xR[i + 1] - x->xR[i]) + 3.0 * (y->xR[i + 1] - y->xR[i]) / (x->xR[i + 1] - x->xR[i]) * (x->xR[i] - x->xR[i - 1]);
       }
    // Right boundary conditions
       if (boundrtype == 0) {
          a1->xR[n - 1] = 1.0;
          a2->xR[n - 1] = 1.0;
          a3->xR[n - 1] = 0.0;
-         b->xR[n - 1] = 2 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]);
+         b->xR[n - 1] = 2.0 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]);
       }
       if (boundrtype == 1) {
          a1->xR[n - 1] = 0.0;
@@ -4054,7 +4054,7 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
          a1->xR[n - 1] = 1.0;
          a2->xR[n - 1] = 2.0;
          a3->xR[n - 1] = 0.0;
-         b->xR[n - 1] = 3 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]) + 0.5 * boundr * (x->xR[n - 1] - x->xR[n - 2]);
+         b->xR[n - 1] = 3.0 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]) + 0.5 * boundr * (x->xR[n - 1] - x->xR[n - 2]);
       }
    // Solve
       spline1d_solvetridiagonal(a1, a2, a3, b, n, d);
@@ -4175,8 +4175,8 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
       delta3 = delta * delta2;
       c->c.xR[4 * i] = y->xR[i];
       c->c.xR[4 * i + 1] = d->xR[i];
-      c->c.xR[4 * i + 2] = (3 * (y->xR[i + 1] - y->xR[i]) - 2 * d->xR[i] * delta - d->xR[i + 1] * delta) / delta2;
-      c->c.xR[4 * i + 3] = (2 * (y->xR[i] - y->xR[i + 1]) + d->xR[i] * delta + d->xR[i + 1] * delta) / delta3;
+      c->c.xR[4 * i + 2] = (3.0 * (y->xR[i + 1] - y->xR[i]) - 2.0 * d->xR[i] * delta - d->xR[i + 1] * delta) / delta2;
+      c->c.xR[4 * i + 3] = (2.0 * (y->xR[i] - y->xR[i + 1]) + d->xR[i] * delta + d->xR[i + 1] * delta) / delta3;
    }
    c->c.xR[4 * (n - 1)] = y->xR[n - 1];
    c->c.xR[4 * (n - 1) + 1] = d->xR[n - 1];
@@ -4359,9 +4359,9 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
    // Periodic boundary conditions
       y->xR[n - 1] = y->xR[0];
       ae_vector_set_length(&d, n);
-      d.xR[0] = (y->xR[1] - y->xR[n - 2]) / (2 * (x->xR[1] - x->xR[0] + x->xR[n - 1] - x->xR[n - 2]));
+      d.xR[0] = (y->xR[1] - y->xR[n - 2]) / (2.0 * (x->xR[1] - x->xR[0] + x->xR[n - 1] - x->xR[n - 2]));
       for (i = 1; i < n - 1; i++) {
-         d.xR[i] = (1 - tension) * (y->xR[i + 1] - y->xR[i - 1]) / (x->xR[i + 1] - x->xR[i - 1]);
+         d.xR[i] = (1.0 - tension) * (y->xR[i + 1] - y->xR[i - 1]) / (x->xR[i + 1] - x->xR[i - 1]);
       }
       d.xR[n - 1] = d.xR[0];
    // Now problem is reduced to the cubic Hermite spline
@@ -4371,10 +4371,10 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
    // Non-periodic boundary conditions
       ae_vector_set_length(&d, n);
       for (i = 1; i < n - 1; i++) {
-         d.xR[i] = (1 - tension) * (y->xR[i + 1] - y->xR[i - 1]) / (x->xR[i + 1] - x->xR[i - 1]);
+         d.xR[i] = (1.0 - tension) * (y->xR[i + 1] - y->xR[i - 1]) / (x->xR[i + 1] - x->xR[i - 1]);
       }
-      d.xR[0] = 2 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]) - d.xR[1];
-      d.xR[n - 1] = 2 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]) - d.xR[n - 2];
+      d.xR[0] = 2.0 * (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]) - d.xR[1];
+      d.xR[n - 1] = 2.0 * (y->xR[n - 1] - y->xR[n - 2]) / (x->xR[n - 1] - x->xR[n - 2]) - d.xR[n - 2];
    // Now problem is reduced to the cubic Hermite spline
       spline1dbuildhermite(x, y, &d, n, c);
    }
@@ -4535,7 +4535,7 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
       d.xR[i] = 0.0;
       d.xR[sn - 1] = 0.0;
       for (j = i + 1; j < sn - 1; j++) {
-         d.xR[j] = ((ey.xR[j] - ey.xR[j - 1]) / (ex.xR[j] - ex.xR[j - 1]) + (ey.xR[j + 1] - ey.xR[j]) / (ex.xR[j + 1] - ex.xR[j])) / 2;
+         d.xR[j] = ((ey.xR[j] - ey.xR[j - 1]) / (ex.xR[j] - ex.xR[j - 1]) + (ey.xR[j + 1] - ey.xR[j]) / (ex.xR[j + 1] - ex.xR[j])) / 2.0;
       }
       for (j = i; j < sn - 1; j++) {
          delta = (ey.xR[j + 1] - ey.xR[j]) / (ex.xR[j + 1] - ex.xR[j]);
@@ -4546,7 +4546,7 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
             alpha = d.xR[j] / delta;
             beta = d.xR[j + 1] / delta;
             if (alpha != 0.0) {
-               cb = alpha * sqrt(1 + sqr(beta / alpha));
+               cb = alpha * sqrt(1.0 + sqr(beta / alpha));
             } else {
                if (beta != 0.0) {
                   cb = beta;
@@ -4555,8 +4555,8 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
                }
             }
             if (cb > 3.0) {
-               d.xR[j] = 3 * alpha * delta / cb;
-               d.xR[j + 1] = 3 * beta * delta / cb;
+               d.xR[j] = 3.0 * alpha * delta / cb;
+               d.xR[j + 1] = 3.0 * beta * delta / cb;
             }
          }
       }
@@ -4802,11 +4802,11 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
       delta = x->xR[i + 1] - x->xR[i];
       delta2 = sqr(delta);
       delta3 = delta * delta2;
-      s2 = (3 * (y->xR[i + 1] - y->xR[i]) - 2 * d1->xR[i] * delta - d1->xR[i + 1] * delta) / delta2;
-      s3 = (2 * (y->xR[i] - y->xR[i + 1]) + d1->xR[i] * delta + d1->xR[i + 1] * delta) / delta3;
-      d2->xR[i] = 2 * s2;
+      s2 = (3.0 * (y->xR[i + 1] - y->xR[i]) - 2.0 * d1->xR[i] * delta - d1->xR[i + 1] * delta) / delta2;
+      s3 = (2.0 * (y->xR[i] - y->xR[i + 1]) + d1->xR[i] * delta + d1->xR[i + 1] * delta) / delta3;
+      d2->xR[i] = 2.0 * s2;
    }
-   d2->xR[n - 1] = 2 * s2 + 6 * s3 * delta;
+   d2->xR[n - 1] = 2.0 * s2 + 6.0 * s3 * delta;
 // Remember that HeapSortPPoints() call?
 // Now we have to reorder them back.
    vectorsetlengthatleast(&dt, n);
@@ -4909,8 +4909,8 @@ static void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold
          db = dold->xR[intervalindex + 1];
          c0 = fa;
          c1 = da;
-         c2 = (3 * (fb - fa) - 2 * da * w - db * w) / w2;
-         c3 = (2 * (fa - fb) + da * w + db * w) / w3;
+         c2 = (3.0 * (fb - fa) - 2.0 * da * w - db * w) / w2;
+         c3 = (2.0 * (fa - fb) + da * w + db * w) / w3;
          continue;
       }
    // Calculate spline and its derivatives using power basis
@@ -4919,10 +4919,10 @@ static void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold
          y->xR[pointindex] = c0 + t * (c1 + t * (c2 + t * c3));
       }
       if (d1 != NULL) {
-         d1->xR[pointindex] = c1 + 2 * t * c2 + 3 * t * t * c3;
+         d1->xR[pointindex] = c1 + 2.0 * t * c2 + 3.0 * t * t * c3;
       }
       if (d2 != NULL) {
-         d2->xR[pointindex] = 2 * c2 + 6 * t * c3;
+         d2->xR[pointindex] = 2.0 * c2 + 6.0 * t * c3;
       }
       pointindex++;
    }
@@ -5420,9 +5420,9 @@ void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, doubl
    ae_int_t r;
    ae_int_t m;
    double t;
-   *s = 0;
-   *ds = 0;
-   *d2s = 0;
+   *s = 0.0;
+   *ds = 0.0;
+   *d2s = 0.0;
    ae_assert(c->k == 3, "Spline1DDiff: internal error");
    ae_assert(!isinf(x), "Spline1DDiff: infinite X!");
 // special case: NaN
@@ -5451,8 +5451,8 @@ void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, doubl
    x -= c->x.xR[l];
    m = 4 * l;
    *s = c->c.xR[m] + x * (c->c.xR[m + 1] + x * (c->c.xR[m + 2] + x * c->c.xR[m + 3]));
-   *ds = c->c.xR[m + 1] + 2 * x * c->c.xR[m + 2] + 3 * sqr(x) * c->c.xR[m + 3];
-   *d2s = 2 * c->c.xR[m + 2] + 6 * x * c->c.xR[m + 3];
+   *ds = c->c.xR[m + 1] + 2.0 * x * c->c.xR[m + 2] + 3.0 * sqr(x) * c->c.xR[m + 3];
+   *d2s = 2.0 * c->c.xR[m + 2] + 6.0 * x * c->c.xR[m + 3];
 }
 
 // This subroutine makes the copy of the spline.
@@ -5791,7 +5791,7 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
    for (b = 0; b < m; b++) {
    // Prepare I-th basis function
       for (j = 0; j < m; j++) {
-         bx.xR[j] = (2.0 * j) / (m - 1) - 1;
+         bx.xR[j] = 2.0 * j / (m - 1) - 1.0;
          by.xR[j] = 0.0;
       }
       by.xR[b] = 1.0;
@@ -5823,7 +5823,7 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
             fb = d2matrix.xyR[i][b + 1];
             ga = d2matrix.xyR[j][b];
             gb = d2matrix.xyR[j][b + 1];
-            v += (bx.xR[b + 1] - bx.xR[b]) * (fa * ga + (fa * (gb - ga) + ga * (fb - fa)) / 2 + (fb - fa) * (gb - ga) / 3);
+            v += (bx.xR[b + 1] - bx.xR[b]) * (fa * ga + (fa * (gb - ga) + ga * (fb - fa)) / 2.0 + (fb - fa) * (gb - ga) / 3.0);
          }
          amatrix.xyR[i][j] = v;
          amatrix.xyR[j][i] = v;
@@ -5882,7 +5882,7 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
    ty.xR[m + 1] = ty.xR[m] + td.xR[m] * (tx.xR[m] - tx.xR[m - 1]);
    td.xR[m + 1] = td.xR[m];
    spline1dbuildhermite(&tx, &ty, &td, m + 2, s);
-   spline1dlintransx(s, 2 / (xb - xa), -(xa + xb) / (xb - xa));
+   spline1dlintransx(s, 2.0 / (xb - xa), -(xa + xb) / (xb - xa));
    spline1dlintransy(s, sb - sa, sa);
    *info = 1;
 // Fill report
@@ -6058,11 +6058,11 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    if (xa == xb) {
       v = xa;
       if (v >= 0.0) {
-         xa = v / 2 - 1;
-         xb = v * 2 + 1;
+         xa = v / 2.0 - 1.0;
+         xb = v * 2.0 + 1.0;
       } else {
-         xa = v * 2 - 1;
-         xb = v / 2 + 1;
+         xa = v * 2.0 - 1.0;
+         xb = v / 2.0 + 1.0;
       }
    }
    ae_assert(xa < xb, "Spline1DFit: integrity error");
@@ -6172,7 +6172,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    // Try Cholesky factorization.
       if (!sparsecholeskyskyline(&ata, m, true)) {
       // Factorization failed, increase regularizer and repeat
-         creg = coalesce(10 * creg, 1.0E-12);
+         creg = coalesce(10.0 * creg, 1.0E-12);
          continue;
       }
       break;
@@ -6299,12 +6299,12 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
    double dd;
    double exf;
    double extr;
-   *x0 = 0;
-   *x1 = 0;
+   *x0 = 0.0;
+   *x1 = 0.0;
    *nr = 0;
 // calculate parameters for equation: A, B  and C
-   a = 6 * p0 + 3 * m0 - 6 * p1 + 3 * m1;
-   b = -6 * p0 - 4 * m0 + 6 * p1 - 2 * m1;
+   a = 6.0 * p0 + 3.0 * m0 - 6.0 * p1 + 3.0 * m1;
+   b = -6.0 * p0 - 4.0 * m0 + 6.0 * p1 - 2.0 * m1;
    c = m0;
 // check case, when A == 0
 // we are considering the linear equation
@@ -6322,7 +6322,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
    }
 // consider case, when extremumu outside (0;1)
 // exist one root only
-   if (fabs(2 * a) <= fabs(b) || sign(b) * sign(a) >= 0) {
+   if (fabs(2.0 * a) <= fabs(b) || sign(b) * sign(a) >= 0) {
       if (sign(m0) * sign(m1) > 0) {
          *nr = 0;
          return;
@@ -6331,13 +6331,13 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
    // same sign of derivative
       if (sign(m0) * sign(m1) < 0) {
          *nr = 1;
-         extr = -b / (2 * a);
-         dd = b * b - 4 * a * c;
+         extr = -b / (2.0 * a);
+         dd = b * b - 4.0 * a * c;
          if (dd < 0.0) {
             return;
          }
-         *x0 = (-b - sqrt(dd)) / (2 * a);
-         *x1 = (-b + sqrt(dd)) / (2 * a);
+         *x0 = (-b - sqrt(dd)) / (2.0 * a);
+         *x1 = (-b + sqrt(dd)) / (2.0 * a);
          if (extr >= 1.0 && *x1 <= extr || extr <= 0.0 && *x1 >= extr) {
             *x0 = *x1;
          }
@@ -6364,15 +6364,15 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
       }
    // consider case, when derivative at 0 is 0, and derivative at 1 isn't 0
       if (m0 == 0.0 && m1 != 0.0) {
-         dd = b * b - 4 * a * c;
+         dd = b * b - 4.0 * a * c;
          if (dd < 0.0) {
             *x0 = 0.0;
             *nr = 1;
             return;
          }
-         *x0 = (-b - sqrt(dd)) / (2 * a);
-         *x1 = (-b + sqrt(dd)) / (2 * a);
-         extr = -b / (2 * a);
+         *x0 = (-b - sqrt(dd)) / (2.0 * a);
+         *x1 = (-b + sqrt(dd)) / (2.0 * a);
+         extr = -b / (2.0 * a);
          exf = a * extr * extr + b * extr + c;
          if (sign(exf) * sign(m1) > 0) {
             *x0 = 0.0;
@@ -6393,15 +6393,15 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
          }
       }
       if (m1 == 0.0 && m0 != 0.0) {
-         dd = b * b - 4 * a * c;
+         dd = b * b - 4.0 * a * c;
          if (dd < 0.0) {
             *x0 = 1.0;
             *nr = 1;
             return;
          }
-         *x0 = (-b - sqrt(dd)) / (2 * a);
-         *x1 = (-b + sqrt(dd)) / (2 * a);
-         extr = -b / (2 * a);
+         *x0 = (-b - sqrt(dd)) / (2.0 * a);
+         *x1 = (-b + sqrt(dd)) / (2.0 * a);
+         extr = -b / (2.0 * a);
          exf = a * extr * extr + b * extr + c;
          if (sign(exf) * sign(m0) > 0) {
             *x0 = 1.0;
@@ -6421,19 +6421,19 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
             return;
          }
       } else {
-         extr = -b / (2 * a);
+         extr = -b / (2.0 * a);
          exf = a * extr * extr + b * extr + c;
          if (sign(exf) * sign(m0) > 0 && sign(exf) * sign(m1) > 0) {
             *nr = 0;
             return;
          }
-         dd = b * b - 4 * a * c;
+         dd = b * b - 4.0 * a * c;
          if (dd < 0.0) {
             *nr = 0;
             return;
          }
-         *x0 = (-b - sqrt(dd)) / (2 * a);
-         *x1 = (-b + sqrt(dd)) / (2 * a);
+         *x0 = (-b - sqrt(dd)) / (2.0 * a);
+         *x1 = (-b + sqrt(dd)) / (2.0 * a);
       // if EXF and m0, EXF and m1 has different signs, then equation has two roots
          if (sign(exf) * sign(m0) < 0 && sign(exf) * sign(m1) < 0) {
             *nr = 2;
@@ -6476,10 +6476,10 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
 //     B0   -   value of a derivative function at T
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 static void spline1d_hermitecalc(double p0, double m0, double p1, double m1, double t, double *s, double *ds) {
-   *s = 0;
-   *ds = 0;
-   *s = p0 * (1 + 2 * t) * (1 - t) * (1 - t) + m0 * t * (1 - t) * (1 - t) + p1 * (3 - 2 * t) * t * t + m1 * t * t * (t - 1);
-   *ds = -p0 * 6 * t * (1 - t) + m0 * (1 - t) * (1 - 3 * t) + p1 * 6 * t * (1 - t) + m1 * t * (3 * t - 2);
+   *s = 0.0;
+   *ds = 0.0;
+   *s = p0 * (1.0 + 2.0 * t) * (1.0 - t) * (1.0 - t) + m0 * t * (1.0 - t) * (1.0 - t) + p1 * (3.0 - 2.0 * t) * t * t + m1 * t * t * (t - 1.0);
+   *ds = -p0 * 6.0 * t * (1.0 - t) + m0 * (1.0 - t) * (1.0 - 3.0 * t) + p1 * 6.0 * t * (1.0 - t) + m1 * t * (3.0 * t - 2.0);
 }
 
 // Function for searching a root at [A;B] by bisection method and return number of roots
@@ -6513,7 +6513,7 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
    double rf;
    double mf;
    ae_int_t result;
-   *x = 0;
+   *x = 0.0;
 // accuracy
    eps = 1000.0 * (b - a) * machineepsilon;
 // initialization left and right borders
@@ -6542,7 +6542,7 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
    }
 // searching a root
    do {
-      m = (b0 + a0) / 2;
+      m = (b0 + a0) / 2.0;
       spline1d_hermitecalc(pa, ma, pb, mb, a0, &lf, &vacuum);
       spline1d_hermitecalc(pa, ma, pb, mb, b0, &rf, &vacuum);
       spline1d_hermitecalc(pa, ma, pb, mb, m, &mf, &vacuum);
@@ -6655,11 +6655,11 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
    double tmpmb;
    double tex0;
    double tex1;
-   *x0 = 0;
-   *x1 = 0;
-   *x2 = 0;
-   *ex0 = 0;
-   *ex1 = 0;
+   *x0 = 0.0;
+   *x1 = 0.0;
+   *x2 = 0.0;
+   *ex0 = 0.0;
+   *ex1 = 0.0;
    *nr = 0;
    *ne = 0;
    vectorsetlengthatleast(tempdata, 3);
@@ -6954,7 +6954,7 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
          pl = c->c.xR[4 * i];
          ml = c->c.xR[4 * i + 1];
          pr = c->c.xR[4 * (i + 1)];
-         mr = c->c.xR[4 * i + 1] + 2 * c->c.xR[4 * i + 2] * (c->x.xR[i + 1] - c->x.xR[i]) + 3 * c->c.xR[4 * i + 3] * (c->x.xR[i + 1] - c->x.xR[i]) * (c->x.xR[i + 1] - c->x.xR[i]);
+         mr = c->c.xR[4 * i + 1] + 2.0 * c->c.xR[4 * i + 2] * (c->x.xR[i + 1] - c->x.xR[i]) + 3.0 * c->c.xR[4 * i + 3] * (c->x.xR[i + 1] - c->x.xR[i]) * (c->x.xR[i + 1] - c->x.xR[i]);
       // pre-searching roots and extremums
          solvecubicpolinom(pl, ml, pr, mr, c->x.xR[i], c->x.xR[i + 1], &x0, &x1, &x2, &ex0, &ex1, &tnr, &tne, &tr);
          *dr = *dr || tnr == -1;
@@ -7636,7 +7636,7 @@ static void lsfit_rdpanalyzesection(RVector *x, RVector *y, ae_int_t i0, ae_int_
    double a;
    double b;
    *worstidx = 0;
-   *worsterror = 0;
+   *worsterror = 0.0;
    xleft = x->xR[i0];
    xright = x->xR[i1];
    if (i1 - i0 + 1 < 3 || xright == xleft) {
@@ -9068,7 +9068,7 @@ static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_in
             if (j == 1) {
                tmp.xR[j] = x->xR[i];
             } else {
-               tmp.xR[j] = 2 * x->xR[i] * tmp.xR[j - 1] - tmp.xR[j - 2];
+               tmp.xR[j] = 2.0 * x->xR[i] * tmp.xR[j - 1] - tmp.xR[j - 2];
             }
          }
       }
@@ -9108,8 +9108,8 @@ static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_in
                tmp.xR[j] = xc->xR[i];
                tmpdiff.xR[j] = 1.0;
             } else {
-               tmp.xR[j] = 2 * xc->xR[i] * tmp.xR[j - 1] - tmp.xR[j - 2];
-               tmpdiff.xR[j] = 2 * (tmp.xR[j - 1] + xc->xR[i] * tmpdiff.xR[j - 1]) - tmpdiff.xR[j - 2];
+               tmp.xR[j] = 2.0 * xc->xR[i] * tmp.xR[j - 1] - tmp.xR[j - 2];
+               tmpdiff.xR[j] = 2.0 * (tmp.xR[j - 1] + xc->xR[i] * tmpdiff.xR[j - 1]) - tmpdiff.xR[j - 2];
             }
          }
       }
@@ -9296,7 +9296,7 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
             if (j == 1) {
                tmp2.xR[j] = u;
             } else {
-               tmp2.xR[j] = 2 * u * tmp2.xR[j - 1] - tmp2.xR[j - 2];
+               tmp2.xR[j] = 2.0 * u * tmp2.xR[j - 1] - tmp2.xR[j - 2];
             }
          }
          v += tmp.xR[j] * tmp2.xR[j];
@@ -9310,7 +9310,7 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
       s = -s;
    }
    barycentricbuildxyw(&bx, &by, &bw, m, p);
-   barycentriclintransx(p, 2 / (xb - xa), -(xa + xb) / (xb - xa));
+   barycentriclintransx(p, 2.0 / (xb - xa), -(xa + xb) / (xb - xa));
    barycentriclintransy(p, sb - sa, sa);
 // Scale absolute errors obtained from LSFitLinearW.
 // Relative error should be calculated separately
@@ -9532,7 +9532,7 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
    double tg;
    double vp0;
    double vp1;
-   *flast = 0;
+   *flast = 0.0;
    for (minlmrestartfrom(state, p1); minlmiteration(state); )
       if (state->xupdated) {
       // Save best function value obtained so far.
@@ -9576,9 +9576,9 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
          // handle these cases
             vp0 = pow(x->xR[i] / tc, tb);
             if (is4pl) {
-               vp1 = 1 + vp0;
+               vp1 = 1.0 + vp0;
             } else {
-               vp1 = pow(1 + vp0, tg);
+               vp1 = pow(1.0 + vp0, tg);
             }
             if (!isfinite(vp1) || vp0 > 1.0E50 || vp1 > 1.0E50) {
             // VP0/VP1 are not finite, assume that it is +INF or -INF
@@ -9599,17 +9599,17 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
                   state->j.xyR[i][0] = 1.0 / vp1;
                   state->j.xyR[i][1] = -(ta - td) * vp0 * log(x->xR[i] / tc) / sqr(vp1);
                   state->j.xyR[i][2] = (ta - td) * (tb / tc) * vp0 / sqr(vp1);
-                  state->j.xyR[i][3] = 1 - 1.0 / vp1;
+                  state->j.xyR[i][3] = 1.0 - 1.0 / vp1;
                   state->j.xyR[i][4] = 0.0;
                }
             } else {
                state->fi.xR[i] = td + (ta - td) / vp1 - y->xR[i];
                if (state->needfij) {
                   state->j.xyR[i][0] = 1.0 / vp1;
-                  state->j.xyR[i][1] = (ta - td) * (-tg) * pow(1 + vp0, -tg - 1) * vp0 * log(x->xR[i] / tc);
-                  state->j.xyR[i][2] = (ta - td) * (-tg) * pow(1 + vp0, -tg - 1) * vp0 * (-tb / tc);
-                  state->j.xyR[i][3] = 1 - 1.0 / vp1;
-                  state->j.xyR[i][4] = -(ta - td) / vp1 * log(1 + vp0);
+                  state->j.xyR[i][1] = (ta - td) * (-tg) * pow(1.0 + vp0, -tg - 1.0) * vp0 * log(x->xR[i] / tc);
+                  state->j.xyR[i][2] = (ta - td) * (-tg) * pow(1.0 + vp0, -tg - 1.0) * vp0 * (-tb / tc);
+                  state->j.xyR[i][3] = 1.0 - 1.0 / vp1;
+                  state->j.xyR[i][4] = -(ta - td) / vp1 * log(1.0 + vp0);
                }
             }
          }
@@ -9810,11 +9810,11 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
    ae_frame_make(&_frame_block);
    DupVector(x);
    DupVector(y);
-   *a = 0;
-   *b = 0;
-   *c = 0;
-   *d = 0;
-   *g = 0;
+   *a = 0.0;
+   *b = 0.0;
+   *c = 0.0;
+   *d = 0.0;
+   *g = 0.0;
    SetObj(lsfitreport, rep);
    NewVector(p0, 0, DT_REAL);
    NewVector(p1, 0, DT_REAL);
@@ -9979,7 +9979,7 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
          bndl.xR[4] = 1.0;
          bndu.xR[4] = 1.0;
          minlmsetbc(&state, &bndl, &bndu);
-         lsfit_logisticfitinternal(x, y, n, is4pl, 100 * lambdav, &state, &replm, &p1, &flast);
+         lsfit_logisticfitinternal(x, y, n, is4pl, 100.0 * lambdav, &state, &replm, &p1, &flast);
          rep->iterationscount += replm.iterationscount;
       // Relax constraints, run optimization one more time
          bndl.xR[1] = 0.1;
@@ -10054,7 +10054,7 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
          bndu1.xR[3] = cnstrright;
       }
       minlmsetbc(&state, &bndl1, &bndu1);
-      lsfit_logisticfitinternal(x, y, n, is4pl, 100 * lambdav, &state, &replm, &p1, &fposb);
+      lsfit_logisticfitinternal(x, y, n, is4pl, 100.0 * lambdav, &state, &replm, &p1, &fposb);
       rep->iterationscount += replm.iterationscount;
    // Second attempt - with negative B (constraints are still tight).
       p2.xR[0] = y->xR[n - 1] + 0.075 * scaley * hqrndmiduniformr(&rs);
@@ -10083,7 +10083,7 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
          bndu2.xR[0] = cnstrright;
       }
       minlmsetbc(&state, &bndl2, &bndu2);
-      lsfit_logisticfitinternal(x, y, n, is4pl, 100 * lambdav, &state, &replm, &p2, &fnegb);
+      lsfit_logisticfitinternal(x, y, n, is4pl, 100.0 * lambdav, &state, &replm, &p2, &fnegb);
       rep->iterationscount += replm.iterationscount;
    // Select best version of B sign
       if (fposb < fnegb) {
@@ -10236,10 +10236,10 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
    ae_frame_make(&_frame_block);
    DupVector(x);
    DupVector(y);
-   *a = 0;
-   *b = 0;
-   *c = 0;
-   *d = 0;
+   *a = 0.0;
+   *b = 0.0;
+   *c = 0.0;
+   *d = 0.0;
    SetObj(lsfitreport, rep);
    logisticfit45x(x, y, n, NAN, NAN, true, 0.0, 0.0, 0, a, b, c, d, &g, rep);
    ae_frame_leave();
@@ -10351,10 +10351,10 @@ void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
    ae_frame_make(&_frame_block);
    DupVector(x);
    DupVector(y);
-   *a = 0;
-   *b = 0;
-   *c = 0;
-   *d = 0;
+   *a = 0.0;
+   *b = 0.0;
+   *c = 0.0;
+   *d = 0.0;
    SetObj(lsfitreport, rep);
    logisticfit45x(x, y, n, cnstrleft, cnstrright, true, 0.0, 0.0, 0, a, b, c, d, &g, rep);
    ae_frame_leave();
@@ -10442,11 +10442,11 @@ void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
    ae_frame_make(&_frame_block);
    DupVector(x);
    DupVector(y);
-   *a = 0;
-   *b = 0;
-   *c = 0;
-   *d = 0;
-   *g = 0;
+   *a = 0.0;
+   *b = 0.0;
+   *c = 0.0;
+   *d = 0.0;
+   *g = 0.0;
    SetObj(lsfitreport, rep);
    logisticfit45x(x, y, n, NAN, NAN, false, 0.0, 0.0, 0, a, b, c, d, g, rep);
    ae_frame_leave();
@@ -10567,11 +10567,11 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
    ae_frame_make(&_frame_block);
    DupVector(x);
    DupVector(y);
-   *a = 0;
-   *b = 0;
-   *c = 0;
-   *d = 0;
-   *g = 0;
+   *a = 0.0;
+   *b = 0.0;
+   *c = 0.0;
+   *d = 0.0;
+   *g = 0.0;
    SetObj(lsfitreport, rep);
    logisticfit45x(x, y, n, cnstrleft, cnstrright, false, 0.0, 0.0, 0, a, b, c, d, g, rep);
    ae_frame_leave();
@@ -10703,7 +10703,7 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
    ae_vector_set_length(&sy, m);
    ae_vector_set_length(&sbf, m);
    for (j = 0; j < m; j++) {
-      sx.xR[j] = (2.0 * j) / (m - 1) - 1;
+      sx.xR[j] = 2.0 * j / (m - 1) - 1.0;
    }
    for (i = 0; i < m; i++) {
       sy.xR[i] = 1.0;
@@ -10765,7 +10765,7 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
 // Generate interpolant and scale it
    ae_v_move(sy.xR, 1, tmp.xR, 1, m);
    barycentricbuildfloaterhormann(&sx, &sy, m, d, b);
-   barycentriclintransx(b, 2 / (xb - xa), -(xa + xb) / (xb - xa));
+   barycentriclintransx(b, 2.0 / (xb - xa), -(xa + xb) / (xb - xa));
    barycentriclintransy(b, sb - sa, sa);
 // Scale absolute errors obtained from LSFitLinearW.
 // Relative error should be calculated separately
@@ -11090,7 +11090,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
       ae_vector_set_length(&sx, m - 2);
       ae_vector_set_length(&sy, m - 2);
       for (j = 0; j < m - 2; j++) {
-         sx.xR[j] = (2.0 * j) / (m - 2 - 1) - 1;
+         sx.xR[j] = 2.0 * j / (m - 3) - 1.0;
       }
    }
    if (st == 1) {
@@ -11099,7 +11099,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
       ae_vector_set_length(&sy, m / 2);
       ae_vector_set_length(&sd, m / 2);
       for (j = 0; j < m / 2; j++) {
-         sx.xR[j] = (2.0 * j) / (m / 2 - 1) - 1;
+         sx.xR[j] = 2.0 * j / (m / 2 - 1) - 1.0;
       }
    }
 // Prepare design and constraints matrices:
@@ -11210,7 +11210,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
       }
       spline1dbuildhermite(&sx, &sy, &sd, m / 2, s);
    }
-   spline1dlintransx(s, 2 / (xb - xa), -(xa + xb) / (xb - xa));
+   spline1dlintransx(s, 2.0 / (xb - xa), -(xa + xb) / (xb - xa));
    spline1dlintransy(s, sb - sa, sa);
 // Scale absolute errors obtained from LSFitLinearW.
 // Relative error should be calculated separately
@@ -12487,7 +12487,7 @@ Spawn:
             state->PQ = 1; goto Pause; Resume1:
             rf = state->f;
             rd = state->g.xR[i];
-            state->c.xR[i] = (lx + rx) / 2;
+            state->c.xR[i] = (lx + rx) / 2.0;
             if (isfinite(state->bndl.xR[i])) {
                state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
             }
@@ -12551,7 +12551,7 @@ Spawn:
             state->needfg = true, state->PQ = 5; goto Pause; Resume5: state->needfg = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
-            v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
+            v = sqr(vv) * 2.0 * (state->f - state->tasky.xR[i]);
             ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
          }
       } else if (state->optstate.needfij) {
@@ -12583,12 +12583,12 @@ Spawn:
             state->needfgh = true, state->PQ = 7; goto Pause; Resume7: state->needfgh = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
-            v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
+            v = sqr(vv) * 2.0 * (state->f - state->tasky.xR[i]);
             ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
             for (j = 0; j < k; j++) {
-               v = 2 * sqr(vv) * state->g.xR[j];
+               v = 2.0 * sqr(vv) * state->g.xR[j];
                ae_v_addd(state->optstate.h.xyR[j], 1, state->g.xR, 1, k, v);
-               v = 2 * sqr(vv) * (state->f - state->tasky.xR[i]);
+               v = 2.0 * sqr(vv) * (state->f - state->tasky.xR[i]);
                ae_v_addd(state->optstate.h.xyR[j], 1, state->h.xyR[j], 1, k, v);
             }
          }
@@ -13680,8 +13680,8 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
    double bi;
    ae_frame_make(&_frame_block);
    SetVector(cx);
-   *rlo = 0;
-   *rhi = 0;
+   *rlo = 0.0;
+   *rhi = 0.0;
    SetObj(fitsphereinternalreport, rep);
    NewVector(vmin, 0, DT_REAL);
    NewVector(vmax, 0, DT_REAL);
@@ -13804,7 +13804,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                lmstate.fi.xR[i] = sqrt(v) - lmstate.x.xR[nx];
                if (lmstate.needfij) {
                   for (j = 0; j < nx; j++) {
-                     lmstate.j.xyR[i][j] = 0.5 / (1.0E-9 * spread + sqrt(v)) * 2 * (lmstate.x.xR[j] - xy->xyR[i][j]);
+                     lmstate.j.xyR[i][j] = 0.5 / (1.0E-9 * spread + sqrt(v)) * 2.0 * (lmstate.x.xR[j] - xy->xyR[i][j]);
                   }
                   lmstate.j.xyR[i][nx] = -1.0;
                }
@@ -13871,8 +13871,8 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                for (j = 0; j < nx; j++) {
                   nlcstate.j.xyR[0][j] = 0.0;
                }
-               nlcstate.j.xyR[0][nx] = -1 * vlo;
-               nlcstate.j.xyR[0][nx + 1] = 1 * vhi;
+               nlcstate.j.xyR[0][nx] = -1.0 * vlo;
+               nlcstate.j.xyR[0][nx + 1] = 1.0 * vhi;
                for (i = 0; i < npoints; i++) {
                   suboffset = 0;
                   if (userhi) {
@@ -13881,12 +13881,12 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                      for (j = 0; j < nx; j++) {
                         vv = nlcstate.x.xR[j] - xy->xyR[i][j];
                         v += vv * vv;
-                        nlcstate.j.xyR[dstrow][j] = 2 * vv;
+                        nlcstate.j.xyR[dstrow][j] = 2.0 * vv;
                      }
                      vv = nlcstate.x.xR[nx + 1];
                      v -= vv * vv;
                      nlcstate.j.xyR[dstrow][nx] = 0.0;
-                     nlcstate.j.xyR[dstrow][nx + 1] = -2 * vv;
+                     nlcstate.j.xyR[dstrow][nx + 1] = -2.0 * vv;
                      nlcstate.fi.xR[dstrow] = v;
                      suboffset++;
                   }
@@ -13896,11 +13896,11 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                      for (j = 0; j < nx; j++) {
                         vv = nlcstate.x.xR[j] - xy->xyR[i][j];
                         v -= vv * vv;
-                        nlcstate.j.xyR[dstrow][j] = -2 * vv;
+                        nlcstate.j.xyR[dstrow][j] = -2.0 * vv;
                      }
                      vv = nlcstate.x.xR[nx];
                      v += vv * vv;
-                     nlcstate.j.xyR[dstrow][nx] = 2 * vv;
+                     nlcstate.j.xyR[dstrow][nx] = 2.0 * vv;
                      nlcstate.j.xyR[dstrow][nx + 1] = 0.0;
                      nlcstate.fi.xR[dstrow] = v;
                      suboffset++;
@@ -13973,15 +13973,15 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                for (j = 0; j < nx; j++) {
                   v += sqr(xy->xyR[i][j]);
                }
-               bi = -v / 2;
+               bi = -v / 2.0;
                suboffset = 0;
                if (userhi) {
                   dstrow = cpr * i + suboffset;
                   for (j = 0; j < nx; j++) {
-                     cmatrix.xyR[dstrow][j] = pcr.xR[j] / 2 - xy->xyR[i][j];
+                     cmatrix.xyR[dstrow][j] = pcr.xR[j] / 2.0 - xy->xyR[i][j];
                   }
                   cmatrix.xyR[dstrow][nx] = 0.0;
-                  cmatrix.xyR[dstrow][nx + 1] = -*rhi / 2;
+                  cmatrix.xyR[dstrow][nx + 1] = -*rhi / 2.0;
                   cmatrix.xyR[dstrow][nx + 2] = bi;
                   ct.xZ[dstrow] = -1;
                   suboffset++;
@@ -13989,9 +13989,9 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                if (userlo) {
                   dstrow = cpr * i + suboffset;
                   for (j = 0; j < nx; j++) {
-                     cmatrix.xyR[dstrow][j] = -(pcr.xR[j] / 2 - xy->xyR[i][j]);
+                     cmatrix.xyR[dstrow][j] = -(pcr.xR[j] / 2.0 - xy->xyR[i][j]);
                   }
-                  cmatrix.xyR[dstrow][nx] = *rlo / 2;
+                  cmatrix.xyR[dstrow][nx] = *rlo / 2.0;
                   cmatrix.xyR[dstrow][nx + 1] = 0.0;
                   cmatrix.xyR[dstrow][nx + 2] = -bi;
                   ct.xZ[dstrow] = -1;
@@ -14011,8 +14011,8 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   for (j = 0; j < nx; j++) {
                      blcstate.g.xR[j] = 0.0;
                   }
-                  blcstate.g.xR[nx] = -1 * vlo;
-                  blcstate.g.xR[nx + 1] = 1 * vhi;
+                  blcstate.g.xR[nx] = -1.0 * vlo;
+                  blcstate.g.xR[nx + 1] = 1.0 * vhi;
                }
             minbleicresults(&blcstate, &pcr, &blcrep);
             ae_assert(blcrep.terminationtype > 0, "FitSphereX: unexpected failure of BLEIC solver");
@@ -14207,8 +14207,8 @@ void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype
    ae_frame _frame_block;
    ae_frame_make(&_frame_block);
    SetVector(cx);
-   *rlo = 0;
-   *rhi = 0;
+   *rlo = 0.0;
+   *rhi = 0.0;
    NewObj(fitsphereinternalreport, rep);
    ae_assert(isfinite(penalty) && penalty >= 0.0, "FitSphereX: Penalty < 0 or is not finite");
    ae_assert(isfinite(epsx) && epsx >= 0.0, "FitSphereX: EpsX < 0 or is not finite");
@@ -14238,7 +14238,7 @@ void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype
 void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *r) {
    double dummy;
    SetVector(cx);
-   *r = 0;
+   *r = 0.0;
    fitspherex(xy, npoints, nx, 0, 0.0, 0, 0.0, cx, &dummy, r);
 }
 
@@ -14270,7 +14270,7 @@ void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi) {
    double dummy;
    SetVector(cx);
-   *rhi = 0;
+   *rhi = 0.0;
    fitspherex(xy, npoints, nx, 1, 0.0, 0, 0.0, cx, &dummy, rhi);
 }
 
@@ -14302,7 +14302,7 @@ void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo) {
    double dummy;
    SetVector(cx);
-   *rlo = 0;
+   *rlo = 0.0;
    fitspherex(xy, npoints, nx, 2, 0.0, 0, 0.0, cx, rlo, &dummy);
 }
 
@@ -14334,8 +14334,8 @@ void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // API: void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
 void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi) {
    SetVector(cx);
-   *rlo = 0;
-   *rhi = 0;
+   *rlo = 0.0;
+   *rhi = 0.0;
    fitspherex(xy, npoints, nx, 3, 0.0, 0, 0.0, cx, rlo, rhi);
 }
 
@@ -14766,8 +14766,8 @@ void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t) {
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y);
 void pspline2calc(pspline2interpolant *p, double t, double *x, double *y) {
-   *x = 0;
-   *y = 0;
+   *x = 0.0;
+   *y = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -14794,9 +14794,9 @@ void pspline2calc(pspline2interpolant *p, double t, double *x, double *y) {
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z);
 void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double *z) {
-   *x = 0;
-   *y = 0;
-   *z = 0;
+   *x = 0.0;
+   *y = 0.0;
+   *z = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -14825,10 +14825,10 @@ void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double
 // API: void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy);
 void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, double *y, double *dy) {
    double d2s;
-   *x = 0;
-   *dx = 0;
-   *y = 0;
-   *dy = 0;
+   *x = 0.0;
+   *dx = 0.0;
+   *y = 0.0;
+   *dy = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -14858,12 +14858,12 @@ void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, doubl
 // API: void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz);
 void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, double *y, double *dy, double *z, double *dz) {
    double d2s;
-   *x = 0;
-   *dx = 0;
-   *y = 0;
-   *dy = 0;
-   *z = 0;
-   *dz = 0;
+   *x = 0.0;
+   *dx = 0.0;
+   *y = 0.0;
+   *dy = 0.0;
+   *z = 0.0;
+   *dz = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -14895,8 +14895,8 @@ void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y) {
    double v;
    double v0;
    double v1;
-   *x = 0;
-   *y = 0;
+   *x = 0.0;
+   *y = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -14935,9 +14935,9 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
    double v0;
    double v1;
    double v2;
-   *x = 0;
-   *y = 0;
-   *z = 0;
+   *x = 0.0;
+   *y = 0.0;
+   *z = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -14971,12 +14971,12 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y);
 void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y) {
-   *x = 0;
-   *dx = 0;
-   *d2x = 0;
-   *y = 0;
-   *dy = 0;
-   *d2y = 0;
+   *x = 0.0;
+   *dx = 0.0;
+   *d2x = 0.0;
+   *y = 0.0;
+   *dy = 0.0;
+   *d2y = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -15008,15 +15008,15 @@ void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, doub
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z);
 void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, double *z, double *dz, double *d2z) {
-   *x = 0;
-   *dx = 0;
-   *d2x = 0;
-   *y = 0;
-   *dy = 0;
-   *d2y = 0;
-   *z = 0;
-   *dz = 0;
-   *d2z = 0;
+   *x = 0.0;
+   *dx = 0.0;
+   *d2x = 0.0;
+   *y = 0.0;
+   *dy = 0.0;
+   *d2y = 0.0;
+   *z = 0.0;
+   *dz = 0.0;
+   *d2z = 0.0;
    if (p->periodic) {
       t -= ifloor(t);
    }
@@ -15126,7 +15126,7 @@ static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i
    double ts;
    double vv;
    *worstidx = 0;
-   *worsterror = 0;
+   *worsterror = 0.0;
 // Quick exit for 0, 1, 2 points
    if (i1 - i0 + 1 < 3) {
       *worstidx = i0;
@@ -17002,7 +17002,7 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
    nx = s->nx;
    ny = s->ny;
 // Try to split large problem
-   problemcost = (s->nl + 1) * s->ny * 2 * (avgfuncpernode + 1);
+   problemcost = (s->nl + 1) * s->ny * 2.0 * (avgfuncpernode + 1.0);
    problemcost *= blocks0->xZ[block0b] - blocks0->xZ[block0a];
    problemcost *= blocks1->xZ[block1b] - blocks1->xZ[block1a];
    problemcost *= blocks2->xZ[block2b] - blocks2->xZ[block2a];
@@ -17782,7 +17782,7 @@ static double rbfv3_autodetectscaleparameter(RMatrix *xx, ae_int_t n, ae_int_t n
    ae_assert(n >= 1, "RBFV3: integrity check 7624 failed");
    allocv(nx, &x);
    kdtreebuild(xx, n, nx, 0, 2, &kdt);
-   nlocal = iround(pow(2.0, nx) + 1);
+   nlocal = iround(pow(2.0, nx) + 1.0);
    result = 0.0;
    for (i = 0; i < n; i++) {
    // Query a batch of nearest neighbors
@@ -17920,9 +17920,9 @@ static void rbfv3_preprocessdataset(RMatrix *xraw, double mergetol, RMatrix *yra
    *nwrk = 0;
    SetVector(xscalewrk);
    SetVector(xshift);
-   *bfparamwrk = 0;
-   *lambdavwrk = 0;
-   *addxrescaleaplied = 0;
+   *bfparamwrk = 0.0;
+   *lambdavwrk = 0.0;
+   *addxrescaleaplied = 0.0;
    NewMatrix(xbuf, 0, 0, DT_REAL);
    NewMatrix(ybuf, 0, 0, DT_REAL);
    NewVector(tmp0, 0, DT_REAL);
@@ -18038,7 +18038,7 @@ static void rbfv3_selectglobalnodes(RMatrix *xx, ae_int_t n, ae_int_t nx, ZVecto
    double vv;
    ae_frame_make(&_frame_block);
    *nchosen = 0;
-   *maxdist = 0;
+   *maxdist = 0.0;
    NewVector(d2, 0, DT_REAL);
    NewVector(x, 0, DT_REAL);
    NewVector(busy, 0, DT_BOOL);
@@ -18495,7 +18495,7 @@ static void rbfv3_computeacbfpreconditionerbasecase(acbfbuilder *builder, acbfbu
          v = sqrt(rdotv2(ncenters, &buf->z));
          rowwisegramschmidt(&buf->q1, ortbasissize, ncenters, &buf->z, &buf->y, true);
          vv = sqrt(rdotv2(ncenters, &buf->z));
-         if (vv > sqrt(machineepsilon) * (v + 1)) {
+         if (vv > sqrt(machineepsilon) * (v + 1.0)) {
             rcopymulvr(ncenters, 1.0 / vv, &buf->z, &buf->q1, ortbasissize);
             rcopyvc(ortbasissize, &buf->y, &buf->r, ortbasissize);
             buf->r.xyR[ortbasissize][ortbasissize] = vv;
@@ -19178,8 +19178,8 @@ static void rbfv3_ddmsolverinitbasecase(rbf3ddmsolver *solver, RMatrix *x, ae_in
    NewMatrix(subsp, 0, 0, DT_REAL);
    NewMatrix(dbga, 0, 0, DT_REAL);
    ae_assert(tgt1 - tgt0 > 0, "RBFV3: integrity check 7364 failed");
-   ae_assert(nneighbors >= 1, "RBFV3: integrity check 7365 failed");
-   reg = (100 + sqrt(tgt1 - tgt0 + nneighbors)) * machineepsilon;
+   ae_assert(nneighbors >= 0, "RBFV3: integrity check 7365 failed");
+   reg = (100.0 + sqrt(tgt1 - tgt0 + nneighbors)) * machineepsilon;
 // Retrieve fresh subproblem. We expect that Solver.SubproblemsBuffer contains
 // no recycled entries and that fresh subproblem with Subproblem.IsValid == False
 // is returned.
@@ -19859,7 +19859,7 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
       v = sqrt(rdotv2(n, &x0));
       rowwisegramschmidt(&ortbasis, ortbasissize, n, &x0, &x0, false);
       vv = sqrt(rdotv2(n, &x0));
-      if (vv > sqrt(machineepsilon) * (v + 1)) {
+      if (vv > sqrt(machineepsilon) * (v + 1.0)) {
          rcopymulvr(n, 1.0 / vv, &x0, &ortbasis, ortbasissize);
          ortbasissize++;
       }
@@ -20267,7 +20267,7 @@ void rbfv3tsdiffbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y,
       for (i = 0; i < ny; i++) {
          y->xR[i] += rdotvr(curchunk, &buf->evalbuf.funcbuf, &s->wchunked, widx + i);
          for (j = 0; j < nx; j++) {
-            dy->xR[i * nx + j] += 2 * rdotrr(curchunk, &s->wchunked, widx + i, &buf->evalbuf.deltabuf, j);
+            dy->xR[i * nx + j] += 2.0 * rdotrr(curchunk, &s->wchunked, widx + i, &buf->evalbuf.deltabuf, j);
          }
       }
       colidx += curchunk;
@@ -20395,16 +20395,16 @@ void rbfv3tshessbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y,
          for (k0 = 0; k0 < nx; k0++) {
             rcopyrv(curchunk, &buf->evalbuf.deltabuf, k0, &buf->evalbuf.wrkbuf);
             rmergemulv(curchunk, &buf->evalbuf.df1, &buf->evalbuf.wrkbuf);
-            dy->xR[i * nx + k0] += 2 * rdotvr(curchunk, &buf->evalbuf.wrkbuf, &s->wchunked, widx + i);
+            dy->xR[i * nx + k0] += 2.0 * rdotvr(curchunk, &buf->evalbuf.wrkbuf, &s->wchunked, widx + i);
          }
          for (k0 = 0; k0 < nx; k0++) {
             for (k1 = 0; k1 < nx; k1++) {
                rcopyv(curchunk, &buf->evalbuf.df2, &buf->evalbuf.wrkbuf);
                rmergemulrv(curchunk, &buf->evalbuf.deltabuf, k0, &buf->evalbuf.wrkbuf);
                rmergemulrv(curchunk, &buf->evalbuf.deltabuf, k1, &buf->evalbuf.wrkbuf);
-               d2y->xR[i * nx * nx + k0 * nx + k1] += 4 * rdotvr(curchunk, &buf->evalbuf.wrkbuf, &s->wchunked, widx + i);
+               d2y->xR[i * nx * nx + k0 * nx + k1] += 4.0 * rdotvr(curchunk, &buf->evalbuf.wrkbuf, &s->wchunked, widx + i);
                if (k0 == k1) {
-                  d2y->xR[i * nx * nx + k0 * nx + k1] += 2 * rdotvr(curchunk, &buf->evalbuf.df1, &s->wchunked, widx + i);
+                  d2y->xR[i * nx * nx + k0 * nx + k1] += 2.0 * rdotvr(curchunk, &buf->evalbuf.df1, &s->wchunked, widx + i);
                }
             }
          }
@@ -20662,7 +20662,7 @@ void rbfv3unpack(rbfv3model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
          }
          ae_assert(recognized, "RBFV3: integrity check 5342 failed");
       // Output indexes
-         xwr->xyR[i][*nx + *ny + *nx + 2] = (double)(s->pointindexes.xZ[i]);
+         xwr->xyR[i][*nx + *ny + *nx + 2] = s->pointindexes.xZ[i];
       }
    }
 }
@@ -21267,7 +21267,7 @@ double spline2dcalc(spline2dinterpolant *c, double x, double y) {
       y2 = c->f.xR[c->n * iy + (ix + 1)];
       y3 = c->f.xR[c->n * (iy + 1) + (ix + 1)];
       y4 = c->f.xR[c->n * (iy + 1) + ix];
-      result = (1 - t) * (1 - u) * y1 + t * (1 - u) * y2 + t * u * y3 + (1 - t) * u * y4;
+      result = (1.0 - t) * (1.0 - u) * y1 + t * (1.0 - u) * y2 + t * u * y3 + (1.0 - t) * u * y4;
       return result;
    }
 // Bicubic interpolation:
@@ -21288,13 +21288,13 @@ double spline2dcalc(spline2dinterpolant *c, double x, double y) {
    t3 = t * t2;
    u2 = u * u;
    u3 = u * u2;
-   ht00 = 2 * t3 - 3 * t2 + 1;
-   ht10 = t3 - 2 * t2 + t;
-   ht01 = -2 * t3 + 3 * t2;
+   ht00 = 2.0 * t3 - 3.0 * t2 + 1.0;
+   ht10 = t3 - 2.0 * t2 + t;
+   ht01 = -2.0 * t3 + 3.0 * t2;
    ht11 = t3 - t2;
-   hu00 = 2 * u3 - 3 * u2 + 1;
-   hu10 = u3 - 2 * u2 + u;
-   hu01 = -2 * u3 + 3 * u2;
+   hu00 = 2.0 * u3 - 3.0 * u2 + 1.0;
+   hu10 = u3 - 2.0 * u2 + u;
+   hu01 = -2.0 * u3 + 3.0 * u2;
    hu11 = u3 - u2;
    ht10 /= dt;
    ht11 /= dt;
@@ -21397,7 +21397,7 @@ void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f) {
          y2 = c->f.xR[c->d * (c->n * iy + (ix + 1)) + i];
          y3 = c->f.xR[c->d * (c->n * (iy + 1) + (ix + 1)) + i];
          y4 = c->f.xR[c->d * (c->n * (iy + 1) + ix) + i];
-         f->xR[i] = (1 - t) * (1 - u) * y1 + t * (1 - u) * y2 + t * u * y3 + (1 - t) * u * y4;
+         f->xR[i] = (1.0 - t) * (1.0 - u) * y1 + t * (1.0 - u) * y2 + t * u * y3 + (1.0 - t) * u * y4;
       }
       return;
    }
@@ -21419,13 +21419,13 @@ void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f) {
    t3 = t * t2;
    u2 = u * u;
    u3 = u * u2;
-   ht00 = 2 * t3 - 3 * t2 + 1;
-   ht10 = t3 - 2 * t2 + t;
-   ht01 = -2 * t3 + 3 * t2;
+   ht00 = 2.0 * t3 - 3.0 * t2 + 1.0;
+   ht10 = t3 - 2.0 * t2 + t;
+   ht01 = -2.0 * t3 + 3.0 * t2;
    ht11 = t3 - t2;
-   hu00 = 2 * u3 - 3 * u2 + 1;
-   hu10 = u3 - 2 * u2 + u;
-   hu01 = -2 * u3 + 3 * u2;
+   hu00 = 2.0 * u3 - 3.0 * u2 + 1.0;
+   hu10 = u3 - 2.0 * u2 + u;
+   hu01 = -2.0 * u3 + 3.0 * u2;
    hu11 = u3 - u2;
    ht10 /= dt;
    ht11 /= dt;
@@ -21551,7 +21551,7 @@ double spline2dcalcvi(spline2dinterpolant *c, double x, double y, ae_int_t i) {
       y2 = c->f.xR[c->d * (c->n * iy + (ix + 1)) + i];
       y3 = c->f.xR[c->d * (c->n * (iy + 1) + (ix + 1)) + i];
       y4 = c->f.xR[c->d * (c->n * (iy + 1) + ix) + i];
-      result = (1 - t) * (1 - u) * y1 + t * (1 - u) * y2 + t * u * y3 + (1 - t) * u * y4;
+      result = (1.0 - t) * (1.0 - u) * y1 + t * (1.0 - u) * y2 + t * u * y3 + (1.0 - t) * u * y4;
       return result;
    }
 // Bicubic interpolation:
@@ -21572,13 +21572,13 @@ double spline2dcalcvi(spline2dinterpolant *c, double x, double y, ae_int_t i) {
    t3 = t * t2;
    u2 = u * u;
    u3 = u * u2;
-   ht00 = 2 * t3 - 3 * t2 + 1;
-   ht10 = t3 - 2 * t2 + t;
-   ht01 = -2 * t3 + 3 * t2;
+   ht00 = 2.0 * t3 - 3.0 * t2 + 1.0;
+   ht10 = t3 - 2.0 * t2 + t;
+   ht01 = -2.0 * t3 + 3.0 * t2;
    ht11 = t3 - t2;
-   hu00 = 2 * u3 - 3 * u2 + 1;
-   hu10 = u3 - 2 * u2 + u;
-   hu01 = -2 * u3 + 3 * u2;
+   hu00 = 2.0 * u3 - 3.0 * u2 + 1.0;
+   hu10 = u3 - 2.0 * u2 + u;
+   hu01 = -2.0 * u3 + 3.0 * u2;
    hu11 = u3 - u2;
    ht10 /= dt;
    ht11 /= dt;
@@ -21657,10 +21657,10 @@ void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double 
    double dhu01;
    double dhu10;
    double dhu11;
-   *f = 0;
-   *fx = 0;
-   *fy = 0;
-   *fxy = 0;
+   *f = 0.0;
+   *fx = 0.0;
+   *fy = 0.0;
+   *fxy = 0.0;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline2DDiff: incorrect C (incorrect parameter C.SType)");
    ae_assert(isfinite(x) && isfinite(y), "Spline2DDiff: X or Y contains NaN or Infinite value");
 // Prepare F, dF/dX, dF/dY, d2F/dXdY
@@ -21705,9 +21705,9 @@ void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double 
       y2 = c->f.xR[c->n * iy + (ix + 1)];
       y3 = c->f.xR[c->n * (iy + 1) + (ix + 1)];
       y4 = c->f.xR[c->n * (iy + 1) + ix];
-      *f = (1 - t) * (1 - u) * y1 + t * (1 - u) * y2 + t * u * y3 + (1 - t) * u * y4;
-      *fx = (-(1 - u) * y1 + (1 - u) * y2 + u * y3 - u * y4) * dt;
-      *fy = (-(1 - t) * y1 - t * y2 + t * y3 + (1 - t) * y4) * du;
+      *f = (1.0 - t) * (1.0 - u) * y1 + t * (1.0 - u) * y2 + t * u * y3 + (1.0 - t) * u * y4;
+      *fx = (-(1.0 - u) * y1 + (1.0 - u) * y2 + u * y3 - u * y4) * dt;
+      *fy = (-(1.0 - t) * y1 - t * y2 + t * y3 + (1.0 - t) * y4) * du;
       *fxy = (y1 - y2 + y3 - y4) * du * dt;
       return;
    }
@@ -21724,26 +21724,26 @@ void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double 
       t3 = t * t2;
       u2 = u * u;
       u3 = u * u2;
-      ht00 = 2 * t3 - 3 * t2 + 1;
-      ht10 = t3 - 2 * t2 + t;
-      ht01 = -2 * t3 + 3 * t2;
+      ht00 = 2.0 * t3 - 3.0 * t2 + 1.0;
+      ht10 = t3 - 2.0 * t2 + t;
+      ht01 = -2.0 * t3 + 3.0 * t2;
       ht11 = t3 - t2;
-      hu00 = 2 * u3 - 3 * u2 + 1;
-      hu10 = u3 - 2 * u2 + u;
-      hu01 = -2 * u3 + 3 * u2;
+      hu00 = 2.0 * u3 - 3.0 * u2 + 1.0;
+      hu10 = u3 - 2.0 * u2 + u;
+      hu01 = -2.0 * u3 + 3.0 * u2;
       hu11 = u3 - u2;
       ht10 /= dt;
       ht11 /= dt;
       hu10 /= du;
       hu11 /= du;
-      dht00 = 6 * t2 - 6 * t;
-      dht10 = 3 * t2 - 4 * t + 1;
-      dht01 = -6 * t2 + 6 * t;
-      dht11 = 3 * t2 - 2 * t;
-      dhu00 = 6 * u2 - 6 * u;
-      dhu10 = 3 * u2 - 4 * u + 1;
-      dhu01 = -6 * u2 + 6 * u;
-      dhu11 = 3 * u2 - 2 * u;
+      dht00 = 6.0 * t2 - 6.0 * t;
+      dht10 = 3.0 * t2 - 4.0 * t + 1.0;
+      dht01 = -6.0 * t2 + 6.0 * t;
+      dht11 = 3.0 * t2 - 2.0 * t;
+      dhu00 = 6.0 * u2 - 6.0 * u;
+      dhu10 = 3.0 * u2 - 4.0 * u + 1.0;
+      dhu01 = -6.0 * u2 + 6.0 * u;
+      dhu11 = 3.0 * u2 - 2.0 * u;
       dht00 *= dt;
       dht01 *= dt;
       dhu00 *= du;
@@ -21849,10 +21849,10 @@ void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, doub
    double dhu01;
    double dhu10;
    double dhu11;
-   *f = 0;
-   *fx = 0;
-   *fy = 0;
-   *fxy = 0;
+   *f = 0.0;
+   *fx = 0.0;
+   *fy = 0.0;
+   *fxy = 0.0;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline2DDiffVI: incorrect C (incorrect parameter C.SType)");
    ae_assert(isfinite(x) && isfinite(y), "Spline2DDiffVI: X or Y contains NaN or Infinite value");
    ae_assert(i >= 0 && i < c->d, "Spline2DDiffVI: I < 0 or I >= D");
@@ -21896,9 +21896,9 @@ void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, doub
       y2 = c->f.xR[d * (c->n * iy + (ix + 1)) + i];
       y3 = c->f.xR[d * (c->n * (iy + 1) + (ix + 1)) + i];
       y4 = c->f.xR[d * (c->n * (iy + 1) + ix) + i];
-      *f = (1 - t) * (1 - u) * y1 + t * (1 - u) * y2 + t * u * y3 + (1 - t) * u * y4;
-      *fx = (-(1 - u) * y1 + (1 - u) * y2 + u * y3 - u * y4) * dt;
-      *fy = (-(1 - t) * y1 - t * y2 + t * y3 + (1 - t) * y4) * du;
+      *f = (1.0 - t) * (1.0 - u) * y1 + t * (1.0 - u) * y2 + t * u * y3 + (1.0 - t) * u * y4;
+      *fx = (-(1.0 - u) * y1 + (1.0 - u) * y2 + u * y3 - u * y4) * dt;
+      *fy = (-(1.0 - t) * y1 - t * y2 + t * y3 + (1.0 - t) * y4) * du;
       *fxy = (y1 - y2 + y3 - y4) * du * dt;
       return;
    }
@@ -21915,26 +21915,26 @@ void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, doub
       t3 = t * t2;
       u2 = u * u;
       u3 = u * u2;
-      ht00 = 2 * t3 - 3 * t2 + 1;
-      ht10 = t3 - 2 * t2 + t;
-      ht01 = -2 * t3 + 3 * t2;
+      ht00 = 2.0 * t3 - 3.0 * t2 + 1.0;
+      ht10 = t3 - 2.0 * t2 + t;
+      ht01 = -2.0 * t3 + 3.0 * t2;
       ht11 = t3 - t2;
-      hu00 = 2 * u3 - 3 * u2 + 1;
-      hu10 = u3 - 2 * u2 + u;
-      hu01 = -2 * u3 + 3 * u2;
+      hu00 = 2.0 * u3 - 3.0 * u2 + 1.0;
+      hu10 = u3 - 2.0 * u2 + u;
+      hu01 = -2.0 * u3 + 3.0 * u2;
       hu11 = u3 - u2;
       ht10 /= dt;
       ht11 /= dt;
       hu10 /= du;
       hu11 /= du;
-      dht00 = 6 * t2 - 6 * t;
-      dht10 = 3 * t2 - 4 * t + 1;
-      dht01 = -6 * t2 + 6 * t;
-      dht11 = 3 * t2 - 2 * t;
-      dhu00 = 6 * u2 - 6 * u;
-      dhu10 = 3 * u2 - 4 * u + 1;
-      dhu01 = -6 * u2 + 6 * u;
-      dhu11 = 3 * u2 - 2 * u;
+      dht00 = 6.0 * t2 - 6.0 * t;
+      dht10 = 3.0 * t2 - 4.0 * t + 1.0;
+      dht01 = -6.0 * t2 + 6.0 * t;
+      dht11 = 3.0 * t2 - 2.0 * t;
+      dhu00 = 6.0 * u2 - 6.0 * u;
+      dhu10 = 3.0 * u2 - 4.0 * u + 1.0;
+      dhu01 = -6.0 * u2 + 6.0 * u;
+      dhu11 = 3.0 * u2 - 2.0 * u;
       dht00 *= dt;
       dht01 *= dt;
       dhu00 *= du;
@@ -22114,8 +22114,8 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
          if (c == oldwidth - 1) {
             c = oldwidth - 2;
          }
-         t = (j * (oldwidth - 1.0)) / (newwidth - 1) - c;
-         b->xyR[i][j] = (1 - t) * (1 - u) * a->xyR[l][c] + t * (1 - u) * a->xyR[l][c + 1] + t * u * a->xyR[l + 1][c + 1] + (1 - t) * u * a->xyR[l + 1][c];
+         t = j * (oldwidth - 1.0) / (newwidth - 1) - c;
+         b->xyR[i][j] = (1.0 - t) * (1.0 - u) * a->xyR[l][c] + t * (1.0 - u) * a->xyR[l][c + 1] + t * u * a->xyR[l + 1][c + 1] + (1.0 - t) * u * a->xyR[l + 1][c];
       }
    }
 }
@@ -22774,20 +22774,20 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
                s4 = *d * (*n * (i + 1) + j) + k;
                tbl->xyR[p][4] = c->f.xR[s1];
                tbl->xyR[p][5] = c->f.xR[sfy + s1] / du;
-               tbl->xyR[p][6] = -3 * c->f.xR[s1] + 3 * c->f.xR[s4] - 2 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
-               tbl->xyR[p][7] = 2 * c->f.xR[s1] - 2 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
+               tbl->xyR[p][6] = -3.0 * c->f.xR[s1] + 3.0 * c->f.xR[s4] - 2.0 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
+               tbl->xyR[p][7] = 2.0 * c->f.xR[s1] - 2.0 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
                tbl->xyR[p][8] = c->f.xR[sfx + s1] / dt;
                tbl->xyR[p][9] = c->f.xR[sfxy + s1] / (dt * du);
-               tbl->xyR[p][10] = -3 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s4] / dt - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][11] = 2 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][12] = -3 * c->f.xR[s1] + 3 * c->f.xR[s2] - 2 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
-               tbl->xyR[p][13] = -3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
-               tbl->xyR[p][14] = 9 * c->f.xR[s1] - 9 * c->f.xR[s2] + 9 * c->f.xR[s3] - 9 * c->f.xR[s4] + 6 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s2] / dt - 3 * c->f.xR[sfx + s3] / dt - 6 * c->f.xR[sfx + s4] / dt + 6 * c->f.xR[sfy + s1] / du - 6 * c->f.xR[sfy + s2] / du - 3 * c->f.xR[sfy + s3] / du + 3 * c->f.xR[sfy + s4] / du + 4 * c->f.xR[sfxy + s1] / (dt * du) + 2 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2 * c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][15] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 4 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s2] / dt + 2 * c->f.xR[sfx + s3] / dt + 4 * c->f.xR[sfx + s4] / dt - 3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du + 3 * c->f.xR[sfy + s3] / du - 3 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2 * c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][16] = 2 * c->f.xR[s1] - 2 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
-               tbl->xyR[p][17] = 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
-               tbl->xyR[p][18] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 3 * c->f.xR[sfx + s1] / dt - 3 * c->f.xR[sfx + s2] / dt + 3 * c->f.xR[sfx + s3] / dt + 3 * c->f.xR[sfx + s4] / dt - 4 * c->f.xR[sfy + s1] / du + 4 * c->f.xR[sfy + s2] / du + 2 * c->f.xR[sfy + s3] / du - 2 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - 2 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][19] = 4 * c->f.xR[s1] - 4 * c->f.xR[s2] + 4 * c->f.xR[s3] - 4 * c->f.xR[s4] + 2 * c->f.xR[sfx + s1] / dt + 2 * c->f.xR[sfx + s2] / dt - 2 * c->f.xR[sfx + s3] / dt - 2 * c->f.xR[sfx + s4] / dt + 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfy + s3] / du + 2 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][10] = -3.0 * c->f.xR[sfx + s1] / dt + 3.0 * c->f.xR[sfx + s4] / dt - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][11] = 2.0 * c->f.xR[sfx + s1] / dt - 2.0 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][12] = -3.0 * c->f.xR[s1] + 3.0 * c->f.xR[s2] - 2.0 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
+               tbl->xyR[p][13] = -3.0 * c->f.xR[sfy + s1] / du + 3.0 * c->f.xR[sfy + s2] / du - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
+               tbl->xyR[p][14] = 9.0 * c->f.xR[s1] - 9.0 * c->f.xR[s2] + 9.0 * c->f.xR[s3] - 9.0 * c->f.xR[s4] + 6.0 * c->f.xR[sfx + s1] / dt + 3.0 * c->f.xR[sfx + s2] / dt - 3.0 * c->f.xR[sfx + s3] / dt - 6.0 * c->f.xR[sfx + s4] / dt + 6.0 * c->f.xR[sfy + s1] / du - 6.0 * c->f.xR[sfy + s2] / du - 3.0 * c->f.xR[sfy + s3] / du + 3.0 * c->f.xR[sfy + s4] / du + 4.0 * c->f.xR[sfxy + s1] / (dt * du) + 2.0 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2.0 * c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][15] = -6.0 * c->f.xR[s1] + 6.0 * c->f.xR[s2] - 6.0 * c->f.xR[s3] + 6.0 * c->f.xR[s4] - 4.0 * c->f.xR[sfx + s1] / dt - 2.0 * c->f.xR[sfx + s2] / dt + 2.0 * c->f.xR[sfx + s3] / dt + 4.0 * c->f.xR[sfx + s4] / dt - 3.0 * c->f.xR[sfy + s1] / du + 3.0 * c->f.xR[sfy + s2] / du + 3.0 * c->f.xR[sfy + s3] / du - 3.0 * c->f.xR[sfy + s4] / du - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2.0 * c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][16] = 2.0 * c->f.xR[s1] - 2.0 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
+               tbl->xyR[p][17] = 2.0 * c->f.xR[sfy + s1] / du - 2.0 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
+               tbl->xyR[p][18] = -6.0 * c->f.xR[s1] + 6.0 * c->f.xR[s2] - 6.0 * c->f.xR[s3] + 6.0 * c->f.xR[s4] - 3.0 * c->f.xR[sfx + s1] / dt - 3.0 * c->f.xR[sfx + s2] / dt + 3.0 * c->f.xR[sfx + s3] / dt + 3.0 * c->f.xR[sfx + s4] / dt - 4.0 * c->f.xR[sfy + s1] / du + 4.0 * c->f.xR[sfy + s2] / du + 2.0 * c->f.xR[sfy + s3] / du - 2.0 * c->f.xR[sfy + s4] / du - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - 2.0 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][19] = 4.0 * c->f.xR[s1] - 4.0 * c->f.xR[s2] + 4.0 * c->f.xR[s3] - 4.0 * c->f.xR[s4] + 2.0 * c->f.xR[sfx + s1] / dt + 2.0 * c->f.xR[sfx + s2] / dt - 2.0 * c->f.xR[sfx + s3] / dt - 2.0 * c->f.xR[sfx + s4] / dt + 2.0 * c->f.xR[sfy + s1] / du - 2.0 * c->f.xR[sfy + s2] / du - 2.0 * c->f.xR[sfy + s3] / du + 2.0 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
             }
          // Rescale Cij
             for (ci = 0; ci <= 3; ci++) {
@@ -22873,20 +22873,20 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
             s4 = *n * (i + 1) + j;
             tbl->xyR[p][4] = c->f.xR[s1];
             tbl->xyR[p][5] = c->f.xR[sfy + s1] / du;
-            tbl->xyR[p][6] = -3 * c->f.xR[s1] + 3 * c->f.xR[s4] - 2 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
-            tbl->xyR[p][7] = 2 * c->f.xR[s1] - 2 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
+            tbl->xyR[p][6] = -3.0 * c->f.xR[s1] + 3.0 * c->f.xR[s4] - 2.0 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
+            tbl->xyR[p][7] = 2.0 * c->f.xR[s1] - 2.0 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
             tbl->xyR[p][8] = c->f.xR[sfx + s1] / dt;
             tbl->xyR[p][9] = c->f.xR[sfxy + s1] / (dt * du);
-            tbl->xyR[p][10] = -3 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s4] / dt - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][11] = 2 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][12] = -3 * c->f.xR[s1] + 3 * c->f.xR[s2] - 2 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
-            tbl->xyR[p][13] = -3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
-            tbl->xyR[p][14] = 9 * c->f.xR[s1] - 9 * c->f.xR[s2] + 9 * c->f.xR[s3] - 9 * c->f.xR[s4] + 6 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s2] / dt - 3 * c->f.xR[sfx + s3] / dt - 6 * c->f.xR[sfx + s4] / dt + 6 * c->f.xR[sfy + s1] / du - 6 * c->f.xR[sfy + s2] / du - 3 * c->f.xR[sfy + s3] / du + 3 * c->f.xR[sfy + s4] / du + 4 * c->f.xR[sfxy + s1] / (dt * du) + 2 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2 * c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][15] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 4 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s2] / dt + 2 * c->f.xR[sfx + s3] / dt + 4 * c->f.xR[sfx + s4] / dt - 3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du + 3 * c->f.xR[sfy + s3] / du - 3 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2 * c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][16] = 2 * c->f.xR[s1] - 2 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
-            tbl->xyR[p][17] = 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
-            tbl->xyR[p][18] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 3 * c->f.xR[sfx + s1] / dt - 3 * c->f.xR[sfx + s2] / dt + 3 * c->f.xR[sfx + s3] / dt + 3 * c->f.xR[sfx + s4] / dt - 4 * c->f.xR[sfy + s1] / du + 4 * c->f.xR[sfy + s2] / du + 2 * c->f.xR[sfy + s3] / du - 2 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - 2 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][19] = 4 * c->f.xR[s1] - 4 * c->f.xR[s2] + 4 * c->f.xR[s3] - 4 * c->f.xR[s4] + 2 * c->f.xR[sfx + s1] / dt + 2 * c->f.xR[sfx + s2] / dt - 2 * c->f.xR[sfx + s3] / dt - 2 * c->f.xR[sfx + s4] / dt + 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfy + s3] / du + 2 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][10] = -3.0 * c->f.xR[sfx + s1] / dt + 3.0 * c->f.xR[sfx + s4] / dt - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][11] = 2.0 * c->f.xR[sfx + s1] / dt - 2.0 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][12] = -3.0 * c->f.xR[s1] + 3.0 * c->f.xR[s2] - 2.0 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
+            tbl->xyR[p][13] = -3.0 * c->f.xR[sfy + s1] / du + 3.0 * c->f.xR[sfy + s2] / du - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
+            tbl->xyR[p][14] = 9.0 * c->f.xR[s1] - 9.0 * c->f.xR[s2] + 9.0 * c->f.xR[s3] - 9.0 * c->f.xR[s4] + 6.0 * c->f.xR[sfx + s1] / dt + 3.0 * c->f.xR[sfx + s2] / dt - 3.0 * c->f.xR[sfx + s3] / dt - 6.0 * c->f.xR[sfx + s4] / dt + 6.0 * c->f.xR[sfy + s1] / du - 6.0 * c->f.xR[sfy + s2] / du - 3.0 * c->f.xR[sfy + s3] / du + 3.0 * c->f.xR[sfy + s4] / du + 4.0 * c->f.xR[sfxy + s1] / (dt * du) + 2.0 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2.0 * c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][15] = -6.0 * c->f.xR[s1] + 6.0 * c->f.xR[s2] - 6.0 * c->f.xR[s3] + 6.0 * c->f.xR[s4] - 4.0 * c->f.xR[sfx + s1] / dt - 2.0 * c->f.xR[sfx + s2] / dt + 2.0 * c->f.xR[sfx + s3] / dt + 4.0 * c->f.xR[sfx + s4] / dt - 3.0 * c->f.xR[sfy + s1] / du + 3.0 * c->f.xR[sfy + s2] / du + 3.0 * c->f.xR[sfy + s3] / du - 3.0 * c->f.xR[sfy + s4] / du - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2.0 * c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][16] = 2.0 * c->f.xR[s1] - 2.0 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
+            tbl->xyR[p][17] = 2.0 * c->f.xR[sfy + s1] / du - 2.0 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
+            tbl->xyR[p][18] = -6.0 * c->f.xR[s1] + 6.0 * c->f.xR[s2] - 6.0 * c->f.xR[s3] + 6.0 * c->f.xR[s4] - 3.0 * c->f.xR[sfx + s1] / dt - 3.0 * c->f.xR[sfx + s2] / dt + 3.0 * c->f.xR[sfx + s3] / dt + 3.0 * c->f.xR[sfx + s4] / dt - 4.0 * c->f.xR[sfy + s1] / du + 4.0 * c->f.xR[sfy + s2] / du + 2.0 * c->f.xR[sfy + s3] / du - 2.0 * c->f.xR[sfy + s4] / du - 2.0 * c->f.xR[sfxy + s1] / (dt * du) - 2.0 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][19] = 4.0 * c->f.xR[s1] - 4.0 * c->f.xR[s2] + 4.0 * c->f.xR[s3] - 4.0 * c->f.xR[s4] + 2.0 * c->f.xR[sfx + s1] / dt + 2.0 * c->f.xR[sfx + s2] / dt - 2.0 * c->f.xR[sfx + s3] / dt - 2.0 * c->f.xR[sfx + s4] / dt + 2.0 * c->f.xR[sfy + s1] / du - 2.0 * c->f.xR[sfy + s2] / du - 2.0 * c->f.xR[sfy + s3] / du + 2.0 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
          }
       // Rescale Cij
          for (ci = 0; ci <= 3; ci++) {
@@ -23884,7 +23884,7 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
    // Try Cholesky factorization.
       if (!spline2d_blockllscholesky(&buf->blockata, kx, ky, &buf->trsmbuf2, &buf->cholbuf2, &buf->cholbuf1)) {
       // Factorization failed, increase regularizer and repeat
-         lambdachol = coalesce(10 * lambdachol, 1.0E-12);
+         lambdachol = coalesce(10.0 * lambdachol, 1.0E-12);
          continue;
       }
       break;
@@ -24709,10 +24709,10 @@ static void spline2d_expandindexrows(RVector *xy, ae_int_t d, RVector *shadow, a
    }
 // Serial execution
    for (i = pt0; i < pt1; i++) {
-      v = 2 * xy->xR[i * entrywidth];
+      v = 2.0 * xy->xR[i * entrywidth];
       xy->xR[i * entrywidth] = v;
       i0 = iboundval(ifloor(v), 0, kxnew - 2);
-      v = 2 * xy->xR[i * entrywidth + 1];
+      v = 2.0 * xy->xR[i * entrywidth + 1];
       xy->xR[i * entrywidth + 1] = v;
       i1 = iboundval(ifloor(v), 0, kynew - 2);
       cidx->xZ[i] = i1 * (kxnew - 1) + i0;
@@ -25041,7 +25041,7 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
          break;
       }
    // Factorization failed, increase regularizer and repeat
-      lambdareg = coalesce(10 * lambdareg, 1.0E-12);
+      lambdareg = coalesce(10.0 * lambdareg, 1.0E-12);
    }
 // Solve
 //
@@ -25275,21 +25275,21 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
    if (xa == xb) {
       v = xa;
       if (v >= 0.0) {
-         xa = v / 2 - 1;
-         xb = v * 2 + 1;
+         xa = v / 2.0 - 1.0;
+         xb = v * 2.0 + 1.0;
       } else {
-         xa = v * 2 - 1;
-         xb = v / 2 + 1;
+         xa = v * 2.0 - 1.0;
+         xb = v / 2.0 + 1.0;
       }
    }
    if (ya == yb) {
       v = ya;
       if (v >= 0.0) {
-         ya = v / 2 - 1;
-         yb = v * 2 + 1;
+         ya = v / 2.0 - 1.0;
+         yb = v * 2.0 + 1.0;
       } else {
-         ya = v * 2 - 1;
-         yb = v / 2 + 1;
+         ya = v * 2.0 - 1.0;
+         yb = v / 2.0 + 1.0;
       }
    }
    ae_assert(xa < xb, "Spline2DFit: integrity error");
@@ -26323,7 +26323,7 @@ double rbfv2basisfunc(ae_int_t bf, double d2) {
    //     exp(1)*exp(-D2)*exp(-1/(1-D2/9))
    // else:
    //     0
-      v = 1 - d2 / 9;
+      v = 1.0 - d2 / 9.0;
       if (v <= 0.0) {
          result = 0.0;
          return result;
@@ -26339,9 +26339,9 @@ double rbfv2basisfunc(ae_int_t bf, double d2) {
 // Assumes that D2 >= 0
 void rbfv2basisfuncdiff2(ae_int_t bf, double d2, double *f, double *df, double *d2f) {
    double v;
-   *f = 0;
-   *df = 0;
-   *d2f = 0;
+   *f = 0.0;
+   *df = 0.0;
+   *d2f = 0.0;
    if (bf == 0) {
       *f = exp(-d2);
       *df = -*f;
@@ -26355,7 +26355,7 @@ void rbfv2basisfuncdiff2(ae_int_t bf, double d2, double *f, double *df, double *
    //     d2F = -dF * [pow(D2/9-1,-2)/9 + 1] - F*(2/81)*pow(D2/9-1,-3)
    // else:
    //     0
-      v = 1 - d2 / 9;
+      v = 1.0 - d2 / 9.0;
       if (v <= 0.0) {
          *f = 0.0;
          *df = 0.0;
@@ -26363,8 +26363,8 @@ void rbfv2basisfuncdiff2(ae_int_t bf, double d2, double *f, double *df, double *
          return;
       }
       *f = exp(1.0) * exp(-d2) * exp(-1.0 / v);
-      *df = -*f * (1.0 / (9 * v * v) + 1);
-      *d2f = -*df * (1.0 / (9 * v * v) + 1) - *f * (2.0 / 81.0) / (v * v * v);
+      *df = -*f * (1.0 / (9.0 * v * v) + 1.0);
+      *d2f = -*df * (1.0 / (9.0 * v * v) + 1.0) - *f * (2.0 / 81.0) / (v * v * v);
       return;
    }
    ae_assert(false, "RBFV2BasisFuncDiff2: unknown BF type");
@@ -27217,7 +27217,7 @@ static void rbfv2_designmatrixgeneraterow(ZVector *kdnodes, RVector *kdsplits, R
       // Generate elements corresponding to nonsmoothness penalty
          ae_assert(rowsperpoint == 1 + nx, "DesignMatrixRowSize: integrity failure (h)");
          for (k = 0; k < nx; k++) {
-            rowval->xR[(*rowsize + j) * rowsperpoint + 1 + k] = penalty * (dval * 2 * invri2 + d2val * sqr(2 * (x0->xR[k] - cw->xR[tmpoffs->xZ[j] + k]) * invri2));
+            rowval->xR[(*rowsize + j) * rowsperpoint + 1 + k] = penalty * (dval * 2.0 * invri2 + d2val * sqr(2.0 * (x0->xR[k] - cw->xR[tmpoffs->xZ[j] + k]) * invri2));
          }
       }
    // Update columns counter
@@ -28288,7 +28288,7 @@ void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x
 // Integrity checks
    ae_assert(s->nx == 2 || s->nx == 3, "RBFV2PartialGridCalcRec: integrity check failed");
 // Try to split large problem
-   problemcost = s->ny * 2 * (avgfuncpernode + 1);
+   problemcost = s->ny * 2.0 * (avgfuncpernode + 1.0);
    problemcost *= blocks0->xZ[block0b] - blocks0->xZ[block0a];
    problemcost *= blocks1->xZ[block1b] - blocks1->xZ[block1a];
    problemcost *= blocks2->xZ[block2b] - blocks2->xZ[block2a];
@@ -29059,13 +29059,13 @@ static void spline3d_spline3ddiff(spline3dinterpolant *c, double x, double y, do
    zd = (z - c->z.xR[iz]) / (c->z.xR[iz + 1] - c->z.xR[iz]);
 // Trilinear interpolation
    if (c->stype == -1) {
-      c0 = c->f.xR[c->n * (c->m * iz + iy) + ix] * (1 - xd) + c->f.xR[c->n * (c->m * iz + iy) + (ix + 1)] * xd;
-      c1 = c->f.xR[c->n * (c->m * iz + (iy + 1)) + ix] * (1 - xd) + c->f.xR[c->n * (c->m * iz + (iy + 1)) + (ix + 1)] * xd;
-      c2 = c->f.xR[c->n * (c->m * (iz + 1) + iy) + ix] * (1 - xd) + c->f.xR[c->n * (c->m * (iz + 1) + iy) + (ix + 1)] * xd;
-      c3 = c->f.xR[c->n * (c->m * (iz + 1) + (iy + 1)) + ix] * (1 - xd) + c->f.xR[c->n * (c->m * (iz + 1) + (iy + 1)) + (ix + 1)] * xd;
-      c0 = c0 * (1 - yd) + c1 * yd;
-      c1 = c2 * (1 - yd) + c3 * yd;
-      *f = c0 * (1 - zd) + c1 * zd;
+      c0 = c->f.xR[c->n * (c->m * iz + iy) + ix] * (1.0 - xd) + c->f.xR[c->n * (c->m * iz + iy) + (ix + 1)] * xd;
+      c1 = c->f.xR[c->n * (c->m * iz + (iy + 1)) + ix] * (1.0 - xd) + c->f.xR[c->n * (c->m * iz + (iy + 1)) + (ix + 1)] * xd;
+      c2 = c->f.xR[c->n * (c->m * (iz + 1) + iy) + ix] * (1.0 - xd) + c->f.xR[c->n * (c->m * (iz + 1) + iy) + (ix + 1)] * xd;
+      c3 = c->f.xR[c->n * (c->m * (iz + 1) + (iy + 1)) + ix] * (1.0 - xd) + c->f.xR[c->n * (c->m * (iz + 1) + (iy + 1)) + (ix + 1)] * xd;
+      c0 = c0 * (1.0 - yd) + c1 * yd;
+      c1 = c2 * (1.0 - yd) + c3 * yd;
+      *f = c0 * (1.0 - zd) + c1 * zd;
    }
 }
 
@@ -29144,13 +29144,13 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
    for (i = 0; i < c->d; i++) {
    // Trilinear interpolation
       if (c->stype == -1) {
-         c0 = c->f.xR[c->d * (c->n * (c->m * iz + iy) + ix) + i] * (1 - xd) + c->f.xR[c->d * (c->n * (c->m * iz + iy) + (ix + 1)) + i] * xd;
-         c1 = c->f.xR[c->d * (c->n * (c->m * iz + (iy + 1)) + ix) + i] * (1 - xd) + c->f.xR[c->d * (c->n * (c->m * iz + (iy + 1)) + (ix + 1)) + i] * xd;
-         c2 = c->f.xR[c->d * (c->n * (c->m * (iz + 1) + iy) + ix) + i] * (1 - xd) + c->f.xR[c->d * (c->n * (c->m * (iz + 1) + iy) + (ix + 1)) + i] * xd;
-         c3 = c->f.xR[c->d * (c->n * (c->m * (iz + 1) + (iy + 1)) + ix) + i] * (1 - xd) + c->f.xR[c->d * (c->n * (c->m * (iz + 1) + (iy + 1)) + (ix + 1)) + i] * xd;
-         c0 = c0 * (1 - yd) + c1 * yd;
-         c1 = c2 * (1 - yd) + c3 * yd;
-         f->xR[i] = c0 * (1 - zd) + c1 * zd;
+         c0 = c->f.xR[c->d * (c->n * (c->m * iz + iy) + ix) + i] * (1.0 - xd) + c->f.xR[c->d * (c->n * (c->m * iz + iy) + (ix + 1)) + i] * xd;
+         c1 = c->f.xR[c->d * (c->n * (c->m * iz + (iy + 1)) + ix) + i] * (1.0 - xd) + c->f.xR[c->d * (c->n * (c->m * iz + (iy + 1)) + (ix + 1)) + i] * xd;
+         c2 = c->f.xR[c->d * (c->n * (c->m * (iz + 1) + iy) + ix) + i] * (1.0 - xd) + c->f.xR[c->d * (c->n * (c->m * (iz + 1) + iy) + (ix + 1)) + i] * xd;
+         c3 = c->f.xR[c->d * (c->n * (c->m * (iz + 1) + (iy + 1)) + ix) + i] * (1.0 - xd) + c->f.xR[c->d * (c->n * (c->m * (iz + 1) + (iy + 1)) + (ix + 1)) + i] * xd;
+         c0 = c0 * (1.0 - yd) + c1 * yd;
+         c1 = c2 * (1.0 - yd) + c3 * yd;
+         f->xR[i] = c0 * (1.0 - zd) + c1 * zd;
       }
    }
 }
@@ -29258,24 +29258,24 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
             if (ix == oldxcount - 1) {
                ix = oldxcount - 2;
             }
-            xd = (i * (oldxcount - 1.0)) / (newxcount - 1) - ix;
+            xd = i * (oldxcount - 1.0) / (newxcount - 1) - ix;
             iy = j * (oldycount - 1) / (newycount - 1);
             if (iy == oldycount - 1) {
                iy = oldycount - 2;
             }
-            yd = (j * (oldycount - 1.0)) / (newycount - 1) - iy;
+            yd = j * (oldycount - 1.0) / (newycount - 1) - iy;
             iz = k * (oldzcount - 1) / (newzcount - 1);
             if (iz == oldzcount - 1) {
                iz = oldzcount - 2;
             }
-            zd = (k * (oldzcount - 1.0)) / (newzcount - 1) - iz;
-            c0 = a->xR[oldxcount * (oldycount * iz + iy) + ix] * (1 - xd) + a->xR[oldxcount * (oldycount * iz + iy) + (ix + 1)] * xd;
-            c1 = a->xR[oldxcount * (oldycount * iz + (iy + 1)) + ix] * (1 - xd) + a->xR[oldxcount * (oldycount * iz + (iy + 1)) + (ix + 1)] * xd;
-            c2 = a->xR[oldxcount * (oldycount * (iz + 1) + iy) + ix] * (1 - xd) + a->xR[oldxcount * (oldycount * (iz + 1) + iy) + (ix + 1)] * xd;
-            c3 = a->xR[oldxcount * (oldycount * (iz + 1) + (iy + 1)) + ix] * (1 - xd) + a->xR[oldxcount * (oldycount * (iz + 1) + (iy + 1)) + (ix + 1)] * xd;
-            c0 = c0 * (1 - yd) + c1 * yd;
-            c1 = c2 * (1 - yd) + c3 * yd;
-            b->xR[newxcount * (newycount * k + j) + i] = c0 * (1 - zd) + c1 * zd;
+            zd = k * (oldzcount - 1.0) / (newzcount - 1) - iz;
+            c0 = a->xR[oldxcount * (oldycount * iz + iy) + ix] * (1.0 - xd) + a->xR[oldxcount * (oldycount * iz + iy) + (ix + 1)] * xd;
+            c1 = a->xR[oldxcount * (oldycount * iz + (iy + 1)) + ix] * (1.0 - xd) + a->xR[oldxcount * (oldycount * iz + (iy + 1)) + (ix + 1)] * xd;
+            c2 = a->xR[oldxcount * (oldycount * (iz + 1) + iy) + ix] * (1.0 - xd) + a->xR[oldxcount * (oldycount * (iz + 1) + iy) + (ix + 1)] * xd;
+            c3 = a->xR[oldxcount * (oldycount * (iz + 1) + (iy + 1)) + ix] * (1.0 - xd) + a->xR[oldxcount * (oldycount * (iz + 1) + (iy + 1)) + (ix + 1)] * xd;
+            c0 = c0 * (1.0 - yd) + c1 * yd;
+            c1 = c2 * (1.0 - yd) + c3 * yd;
+            b->xR[newxcount * (newycount * k + j) + i] = c0 * (1.0 - zd) + c1 * zd;
          }
       }
    }
@@ -29866,8 +29866,8 @@ namespace alglib_impl {
 // API: void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi);
 void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi) {
    SetVector(cx);
-   *rlo = 0;
-   *rhi = 0;
+   *rlo = 0.0;
+   *rhi = 0.0;
    fitspherex(xy, npoints, nx, problemtype, epsx, aulits, penalty, cx, rlo, rhi);
 }
 
@@ -29878,7 +29878,7 @@ void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemty
 void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi) {
    double dummy;
    SetVector(cx);
-   *rhi = 0;
+   *rhi = 0.0;
    nsfitspherex(xy, npoints, nx, 1, 0.0, 0, 0.0, cx, &dummy, rhi);
 }
 
@@ -29889,7 +29889,7 @@ void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, dou
 void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo) {
    double dummy;
    SetVector(cx);
-   *rlo = 0;
+   *rlo = 0.0;
    nsfitspherex(xy, npoints, nx, 2, 0.0, 0, 0.0, cx, rlo, &dummy);
 }
 
@@ -29899,8 +29899,8 @@ void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, dou
 // API: void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
 void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi) {
    SetVector(cx);
-   *rlo = 0;
-   *rhi = 0;
+   *rlo = 0.0;
+   *rhi = 0.0;
    nsfitspherex(xy, npoints, nx, 3, 0.0, 0, 0.0, cx, rlo, rhi);
 }
 } // end of namespace alglib_impl
@@ -31341,8 +31341,8 @@ void rbfdiff(rbfmodel *s, RVector *x, RVector *y, RVector *dy) {
 // ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
 // API: void rbfdiff1(const rbfmodel &s, const double x0, double &y, double &dy0);
 void rbfdiff1(rbfmodel *s, double x0, double *y, double *dy0) {
-   *y = 0;
-   *dy0 = 0;
+   *y = 0.0;
+   *dy0 = 0.0;
    ae_assert(isfinite(x0), "RBFDiff1: invalid value for X0 (X0 is Inf or NaN)!");
    *y = 0.0;
    *dy0 = 0.0;
@@ -31386,9 +31386,9 @@ void rbfdiff1(rbfmodel *s, double x0, double *y, double *dy0) {
 // ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
 // API: void rbfdiff2(const rbfmodel &s, const double x0, const double x1, double &y, double &dy0, double &dy1);
 void rbfdiff2(rbfmodel *s, double x0, double x1, double *y, double *dy0, double *dy1) {
-   *y = 0;
-   *dy0 = 0;
-   *dy1 = 0;
+   *y = 0.0;
+   *dy0 = 0.0;
+   *dy1 = 0.0;
    ae_assert(isfinite(x0), "RBFDiff2: invalid value for X0 (X0 is Inf or NaN)!");
    ae_assert(isfinite(x1), "RBFDiff2: invalid value for X1 (X1 is Inf or NaN)!");
    *y = 0.0;
@@ -31438,10 +31438,10 @@ void rbfdiff2(rbfmodel *s, double x0, double x1, double *y, double *dy0, double 
 // ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
 // API: void rbfdiff3(const rbfmodel &s, const double x0, const double x1, const double x2, double &y, double &dy0, double &dy1, double &dy2);
 void rbfdiff3(rbfmodel *s, double x0, double x1, double x2, double *y, double *dy0, double *dy1, double *dy2) {
-   *y = 0;
-   *dy0 = 0;
-   *dy1 = 0;
-   *dy2 = 0;
+   *y = 0.0;
+   *dy0 = 0.0;
+   *dy1 = 0.0;
+   *dy2 = 0.0;
    ae_assert(isfinite(x0), "RBFDiff3: invalid value for X0 (X0 is Inf or NaN)!");
    ae_assert(isfinite(x1), "RBFDiff3: invalid value for X1 (X1 is Inf or NaN)!");
    ae_assert(isfinite(x2), "RBFDiff3: invalid value for X2 (X2 is Inf or NaN)!");
@@ -32173,7 +32173,7 @@ void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t
    // * analyze average number of basis functions per grid node
    // * partition grid in into blocks
       rmax = s->model1.rmax;
-      blockwidth = 2 * rmax;
+      blockwidth = 2.0 * rmax;
       maxblocksize = 8;
       searchradius = rmax * rbffarradius + 0.5 * sqrt(s->nx) * blockwidth;
       ntrials = 100;

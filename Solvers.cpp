@@ -4125,7 +4125,7 @@ Spawn:
          // Residual decrease condition met, stopping
             state->repterminationtype = 1;
             break;
-         } else if (res >= prevres * (1 - sqrt(machineepsilon))) {
+         } else if (res >= prevres * (1.0 - sqrt(machineepsilon))) {
          // The algorithm stagnated
             state->repterminationtype = 7;
             break;
@@ -4275,7 +4275,7 @@ void sparsesolveroocgetrequestdata(sparsesolverstate *state, RVector *x) {
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
 // API: void sparsesolveroocgetrequestdata1(const sparsesolverstate &state, double &v);
 void sparsesolveroocgetrequestdata1(sparsesolverstate *state, double *v) {
-   *v = 0;
+   *v = 0.0;
    ae_assert(state->running, "SparseSolverOOCGetRequestInfo: the solver is not running");
    *v = state->reply1;
 }
@@ -5079,7 +5079,7 @@ Spawn:
    for (i = 0; i < state->n; i++) {
       state->r.xR[i] = state->b.xR[i] - state->mv.xR[i];
       state->r2 += state->r.xR[i] * state->r.xR[i];
-      state->meritfunction += state->mv.xR[i] * state->rx.xR[i] - 2 * state->b.xR[i] * state->rx.xR[i];
+      state->meritfunction += state->mv.xR[i] * state->rx.xR[i] - 2.0 * state->b.xR[i] * state->rx.xR[i];
       bnorm += state->b.xR[i] * state->b.xR[i];
    }
    bnorm = sqrt(bnorm);
@@ -5160,7 +5160,7 @@ Spawn:
       // Check emergency stopping criterion
          v = 0.0;
          for (i = 0; i < state->n; i++) {
-            v += state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
+            v += state->mv.xR[i] * state->cx.xR[i] - 2.0 * state->b.xR[i] * state->cx.xR[i];
          }
          if (v >= state->meritfunction) {
             for (i = 0; i < state->n; i++) {
@@ -6674,7 +6674,7 @@ Spawn:
       ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
       state->needfij = true, state->PQ = 2; goto Pause; Resume2: state->needfij = false, state->repnfunc++, state->repnjac++;
       rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
-      ae_v_muld(state->rightpart.xR, 1, n, -1);
+      ae_v_muld(state->rightpart.xR, 1, n, -1.0);
    // Inner cycle: find good lambda
       while (true) {
       // Solve (J^T*J + (Lambda+Mu)*I)*y = J^T*F

@@ -784,17 +784,17 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
    DupVector(a);
    DupVector(c);
    *info = 0;
-   *threshold = 0;
-   *pal = 0;
-   *pbl = 0;
-   *par = 0;
-   *pbr = 0;
-   *cve = 0;
+   *threshold = 0.0;
+   *pal = 0.0;
+   *pbl = 0.0;
+   *par = 0.0;
+   *pbr = 0.0;
+   *cve = 0.0;
    NewVector(ties, 0, DT_INT);
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // Test for errors in inputs
-   if (n <= 0) {
+   if (n < 0) {
       *info = -1;
       ae_frame_leave();
       return;
@@ -856,10 +856,10 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
       }
    // Calculate cross-validation CE
       cv = 0.0;
-      cv -= bdss_xlny(*pal + pak, (*pal + pak) / (*pal + pak + *pbl + pbk + 1));
-      cv -= bdss_xlny(*pbl + pbk, (*pbl + pbk) / (*pal + pak + 1 + *pbl + pbk));
-      cv -= bdss_xlny(*par - pak, (*par - pak) / (*par - pak + *pbr - pbk + 1));
-      cv -= bdss_xlny(*pbr - pbk, (*pbr - pbk) / (*par - pak + 1 + *pbr - pbk));
+      cv -= bdss_xlny(*pal + pak, (*pal + pak) / (*pal + pak + *pbl + pbk + 1.0));
+      cv -= bdss_xlny(*pbl + pbk, (*pbl + pbk) / (*pal + pak + 1.0 + *pbl + pbk));
+      cv -= bdss_xlny(*par - pak, (*par - pak) / (*par - pak + *pbr - pbk + 1.0));
+      cv -= bdss_xlny(*pbr - pbk, (*pbr - pbk) / (*par - pak + 1.0 + *pbr - pbk));
    // Compare with best
       if (cv < cvoptimal) {
          cvoptimal = cv;
@@ -936,9 +936,9 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
    double w;
    double x;
    *info = 0;
-   *threshold = 0;
-   *rms = 0;
-   *cvrms = 0;
+   *threshold = 0.0;
+   *rms = 0.0;
+   *cvrms = 0.0;
 // Test for errors in inputs
    if (n <= 0 || nc < 2) {
       *info = -1;
@@ -991,7 +991,7 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
       }
       v = sqrt(v / (nc * n));
    // Compare with best
-      x = (2.0 * sl) / (sl + sr) - 1.0;
+      x = 2.0 * sl / (sl + sr) - 1.0;
       cc = v * (1.0 - alpha + alpha * sqr(x));
       if (cc < cbest) {
       // store split
@@ -1044,7 +1044,7 @@ static double bdss_getcv(ZVector *cnt, ae_int_t nc) {
    }
    result = 0.0;
    for (i = 0; i < nc; i++) {
-      result -= bdss_xlny(cnt->xZ[i], cnt->xZ[i] / (s + nc - 1));
+      result -= bdss_xlny(cnt->xZ[i], cnt->xZ[i] / (s + nc - 1.0));
    }
    return result;
 }
@@ -1084,7 +1084,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
    *info = 0;
    SetVector(thresholds);
    *ni = 0;
-   *cve = 0;
+   *cve = 0.0;
    NewVector(ties, 0, DT_INT);
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
@@ -1244,7 +1244,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
    *info = 0;
    SetVector(thresholds);
    *ni = 0;
-   *cve = 0;
+   *cve = 0.0;
    NewVector(ties, 0, DT_INT);
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
@@ -2614,9 +2614,9 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
    double arg;
    double root;
    double r;
-   *f = 0;
-   *df = 0;
-   *d2f = 0;
+   *f = 0.0;
+   *df = 0.0;
+   *d2f = 0.0;
    if (k == 0 || k == -5) {
       *f = net;
       *df = 1.0;
@@ -2630,19 +2630,19 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
       } else {
          *f = sign(net);
       }
-      *df = 1 - *f * *f;
-      *d2f = -2 * *f * *df;
+      *df = 1.0 - *f * *f;
+      *d2f = -2.0 * *f * *df;
       return;
    }
    if (k == 3) {
    // EX activation function
       if (net >= 0.0) {
          net2 = net * net;
-         arg = net2 + 1;
+         arg = net2 + 1.0;
          root = sqrt(arg);
          *f = net + root;
          r = net / root;
-         *df = 1 + r;
+         *df = 1.0 + r;
          *d2f = (root - net * r) / arg;
       } else {
          *f = exp(net);
@@ -2653,8 +2653,8 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
    }
    if (k == 2) {
       *f = exp(-sqr(net));
-      *df = -2 * net * *f;
-      *d2f = -2 * (*f + *df * net);
+      *df = -2.0 * net * *f;
+      *d2f = -2.0 * (*f + *df * net);
       return;
    }
    *f = 0.0;
@@ -3232,13 +3232,13 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
             for (i = 0; i < nout; i++) {
                fown = batch4buf->xR[offs1];
                if (i == kl) {
-                  deown = fown / s - 1;
+                  deown = fown / s - 1.0;
                } else {
                   deown = fown / s;
                }
                batch4buf->xR[offs2] = deown;
                vv += deown * fown;
-               *e += deown * deown / 2;
+               *e += deown * deown / 2.0;
                offs1 += chunksize;
                offs2 += chunksize;
             }
@@ -3271,7 +3271,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          for (j = 0; j < csize; j++) {
             v = batch4buf->xR[offs0 + j] * v0 + v1 - xy->xyR[cstart + j][nin + i];
             batch4buf->xR[offs1 + j] = v * v0;
-            *e += v * v / 2;
+            *e += v * v / 2.0;
          }
       }
    }
@@ -3617,7 +3617,7 @@ void mlpgrad(multilayerperceptron *network, RVector *x, RVector *desiredy, doubl
    ae_int_t i;
    ae_int_t nout;
    ae_int_t ntotal;
-   *e = 0;
+   *e = 0.0;
 // Alloc
    vectorsetlengthatleast(grad, network->structinfo.xZ[4]);
 // Prepare dError/dOut, internal structures
@@ -3630,7 +3630,7 @@ void mlpgrad(multilayerperceptron *network, RVector *x, RVector *desiredy, doubl
    }
    for (i = 0; i < nout; i++) {
       network->derror.xR[ntotal - nout + i] = network->y.xR[i] - desiredy->xR[i];
-      *e += sqr(network->y.xR[i] - desiredy->xR[i]) / 2;
+      *e += sqr(network->y.xR[i] - desiredy->xR[i]) / 2.0;
    }
 // gradient
    mlpbase_mlpinternalcalculategradient(network, &network->neurons, &network->weights, &network->derror, grad, false);
@@ -3658,7 +3658,7 @@ void mlpgradn(multilayerperceptron *network, RVector *x, RVector *desiredy, doub
    ae_int_t i;
    ae_int_t nout;
    ae_int_t ntotal;
-   *e = 0;
+   *e = 0.0;
 // Alloc
    vectorsetlengthatleast(grad, network->structinfo.xZ[4]);
 // Prepare dError/dOut, internal structures
@@ -3673,7 +3673,7 @@ void mlpgradn(multilayerperceptron *network, RVector *x, RVector *desiredy, doub
    // Regression network, least squares
       for (i = 0; i < nout; i++) {
          network->derror.xR[ntotal - nout + i] = network->y.xR[i] - desiredy->xR[i];
-         *e += sqr(network->y.xR[i] - desiredy->xR[i]) / 2;
+         *e += sqr(network->y.xR[i] - desiredy->xR[i]) / 2.0;
       }
    } else {
    // Classification network, cross-entropy
@@ -3735,7 +3735,7 @@ void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
 // NOTE: it is important to use real arithmetics for ProblemCost
 //       because ProblemCost may be larger than MAXINT.
    problemcost = subset1 - subset0;
-   problemcost *= wcount * 2;
+   problemcost *= wcount * 2.0;
 // Parallelism was tried if: problemcost >= smpactivationlevel() && subset1 - subset0 >= 2 * mlpbase_microbatchsize
    if (subset1 - subset0 >= 2 * mlpbase_microbatchsize && problemcost > spawnlevel()) {
       len0 = splitlength(subset1 - subset0, mlpbase_microbatchsize), len1 = subset1 - subset0 - len0;
@@ -3810,7 +3810,7 @@ void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, do
    ae_int_t subset1;
    ae_int_t subsettype;
    ae_frame_make(&_frame_block);
-   *e = 0;
+   *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize < 0");
    subset0 = 0;
@@ -3871,7 +3871,7 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
    ae_int_t subset1;
    ae_int_t subsettype;
    ae_frame_make(&_frame_block);
-   *e = 0;
+   *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize < 0");
    ae_assert(sparseiscrs(xy), "MLPGradBatchSparse: sparse matrix XY must be in CRS format.");
@@ -3946,7 +3946,7 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
    ae_int_t subset1;
    ae_int_t subsettype;
    ae_frame_make(&_frame_block);
-   *e = 0;
+   *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(setsize >= 0, "MLPGradBatchSubset: SetSize < 0");
    ae_assert(subsetsize <= idx->cnt, "MLPGradBatchSubset: SubsetSize > Length(Idx)");
@@ -4037,7 +4037,7 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
    ae_int_t subset1;
    ae_int_t subsettype;
    ae_frame_make(&_frame_block);
-   *e = 0;
+   *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(setsize >= 0, "MLPGradBatchSparseSubset: SetSize < 0");
    ae_assert(subsetsize <= idx->cnt, "MLPGradBatchSparseSubset: SubsetSize > Length(Idx)");
@@ -4368,9 +4368,9 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
                for (j = 0; j < nout; j++) {
                   expj = network->nwbuf.xR[j];
                   if (j == i) {
-                     deidyj = expi / sqr(s) * ((z + expi) * (s - 2 * expi) / s + expi * s2 / sqr(s));
+                     deidyj = expi / sqr(s) * ((z + expi) * (s - 2.0 * expi) / s + expi * s2 / sqr(s));
                   } else {
-                     deidyj = expi * expj / sqr(s) * (s2 / sqr(s) - 2 * z / s - (expi + expj) / s + (network->y.xR[i] - desiredy.xR[i]) - (network->y.xR[j] - desiredy.xR[j]));
+                     deidyj = expi * expj / sqr(s) * (s2 / sqr(s) - 2.0 * z / s - (expi + expj) / s + (network->y.xR[i] - desiredy.xR[i]) - (network->y.xR[j] - desiredy.xR[j]));
                   }
                   ae_v_addd(rdy.xyR[ntotal - nout + i], 1, ry.xyR[ntotal - nout + j], 1, wcount, deidyj);
                }
@@ -4530,8 +4530,8 @@ ae_int_t mlpgetlayersize(multilayerperceptron *network, ae_int_t k) {
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 // API: void mlpgetinputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
 void mlpgetinputscaling(multilayerperceptron *network, ae_int_t i, double *mean, double *sigma) {
-   *mean = 0;
-   *sigma = 0;
+   *mean = 0.0;
+   *sigma = 0.0;
    ae_assert(i >= 0 && i < network->hllayersizes.xZ[0], "MLPGetInputScaling: incorrect (nonexistent) I");
    *mean = network->columnmeans.xR[i];
    *sigma = network->columnsigmas.xR[i];
@@ -4558,8 +4558,8 @@ void mlpgetinputscaling(multilayerperceptron *network, ae_int_t i, double *mean,
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 // API: void mlpgetoutputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
 void mlpgetoutputscaling(multilayerperceptron *network, ae_int_t i, double *mean, double *sigma) {
-   *mean = 0;
-   *sigma = 0;
+   *mean = 0.0;
+   *sigma = 0.0;
    ae_assert(i >= 0 && i < network->hllayersizes.xZ[network->hllayersizes.cnt - 1], "MLPGetOutputScaling: incorrect (nonexistent) I");
    if (network->structinfo.xZ[6] == 1) {
       *mean = 0.0;
@@ -4593,7 +4593,7 @@ void mlpgetneuroninfo(multilayerperceptron *network, ae_int_t k, ae_int_t i, ae_
    ae_int_t highlevelidx;
    ae_int_t activationoffset;
    *fkind = 0;
-   *threshold = 0;
+   *threshold = 0.0;
    ncnt = network->hlneurons.cnt / mlpbase_hlnfieldwidth;
    istart = network->structinfo.xZ[5];
 // search
@@ -5638,7 +5638,7 @@ void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
 // NOTE: it is important to use real arithmetics for ProblemCost
 //       because ProblemCost may be larger than MAXINT.
    problemcost = subset1 - subset0;
-   problemcost *= wcount * 2;
+   problemcost *= wcount * 2.0;
 // Parallelism was tried if: problemcost >= smpactivationlevel() && subset1 - subset0 >= 2 * mlpbase_microbatchsize
    if (subset1 - subset0 >= 2 * mlpbase_microbatchsize && problemcost > spawnlevel()) {
       len0 = splitlength(subset1 - subset0, mlpbase_microbatchsize), len1 = subset1 - subset0 - len0;
@@ -5754,7 +5754,7 @@ double mlperror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints) {
       }
    }
    mlpallerrorsx(network, xy, &network->dummysxy, npoints, 0, &network->dummyidx, 0, npoints, 0, &network->buf, &network->err);
-   result = sqr(network->err.rmserror) * npoints * mlpgetoutputscount(network) / 2;
+   result = sqr(network->err.rmserror) * npoints * mlpgetoutputscount(network) / 2.0;
    return result;
 }
 
@@ -5804,7 +5804,7 @@ double mlperrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t 
       }
    }
    mlpallerrorsx(network, &network->dummydxy, xy, npoints, 1, &network->dummyidx, 0, npoints, 0, &network->buf, &network->err);
-   result = sqr(network->err.rmserror) * npoints * mlpgetoutputscount(network) / 2;
+   result = sqr(network->err.rmserror) * npoints * mlpgetoutputscount(network) / 2.0;
    return result;
 }
 
@@ -5833,7 +5833,7 @@ double mlperrorn(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize) {
       // Least squares error function
          ae_v_sub(network->y.xR, 1, &xy->xyR[i][nin], 1, nout);
          e = ae_v_dotproduct(network->y.xR, 1, network->y.xR, 1, nout);
-         result += e / 2;
+         result += e / 2.0;
       } else {
       // Cross-entropy error function
          k = iround(xy->xyR[i][nin]);
@@ -6532,7 +6532,7 @@ double mlperrorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsi
       idxtype = 0;
    }
    mlpallerrorsx(network, xy, &network->dummysxy, setsize, 0, subset, idx0, idx1, idxtype, &network->buf, &network->err);
-   result = sqr(network->err.rmserror) * (idx1 - idx0) * mlpgetoutputscount(network) / 2;
+   result = sqr(network->err.rmserror) * (idx1 - idx0) * mlpgetoutputscount(network) / 2.0;
    return result;
 }
 
@@ -6602,7 +6602,7 @@ double mlperrorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_
       idxtype = 0;
    }
    mlpallerrorsx(network, &network->dummydxy, xy, setsize, 1, subset, idx0, idx1, idxtype, &network->buf, &network->err);
-   result = sqr(network->err.rmserror) * (idx1 - idx0) * mlpgetoutputscount(network) / 2;
+   result = sqr(network->err.rmserror) * (idx1 - idx0) * mlpgetoutputscount(network) / 2.0;
    return result;
 }
 
@@ -7823,11 +7823,11 @@ void mlpeallerrorssparse(mlpensemble *ensemble, sparsematrix *xy, ae_int_t npoin
    ae_int_t nin;
    ae_int_t nout;
    ae_frame_make(&_frame_block);
-   *relcls = 0;
-   *avgce = 0;
-   *rms = 0;
-   *avg = 0;
-   *avgrel = 0;
+   *relcls = 0.0;
+   *avgce = 0.0;
+   *rms = 0.0;
+   *avg = 0.0;
+   *avgrel = 0.0;
    NewVector(buf, 0, DT_REAL);
    NewVector(workx, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -8964,7 +8964,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
    SetMatrix(ccol);
    SetMatrix(crow);
    SetVector(xyc);
-   *energy = 0;
+   *energy = 0.0;
    NewObj(hqrndstate, rs);
 // Test parameters
    if (npoints < k || nvars < 1 || k < 1 || restarts < 1) {
@@ -9508,7 +9508,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
       for (i = 0; i < npoints; i++) {
          d->xyR[i][i] = 0.0;
          for (j = i + 1; j < npoints; j++) {
-            v = sqrt(rmax2(buf->ra0.xR[i] + buf->ra0.xR[j] - 2 * d->xyR[i][j], 0.0));
+            v = sqrt(rmax2(buf->ra0.xR[i] + buf->ra0.xR[j] - 2.0 * d->xyR[i][j], 0.0));
             d->xyR[i][j] = v;
          }
       }
@@ -9541,9 +9541,9 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
          for (j = i + 1; j < npoints; j++) {
             v = d->xyR[i][j] / sqrt(buf->ra0.xR[i] * buf->ra0.xR[j]);
             if (disttype == 10) {
-               v = 1 - v;
+               v = 1.0 - v;
             } else {
-               v = 1 - fabs(v);
+               v = 1.0 - fabs(v);
             }
             v = rmax2(v, 0.0);
             d->xyR[i][j] = v;
@@ -9570,7 +9570,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
                v = fabs(v);
             }
             v = rmin2(v, 1.0);
-            d->xyR[i][j] = 1 - v;
+            d->xyR[i][j] = 1.0 - v;
          }
       }
       rmatrixenforcesymmetricity(d, npoints, true);
@@ -9600,9 +9600,9 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
          for (j = i + 1; j < npoints; j++) {
             vv = d->xyR[i][j] * v * buf->ra0.xR[j];
             if (disttype == 20) {
-               vr = 1 - vv;
+               vr = 1.0 - vv;
             } else {
-               vr = 1 - fabs(vv);
+               vr = 1.0 - fabs(vv);
             }
             if (vr < 0.0) {
                vr = 0.0;
@@ -9824,7 +9824,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
                d->xyR[i][c0] = (csizes.xZ[c0] * d->xyR[i][c0] + csizes.xZ[c1] * d->xyR[i][c1]) / (csizes.xZ[c0] + csizes.xZ[c1]);
             }
             if (s->ahcalgo == 3) {
-               d->xyR[i][c0] = (d->xyR[i][c0] + d->xyR[i][c1]) / 2;
+               d->xyR[i][c0] = (d->xyR[i][c0] + d->xyR[i][c1]) / 2.0;
             }
             if (s->ahcalgo == 4) {
                d->xyR[i][c0] = ((n0 + ni) * d->xyR[i][c0] + (n1 + ni) * d->xyR[i][c1] - ni * d01) / (n0 + n1 + ni);
@@ -10355,7 +10355,7 @@ void clusterizerseparatedbycorr(ahcreport *rep, double r, ae_int_t *k, ZVector *
    SetVector(cz);
    ae_assert(isfinite(r) && r >= -1.0 && r <= 1.0, "ClusterizerSeparatedByCorr: R is infinite or less than 0");
    *k = 1;
-   while (*k < rep->npoints && rep->mergedist.xR[rep->npoints - 1 - *k] >= 1 - r) {
+   while (*k < rep->npoints && rep->mergedist.xR[rep->npoints - 1 - *k] >= 1.0 - r) {
       ++*k;
    }
    clusterizergetkclusters(rep, *k, cidx, cz);
@@ -11329,8 +11329,8 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
    double vmin;
    double vmax;
    *info = 0;
-   *threshold = 0;
-   *e = 0;
+   *threshold = 0.0;
+   *e = 0.0;
    ae_assert(s->rdfsplitstrength == 0 || s->rdfsplitstrength == 1 || s->rdfsplitstrength == 2, "RDF: unexpected split type at ClassifierSplit()");
    nclasses = s->nclasses;
    advanceby = 1;
@@ -11380,7 +11380,7 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
       for (j = 0; j < nclasses; j++) {
          k0 = workbuf->classtotals0.xZ[j];
          k1 = workbuf->classpriors.xZ[j] - k0;
-         rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+         rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
       }
       *threshold = v;
       *info = 1;
@@ -11425,7 +11425,7 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
       for (j = 0; j < nclasses; j++) {
          k0 = workbuf->classtotals0.xZ[j];
          k1 = workbuf->classpriors.xZ[j] - k0;
-         rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+         rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
       }
       *threshold = v;
       *info = 1;
@@ -11459,7 +11459,7 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
          for (j = 0; j < nclasses; j++) {
             k0 = workbuf->classtotals0.xZ[j];
             k1 = workbuf->classpriors.xZ[j] - k0;
-            rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+            rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
          }
          if (*info < 0 || rms < *e) {
             *info = 1;
@@ -11514,8 +11514,8 @@ static void dforest_regressionsplit(decisionforestbuilder *s, dfworkbuf *workbuf
    ae_int_t k0;
    ae_int_t k1;
    *info = 0;
-   *threshold = 0;
-   *e = 0;
+   *threshold = 0.0;
+   *e = 0.0;
    advanceby = 1;
    if (n >= 20) {
       advanceby = imax2(2, iround(n * 0.05));
@@ -11601,16 +11601,16 @@ static void dforest_regressionsplit(decisionforestbuilder *s, dfworkbuf *workbuf
       rms = 0.0;
       k0 = cnt0;
       k1 = total0 - cnt0;
-      rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+      rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
       k0 = cnt1;
       k1 = total1 - cnt1;
-      rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+      rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
       k0 = cnt2;
       k1 = total2 - cnt2;
-      rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+      rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
       k0 = cnt3;
       k1 = total3 - cnt3;
-      rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+      rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
       if (*info < 0 || rms < *e) {
          *info = 1;
          *e = rms;
@@ -11689,8 +11689,8 @@ static void dforest_evaluatedensesplit(decisionforestbuilder *s, dfworkbuf *work
    ae_int_t sl;
    ae_int_t sr;
    *info = 0;
-   *split = 0;
-   *rms = 0;
+   *split = 0.0;
+   *rms = 0.0;
    ae_assert(idx0 < idx1, "BuildRandomTreeRec: integrity check failed (8754)");
    nclasses = s->nclasses;
    if (s->dsbinary.xB[splitvar]) {
@@ -11719,7 +11719,7 @@ static void dforest_evaluatedensesplit(decisionforestbuilder *s, dfworkbuf *work
          for (j = 0; j < nclasses; j++) {
             k0 = workbuf->classtotals0.xZ[j];
             k1 = workbuf->classpriors.xZ[j] - k0;
-            *rms += k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
+            *rms += k0 * (1.0 - v0 * k0) + k1 * (1.0 - v1 * k1);
          }
          *rms = sqrt(*rms / (nclasses * (idx1 - idx0 + 1)));
       } else {
@@ -11792,7 +11792,7 @@ static void dforest_choosecurrentsplitdense(decisionforestbuilder *s, dfworkbuf 
    double currms;
    ae_int_t info;
    *varbest = 0;
-   *splitbest = 0;
+   *splitbest = 0.0;
    ae_assert(s->dstype == 0, "sparsity is not supported 4terg!");
    ae_assert(s->rdfalgo == 0, "BuildRandomTreeRec: integrity check failed (1657)");
    ae_assert(idx0 < idx1, "BuildRandomTreeRec: integrity check failed (3445)");
@@ -11905,7 +11905,7 @@ static double dforest_meannrms2(ae_int_t nclasses, ZVector *trnlabelsi, RVector 
       for (i = 0; i < nclasses; i++) {
          pitrn = tmpi->xZ[i] * invntrn;
          nitst = tmpi->xZ[i + nclasses];
-         result += nitst * (1 - pitrn) * (1 - pitrn);
+         result += nitst * (1.0 - pitrn) * (1.0 - pitrn);
          result += (ntst - nitst) * pitrn * pitrn;
       }
    } else {
@@ -12513,7 +12513,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
       nopermloss = losses.xR[nvars + 1];
       totalpermloss = losses.xR[nvars];
       for (i = 0; i < nvars; i++) {
-         rep->varimportances.xR[i] = 1 - nopermloss / totalpermloss - (1 - losses.xR[i] / totalpermloss);
+         rep->varimportances.xR[i] = 1.0 - nopermloss / totalpermloss - (1.0 - losses.xR[i] / totalpermloss);
          rep->varimportances.xR[i] = rboundval(rep->varimportances.xR[i], 0.0, 1.0);
       }
    // Compute topvars[] array
@@ -12775,9 +12775,9 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
             v = buf->trntotals.xR[i * nclasses + j];
             if (j == k) {
                rep->avgce -= log(coalesce(v, minrealnumber));
-               rep->rmserror += sqr(v - 1);
-               rep->avgerror += fabs(v - 1);
-               rep->avgrelerror += fabs(v - 1);
+               rep->rmserror += sqr(v - 1.0);
+               rep->avgerror += fabs(v - 1.0);
+               rep->avgrelerror += fabs(v - 1.0);
                avgrelcnt++;
             } else {
                rep->rmserror += sqr(v);
@@ -12786,9 +12786,9 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
             v = buf->oobtotals.xR[i * nclasses + j];
             if (j == k) {
                rep->oobavgce -= log(coalesce(v, minrealnumber));
-               rep->oobrmserror += sqr(v - 1);
-               rep->oobavgerror += fabs(v - 1);
-               rep->oobavgrelerror += fabs(v - 1);
+               rep->oobrmserror += sqr(v - 1.0);
+               rep->oobavgerror += fabs(v - 1.0);
+               rep->oobavgrelerror += fabs(v - 1.0);
                oobavgrelcnt++;
             } else {
                rep->oobrmserror += sqr(v);
@@ -13900,7 +13900,7 @@ double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
          }
          for (j = 0; j < df->nclasses; j++) {
             if (j == k) {
-               result += sqr(y.xR[j] - 1);
+               result += sqr(y.xR[j] - 1.0);
             } else {
                result += sqr(y.xR[j]);
             }
@@ -13948,7 +13948,7 @@ double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
          k = iround(xy->xyR[i][df->nvars]);
          for (j = 0; j < df->nclasses; j++) {
             if (j == k) {
-               result += fabs(y.xR[j] - 1);
+               result += fabs(y.xR[j] - 1.0);
             } else {
                result += fabs(y.xR[j]);
             }
@@ -13998,7 +13998,7 @@ double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
          k = iround(xy->xyR[i][df->nvars]);
          for (j = 0; j < df->nclasses; j++) {
             if (j == k) {
-               result += fabs(y.xR[j] - 1);
+               result += fabs(y.xR[j] - 1.0);
                relcnt++;
             }
          }
@@ -15312,12 +15312,12 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       }
    // Error using fast leave-one-out cross-validation
       p = ae_v_dotproduct(u.xyR[i], 1, u.xyR[i], 1, nvars);
-      if (p > 1 - epstol * machineepsilon) {
+      if (p > 1.0 - epstol * machineepsilon) {
          ar->cvdefects.xZ[ar->ncvdefects] = i;
          ar->ncvdefects++;
          continue;
       }
-      r = s->xR[i] * (r / s->xR[i] - b.xR[i] * p) / (1 - p);
+      r = s->xR[i] * (r / s->xR[i] - b.xR[i] * p) / (1.0 - p);
       ar->cvrmserror += sqr(r - xy->xyR[i][nvars]);
       ar->cvavgerror += fabs(r - xy->xyR[i][nvars]);
       if (xy->xyR[i][nvars] != 0.0) {
@@ -15715,13 +15715,13 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
    double t;
    double chi2;
    *info = 0;
-   *a = 0;
-   *b = 0;
-   *vara = 0;
-   *varb = 0;
-   *covab = 0;
-   *corrab = 0;
-   *p = 0;
+   *a = 0.0;
+   *b = 0.0;
+   *vara = 0.0;
+   *varb = 0.0;
+   *covab = 0.0;
+   *corrab = 0.0;
+   *p = 0.0;
    if (n < 2) {
       *info = -1;
       return;
@@ -15746,7 +15746,7 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
       sxx += sqr(xy->xyR[i][0]) / t;
    }
 // Test for condition number
-   t = sqrt(4 * sqr(sx) + sqr(ss - sxx));
+   t = sqrt(4.0 * sqr(sx) + sqr(ss - sxx));
    e1 = 0.5 * (ss + sxx + t);
    e2 = 0.5 * (ss + sxx - t);
    if (rmin2(e1, e2) <= 1000.0 * machineepsilon * rmax2(e1, e2)) {
@@ -15770,12 +15770,12 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
       for (i = 0; i < n; i++) {
          chi2 += sqr((xy->xyR[i][1] - *a - *b * xy->xyR[i][0]) / s->xR[i]);
       }
-      *p = incompletegammac((n - 2) / 2.0, chi2 / 2);
+      *p = incompletegammac((n - 2) / 2.0, chi2 / 2.0);
    } else {
       *p = 1.0;
    }
 // Calculate other parameters
-   *vara = (1 + sqr(sx) / (ss * stt)) / ss;
+   *vara = (1.0 + sqr(sx) / (ss * stt)) / ss;
    *varb = 1.0 / stt;
    *covab = -sx / (ss * stt);
    *corrab = *covab / sqrt(*vara * *varb);
@@ -15791,8 +15791,8 @@ void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b) {
    double p;
    ae_frame_make(&_frame_block);
    *info = 0;
-   *a = 0;
-   *b = 0;
+   *a = 0.0;
+   *b = 0.0;
    NewVector(s, 0, DT_REAL);
    if (n < 2) {
       *info = -1;
@@ -16093,7 +16093,7 @@ void filterema(RVector *x, ae_int_t n, double alpha) {
    }
 // Process
    for (i = 1; i < n; i++) {
-      x->xR[i] = alpha * x->xR[i] + (1 - alpha) * x->xR[i - 1];
+      x->xR[i] = alpha * x->xR[i] + (1.0 - alpha) * x->xR[i - 1];
    }
 }
 
@@ -16684,7 +16684,7 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits) {
          nu2 += v * v;
       }
       if (nu2 < 1.0 - 1000.0 * machineepsilon) {
-         rmatrixgemv(winw - 1, s->nbasis, 1.0 / (1 - nu2), &s->basist, 0, 0, 1, &s->tmp0, 0, 0.0, &s->forecasta, 0);
+         rmatrixgemv(winw - 1, s->nbasis, 1.0 / (1.0 - nu2), &s->basist, 0, 0, 1, &s->tmp0, 0, 0.0, &s->forecasta, 0);
       } else {
          degeneraterecurrence = true;
       }
@@ -18988,7 +18988,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
          v += w->xyR[i][k];
       }
       if (v < 0.0) {
-         ae_v_muld(&w->xyR[0][k], w->stride, nvars, -1);
+         ae_v_muld(&w->xyR[0][k], w->stride, nvars, -1.0);
       }
    }
    ae_frame_leave();
@@ -19859,13 +19859,13 @@ void mcpdsolve(mcpdstate *s) {
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         s->h.xR[i * n + j] = 2 * s->regterm;
+         s->h.xR[i * n + j] = 2.0 * s->regterm;
       }
    }
    for (k = 0; k < npairs; k++) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            s->h.xR[i * n + j] += 2 * sqr(s->effectivew.xR[i]) * sqr(s->data.xyR[k][j]);
+            s->h.xR[i * n + j] += 2.0 * sqr(s->effectivew.xR[i]) * sqr(s->data.xyR[k][j]);
          }
       }
    }
@@ -19956,7 +19956,7 @@ void mcpdsolve(mcpdstate *s) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                s->bs.f += vv * sqr(s->bs.x.xR[i * n + j] - s->priorp.xyR[i][j]);
-               s->bs.g.xR[i * n + j] = 2 * vv * (s->bs.x.xR[i * n + j] - s->priorp.xyR[i][j]);
+               s->bs.g.xR[i * n + j] = 2.0 * vv * (s->bs.x.xR[i * n + j] - s->priorp.xyR[i][j]);
             }
          }
       // calculate prediction error/gradient for K-th pair
@@ -19966,7 +19966,7 @@ void mcpdsolve(mcpdstate *s) {
                vv = s->effectivew.xR[i];
                s->bs.f += sqr(vv * (v - s->data.xyR[k][n + i]));
                for (j = 0; j < n; j++) {
-                  s->bs.g.xR[i * n + j] += 2 * vv * vv * (v - s->data.xyR[k][n + i]) * s->data.xyR[k][j];
+                  s->bs.g.xR[i * n + j] += 2.0 * vv * vv * (v - s->data.xyR[k][n + i]) * s->data.xyR[k][j];
                }
             }
          }
@@ -20647,7 +20647,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
       for (i = 0; i < (nvars + 1) * (nclasses - 1); i++) {
          lm->w.xR[offs + i] = 0.0;
       }
-      v = -2 * log(minrealnumber);
+      v = -2.0 * log(minrealnumber);
       k = iround(xy->xyR[0][nvars]);
       if (k == nclasses - 1) {
          for (i = 0; i < nclasses - 1; i++) {
@@ -20720,7 +20720,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
       if (spd) {
       // H is positive definite.
       // Step in Newton direction.
-         ae_v_muld(wdir.xR, 1, wcount, -1);
+         ae_v_muld(wdir.xR, 1, wcount, -1.0);
          spd = true;
       } else {
       // H is indefinite.
@@ -20849,11 +20849,11 @@ static void logit_mnlallerrors(logitmodel *lm, RMatrix *xy, ae_int_t npoints, do
    ae_int_t nclasses;
    ae_int_t i;
    ae_frame_make(&_frame_block);
-   *relcls = 0;
-   *avgce = 0;
-   *rms = 0;
-   *avg = 0;
-   *avgrel = 0;
+   *relcls = 0.0;
+   *avgce = 0.0;
+   *rms = 0.0;
+   *avg = 0.0;
+   *avgrel = 0.0;
    NewVector(buf, 0, DT_REAL);
    NewVector(workx, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -22564,7 +22564,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
             nu *= 2.0;
             continue;
          }
-         ae_v_muld(wdir.xR, 1, wcount, -1);
+         ae_v_muld(wdir.xR, 1, wcount, -1.0);
       // Lambda found.
       // 1. Save old w in WBase
       // 1. Test some stopping criterions
@@ -23064,9 +23064,9 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
             k = iround(testset.xyR[i][nin]);
             for (j = 0; j < nout; j++) {
                if (j == k) {
-                  cvrep->rmserror += sqr(y.xR[j] - 1);
-                  cvrep->avgerror += fabs(y.xR[j] - 1);
-                  cvrep->avgrelerror += fabs(y.xR[j] - 1);
+                  cvrep->rmserror += sqr(y.xR[j] - 1.0);
+                  cvrep->avgerror += fabs(y.xR[j] - 1.0);
+                  cvrep->avgrelerror += fabs(y.xR[j] - 1.0);
                   relcnt++;
                } else {
                   cvrep->rmserror += sqr(y.xR[j]);

@@ -204,8 +204,8 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2) {
    double u;
    double v;
    double s;
-   *x1 = 0;
-   *x2 = 0;
+   *x1 = 0.0;
+   *x2 = 0.0;
    while (true) {
       u = hqrndmiduniformr(state);
       v = hqrndmiduniformr(state);
@@ -213,7 +213,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2) {
       if (s > 0.0 && s < 1.0) {
       // two sqrt's instead of one to
       // avoid overflow when S is too small
-         s = sqrt(-2 * log(s)) / sqrt(s);
+         s = sqrt(-2.0 * log(s)) / sqrt(s);
          *x1 = u * s;
          *x2 = v * s;
          return;
@@ -302,14 +302,14 @@ void hqrndunit2(hqrndstate *state, double *x, double *y) {
    double v;
    double mx;
    double mn;
-   *x = 0;
-   *y = 0;
+   *x = 0.0;
+   *y = 0.0;
    do {
       hqrndnormal2(state, x, y);
    } while (!(*x != 0.0 || *y != 0.0));
    mx = rmax2(fabs(*x), fabs(*y));
    mn = rmin2(fabs(*x), fabs(*y));
-   v = mx * sqrt(1 + sqr(mn / mx));
+   v = mx * sqrt(1.0 + sqr(mn / mx));
    *x /= v;
    *y /= v;
 }
@@ -1079,7 +1079,7 @@ double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix 
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          if (c->xyB[i][j]) {
-            result += a->xyR[i][j] * (1 + b->xyR[i][j]);
+            result += a->xyR[i][j] * (1.0 + b->xyR[i][j]);
          }
       }
    }
@@ -1897,12 +1897,12 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             }
          }
       // Skip points with zero distance if self-matches are turned off
-         if (ptdist == 0 && !buf->selfmatch) {
+         if (ptdist == 0.0 && !buf->selfmatch) {
             continue;
          }
       // We CAN'T process point if R-criterion isn't satisfied,
       // i.e. (RNeeded != 0) and (PtDist > R).
-         if (buf->rneeded == 0 || ptdist <= buf->rneeded) {
+         if (buf->rneeded == 0.0 || ptdist <= buf->rneeded) {
          // R-criterion is satisfied, we must either:
          // * replace worst point, if (KNeeded != 0) and (KCur == KNeeded)
          //   (or skip, if worst point is better)
@@ -1993,7 +1993,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             buf->curboxmax.xR[d] = s;
          }
       // Decide: to dive into cell or not to dive
-         if (buf->rneeded != 0 && buf->curdist > buf->rneeded) {
+         if (buf->rneeded != 0.0 && buf->curdist > buf->rneeded) {
             todive = false;
          } else {
             if (buf->kcur < buf->kneeded || buf->kneeded == 0) {
@@ -2088,9 +2088,9 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
    buf->rneeded = 0.0;
    buf->selfmatch = selfmatch;
    if (kdt->normtype == 2) {
-      buf->approxf = 1.0 / sqr(1 + eps);
+      buf->approxf = 1.0 / sqr(1.0 + eps);
    } else {
-      buf->approxf = 1.0 / (1 + eps);
+      buf->approxf = 1.0 / (1.0 + eps);
    }
    buf->kcur = 0;
 // calculate distance from point to current bounding box
@@ -3187,7 +3187,7 @@ void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k) {
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_int_t *nodele, ae_int_t *nodege) {
    *d = 0;
-   *s = 0;
+   *s = 0.0;
    *nodele = 0;
    *nodege = 0;
    ae_assert(node >= 0, "KDTreeExploreSplit: incorrect node index");
