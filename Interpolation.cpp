@@ -2709,7 +2709,7 @@ void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentr
    for (i = 0; i < n; i++) {
       w.xR[i] = v;
       x.xR[i] = a + (b - a) * i / (n - 1);
-      v *= -(n - 1 - i);
+      v *= i + 1 - n;
       v /= i + 1;
    }
    barycentricbuildxyw(&x, y, &w, n, p);
@@ -3340,7 +3340,7 @@ double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t
          s1 += v * f->xR[i];
          s2 += v;
       }
-      w *= -(n - 1 - i);
+      w *= i + 1 - n;
       w /= i + 1;
    }
    result = s1 / s2;
@@ -4860,15 +4860,9 @@ static void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold
    double db;
    double t;
 // Prepare space
-   if (y != NULL) {
-      vectorsetlengthatleast(y, n2);
-   }
-   if (d1 != NULL) {
-      vectorsetlengthatleast(d1, n2);
-   }
-   if (d2 != NULL) {
-      vectorsetlengthatleast(d2, n2);
-   }
+   if (y != NULL) vectorsetlengthatleast(y, n2);
+   if (d1 != NULL) vectorsetlengthatleast(d1, n2);
+   if (d2 != NULL) vectorsetlengthatleast(d2, n2);
 // These assignments aren't actually needed
 // (variables are initialized in the loop below),
 // but without them compiler will complain about uninitialized locals
@@ -6644,10 +6638,9 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 //
 // Length of [A;B] must be positive and isn't zero, i.e. A != B and A < B.
 //
-// REMARK:
-//
-// If 'NR' is -1 its mean, than polinom has infiniti roots.
-// If 'NE' is -1 its mean, than polinom has infiniti extremums.
+// Remarks:
+// *	*nr == -1 means the polynomial has infinite roots.
+// *	*ne == -1 means the polynomial has infinite extrema.
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, double b, double *x0, double *x1, double *x2, double *ex0, double *ex1, ae_int_t *nr, ae_int_t *ne, RVector *tempdata) {
    ae_int_t i;

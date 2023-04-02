@@ -126,7 +126,7 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	The revision was done earlier, up front.
 	Corrections in the comments &amp; printouts; e.g.
 		"launcn" → "launch", "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
-		"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
+		"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure", "is't" ⇒ "isn't",
 		"⋯intial⋯" → "⋯initial⋯", "lentgh" → "length", "loosing" → "losing", "Additonally" → "Additionally",
 		"VIMP⋯" → "VIPM⋯", "fileds" → "fields", "ouput" → "output", "paremeter" → "parameter", "poportional" → "proportional".
 		"info" → "information", to prevent confusion with any variables of the same name.
@@ -300,8 +300,8 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 			redefined as task0 = splitlengtheven(tasksize), task1 = tasksize - task0;
 		―	Non-API routine sortmiddlei() removed and replaced by its duplicate tagsortmiddlei() [newly added to version 3.17.0].
 		―	Non-API routines tagsortmiddleir(), tagsortmiddlei() redeclared with default offset = 0, and recoded.
-			Non-API routione tagsortmiddleii() (add in version 3.19.0) redeclared with default offset = 0, and recoded.
-			Declarations changed from tagsortmiddlei*(a, b, offset, n) to tagsortmiddlei*(a, b, n, offset = 0).
+			Non-API routine tagsortmiddleii() (add in version 3.19.0) redeclared with default offset = 0, and recoded.
+			Declarations changed from tagsortmiddle*(a, b, offset, n) to tagsortmiddle*(a, b, n, offset = 0).
 		―	Non-API routines tagsortfast[ir]() recoded.
 		―	Local routines tsort_tagsortfast[ir]rec() recoded.
 		―	Local routine tsort_tagsortfastirec(a, b, bufa, bufb, i1, i2)
@@ -490,13 +490,28 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	∙	TestC.cpp: a hidden bug was inherited from the distribution version of ALGLIB
 		for version 3 RBF routines from somewhere in rbfv3build().
 	∙	It has not been resolved; the suppression of the testing errors are tagged as "//@@" in TestC.cpp.
+41	Belated changes/corrections from revisions predating 3.20.0.
+	∙	Arithmetic-folding that should have been done
+		―	Adding prefix + (yes, we actually do so, sometimes!)
+		―	Normalizing numerals (e.g. 5.0E-2 ⇒ 0.05)
+		―	Compile-time arithmetic (e.g. x ± 0 ⇒ x, 1 * x ⇒ x, 0 * x ⇒ 0, a + b * -1 ⇒ a - b, 5 * 100.0 ⇒ 500.0 etc.)
+		―	Grouping/bracketing (e.g. A + (B + C) ⇔ A + B + C, (A &amp;&amp; B) &amp;&amp; C ⇔ A &amp;&amp; B &amp;&amp; C).
+	∙	Normalizing comparisons
+		―	Near Comparisons; e.g. NearAtR(A, B + C, Epsilon) ⇒ NearAtR(A - B, C, Epsilon), where appropriate,
+		―	Complex Comparisons; e.g. !ae_c_neq(A, B) ⇒ ae_c_eq(A, B).
+	∙	Extraneous printouts (belatedly) removed.
+	∙	(Belated) removal of dead code.
+	∙	Normalization of conditionals (e.g. A / B &ge; C ⇒ A &ge; B * C, when B &gt; 0 is known).
+	∙	(Belated) normalizaiton of layout (e.g. if (A) { ⋯ break; } if (B) ⋯ ⇒ if (A) { ⋯ break; } else if (B) ⋯.
+	∙	Layout of comments and documentation fixed up.
+	∙	Routines local in Kernel*.cpp declared as static.
 42	Integration of structural and layout changes made in 3.20.0.
 	∙	Adding and Renaming/redeclaring "Class" constructors/destructors:
 		―	ae_init_op: inherited from ae_constructor in ALGLIB 3.20.0.
 		―	ae_copy_op: inherited from ae_copy_constructor in ALGLIB 3.20.0.
 		―	ae_free_op: inherited from ae_destructor in ALGLIB 3.20.0, and redefined as void (*ae_free_op)(void *, bool).
-		―       ae_deallocator: defined as void (*ae_deallocator)(void *), retained in place of ae_destructor for ae_dyn_block and ae_db_swap().
-		―       The source pointer in all the *_copy constructors has been made const.
+		―	ae_deallocator: defined as void (*ae_deallocator)(void *), retained in place of ae_destructor for ae_dyn_block and ae_db_swap().
+		―	The source pointer in all the *_copy constructors has been made const.
 	∙	Conversions of declared types to size_t
 		―	size_of_object in ae_shared_pool and ae_shared_pool_set_seed() redeclared as size_t.
 		―	size_of_object in ae_smart_ptr and obj_size in ae_smart_ptr_assign redeclared as size_t.
@@ -507,8 +522,8 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 		They are (for now) static local variables, which are already initialized to 0.
 	∙	Reorder the routines to match the topological sorting for 3.20.0; and fix the vertical layout.
 	∙	AlgLibInternal.{cpp,h}, TestC.cpp
-        	―	Restored unsetintegerarray(), unsetrealarray(): it was changed in 3.20.0 so that it is no longer a duplicate of SetVector().
-        	―	Restored unsetrealmatrix(): it was changed in 3.20.0 so that it is no longer a duplicate of SetMatrix().
+		―	Restored unsetintegerarray(), unsetrealarray(): it was changed in 3.20.0 so that it is no longer a duplicate of SetVector().
+		―	Restored unsetrealmatrix(): it was changed in 3.20.0 so that it is no longer a duplicate of SetMatrix().
 </pre>
 </p>
 <p>

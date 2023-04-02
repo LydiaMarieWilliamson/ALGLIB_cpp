@@ -126,6 +126,8 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 // -	a compiler which supports intrinsics.
 // The presence of _ALGLIB_HAS_???_INTRINSICS does NOT mean that our CPU actually supports these intrinsics -
 // such things should be determined by CurCPU, which is initialized on start-up.
+// (@) Start-up initialization removes direct support for "hot swapping" CPU's or for installations with hetergeneous CPU cores.
+//
 // It means that we are working under Intel and our compiler can issue SIMD-capable code.
 #if defined AE_CPU && AE_CPU == AE_INTEL // Intel definitions.
 // Other than Sun studio, we only assume that the compiler supports all instruction sets if something is not explicitly turned off.
@@ -582,9 +584,9 @@ typedef bool (*ae_stream_writer)(const char *S, ae_int_t Aux);
 //			(ANSI encoding is used, the buffer should be large enough to store all symbols and a trailing '\0').
 //	After being called by the X-core, this function must:
 //	-	skip all space and linefeed characters from the current position at the stream
-//		up to the first non-space non-linefeed character
-//	-	read exactly N symbols from the stream to the buffer; checking that they are all non-space non-linefeed ones
-//	-	append a trailing '\0' to the buffer
+//		up to the first non-space non-linefeed character,
+//	-	read exactly N symbols from the stream to the buffer; checking that they are all non-space non-linefeed ones,
+//	-	append a trailing '\0' to the buffer,
 //	-	return true for success, false if any of the conditions above fails,
 //		in which case, the contents of S are not used.
 typedef bool (*ae_stream_reader)(ae_int_t Aux, ae_int_t N, char *S);
@@ -749,20 +751,20 @@ extern const double pi;
 
 // Optimized shared C/C++ linear algebra code.
 #define ALGLIB_INTERCEPTS_ABLAS
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
-bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double Alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst);
-void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode);
-void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride);
+void _ialglib_mm22(double Alpha, const double *a, const double *b, ae_int_t k, double Beta, double *r, ae_int_t stride, ae_int_t store_mode);
+void _ialglib_mm22x2(double Alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double Beta, double *r, ae_int_t stride);
 
 // ABLASF kernels.
 bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
@@ -1263,10 +1265,10 @@ protected:
 //	All previously allocated memory is correctly freed on error.
    void attach_to(alglib_impl::x_matrix *new_ptr);
 #if 0 //(@) Not implemented.
-// This function initializes matrix and allocates own memory storage.
+// This function initializes the matrix and allocates its own memory storage.
 // NOTE:
-// *	initial state of wrapper object is assumed to be uninitialized;
-//	if This != NULL on entry, it is considered critical error (abort is called).
+// *	the initial state of the wrapper object is assumed to be uninitialized;
+//	if This != NULL on entry, it is considered a critical error (abort is called).
    void init(ae_int_t rows, ae_int_t cols, alglib_impl::ae_datatype datatype);
 #endif
 // Assign rhs to the current object and return *this.

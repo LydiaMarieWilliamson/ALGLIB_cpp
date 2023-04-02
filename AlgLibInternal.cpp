@@ -2028,7 +2028,7 @@ double rmaxv(ae_int_t n, RVector *x) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
-   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxv(n, x->xR));
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxv(n, x->xR))
 #endif
    if (n <= 0) return 0.0;
    double max = x->xR[0];
@@ -2159,7 +2159,7 @@ void rsetvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
 //	yp:	Elements [0,n) of yp are set to v.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 static void rsetm_simd(const ae_int_t n, const double v, double *yp) {
-   KerSubSse2Avx2(rsetv(n, v, yp));
+   KerSubSse2Avx2(rsetv(n, v, yp))
    for (ae_int_t j = 0; j < n; j++) yp[j] = v;
 }
 #endif
@@ -3495,7 +3495,7 @@ namespace alglib_impl {
 // library. It has similar functionality except for the fact that it  doesn't
 // handle errors when intermediate results cause an overflow.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
@@ -3598,7 +3598,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
 //                 transformation matrix which is given by Tau and V.
 //                 If N1 > N2 or M1 > M2, C is not modified.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
@@ -3645,7 +3645,7 @@ void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_i
 //                 transformation matrix which is given by Tau and V.
 //                 If N1 > N2 or M1 > M2, C is not modified.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
@@ -4423,7 +4423,7 @@ static void tsort_tagsortfastrec(double *ap, double *abp, ae_int_t n) {
 // 2.	these functions use buffer(s), bufa and bufb, that will be reallocated to size n, if necessary.
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
 void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n) {
-// Special case
+// Special case.
    if (n <= 1) return;
 // Test for already sorted set
    bool isascending = true, isdescending = true;
@@ -4440,7 +4440,7 @@ void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t
          swapi(&b->xZ[i], &b->xZ[j]);
       }
    } else {
-   // General case
+   // General case.
       if (bufa->cnt < n) ae_vector_set_length(bufa, n);
       if (bufb->cnt < n) ae_vector_set_length(bufb, n);
       tsort_tagsortfastirec(a->xR, b->xZ, bufa->xR, bufb->xZ, n);
@@ -4448,7 +4448,7 @@ void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t
 }
 
 void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n) {
-// Special case
+// Special case.
    if (n <= 1) return;
 // Test for already sorted set
    bool isascending = true, isdescending = true;
@@ -4465,7 +4465,7 @@ void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t
          swapr(&b->xR[i], &b->xR[j]);
       }
    } else {
-   // General case
+   // General case.
       if (bufa->cnt < n) ae_vector_set_length(bufa, n);
       if (bufb->cnt < n) ae_vector_set_length(bufb, n);
       tsort_tagsortfastrrec(a->xR, b->xR, bufa->xR, bufb->xR, n);
@@ -4473,7 +4473,7 @@ void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t
 }
 
 void tagsortfast(RVector *a, RVector *bufa, ae_int_t n) {
-// Special case
+// Special case.
    if (n <= 1) return;
 // Test for already sorted set
    bool isascending = true, isdescending = true;
@@ -4489,7 +4489,7 @@ void tagsortfast(RVector *a, RVector *bufa, ae_int_t n) {
          swapr(&a->xR[i], &a->xR[j]);
       }
    } else {
-   // General case
+   // General case.
       if (bufa->cnt < n) ae_vector_set_length(bufa, n);
       tsort_tagsortfastrec(a->xR, bufa->xR, n);
    }
@@ -6088,7 +6088,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
 //     X       -   solution. Array whose index ranges within [0..N-1].
 //     S       -   scaling factor.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      June 30, 1992
@@ -6633,7 +6633,6 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
          ks += k;
       }
       *r += s * ks;
-      v = fabs(*r);
       if (allzeros || s * n + mx == mx) {
          break;
       }
@@ -8479,8 +8478,6 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, dou
             ae_assert(subrow[ftbase_coltype] == ftbase_opstart, "ftbase_ftapplysubplan: incorrect child subplan header");
             ae_assert(supn == subn, "ftbase_ftapplysubplan: incorrect child subplan header");
             ae_int_t chunksize = imax2(ftbase_recursivethreshold / subn, 1);
-            ae_int_t lastchunksize = args % chunksize;
-            if (lastchunksize == 0) lastchunksize = chunksize;
             for (ae_int_t i = 0; i < args; i += chunksize) {
                chunksize = imin2(chunksize, args - i);
                ftbase_ftapplysubplan(plan, rowidx + param0, ap + i * subn, aoffset + i * subn, buf, chunksize);

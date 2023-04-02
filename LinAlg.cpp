@@ -127,7 +127,7 @@ ae_int_t gemmparallelsize() {
 // MODIFICATIONS:
 //     24.12.2005 sign(Alpha) was replaced with an analogous to the Fortran SIGN code.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
@@ -293,7 +293,7 @@ void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, 
 //                 transformation matrix which is given by Tau and V.
 //                 If N1 > N2 or M1 > M2, C is not modified.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
@@ -328,7 +328,7 @@ void applyreflectionfromtheleft(RMatrix *c, double tau, RVector *v, ae_int_t m1,
 //                 transformation matrix which is given by Tau and V.
 //                 If N1 > N2 or M1 > M2, C is not modified.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
@@ -12353,7 +12353,7 @@ static const ae_int_t evd_stepswithintol = 2;
 // The algorithm is due to Robert L. Smith and can be found
 // in D. Knuth, The art of Computer Programming, Vol.2, p.195
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1992
@@ -12406,7 +12406,7 @@ static void evd_internalhsevdladiv(double a, double b, double c, double d, doubl
 // Note: all input quantities are assumed to be smaller than overflow
 // by a reasonable factor.  (See BIGNUM.)
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1992
@@ -13621,7 +13621,7 @@ static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_i
 // On return, RT1 is the eigenvalue of larger absolute value, and RT2
 // is the eigenvalue of smaller absolute value.
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1992
@@ -13691,7 +13691,7 @@ static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2) 
 //    [ CS1  SN1 ] [  A   B  ] [ CS1 -SN1 ]  =  [ RT1  0  ]
 //    [-SN1  CS1 ] [  B   C  ] [ SN1  CS1 ]     [  0  RT2 ].
 //
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1992
@@ -21014,11 +21014,11 @@ namespace alglib_impl {
 // The recommended width of the SIMD-friendly buffer.
 // Informational function, useful for debugging.
 static ae_int_t spchol_spsymmgetmaxsimd() {
-#   if !defined ALGLIB_NO_FAST_KERNELS && AE_CPU == AE_INTEL
+#if !defined ALGLIB_NO_FAST_KERNELS && AE_CPU == AE_INTEL
    return 4;
-#   else
+#else
    return 1;
-#   endif
+#endif
 }
 
 // Fast kernels for small supernodal updates: special 4 x 4 x 4 x 4 function.
@@ -23450,7 +23450,7 @@ bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_i
             }
          // Analyze sparsity pattern of the current submatrix (TmpA), manually move completely dense rows to the end.
             if (m > 0) {
-               ae_assert((analysis->tmpa.m == m && analysis->tmpa.n == m) && analysis->tmpa.ninitialized == analysis->tmpa.ridx.xZ[m], "SPSymmAnalyze: integrity check failed (0572)");
+               ae_assert(analysis->tmpa.m == m && analysis->tmpa.n == m && analysis->tmpa.ninitialized == analysis->tmpa.ridx.xZ[m], "SPSymmAnalyze: integrity check failed (0572)");
                isetallocv(m, 1, &analysis->tmp0);
                for (i = 0; i < m; i++) {
                   j0 = analysis->tmpa.ridx.xZ[i];
@@ -27214,7 +27214,7 @@ static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n) {
 // Internal subroutine for matrix norm estimation
 // Return Value:
 // *	The condition (*kase != 0), indicating that iteration is in progress.
-//   -- LAPACK auxiliary routine (version 3.0) --
+// LAPACK auxiliary routine (version 3.0):
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      February 29, 1992

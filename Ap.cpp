@@ -68,7 +68,7 @@ namespace alglib_impl {
 #define AE_SER_ENTRIES_PER_ROW	5
 
 #if defined ALGLIB_REDZONE
-#   define _ALGLIB_REDZONE_VAL                 0x3c
+#   define _ALGLIB_REDZONE_VAL	0x3c
 #endif
 
 // These declarations are used to ensure, at compile-time, that
@@ -77,7 +77,7 @@ namespace alglib_impl {
 //	static char DummyArray[Cond ? +1 : -1];
 // that would lead to a syntax error if the condition failed (by declaring a negative array size).
 // You can remove them, if you want, since they are not used anywhere else.
-#define ForceCond(Arr, Cond)	static char Arr[(Cond) ? +1 : -1];
+#define ForceCond(Arr, Cond)	static char Arr[(Cond) ? +1 : -1]
 ForceCond(_ae_bool_must_be_8_bits_wide, (int)sizeof(bool) == 1);
 ForceCond(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t) == 4);
 ForceCond(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t) == 8);
@@ -345,7 +345,7 @@ static ae_cpuid_t ae_cpuid() {
 
 const/* AutoS */ae_cpuid_t CurCPU = ae_cpuid();
 
-// The number of cores in the system: values < 1 may be returned.
+// The number of cores in the system: values < 1 may be returned on error.
 ae_int_t ae_cores_count() {
 #if AE_OS == AE_POSIX
    return sysconf(_SC_NPROCESSORS_ONLN);
@@ -4660,16 +4660,16 @@ static bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_
 // *	handle the degenerate cases like zero matrices by ALGLIB++ - greatly simplifies passing data to ALGLIB++ kernel,
 // *	handle the general cases with the optimized ALGLIB++ kernel.
 
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc) {
    if (Alpha == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-   return _ialglib_rmatrixgemm(m, n, k, Alpha, _a->xyR[ia] + ja, _a->stride, opa, _b->xyR[ib] + jb, _b->stride, opb, Beta, _c->xyR[ic] + jc, _c->stride);
+   return _ialglib_rmatrixgemm(m, n, k, Alpha, a->xyR[ia] + ja, a->stride, opa, b->xyR[ib] + jb, b->stride, opb, Beta, c->xyR[ic] + jc, c->stride);
 }
 
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc) {
    if (Alpha.x == 0.0 && Alpha.y == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-   return _ialglib_cmatrixgemm(m, n, k, Alpha, _a->xyC[ia] + ja, _a->stride, opa, _b->xyC[ib] + jb, _b->stride, opb, Beta, _c->xyC[ic] + jc, _c->stride);
+   return _ialglib_cmatrixgemm(m, n, k, Alpha, a->xyC[ia] + ja, a->stride, opa, b->xyC[ib] + jb, b->stride, opb, Beta, c->xyC[ic] + jc, c->stride);
 }
 
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
@@ -5097,9 +5097,9 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
    void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = avx2_ablasf_daxpby;
 // Determine CPU and kernel support.
    if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(CurCPU & CPU_AVX2)) return false;
-#if defined _ALGLIB_HAS_FMA_INTRINSICS
+#   if defined _ALGLIB_HAS_FMA_INTRINSICS
    if (CurCPU & CPU_FMA) ablasf_dotblk = fma_ablasf_dotblkh;
-#endif
+#   endif
 // Prepare c.
    double *cp = c->xyR[ic] + jc;
    ae_int_t stride_c = c->stride;
@@ -5158,7 +5158,7 @@ static const char *_alglib_last_error = NULL;
 static void set_error_flag(const char *Msg) { _alglib_last_error = Msg == NULL ? "set_error_flag: unknown error" : Msg; }
 void set_error_msg() { _alglib_last_error = alglib_impl::CurMsg; }
 
-bool get_error_flag(const char **MsgP) {
+bool get_error_flag(const char **MsgP/* = NULL*/) {
    if (_alglib_last_error == NULL) return false;
    if (MsgP != NULL) *MsgP = _alglib_last_error;
    return true;

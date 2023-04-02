@@ -961,7 +961,7 @@ but when PA-RISC CPU is in its default state, it is silently converted to the qu
 </p>
 <p>
 <a name=gs_stdfunctions class=sheader></a><h3>5.5. Functions</h3>
-The most important "basic" functions from ALGLIB++ namespace (<code>Ap.h</code> header) are:
+The most important "basic" functions from ALGLIB++ alglib namespace (<code>Ap.h</code> header) are:
 <ul>
 <li><code>randomreal()</code> &mdash; returns random real number from [0,1)</li>
 <li><code>randominteger(mx)</code> &mdash; returns random integer number from [0,nx); <i>mx</i> must be less than RAND_MAX</li>
@@ -1364,7 +1364,7 @@ Future enhancements or additions include a larger set of DSP (and multi-precisio
 ]</font>
 </p>
 <p>
-<a name=gs_redzones class='sheader'></a><h3>7.1 Using Red Zones To Find Memory Access Violations</h3>
+<a name=gs_redzones class=sheader></a><h3>7.1. Using Red Zones To Find Memory Access Violations</h3>
 A ‟Red Zone” monitoring facility, added to ALGLIB in version 3.19.0, has also been incorporated into ALGLIB++.
 A Red Zone is a fixed size area added <i>before</i> and <i>after</i> each dynamically allocated block,
 that is filled by the special red zone control value during its allocation,
@@ -37721,7 +37721,7 @@ TERMINATION CODES
 
 TerminationType field contains completion code, which can be either:
 
-==== FAILURE CODE ====
+==== FAILURE CODES ====
   -8    internal integrity control detected  infinite  or  NAN  values  in
         function/gradient. Abnormal termination signaled.
   -3    box  constraints  are  infeasible.  Note: infeasibility of non-box
@@ -37729,7 +37729,7 @@ TerminationType field contains completion code, which can be either:
         examine  bcerr/lcerr/nlcerr   to  detect   possibly   inconsistent
         constraints.
 
-==== SUCCESS CODE ====
+==== SUCCESS CODES ====
    2    relative step is no more than EpsX.
    5    MaxIts steps was taken
    7    stopping conditions are too stringent,

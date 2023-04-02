@@ -388,7 +388,7 @@ void avx2_raddv(const ae_int_t n, const double alpha, const Real *__restrict y, 
    }
 }
 
-void raddvx_avx_xaligned(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
+static void raddvx_avx_xaligned(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
    ae_int_t i;
    const ae_int_t vecLen = (n >> 2) << 2;
    const __m256d avx2alpha = _mm256_set1_pd(alpha);
@@ -652,7 +652,7 @@ static void avx2_rcopyvx_xaligned(const ae_int_t n, const double *__restrict x, 
          const ae_int_t iSrc = i >> 2;
          const __m256d t = pSrc[iSrc];
          _mm_storeu_pd(y + i, _mm256_extractf128_pd(t, 0));
-         y[i + 2] = *(((const double *)&t) + 2);
+         y[i + 2] = *((const double *)&t + 2);
       }
       break;
    }
@@ -831,7 +831,7 @@ void avx2_rgemv_transposed(const ae_int_t m, const ae_int_t n, const double alph
    }
 }
 
-void avx2_rgemvx_straight_xaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
+static void avx2_rgemvx_straight_xaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    const __m256d *__restrict pX = (const __m256d *)x;
@@ -948,7 +948,7 @@ void avx2_rgemvx_straight(const ae_int_t m, const ae_int_t n, const double alpha
    avx2_rgemvx_straight_xaligned(m, n - shift, alpha, a, ia, ja + shift, x + shift, y);
 }
 
-void avx2_rgemvx_transposed_yaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
+static void avx2_rgemvx_transposed_yaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    __m256d *__restrict pY = (__m256d *)y;

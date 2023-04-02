@@ -445,7 +445,7 @@ void fasttransformplan_copy(void *_dst, const void *_src, bool make_automatic);
 void fasttransformplan_free(void *_p, bool make_automatic);
 
 double ftbasegetflopestimate(ae_int_t n);
-void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2);
+void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1p, ae_int_t *n2p);
 bool ftbaseissmooth(ae_int_t n);
 ae_int_t ftbasefindsmooth(ae_int_t n);
 ae_int_t ftbasefindsmootheven(ae_int_t n);

@@ -1891,7 +1891,7 @@ bool testhqrnd() {
    normsigmaerr = 0.0;
    testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
    if (means != 0.0) {
-      normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0.0) / means));
+      normsigmaerr = rmax2(normsigmaerr, fabs(mean / means));
    } else {
       normOk = false;
    }
@@ -1911,7 +1911,7 @@ bool testhqrnd() {
       normOk = normOk && means != 0.0;
       normOk = normOk && stddevs != 0.0;
       normsigmaerr = 0.0;
-      normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0.0) / coalesce(means, 1.0)));
+      normsigmaerr = rmax2(normsigmaerr, fabs(mean / coalesce(means, 1.0)));
       normsigmaerr = rmax2(normsigmaerr, fabs((stddev - 1.0) / coalesce(stddevs, 1.0)));
       normOk = normOk && normsigmaerr <= sigmathreshold;
    // Check that subsequent differences are normally distributed too
@@ -1923,7 +1923,7 @@ bool testhqrnd() {
       normOk = normOk && means != 0.0;
       normOk = normOk && stddevs != 0.0;
       normsigmaerr = 0.0;
-      normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0.0) / coalesce(means, 1.0)));
+      normsigmaerr = rmax2(normsigmaerr, fabs(mean / coalesce(means, 1.0)));
       normsigmaerr = rmax2(normsigmaerr, fabs((stddev - sqrt(2.0)) / coalesce(stddevs, 1.0)));
       normOk = normOk && normsigmaerr <= sigmathreshold;
    }
@@ -1943,7 +1943,7 @@ bool testhqrnd() {
    normOk = normOk && means != 0.0;
    normOk = normOk && stddevs != 0.0;
    normsigmaerr = 0.0;
-   normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0.0) / coalesce(means, 1.0)));
+   normsigmaerr = rmax2(normsigmaerr, fabs(mean / coalesce(means, 1.0)));
    normsigmaerr = rmax2(normsigmaerr, fabs((stddev - 1.0) / coalesce(stddevs, 1.0)));
    normOk = normOk && normsigmaerr <= sigmathreshold;
 // Test unit2
@@ -3503,7 +3503,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       cmatrixmv(m, n, &refca, aoffsi, aoffsj, opca, &cx, xoffs, &cy, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            Ok = Ok && !ae_c_neq_d(cy.xC[i], i);
+            Ok = Ok && ae_c_eq_d(cy.xC[i], i);
          } else {
             cv1 = cy.xC[i];
             cv2 = complex_from_d(0.0);
@@ -3908,7 +3908,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
-               Ok = Ok && !ae_c_neq_d(cb.xyC[i][j], 1 + 2 * i + 3 * j);
+               Ok = Ok && ae_c_eq_d(cb.xyC[i][j], 1 + 2 * i + 3 * j);
             } else {
                Ok = Ok && NearAtC(ca.xyC[aoffsi + i - boffsi][aoffsj + j - boffsj], cb.xyC[i][j], threshold);
             }
@@ -4905,7 +4905,7 @@ static bool testortfacunit_testcqrproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < imin2(i, n - 1); j++) {
-         Ok = Ok && !ae_c_neq_d(r.xyC[i][j], 0.0);
+         Ok = Ok && ae_c_eq_d(r.xyC[i][j], 0.0);
       }
    }
    for (i = 0; i < m; i++) {
@@ -5007,7 +5007,7 @@ static bool testortfacunit_testclqproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    }
    for (i = 0; i < m; i++) {
       for (j = imin2(i, n - 1) + 1; j < n; j++) {
-         Ok = Ok && !ae_c_neq_d(l.xyC[i][j], 0.0);
+         Ok = Ok && ae_c_eq_d(l.xyC[i][j], 0.0);
       }
    }
    for (i = 0; i < n; i++) {
@@ -5518,7 +5518,7 @@ bool testortfac() {
    rhessOk = true;
    rtdOk = true;
    ctdOk = true;
-   threshold = 5.0 * 1000.0 * machineepsilon;
+   threshold = 5000.0 * machineepsilon;
 // Medium-scale problems with various sparseness profiles
    for (mx = 1; mx <= 3 * matrixtilesizea() + 1; mx++) {
    // Rectangular factorizations: QR, LQ, bidiagonal
@@ -6377,7 +6377,7 @@ bool testmatgen() {
                }
             // test for difference in A and B
                if (n >= 2) {
-                  cOk = cOk && !ae_c_eq(ca.xyC[i][j], cb.xyC[i][j]);
+                  cOk = cOk && ae_c_neq(ca.xyC[i][j], cb.xyC[i][j]);
                }
             }
          }
@@ -6517,7 +6517,7 @@ bool testmatgen() {
                   cOk = cOk && SmallAtC(ct, threshold);
                }
             // test for difference in A and B
-               cOk = cOk && !ae_c_eq(ca.xyC[i][j], cb.xyC[i][j]);
+               cOk = cOk && ae_c_neq(ca.xyC[i][j], cb.xyC[i][j]);
             }
          }
          for (i = 0; i < n; i++) {
@@ -6566,7 +6566,7 @@ bool testmatgen() {
                   cOk = cOk && SmallAtC(ct, threshold);
                }
             // test for difference in A and B
-               cOk = cOk && !ae_c_eq(ca.xyC[i][j], cb.xyC[i][j]);
+               cOk = cOk && ae_c_neq(ca.xyC[i][j], cb.xyC[i][j]);
             }
          }
          for (i = 0; i < n; i++) {
@@ -6664,7 +6664,7 @@ bool testmatgen() {
          if (n >= 2) {
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  hpdOk = hpdOk && !ae_c_eq(ca.xyC[i][j], cb.xyC[i][j]);
+                  hpdOk = hpdOk && ae_c_neq(ca.xyC[i][j], cb.xyC[i][j]);
                }
             }
          }
@@ -6705,7 +6705,7 @@ bool testmatgen() {
          if (n >= 2) {
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  hOk = hOk && !ae_c_eq(ca.xyC[i][j], cb.xyC[i][j]);
+                  hOk = hOk && ae_c_neq(ca.xyC[i][j], cb.xyC[i][j]);
                }
             }
          }
@@ -7025,7 +7025,7 @@ bool testtsort() {
          for (i = 0; i < n; i++) {
             Ok = Ok && a4.xZ[i] == a0.xR[i];
          }
-      // Special test for TagSortMiddleIR: sorting in the middle gives same results
+      // Special test for tagsortmiddle: sorting in the middle gives same results
       // as sorting in the beginning of the array
          m = 3 * n;
          offs = randominteger(n);
@@ -8696,7 +8696,7 @@ static bool basicfuncrandomtest() {
                if (randominteger(2) == 0) {
                   sparseset(&s, i1, j1, 0.0);
                } else {
-                  sparseadd(&s, i1, j1, -1 * sparseget(&s, i1, j1));
+                  sparseadd(&s, i1, j1, -sparseget(&s, i1, j1));
                }
             }
          }
@@ -14282,7 +14282,7 @@ bool testtrfac() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j > i) {
-                  hpdOk = hpdOk && !ae_c_neq_d(cal.xyC[i][j], i);
+                  hpdOk = hpdOk && ae_c_eq_d(cal.xyC[i][j], i);
                } else {
                   vc = ae_v_cdotproduct(cal.xyC[i], 1, "N", cal.xyC[j], 1, "Conj", j + 1);
                   hpdOk = hpdOk && NearAtC(ca.xyC[i][j], vc, threshold);
@@ -14296,7 +14296,7 @@ bool testtrfac() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j < i) {
-                  hpdOk = hpdOk && !ae_c_neq_d(cau.xyC[i][j], j);
+                  hpdOk = hpdOk && ae_c_eq_d(cau.xyC[i][j], j);
                } else {
                   vc = ae_v_cdotproduct(&cau.xyC[0][i], cau.stride, "Conj", &cau.xyC[0][j], cau.stride, "N", i + 1);
                   hpdOk = hpdOk && NearAtC(ca.xyC[i][j], vc, threshold);
@@ -14457,10 +14457,10 @@ bool testpolynomialsolver() {
    a.xR[3] = 0.0;
    a.xR[4] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
-   Ok = Ok && !ae_c_neq_d(x.xC[0], 0.0);
-   Ok = Ok && !ae_c_neq_d(x.xC[1], 0.0);
-   Ok = Ok && !ae_c_neq_d(x.xC[2], 0.0);
-   Ok = Ok && !ae_c_neq_d(x.xC[3], 0.0);
+   Ok = Ok && ae_c_eq_d(x.xC[0], 0.0);
+   Ok = Ok && ae_c_eq_d(x.xC[1], 0.0);
+   Ok = Ok && ae_c_eq_d(x.xC[2], 0.0);
+   Ok = Ok && ae_c_eq_d(x.xC[3], 0.0);
    Ok = Ok && rep.maxerr <= 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
@@ -14469,11 +14469,11 @@ bool testpolynomialsolver() {
    a.xR[2] = 2.0;
    polynomialsolve(&a, n, &x, &rep);
    if (x.xC[0].x > x.xC[1].x) {
-      Ok = Ok && !ae_c_neq_d(x.xC[0], 0.0);
+      Ok = Ok && ae_c_eq_d(x.xC[0], 0.0);
       Ok = Ok && NearAtR(x.xC[1].x, -3.0 / 2.0, eps);
       Ok = Ok && x.xC[1].y == 0.0;
    } else {
-      Ok = Ok && !ae_c_neq_d(x.xC[1], 0.0);
+      Ok = Ok && ae_c_eq_d(x.xC[1], 0.0);
       Ok = Ok && NearAtR(x.xC[0].x, -3.0 / 2.0, eps);
       Ok = Ok && x.xC[0].y == 0.0;
    }
@@ -14819,7 +14819,7 @@ bool testbdsvd() {
    convOk = true;
    Ok = true;
    maxn = 15;
-   threshold = 5.0 * 100.0 * machineepsilon;
+   threshold = 500.0 * machineepsilon;
    ae_vector_set_length(&d, maxn);
    ae_vector_set_length(&e, maxn - 1);
 // special case: zero divide matrix
@@ -15057,7 +15057,7 @@ bool testsvd() {
    convOk = true;
    Ok = true;
    maxmn = 30;
-   threshold = 5.0 * 100.0 * machineepsilon;
+   threshold = 500.0 * machineepsilon;
    ae_matrix_set_length(&a, maxmn, maxmn);
 // TODO: div by zero fail, convergence fail
    for (gpass = 1; gpass <= 1; gpass++) {
@@ -16915,7 +16915,7 @@ bool testxblas() {
       xcdot(&cx, &cy, n, &temp, &cv2, &cv2err);
       exactnessOk = exactnessOk && cv2err >= 0.0;
       exactnessOk = exactnessOk && cv2err <= 4.0 * machineepsilon * abscomplex(cy.xC[0]) * n;
-      exactnessOk = exactnessOk && NearAtC(cv2, ae_c_mul_d(cy.xC[0], 1.0 * n), cv2err);
+      exactnessOk = exactnessOk && NearAtC(cv2, ae_c_mul_d(cy.xC[0], n), cv2err);
    }
 // The final report.
    Ok = approxOk && exactnessOk;
@@ -21079,7 +21079,7 @@ static bool testlincgunit_precondtest() {
       return Ok;
    }
    for (i = 0; i < n; i++) {
-      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 0.05 / d.xR[i])) {
          Ok = false;
          ae_frame_leave();
          return Ok;
@@ -21091,7 +21091,7 @@ static bool testlincgunit_precondtest() {
    if (rep.terminationtype > 0) {
       bflag = false;
       for (i = 0; i < n; i++) {
-         bflag = bflag || !NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i]);
+         bflag = bflag || !NearAtR(xe.xR[i], x0.xR[i], 0.05 / d.xR[i]);
       }
       if (!bflag) {
          Ok = false;
@@ -21108,7 +21108,7 @@ static bool testlincgunit_precondtest() {
       return Ok;
    }
    for (i = 0; i < n; i++) {
-      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 0.05 / d.xR[i])) {
          Ok = false;
          ae_frame_leave();
          return Ok;
@@ -21298,7 +21298,6 @@ bool testnormestimator() {
 // The final report.
    if (!Ok || !silent) {
       printf("Norm Estimator Test\n");
-      printf("Test:                                     %s\n", Ok ? "Ok" : "Failed");
       printf("Test %s\n", Ok ? "Passed" : "Failed");
    }
    ae_frame_leave();
@@ -22682,7 +22681,7 @@ static bool testlinlsqrunit_preconditionertest() {
       return Ok;
    }
    for (i = 0; i < n; i++) {
-      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 0.05 / d.xR[i])) {
          Ok = false;
          ae_frame_leave();
          return Ok;
@@ -22694,7 +22693,7 @@ static bool testlinlsqrunit_preconditionertest() {
    if (rep.terminationtype > 0) {
       bflag = false;
       for (i = 0; i < n; i++) {
-         bflag = bflag || !NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i]);
+         bflag = bflag || !NearAtR(xe.xR[i], x0.xR[i], 0.05 / d.xR[i]);
       }
       if (!bflag) {
          Ok = false;
@@ -22711,7 +22710,7 @@ static bool testlinlsqrunit_preconditionertest() {
       return Ok;
    }
    for (i = 0; i < n; i++) {
-      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 0.05 / d.xR[i])) {
          Ok = false;
          ae_frame_leave();
          return Ok;
@@ -23444,19 +23443,19 @@ static bool testmatinvunit_testctrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
          // Structural test
             if (isunit) {
                for (i = 0; i < n; i++) {
-                  Ok = Ok && !ae_c_neq(a.xyC[i][i], b.xyC[i][i]);
+                  Ok = Ok && ae_c_eq(a.xyC[i][i], b.xyC[i][i]);
                }
             }
             if (isupper) {
                for (i = 0; i < n; i++) {
                   for (j = 0; j < i; j++) {
-                     Ok = Ok && !ae_c_neq(a.xyC[i][j], b.xyC[i][j]);
+                     Ok = Ok && ae_c_eq(a.xyC[i][j], b.xyC[i][j]);
                   }
                }
             } else {
                for (i = 0; i < n; i++) {
                   for (j = i + 1; j < n; j++) {
-                     Ok = Ok && !ae_c_neq(a.xyC[i][j], b.xyC[i][j]);
+                     Ok = Ok && ae_c_eq(a.xyC[i][j], b.xyC[i][j]);
                   }
                }
             }
@@ -24984,7 +24983,7 @@ static bool testminlbfgsunit_testother() {
       while (minlbfgsiteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2.0) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
-            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) + 2.0 * (state.x.xR[2] - state.x.xR[0]) * (-1);
+            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) - 2.0 * (state.x.xR[2] - state.x.xR[0]);
             state.g.xR[1] = 2.0 * state.x.xR[1];
             state.g.xR[2] = 2.0 * (state.x.xR[2] - state.x.xR[0]);
             if (callidx == stopcallidx) {
@@ -28442,7 +28441,7 @@ static bool testminbleicunit_testother() {
       while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2.0) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
-            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) + 2.0 * (state.x.xR[2] - state.x.xR[0]) * (-1);
+            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) - 2.0 * (state.x.xR[2] - state.x.xR[0]);
             state.g.xR[1] = 2.0 * state.x.xR[1];
             state.g.xR[2] = 2.0 * (state.x.xR[2] - state.x.xR[0]);
             if (callidx == stopcallidx) {
@@ -29902,7 +29901,7 @@ static bool testminbleicunit_testoptguard() {
             x0.xR[i] = (1.0 + 0.1 * i) * s.xR[i];
             j = hqrnduniformi(&rs, 3);
             bndl.xR[i] = -100.0 * s.xR[i];
-            bndu.xR[i] = 100.0 * s.xR[i];
+            bndu.xR[i] = +100.0 * s.xR[i];
             if (j == 1) {
                bndl.xR[i] = x0.xR[i];
             }
@@ -31948,7 +31947,7 @@ static bool bleictests() {
    ae_vector_set_length(&x, n);
    for (i = 0; i < n; i++) {
       bndl.xR[i] = -1.0;
-      bndu.xR[i] = 1.0;
+      bndu.xR[i] = +1.0;
       x.xR[i] = randomreal() - 0.5;
    }
    minqpcreate(n, &state);
@@ -32014,7 +32013,7 @@ static bool bleictests() {
    Ok = Ok && rep.terminationtype > 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         Ok = Ok && (NearAtR(xend0.xR[i], -1.0, 100.0 * machineepsilon) || NearAtR(xend0.xR[i], 1.0, 100.0 * machineepsilon));
+         Ok = Ok && (NearAtR(xend0.xR[i], -1.0, 100.0 * machineepsilon) || NearAtR(xend0.xR[i], +1.0, 100.0 * machineepsilon));
       }
    }
    minqpsetlc(&state, &c, &ct, 2 * (n - 1));
@@ -32040,7 +32039,7 @@ static bool bleictests() {
    ae_vector_set_length(&b, n);
    for (i = 0; i < n; i++) {
       bndl.xR[i] = -1.0;
-      bndu.xR[i] = 1.0;
+      bndu.xR[i] = +1.0;
       b.xR[i] = randomnormal();
    }
    minqpcreate(n, &state);
@@ -32694,7 +32693,7 @@ static bool testminqpunit_bcqptest() {
          for (i = 0; i < n; i++) {
             b.xR[i] = hqrndnormal(&rs);
             bndl.xR[i] = -1.0;
-            bndu.xR[i] = 1.0;
+            bndu.xR[i] = +1.0;
             x0.xR[i] = hqrndmiduniformr(&rs);
          }
       // Solve problem:
@@ -32767,7 +32766,7 @@ static bool testminqpunit_bcqptest() {
                b.xR[i] = hqrndnormal(&rs);
             } while (b.xR[i] == 0.0);
             bndl.xR[i] = -1.0;
-            bndu.xR[i] = 1.0;
+            bndu.xR[i] = +1.0;
             x0.xR[i] = hqrndmiduniformr(&rs);
          }
       // Solve problem:
@@ -33007,7 +33006,7 @@ static bool testminqpunit_ecqptest() {
 //
 // NOTE: sometimes we need as much as 300 Augmented Lagrangian iterations for
 //       method to converge.
-   eps = 5.0E-2;
+   eps = 0.05;
    theta = 10000.0;
    aulits = 300;
    for (n = 4; n <= 6; n++) {
@@ -35348,7 +35347,7 @@ static bool testminqpunit_generallcqptest() {
                ae_vector_set_length(&bndu, n);
                for (i = 0; i < n; i++) {
                   bndl.xR[i] = -1.0;
-                  bndu.xR[i] = 1.0;
+                  bndu.xR[i] = +1.0;
                }
                rawccnt = imin2(3, n - 1);
                ae_matrix_set_length(&rawc, rawccnt, n + 1);
@@ -36179,7 +36178,7 @@ static bool testminqpunit_generallcqptest() {
             ae_vector_set_length(&bndu, n);
             for (i = 0; i < n; i++) {
                bndl.xR[i] = -1.0;
-               bndu.xR[i] = 1.0;
+               bndu.xR[i] = +1.0;
             }
             rawccnt = iround(pow(2.0, n));
             ae_matrix_set_length(&rawc, rawccnt, n + 1);
@@ -37932,7 +37931,7 @@ static bool testminqpunit_spectests() {
          rawa.xyR[i][i] = pow(2, hqrnduniformi(&rs, 9) - 4);
          b.xR[i] = hqrndnormal(&rs);
          bndl.xR[i] = -1.0;
-         bndu.xR[i] = 1.0;
+         bndu.xR[i] = +1.0;
          x0.xR[i] = 0.0;
       }
    // Create solver
@@ -38637,7 +38636,7 @@ static bool testminlmunit_testbc() {
          minlmresults(&state, &x, &rep);
          if (rep.terminationtype > 0) {
             for (i = 0; i < n; i++) {
-               Ok = Ok && NearAtR(x.xR[i], rboundval(xe.xR[i], bl.xR[i], bu.xR[i]), 5.0E-2);
+               Ok = Ok && NearAtR(x.xR[i], rboundval(xe.xR[i], bl.xR[i], bu.xR[i]), 0.05);
             }
          } else {
             Ok = false;
@@ -39524,7 +39523,7 @@ static bool testminlmunit_testoptguard() {
                x0.xR[i] = (1.0 + 0.1 * i) * s.xR[i];
                j = hqrnduniformi(&rs, 3);
                bndl.xR[i] = -100.0 * s.xR[i];
-               bndu.xR[i] = 100.0 * s.xR[i];
+               bndu.xR[i] = +100.0 * s.xR[i];
                if (j == 1) {
                   bndl.xR[i] = x0.xR[i];
                }
@@ -40136,7 +40135,7 @@ static bool testother() {
       while (mincgiteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2.0) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
-            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) + 2.0 * (state.x.xR[2] - state.x.xR[0]) * (-1);
+            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) - 2.0 * (state.x.xR[2] - state.x.xR[0]);
             state.g.xR[1] = 2.0 * state.x.xR[1];
             state.g.xR[2] = 2.0 * (state.x.xR[2] - state.x.xR[0]);
             if (callidx == stopcallidx) {
@@ -45708,7 +45707,7 @@ static bool testminnlcunit_testother() {
             x0.xR[i] = hqrndnormal(&rs);
             xu.xR[i] = hqrndnormal(&rs);
             bndl.xR[i] = -1000.0;
-            bndu.xR[i] = 1000.0;
+            bndu.xR[i] = +1000.0;
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
@@ -46008,7 +46007,7 @@ static bool testminnlcunit_testother() {
          while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = ss * sqr(exp(state.x.xR[0]) - 2.0) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
-               state.j.xyR[0][0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) + 2.0 * (state.x.xR[2] - state.x.xR[0]) * (-1);
+               state.j.xyR[0][0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) - 2.0 * (state.x.xR[2] - state.x.xR[0]);
                state.j.xyR[0][1] = 2.0 * state.x.xR[1];
                state.j.xyR[0][2] = 2.0 * (state.x.xR[2] - state.x.xR[0]);
                if (callidx == stopcallidx) {
@@ -46894,7 +46893,7 @@ static bool testminnlcunit_testoptguard() {
                   x0.xR[i] = (1.0 + 0.1 * i) * s.xR[i];
                   j = hqrnduniformi(&rs, 3);
                   bndl.xR[i] = -100.0 * s.xR[i];
-                  bndu.xR[i] = 100.0 * s.xR[i];
+                  bndu.xR[i] = +100.0 * s.xR[i];
                   if (j == 1) {
                      bndl.xR[i] = x0.xR[i];
                   }
@@ -48566,7 +48565,7 @@ static bool testminnsunit_testbc(bool *otherOkP) {
          for (i = 0; i < n; i++) {
             x0.xR[i] = randomreal() - 0.5;
             bndl.xR[i] = -1.0;
-            bndu.xR[i] = 1.0;
+            bndu.xR[i] = +1.0;
          }
          epsrad = 0.0001;
          xtol = 15.0 * epsrad;
@@ -50340,7 +50339,7 @@ static bool testminbcunit_testother() {
       while (minbciteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2.0) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
-            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) + 2.0 * (state.x.xR[2] - state.x.xR[0]) * (-1);
+            state.g.xR[0] = 2.0 * ss * (exp(state.x.xR[0]) - 2.0) * exp(state.x.xR[0]) - 2.0 * (state.x.xR[2] - state.x.xR[0]);
             state.g.xR[1] = 2.0 * state.x.xR[1];
             state.g.xR[2] = 2.0 * (state.x.xR[2] - state.x.xR[0]);
             if (callidx == stopcallidx) {
@@ -50813,7 +50812,7 @@ static bool testminbcunit_testoptguard() {
             x0.xR[i] = (1.0 + 0.1 * i) * s.xR[i];
             j = hqrnduniformi(&rs, 3);
             bndl.xR[i] = -100.0 * s.xR[i];
-            bndu.xR[i] = 100.0 * s.xR[i];
+            bndu.xR[i] = +100.0 * s.xR[i];
             if (j == 1) {
                bndl.xR[i] = x0.xR[i];
             }
@@ -55550,12 +55549,12 @@ bool testratint() {
       if (pass % 2 == 1) {
          h = 0.01 * maxrealnumber;
       }
-      x.xR[0] = 0.0 * h;
-      x.xR[1] = 1.0 * h;
+      x.xR[0] = 0.0;
+      x.xR[1] = h;
       x.xR[2] = 2.0 * h;
       x.xR[3] = 3.0 * h;
-      y.xR[0] = 0.0 * h;
-      y.xR[1] = 1.0 * h;
+      y.xR[0] = 0.0;
+      y.xR[1] = h;
       y.xR[2] = 2.0 * h;
       y.xR[3] = 3.0 * h;
       w.xR[0] = -1.0 / (x.xR[1] - x.xR[0]);
@@ -55588,12 +55587,12 @@ bool testratint() {
    ae_vector_set_length(&y, 4);
    ae_vector_set_length(&w, 4);
    h = 0.01 * maxrealnumber;
-   x.xR[0] = 0.0 * h;
-   x.xR[1] = 1.0 * h;
+   x.xR[0] = 0.0;
+   x.xR[1] = h;
    x.xR[2] = 2.0 * h;
    x.xR[3] = 3.0 * h;
-   y.xR[0] = 0.0 * h;
-   y.xR[1] = 1.0 * h;
+   y.xR[0] = 0.0;
+   y.xR[1] = h;
    y.xR[2] = 2.0 * h;
    y.xR[3] = 3.0 * h;
    w.xR[0] = -1.0 / (x.xR[1] - x.xR[0]);
@@ -55615,12 +55614,12 @@ bool testratint() {
    ae_vector_set_length(&y, 4);
    ae_vector_set_length(&w, 4);
    h = 2.0 * minrealnumber;
-   x.xR[0] = 0.0 * h;
-   x.xR[1] = 1.0 * h;
+   x.xR[0] = 0.0;
+   x.xR[1] = h;
    x.xR[2] = 2.0 * h;
    x.xR[3] = 3.0 * h;
-   y.xR[0] = 0.0 * h;
-   y.xR[1] = 1.0 * h;
+   y.xR[0] = 0.0;
+   y.xR[1] = h;
    y.xR[2] = 2.0 * h;
    y.xR[3] = 3.0 * h;
    w.xR[0] = -1.0 / (x.xR[1] - x.xR[0]);
@@ -58192,7 +58191,7 @@ bool testspline1d() {
       for (pass = 1; pass <= passcount; pass++) {
       // Prepare cubic spline
          a = -1.0 - 0.2 * randomreal();
-         b = 1.0 + 0.2 * randomreal();
+         b = +1.0 + 0.2 * randomreal();
          for (i = 0; i < n; i++) {
             x.xR[i] = a + (b - a) * i / (n - 1);
             y.xR[i] = sin(pi * x.xR[i] + 0.4) + exp(x.xR[i]);
@@ -68442,9 +68441,9 @@ static bool testrbfunit_basicxrbftest() {
                   for (j = 0; j < ny; j++) {
 #if 0 //@@
                      Ok = Ok && NearAtR(y.xR[j], xy.xyR[i][nx + j], errtol); //@@
-#else
+#else //@@
                      Ok = Ok && !(fabs(y.xR[j] - xy.xyR[i][nx + j]) > errtol); //@@
-#endif
+#endif //@@
                   }
                }
             }
@@ -68502,9 +68501,9 @@ static bool testrbfunit_basicxrbftest() {
                for (j = 0; j < ny; j++) {
 #if 0 //@@
                   Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol); //@@
-#else
+#else //@@
                   Ok = Ok && !(fabs(y.xR[j] - 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j])) > errtol); //@@
-#endif
+#endif //@@
                   refrms += sqr(y.xR[j] - xy2.xyR[2 * i][nx + j]) + sqr(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]);
                   refmax = rmax3(refmax, fabs(y.xR[j] - xy2.xyR[2 * i][nx + j]), fabs(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]));
                }
@@ -68513,10 +68512,10 @@ static bool testrbfunit_basicxrbftest() {
 #if 0 //@@
             Ok = Ok && NearAtR(refrms, rep.rmserror, errtol); //@@
             Ok = Ok && NearAtR(refmax, rep.maxerror, errtol); //@@
-#else
+#else //@@
             Ok = Ok && !(fabs(refrms - rep.rmserror) > errtol); //@@
             Ok = Ok && !(fabs(refmax - rep.maxerror) > errtol); //@@
-#endif
+#endif //@@
          }
       }
    }
@@ -72647,33 +72646,33 @@ bool testchebyshev() {
    chebyshevcoefficients(0, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] - 1.0));
    chebyshevcoefficients(1, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] - 1.0));
    chebyshevcoefficients(2, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] + 1.0));
-   cerr = rmax2(cerr, fabs(c.xR[1] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[1]));
    cerr = rmax2(cerr, fabs(c.xR[2] - 2.0));
    chebyshevcoefficients(3, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] + 3.0));
-   cerr = rmax2(cerr, fabs(c.xR[2] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[2]));
    cerr = rmax2(cerr, fabs(c.xR[3] - 4.0));
    chebyshevcoefficients(4, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] - 1.0));
-   cerr = rmax2(cerr, fabs(c.xR[1] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[1]));
    cerr = rmax2(cerr, fabs(c.xR[2] + 8.0));
-   cerr = rmax2(cerr, fabs(c.xR[3] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[3]));
    cerr = rmax2(cerr, fabs(c.xR[4] - 8.0));
    chebyshevcoefficients(9, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] - 9.0));
-   cerr = rmax2(cerr, fabs(c.xR[2] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[2]));
    cerr = rmax2(cerr, fabs(c.xR[3] + 120.0));
-   cerr = rmax2(cerr, fabs(c.xR[4] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[4]));
    cerr = rmax2(cerr, fabs(c.xR[5] - 432.0));
-   cerr = rmax2(cerr, fabs(c.xR[6] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[6]));
    cerr = rmax2(cerr, fabs(c.xR[7] + 576.0));
-   cerr = rmax2(cerr, fabs(c.xR[8] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[8]));
    cerr = rmax2(cerr, fabs(c.xR[9] - 256.0));
 // Testing FromChebyshev
    maxn = 10;
@@ -72775,37 +72774,37 @@ bool testhermite() {
    hermitecoefficients(0, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] - 1.0));
    hermitecoefficients(1, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] - 2.0));
    hermitecoefficients(2, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] + 2.0));
-   cerr = rmax2(cerr, fabs(c.xR[1] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[1]));
    cerr = rmax2(cerr, fabs(c.xR[2] - 4.0));
    hermitecoefficients(3, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] + 12.0));
-   cerr = rmax2(cerr, fabs(c.xR[2] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[2]));
    cerr = rmax2(cerr, fabs(c.xR[3] - 8.0));
    hermitecoefficients(4, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] - 12.0));
-   cerr = rmax2(cerr, fabs(c.xR[1] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[1]));
    cerr = rmax2(cerr, fabs(c.xR[2] + 48.0));
-   cerr = rmax2(cerr, fabs(c.xR[3] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[3]));
    cerr = rmax2(cerr, fabs(c.xR[4] - 16.0));
    hermitecoefficients(5, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] - 120.0));
-   cerr = rmax2(cerr, fabs(c.xR[2] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[2]));
    cerr = rmax2(cerr, fabs(c.xR[3] + 160.0));
-   cerr = rmax2(cerr, fabs(c.xR[4] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[4]));
    cerr = rmax2(cerr, fabs(c.xR[5] - 32.0));
    hermitecoefficients(6, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] + 120.0));
-   cerr = rmax2(cerr, fabs(c.xR[1] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[1]));
    cerr = rmax2(cerr, fabs(c.xR[2] - 720.0));
-   cerr = rmax2(cerr, fabs(c.xR[3] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[3]));
    cerr = rmax2(cerr, fabs(c.xR[4] + 480.0));
-   cerr = rmax2(cerr, fabs(c.xR[5] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[5]));
    cerr = rmax2(cerr, fabs(c.xR[6] - 64.0));
 // The final report.
    Ok = err <= threshold && sumerr <= threshold && cerr <= threshold;
@@ -72873,33 +72872,33 @@ bool testlegendre() {
    legendrecoefficients(0, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] - 1.0));
    legendrecoefficients(1, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0.0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] - 1.0));
    legendrecoefficients(2, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] + 1.0 / 2.0));
-   cerr = rmax2(cerr, fabs(c.xR[1] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[1]));
    cerr = rmax2(cerr, fabs(c.xR[2] - 3.0 / 2.0));
    legendrecoefficients(3, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] + 3.0 / 2.0));
-   cerr = rmax2(cerr, fabs(c.xR[2] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[2]));
    cerr = rmax2(cerr, fabs(c.xR[3] - 5.0 / 2.0));
    legendrecoefficients(4, &c);
    cerr = rmax2(cerr, fabs(c.xR[0] - 3.0 / 8.0));
-   cerr = rmax2(cerr, fabs(c.xR[1] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[1]));
    cerr = rmax2(cerr, fabs(c.xR[2] + 30.0 / 8.0));
-   cerr = rmax2(cerr, fabs(c.xR[3] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[3]));
    cerr = rmax2(cerr, fabs(c.xR[4] - 35.0 / 8.0));
    legendrecoefficients(9, &c);
-   cerr = rmax2(cerr, fabs(c.xR[0] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[0]));
    cerr = rmax2(cerr, fabs(c.xR[1] - 315.0 / 128.0));
-   cerr = rmax2(cerr, fabs(c.xR[2] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[2]));
    cerr = rmax2(cerr, fabs(c.xR[3] + 4620.0 / 128.0));
-   cerr = rmax2(cerr, fabs(c.xR[4] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[4]));
    cerr = rmax2(cerr, fabs(c.xR[5] - 18018.0 / 128.0));
-   cerr = rmax2(cerr, fabs(c.xR[6] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[6]));
    cerr = rmax2(cerr, fabs(c.xR[7] + 25740.0 / 128.0));
-   cerr = rmax2(cerr, fabs(c.xR[8] - 0));
+   cerr = rmax2(cerr, fabs(c.xR[8]));
    cerr = rmax2(cerr, fabs(c.xR[9] - 12155.0 / 128.0));
 // The final report.
    Ok = err <= threshold && sumerr <= threshold && cerr <= threshold;
@@ -75636,7 +75635,7 @@ static bool testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
          }
          for (i = 0; i < wcount; i++) {
             for (j = 0; j < wcount; j++) {
-               if (!SmallAtR(h1.xyR[i][j], 5.0E-2)) {
+               if (!SmallAtR(h1.xyR[i][j], 0.05)) {
                   Ok = Ok && NearAtR(h1.xyR[i][j], h2.xyR[i][j], fabs(h1.xyR[i][j]) * etol);
                } else {
                   Ok = Ok && NearAtR(h2.xyR[i][j], h1.xyR[i][j], etol);
@@ -81016,7 +81015,7 @@ bool testlinreg() {
                      for (j = 0; j < m; j++) {
                         xy.xyR[i][j] = 0.0;
                      }
-                     xy.xyR[i][0 + i % 3] = 1.0;
+                     xy.xyR[i][i % 3] = 1.0;
                      xy.xyR[i][3 + i / 3 % 3] = 1.0;
                      xy.xyR[i][6 + i / 9 % 3] = 1.0;
                      v = ae_v_dotproduct(xy.xyR[i], 1, ta.xR, 1, 9);
@@ -81802,7 +81801,7 @@ static bool testssaunit_testgeneral() {
             for (j = 0; j < nbasis; j++) {
                v = a.xyR[1][j] - a.xyR[0][j];
                for (i = 2; i < windowwidth; i++) {
-                  Ok = Ok && NearAtR(a.xyR[i][j], a.xyR[i - 1][j] + v, tol);
+                  Ok = Ok && NearAtR(a.xyR[i][j] - a.xyR[i - 1][j], v, tol);
                }
             }
          }
@@ -86023,7 +86022,7 @@ static bool testmlptrainunit_testmlptrainclass() {
       // Initialization:
       // * create negative part of the set;
          for (i = 0; i < n / 2; i++) {
-            xy.xyR[i][0] = -1 * ((mxc - mnc) * randomreal() + mnc);
+            xy.xyR[i][0] = -((mxc - mnc) * randomreal() + mnc);
             xy.xyR[i][1] = 0.0;
          }
       // * create positive part of the set;
@@ -86842,7 +86841,7 @@ static bool testmlptrainunit_testmlptrainensregr() {
    Ok = true;
 // This test checks ability to train ensemble on simple regression
 // problem "f(x0,x1,x2,...) = x0 + x1 + x2 + ...".
-   eps = 5.0E-2;
+   eps = 0.05;
    mnval = -1.0;
    mxval = 1.0;
    ntrain = 40;
@@ -86993,7 +86992,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
    NewMatrix(xytest, 0, 0, DT_REAL);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   eps = 5.0E-2;
+   eps = 0.05;
    delta = 0.1;
    ntrain = 90;
    ntest = 90;
@@ -88128,156 +88127,156 @@ static bool testalglibbasicsunit_testieeespecial() {
    okinf = okinf && !(+INFINITY == -INFINITY);
    okinf = okinf && !(+INFINITY == v2);
    okinf = okinf && !(+INFINITY == 0.0);
-   okinf = okinf && !(+INFINITY == 1.2);
+   okinf = okinf && !(+INFINITY == +1.2);
    okinf = okinf && !(+INFINITY == -1.2);
    okinf = okinf && v1 == +INFINITY;
    okinf = okinf && !(-INFINITY == +INFINITY);
    okinf = okinf && !(v2 == +INFINITY);
    okinf = okinf && !(0.0 == +INFINITY);
-   okinf = okinf && !(1.2 == +INFINITY);
+   okinf = okinf && !(+1.2 == +INFINITY);
    okinf = okinf && !(-1.2 == +INFINITY);
    okinf = okinf && !(+INFINITY != +INFINITY);
    okinf = okinf && !(+INFINITY != v1);
    okinf = okinf && +INFINITY != -INFINITY;
    okinf = okinf && +INFINITY != v2;
    okinf = okinf && +INFINITY != 0.0;
-   okinf = okinf && +INFINITY != 1.2;
+   okinf = okinf && +INFINITY != +1.2;
    okinf = okinf && +INFINITY != -1.2;
    okinf = okinf && !(v1 != +INFINITY);
    okinf = okinf && -INFINITY != +INFINITY;
    okinf = okinf && v2 != +INFINITY;
    okinf = okinf && 0.0 != +INFINITY;
-   okinf = okinf && 1.2 != +INFINITY;
+   okinf = okinf && +1.2 != +INFINITY;
    okinf = okinf && -1.2 != +INFINITY;
    okinf = okinf && !(+INFINITY < +INFINITY);
    okinf = okinf && !(+INFINITY < v1);
    okinf = okinf && !(+INFINITY < -INFINITY);
    okinf = okinf && !(+INFINITY < v2);
    okinf = okinf && !(+INFINITY < 0.0);
-   okinf = okinf && !(+INFINITY < 1.2);
+   okinf = okinf && !(+INFINITY < +1.2);
    okinf = okinf && !(+INFINITY < -1.2);
    okinf = okinf && !(v1 < +INFINITY);
    okinf = okinf && -INFINITY < +INFINITY;
    okinf = okinf && v2 < +INFINITY;
    okinf = okinf && 0.0 < +INFINITY;
-   okinf = okinf && 1.2 < +INFINITY;
+   okinf = okinf && +1.2 < +INFINITY;
    okinf = okinf && -1.2 < +INFINITY;
    okinf = okinf && +INFINITY <= +INFINITY;
    okinf = okinf && +INFINITY <= v1;
    okinf = okinf && !(+INFINITY <= -INFINITY);
    okinf = okinf && !(+INFINITY <= v2);
    okinf = okinf && !(+INFINITY <= 0.0);
-   okinf = okinf && !(+INFINITY <= 1.2);
+   okinf = okinf && !(+INFINITY <= +1.2);
    okinf = okinf && !(+INFINITY <= -1.2);
    okinf = okinf && v1 <= +INFINITY;
    okinf = okinf && -INFINITY <= +INFINITY;
    okinf = okinf && v2 <= +INFINITY;
    okinf = okinf && 0.0 <= +INFINITY;
-   okinf = okinf && 1.2 <= +INFINITY;
+   okinf = okinf && +1.2 <= +INFINITY;
    okinf = okinf && -1.2 <= +INFINITY;
    okinf = okinf && !(+INFINITY > +INFINITY);
    okinf = okinf && !(+INFINITY > v1);
    okinf = okinf && +INFINITY > -INFINITY;
    okinf = okinf && +INFINITY > v2;
    okinf = okinf && +INFINITY > 0.0;
-   okinf = okinf && +INFINITY > 1.2;
+   okinf = okinf && +INFINITY > +1.2;
    okinf = okinf && +INFINITY > -1.2;
    okinf = okinf && !(v1 > +INFINITY);
    okinf = okinf && !(-INFINITY > +INFINITY);
    okinf = okinf && !(v2 > +INFINITY);
    okinf = okinf && !(0.0 > +INFINITY);
-   okinf = okinf && !(1.2 > +INFINITY);
+   okinf = okinf && !(+1.2 > +INFINITY);
    okinf = okinf && !(-1.2 > +INFINITY);
    okinf = okinf && +INFINITY >= +INFINITY;
    okinf = okinf && +INFINITY >= v1;
    okinf = okinf && +INFINITY >= -INFINITY;
    okinf = okinf && +INFINITY >= v2;
    okinf = okinf && +INFINITY >= 0.0;
-   okinf = okinf && +INFINITY >= 1.2;
+   okinf = okinf && +INFINITY >= +1.2;
    okinf = okinf && +INFINITY >= -1.2;
    okinf = okinf && v1 >= +INFINITY;
    okinf = okinf && !(-INFINITY >= +INFINITY);
    okinf = okinf && !(v2 >= +INFINITY);
    okinf = okinf && !(0.0 >= +INFINITY);
-   okinf = okinf && !(1.2 >= +INFINITY);
+   okinf = okinf && !(+1.2 >= +INFINITY);
    okinf = okinf && !(-1.2 >= +INFINITY);
    okinf = okinf && !(-INFINITY == +INFINITY);
    okinf = okinf && !(-INFINITY == v1);
    okinf = okinf && -INFINITY == -INFINITY;
    okinf = okinf && -INFINITY == v2;
    okinf = okinf && !(-INFINITY == 0.0);
-   okinf = okinf && !(-INFINITY == 1.2);
+   okinf = okinf && !(-INFINITY == +1.2);
    okinf = okinf && !(-INFINITY == -1.2);
    okinf = okinf && !(v1 == -INFINITY);
    okinf = okinf && -INFINITY == -INFINITY;
    okinf = okinf && v2 == -INFINITY;
    okinf = okinf && !(0.0 == -INFINITY);
-   okinf = okinf && !(1.2 == -INFINITY);
+   okinf = okinf && !(+1.2 == -INFINITY);
    okinf = okinf && !(-1.2 == -INFINITY);
    okinf = okinf && -INFINITY != +INFINITY;
    okinf = okinf && -INFINITY != v1;
    okinf = okinf && !(-INFINITY != -INFINITY);
    okinf = okinf && !(-INFINITY != v2);
    okinf = okinf && -INFINITY != 0.0;
-   okinf = okinf && -INFINITY != 1.2;
+   okinf = okinf && -INFINITY != +1.2;
    okinf = okinf && -INFINITY != -1.2;
    okinf = okinf && v1 != -INFINITY;
    okinf = okinf && !(-INFINITY != -INFINITY);
    okinf = okinf && !(v2 != -INFINITY);
    okinf = okinf && 0.0 != -INFINITY;
-   okinf = okinf && 1.2 != -INFINITY;
+   okinf = okinf && +1.2 != -INFINITY;
    okinf = okinf && -1.2 != -INFINITY;
    okinf = okinf && -INFINITY < +INFINITY;
    okinf = okinf && -INFINITY < v1;
    okinf = okinf && !(-INFINITY < -INFINITY);
    okinf = okinf && !(-INFINITY < v2);
    okinf = okinf && -INFINITY < 0.0;
-   okinf = okinf && -INFINITY < 1.2;
+   okinf = okinf && -INFINITY < +1.2;
    okinf = okinf && -INFINITY < -1.2;
    okinf = okinf && !(v1 < -INFINITY);
    okinf = okinf && !(-INFINITY < -INFINITY);
    okinf = okinf && !(v2 < -INFINITY);
    okinf = okinf && !(0.0 < -INFINITY);
-   okinf = okinf && !(1.2 < -INFINITY);
+   okinf = okinf && !(+1.2 < -INFINITY);
    okinf = okinf && !(-1.2 < -INFINITY);
    okinf = okinf && -INFINITY <= +INFINITY;
    okinf = okinf && -INFINITY <= v1;
    okinf = okinf && -INFINITY <= -INFINITY;
    okinf = okinf && -INFINITY <= v2;
    okinf = okinf && -INFINITY <= 0.0;
-   okinf = okinf && -INFINITY <= 1.2;
+   okinf = okinf && -INFINITY <= +1.2;
    okinf = okinf && -INFINITY <= -1.2;
    okinf = okinf && !(v1 <= -INFINITY);
    okinf = okinf && -INFINITY <= -INFINITY;
    okinf = okinf && v2 <= -INFINITY;
    okinf = okinf && !(0.0 <= -INFINITY);
-   okinf = okinf && !(1.2 <= -INFINITY);
+   okinf = okinf && !(+1.2 <= -INFINITY);
    okinf = okinf && !(-1.2 <= -INFINITY);
    okinf = okinf && !(-INFINITY > +INFINITY);
    okinf = okinf && !(-INFINITY > v1);
    okinf = okinf && !(-INFINITY > -INFINITY);
    okinf = okinf && !(-INFINITY > v2);
    okinf = okinf && !(-INFINITY > 0.0);
-   okinf = okinf && !(-INFINITY > 1.2);
+   okinf = okinf && !(-INFINITY > +1.2);
    okinf = okinf && !(-INFINITY > -1.2);
    okinf = okinf && v1 > -INFINITY;
    okinf = okinf && !(-INFINITY > -INFINITY);
    okinf = okinf && !(v2 > -INFINITY);
    okinf = okinf && 0.0 > -INFINITY;
-   okinf = okinf && 1.2 > -INFINITY;
+   okinf = okinf && +1.2 > -INFINITY;
    okinf = okinf && -1.2 > -INFINITY;
    okinf = okinf && !(-INFINITY >= +INFINITY);
    okinf = okinf && !(-INFINITY >= v1);
    okinf = okinf && -INFINITY >= -INFINITY;
    okinf = okinf && -INFINITY >= v2;
    okinf = okinf && !(-INFINITY >= 0.0);
-   okinf = okinf && !(-INFINITY >= 1.2);
+   okinf = okinf && !(-INFINITY >= +1.2);
    okinf = okinf && !(-INFINITY >= -1.2);
    okinf = okinf && v1 >= -INFINITY;
    okinf = okinf && -INFINITY >= -INFINITY;
    okinf = okinf && v2 >= -INFINITY;
    okinf = okinf && 0.0 >= -INFINITY;
-   okinf = okinf && 1.2 >= -INFINITY;
+   okinf = okinf && +1.2 >= -INFINITY;
    okinf = okinf && -1.2 >= -INFINITY;
 // summary
    Ok = Ok && oknan && okinf && okother;
@@ -88465,7 +88464,7 @@ static bool testalglibbasicsunit_teststandardfunctions() {
    bool Ok;
    Ok = true;
 // Test sign()
-   Ok = Ok && sign(1.2) == 1 && sign(0.0) == 0 && sign(-1.2) == -1;
+   Ok = Ok && sign(+1.2) == +1 && sign(0.0) == 0 && sign(-1.2) == -1;
 // summary
    if (!silent) {
       printf("Standard Functions:                       %s\n", Ok ? "Ok" : "Failed");

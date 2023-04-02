@@ -350,7 +350,7 @@ void sse2_raddv(const ae_int_t n, const double alpha, const Real *__restrict y, 
    }
 }
 
-void sse2_raddvx_xaligned(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
+static void sse2_raddvx_xaligned(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
    ae_int_t i;
    const ae_int_t vecLen = (n >> 1) << 1;
    const __m128d sse2alpha = _mm_set1_pd(alpha);

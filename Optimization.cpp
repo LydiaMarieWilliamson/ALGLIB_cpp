@@ -2820,7 +2820,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
       // test intervals of sign change.
          if (funcidx == 0) {
          // Skip if not minimum
-            if (!(f1 < f0 + (noise0 + noise1) && f2 < f3 + noise2 + noise3)) {
+            if (!(f1 < f0 + (noise0 + noise1) && f2 < f3 + (noise2 + noise3))) {
                continue;
             }
          } else {
@@ -21609,23 +21609,22 @@ static void minlm_minlmstepfinderstart(minlmstepfinder *state, RMatrix *quadrati
 }
 
 // This function runs LM step search session.
-// //
-// // Find value of Levenberg-Marquardt damping parameter which:
-// // * leads to positive definite damped model
-// // * within bounds specified by StpMax
-// // * generates step which decreases function value
-// //
-// // After this block IFlag is set to:
-// // * -8:	if infinities/NANs were detected in function values/gradient
-// // * -3:	if constraints are infeasible
-// // * -2:	if model update is needed (either Lambda growth is too large
-// //		or step is too short, but we can't rely on model and stop iterations)
-// // * -1:	if model is fresh, Lambda have grown too large, termination is needed
-// // *  0:	if everything is OK, continue iterations
-// // * > 0:	successful completion (step size is small enough)
-// //
-// // State.Nu can have any value on enter, but after exit it is set to 1.0
-// //
+//
+// Find value of Levenberg-Marquardt damping parameter which:
+// * leads to positive definite damped model
+// * within bounds specified by StpMax
+// * generates step which decreases function value
+//
+// After this block IFlag is set to:
+// * -8:	if infinities/NANs were detected in function values/gradient
+// * -3:	if constraints are infeasible
+// * -2:	if model update is needed (either Lambda growth is too large
+//		or step is too short, but we can't rely on model and stop iterations)
+// * -1:	if model is fresh, Lambda have grown too large, termination is needed
+// *  0:	if everything is OK, continue iterations
+// * > 0:	successful completion (step size is small enough)
+//
+// State.Nu can have any value on enter, but after exit it is set to 1.0
 static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambdav, double *nu, RVector *xnew, RVector *deltax, bool *deltaxready, RVector *deltaf, bool *deltafready, ae_int_t *iflag, double *fnew, ae_int_t *ncholesky) {
    AutoS ae_int_t i;
    AutoS bool bflag;
@@ -21763,18 +21762,17 @@ Spawn:
       // Integrity check failed, break!
          *iflag = -8;
          break;
-      }
-      if (*fnew >= state->fbase) {
+      } else if (*fnew >= state->fbase) {
       // Increase lambda and continue
          if (!minlm_increaselambda(lambdav, nu)) {
             *iflag = -1;
             break;
          }
-         continue;
+      } else {
+      // We've found our step!
+         *iflag = 0;
+         break;
       }
-   // We've found our step!
-      *iflag = 0;
-      break;
    }
    *nu = 1.0;
    ae_assert(*iflag >= -3 && *iflag <= 0 || *iflag == -8 || *iflag > 0, "MinLM: internal integrity check failed!");
@@ -22482,18 +22480,17 @@ Spawn:
             // Integrity check failed, break!
                state->repterminationtype = -8;
                goto Exit;
-            }
-            if (state->f >= state->fbase) {
+            } else if (state->f >= state->fbase) {
             // Increase lambda and continue
                if (!minlm_increaselambda(&state->lambdav, &state->nu)) {
                   iflag = -1;
                   break;
                }
-               continue;
+            } else {
+            // We've found our step!
+               iflag = 0;
+               break;
             }
-         // We've found our step!
-            iflag = 0;
-            break;
          }
          if (state->userterminationneeded) {
          // User requested termination
@@ -25327,10 +25324,10 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
 // Too large Hessian updates sometimes may come from noisy or nonsmooth problems.
 //
 // Skip updates with max(Yk)^2/(Yk,Sk) >= BIG or max(H*Sk)^2/(Sk*H*Sk) >= BIG
-   if (sqr(mxy) / sy >= big) {
+   if (sqr(mxy) >= sy * big) {
       return result;
    }
-   if (sqr(mxhs) / shs >= big) {
+   if (sqr(mxhs) >= shs * big) {
       return result;
    }
 // Compare eigenvalues of H: old one removed by update, and new one.
@@ -26212,7 +26209,7 @@ Spawn:
 #if 0 //(@) Not used.
 // Perform aggressive probing of the search direction - additional function evaluations
 // which help us to determine possible discontinuity and nonsmoothness of the problem
-#   if 0
+#   if 0 //(@) Not used.
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
    smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
    while (smoothnessmonitorprobe(smonitor)) {
@@ -26238,10 +26235,8 @@ Spawn:
 #   endif
 // Update debug curvature information - TraceGamma[]
    v = 0.0;
-   double mx = 0.0;
    for (j = 0; j < n; j++) {
       vv = meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j];
-      mx = rmax2(mx, fabs(vv));
       v += vv * vv;
    }
    if (v > 0.0) {
@@ -26254,10 +26249,6 @@ Spawn:
       }
    }
 // Output other information
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      mx = rmax2(mx, fabs(meritstate->d.xR[i]) / state->trustrad);
-   }
    v = 0.0;
    for (i = 0; i < n; i++) {
       v += (meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i]) * (meritstate->stepknlaggrad.xR[i] - meritstate->stepklaggrad.xR[i]);
@@ -33316,7 +33307,7 @@ Spawn:
       goto Exit;
    }
 #if 0 //(@) Not used.
-#   if 0
+#   if 0 //(@) Not used.
    for (smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad); smoothnessmonitorprobe(smonitor); ) {
       for (j = 0; j < n; j++) {
          state13->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state13->d.xR[j];
@@ -33603,7 +33594,7 @@ Spawn:
          *gammamax = rmax2(*gammamax, fabs(vv / v));
       }
 #if 0 //(@) Not used.
-#   if 0
+#   if 0 //(@) Not used.
       for (smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad); smoothnessmonitorprobe(smonitor); ) {
          for (j = 0; j < n; j++) {
             state2->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state2->d.xR[j];
@@ -37242,7 +37233,7 @@ DefClass(minnlcstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) 
 //
 // TerminationType field contains completion code, which can be either:
 //
-// ==== FAILURE CODE ====
+// ==== FAILURE CODES ====
 //   -8    internal integrity control detected  infinite  or  NAN  values  in
 //         function/gradient. Abnormal termination signaled.
 //   -3    box  constraints  are  infeasible.  Note: infeasibility of non-box
@@ -37250,7 +37241,7 @@ DefClass(minnlcstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) 
 //         examine  bcerr/lcerr/nlcerr   to  detect   possibly   inconsistent
 //         constraints.
 //
-// ==== SUCCESS CODE ====
+// ==== SUCCESS CODES ====
 //    2    relative step is no more than EpsX.
 //    5    MaxIts steps was taken
 //    7    stopping conditions are too stringent,

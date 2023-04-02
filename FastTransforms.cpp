@@ -1211,7 +1211,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = (m + p - 1) / p * (2 * ftbasegetflopestimate(ptotal / 2) + 1 * (ptotal / 2));
+         flopcand = (m + p - 1) / p * (2 * ftbasegetflopestimate(ptotal / 2) + ptotal / 2);
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
