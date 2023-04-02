@@ -10781,9 +10781,9 @@ void sparsematrix_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->uidx, 0, DT_INT, make_automatic);
 }
 
-void sparsematrix_copy(void *_dst, void *_src, bool make_automatic) {
+void sparsematrix_copy(void *_dst, const void *_src, bool make_automatic) {
    sparsematrix *dst = (sparsematrix *)_dst;
-   sparsematrix *src = (sparsematrix *)_src;
+   const sparsematrix *src = (const sparsematrix *)_src;
    ae_vector_copy(&dst->vals, &src->vals, make_automatic);
    ae_vector_copy(&dst->idx, &src->idx, make_automatic);
    ae_vector_copy(&dst->ridx, &src->ridx, make_automatic);
@@ -10813,9 +10813,9 @@ void sparsebuffers_init(void *_p, bool make_automatic) {
    sparsematrix_init(&p->s, make_automatic);
 }
 
-void sparsebuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void sparsebuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    sparsebuffers *dst = (sparsebuffers *)_dst;
-   sparsebuffers *src = (sparsebuffers *)_src;
+   const sparsebuffers *src = (const sparsebuffers *)_src;
    ae_vector_copy(&dst->d, &src->d, make_automatic);
    ae_vector_copy(&dst->u, &src->u, make_automatic);
    sparsematrix_copy(&dst->s, &src->s, make_automatic);
@@ -17273,9 +17273,9 @@ void eigsubspacestate_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->ax, 0, 0, DT_REAL, make_automatic);
 }
 
-void eigsubspacestate_copy(void *_dst, void *_src, bool make_automatic) {
+void eigsubspacestate_copy(void *_dst, const void *_src, bool make_automatic) {
    eigsubspacestate *dst = (eigsubspacestate *)_dst;
-   eigsubspacestate *src = (eigsubspacestate *)_src;
+   const eigsubspacestate *src = (const eigsubspacestate *)_src;
    dst->n = src->n;
    dst->k = src->k;
    dst->nwork = src->nwork;
@@ -17337,9 +17337,9 @@ void eigsubspacestate_free(void *_p, bool make_automatic) {
 void eigsubspacereport_init(void *_p, bool make_automatic) {
 }
 
-void eigsubspacereport_copy(void *_dst, void *_src, bool make_automatic) {
+void eigsubspacereport_copy(void *_dst, const void *_src, bool make_automatic) {
    eigsubspacereport *dst = (eigsubspacereport *)_dst;
-   eigsubspacereport *src = (eigsubspacereport *)_src;
+   const eigsubspacereport *src = (const eigsubspacereport *)_src;
    dst->iterationscount = src->iterationscount;
 }
 
@@ -18949,9 +18949,9 @@ void sluv2list1matrix_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->strgval, 0, DT_REAL, make_automatic);
 }
 
-void sluv2list1matrix_copy(void *_dst, void *_src, bool make_automatic) {
+void sluv2list1matrix_copy(void *_dst, const void *_src, bool make_automatic) {
    sluv2list1matrix *dst = (sluv2list1matrix *)_dst;
-   sluv2list1matrix *src = (sluv2list1matrix *)_src;
+   const sluv2list1matrix *src = (const sluv2list1matrix *)_src;
    dst->nfixed = src->nfixed;
    dst->ndynamic = src->ndynamic;
    ae_vector_copy(&dst->idxfirst, &src->idxfirst, make_automatic);
@@ -18981,9 +18981,9 @@ void sluv2sparsetrail_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
 }
 
-void sluv2sparsetrail_copy(void *_dst, void *_src, bool make_automatic) {
+void sluv2sparsetrail_copy(void *_dst, const void *_src, bool make_automatic) {
    sluv2sparsetrail *dst = (sluv2sparsetrail *)_dst;
-   sluv2sparsetrail *src = (sluv2sparsetrail *)_src;
+   const sluv2sparsetrail *src = (const sluv2sparsetrail *)_src;
    dst->n = src->n;
    dst->k = src->k;
    ae_vector_copy(&dst->nzc, &src->nzc, make_automatic);
@@ -19020,9 +19020,9 @@ void sluv2densetrail_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->did, 0, DT_INT, make_automatic);
 }
 
-void sluv2densetrail_copy(void *_dst, void *_src, bool make_automatic) {
+void sluv2densetrail_copy(void *_dst, const void *_src, bool make_automatic) {
    sluv2densetrail *dst = (sluv2densetrail *)_dst;
-   sluv2densetrail *src = (sluv2densetrail *)_src;
+   const sluv2densetrail *src = (const sluv2densetrail *)_src;
    dst->n = src->n;
    dst->ndense = src->ndense;
    ae_matrix_copy(&dst->d, &src->d, make_automatic);
@@ -19054,9 +19054,9 @@ void sluv2buffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmpp, 0, DT_INT, make_automatic);
 }
 
-void sluv2buffer_copy(void *_dst, void *_src, bool make_automatic) {
+void sluv2buffer_copy(void *_dst, const void *_src, bool make_automatic) {
    sluv2buffer *dst = (sluv2buffer *)_dst;
-   sluv2buffer *src = (sluv2buffer *)_src;
+   const sluv2buffer *src = (const sluv2buffer *)_src;
    dst->n = src->n;
    sparsematrix_copy(&dst->sparsel, &src->sparsel, make_automatic);
    sparsematrix_copy(&dst->sparseut, &src->sparseut, make_automatic);
@@ -20812,9 +20812,9 @@ void amdnset_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->locationof, 0, DT_INT, make_automatic);
 }
 
-void amdnset_copy(void *_dst, void *_src, bool make_automatic) {
+void amdnset_copy(void *_dst, const void *_src, bool make_automatic) {
    amdnset *dst = (amdnset *)_dst;
-   amdnset *src = (amdnset *)_src;
+   const amdnset *src = (const amdnset *)_src;
    dst->n = src->n;
    dst->nstored = src->nstored;
    ae_vector_copy(&dst->items, &src->items, make_automatic);
@@ -20837,9 +20837,9 @@ void amdknset_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->data, 0, DT_INT, make_automatic);
 }
 
-void amdknset_copy(void *_dst, void *_src, bool make_automatic) {
+void amdknset_copy(void *_dst, const void *_src, bool make_automatic) {
    amdknset *dst = (amdknset *)_dst;
-   amdknset *src = (amdknset *)_src;
+   const amdknset *src = (const amdknset *)_src;
    dst->k = src->k;
    dst->n = src->n;
    ae_vector_copy(&dst->flagarray, &src->flagarray, make_automatic);
@@ -20871,9 +20871,9 @@ void amdvertexset_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->vnext, 0, DT_INT, make_automatic);
 }
 
-void amdvertexset_copy(void *_dst, void *_src, bool make_automatic) {
+void amdvertexset_copy(void *_dst, const void *_src, bool make_automatic) {
    amdvertexset *dst = (amdvertexset *)_dst;
-   amdvertexset *src = (amdvertexset *)_src;
+   const amdvertexset *src = (const amdvertexset *)_src;
    dst->n = src->n;
    dst->checkexactdegrees = src->checkexactdegrees;
    dst->smallestdegree = src->smallestdegree;
@@ -20902,9 +20902,9 @@ void amdllmatrix_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->entries, 0, DT_INT, make_automatic);
 }
 
-void amdllmatrix_copy(void *_dst, void *_src, bool make_automatic) {
+void amdllmatrix_copy(void *_dst, const void *_src, bool make_automatic) {
    amdllmatrix *dst = (amdllmatrix *)_dst;
-   amdllmatrix *src = (amdllmatrix *)_src;
+   const amdllmatrix *src = (const amdllmatrix *)_src;
    dst->n = src->n;
    ae_vector_copy(&dst->vbegin, &src->vbegin, make_automatic);
    ae_vector_copy(&dst->vcolcnt, &src->vcolcnt, make_automatic);
@@ -20949,9 +20949,9 @@ void amdbuffer_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->dbga, 0, 0, DT_REAL, make_automatic);
 }
 
-void amdbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void amdbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    amdbuffer *dst = (amdbuffer *)_dst;
-   amdbuffer *src = (amdbuffer *)_src;
+   const amdbuffer *src = (const amdbuffer *)_src;
    dst->n = src->n;
    dst->checkexactdegrees = src->checkexactdegrees;
    ae_vector_copy(&dst->iseliminated, &src->iseliminated, make_automatic);
@@ -24004,9 +24004,9 @@ void spcholanalysis_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->simdbuf, 0, DT_REAL, make_automatic);
 }
 
-void spcholanalysis_copy(void *_dst, void *_src, bool make_automatic) {
+void spcholanalysis_copy(void *_dst, const void *_src, bool make_automatic) {
    spcholanalysis *dst = (spcholanalysis *)_dst;
-   spcholanalysis *src = (spcholanalysis *)_src;
+   const spcholanalysis *src = (const spcholanalysis *)_src;
    dst->tasktype = src->tasktype;
    dst->n = src->n;
    dst->permtype = src->permtype;
@@ -25855,9 +25855,9 @@ void sparsedecompositionanalysis_init(void *_p, bool make_automatic) {
    sparsematrix_init(&p->crsat, make_automatic);
 }
 
-void sparsedecompositionanalysis_copy(void *_dst, void *_src, bool make_automatic) {
+void sparsedecompositionanalysis_copy(void *_dst, const void *_src, bool make_automatic) {
    sparsedecompositionanalysis *dst = (sparsedecompositionanalysis *)_dst;
-   sparsedecompositionanalysis *src = (sparsedecompositionanalysis *)_src;
+   const sparsedecompositionanalysis *src = (const sparsedecompositionanalysis *)_src;
    dst->n = src->n;
    dst->facttype = src->facttype;
    dst->permtype = src->permtype;
@@ -29712,9 +29712,9 @@ void fblslincgstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmp2, 0, DT_REAL, make_automatic);
 }
 
-void fblslincgstate_copy(void *_dst, void *_src, bool make_automatic) {
+void fblslincgstate_copy(void *_dst, const void *_src, bool make_automatic) {
    fblslincgstate *dst = (fblslincgstate *)_dst;
-   fblslincgstate *src = (fblslincgstate *)_src;
+   const fblslincgstate *src = (const fblslincgstate *)_src;
    dst->e1 = src->e1;
    dst->e2 = src->e2;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
@@ -29763,9 +29763,9 @@ void fblsgmresstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmp1, 0, DT_REAL, make_automatic);
 }
 
-void fblsgmresstate_copy(void *_dst, void *_src, bool make_automatic) {
+void fblsgmresstate_copy(void *_dst, const void *_src, bool make_automatic) {
    fblsgmresstate *dst = (fblsgmresstate *)_dst;
-   fblsgmresstate *src = (fblsgmresstate *)_src;
+   const fblsgmresstate *src = (const fblsgmresstate *)_src;
    ae_vector_copy(&dst->b, &src->b, make_automatic);
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->ax, &src->ax, make_automatic);
@@ -30016,9 +30016,9 @@ void normestimatorstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->mtv, 0, DT_REAL, make_automatic);
 }
 
-void normestimatorstate_copy(void *_dst, void *_src, bool make_automatic) {
+void normestimatorstate_copy(void *_dst, const void *_src, bool make_automatic) {
    normestimatorstate *dst = (normestimatorstate *)_dst;
-   normestimatorstate *src = (normestimatorstate *)_src;
+   const normestimatorstate *src = (const normestimatorstate *)_src;
    dst->n = src->n;
    dst->m = src->m;
    dst->nstart = src->nstart;
@@ -31380,9 +31380,9 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
 void matinvreport_init(void *_p, bool make_automatic) {
 }
 
-void matinvreport_copy(void *_dst, void *_src, bool make_automatic) {
+void matinvreport_copy(void *_dst, const void *_src, bool make_automatic) {
    matinvreport *dst = (matinvreport *)_dst;
-   matinvreport *src = (matinvreport *)_src;
+   const matinvreport *src = (const matinvreport *)_src;
    dst->r1 = src->r1;
    dst->rinf = src->rinf;
 }

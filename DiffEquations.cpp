@@ -408,9 +408,9 @@ void odesolverstate_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->rkk, 0, 0, DT_REAL, make_automatic);
 }
 
-void odesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
+void odesolverstate_copy(void *_dst, const void *_src, bool make_automatic) {
    odesolverstate *dst = (odesolverstate *)_dst;
-   odesolverstate *src = (odesolverstate *)_src;
+   const odesolverstate *src = (const odesolverstate *)_src;
    dst->n = src->n;
    dst->m = src->m;
    dst->xscale = src->xscale;
@@ -458,9 +458,9 @@ void odesolverstate_free(void *_p, bool make_automatic) {
 void odesolverreport_init(void *_p, bool make_automatic) {
 }
 
-void odesolverreport_copy(void *_dst, void *_src, bool make_automatic) {
+void odesolverreport_copy(void *_dst, const void *_src, bool make_automatic) {
    odesolverreport *dst = (odesolverreport *)_dst;
-   odesolverreport *src = (odesolverreport *)_src;
+   const odesolverreport *src = (const odesolverreport *)_src;
    dst->nfev = src->nfev;
    dst->terminationtype = src->terminationtype;
 }

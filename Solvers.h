@@ -23,7 +23,7 @@ struct polynomialsolverreport {
    double maxerr;
 };
 void polynomialsolverreport_init(void *_p, bool make_automatic);
-void polynomialsolverreport_copy(void *_dst, void *_src, bool make_automatic);
+void polynomialsolverreport_copy(void *_dst, const void *_src, bool make_automatic);
 void polynomialsolverreport_free(void *_p, bool make_automatic);
 
 void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep);
@@ -44,7 +44,7 @@ struct densesolverreport {
    double rinf;
 };
 void densesolverreport_init(void *_p, bool make_automatic);
-void densesolverreport_copy(void *_dst, void *_src, bool make_automatic);
+void densesolverreport_copy(void *_dst, const void *_src, bool make_automatic);
 void densesolverreport_free(void *_p, bool make_automatic);
 
 struct densesolverlsreport {
@@ -54,7 +54,7 @@ struct densesolverlsreport {
    ae_int_t k;
 };
 void densesolverlsreport_init(void *_p, bool make_automatic);
-void densesolverlsreport_copy(void *_dst, void *_src, bool make_automatic);
+void densesolverlsreport_copy(void *_dst, const void *_src, bool make_automatic);
 void densesolverlsreport_free(void *_p, bool make_automatic);
 
 void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix *x);
@@ -149,7 +149,7 @@ struct sparsesolverreport {
    double r2;
 };
 void sparsesolverreport_init(void *_p, bool make_automatic);
-void sparsesolverreport_copy(void *_dst, void *_src, bool make_automatic);
+void sparsesolverreport_copy(void *_dst, const void *_src, bool make_automatic);
 void sparsesolverreport_free(void *_p, bool make_automatic);
 
 void initsparsesolverreport(sparsesolverreport *rep);
@@ -200,7 +200,7 @@ struct sparsesolverstate {
    ae_int_t PQ;
 };
 void sparsesolverstate_init(void *_p, bool make_automatic);
-void sparsesolverstate_copy(void *_dst, void *_src, bool make_automatic);
+void sparsesolverstate_copy(void *_dst, const void *_src, bool make_automatic);
 void sparsesolverstate_free(void *_p, bool make_automatic);
 
 void sparsesolversetalgogmres(sparsesolverstate *state, ae_int_t k);
@@ -288,7 +288,7 @@ struct lincgstate {
    ae_int_t PQ;
 };
 void lincgstate_init(void *_p, bool make_automatic);
-void lincgstate_copy(void *_dst, void *_src, bool make_automatic);
+void lincgstate_copy(void *_dst, const void *_src, bool make_automatic);
 void lincgstate_free(void *_p, bool make_automatic);
 
 struct lincgreport {
@@ -298,7 +298,7 @@ struct lincgreport {
    double r2;
 };
 void lincgreport_init(void *_p, bool make_automatic);
-void lincgreport_copy(void *_dst, void *_src, bool make_automatic);
+void lincgreport_copy(void *_dst, const void *_src, bool make_automatic);
 void lincgreport_free(void *_p, bool make_automatic);
 
 void lincgcreate(ae_int_t n, lincgstate *state);
@@ -392,7 +392,7 @@ struct linlsqrstate {
    ae_int_t PQ;
 };
 void linlsqrstate_init(void *_p, bool make_automatic);
-void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic);
+void linlsqrstate_copy(void *_dst, const void *_src, bool make_automatic);
 void linlsqrstate_free(void *_p, bool make_automatic);
 
 struct linlsqrreport {
@@ -401,7 +401,7 @@ struct linlsqrreport {
    ae_int_t terminationtype;
 };
 void linlsqrreport_init(void *_p, bool make_automatic);
-void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic);
+void linlsqrreport_copy(void *_dst, const void *_src, bool make_automatic);
 void linlsqrreport_free(void *_p, bool make_automatic);
 
 void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state);
@@ -468,7 +468,7 @@ struct nleqstate {
    ae_vector cgbuf;
 };
 void nleqstate_init(void *_p, bool make_automatic);
-void nleqstate_copy(void *_dst, void *_src, bool make_automatic);
+void nleqstate_copy(void *_dst, const void *_src, bool make_automatic);
 void nleqstate_free(void *_p, bool make_automatic);
 
 struct nleqreport {
@@ -478,7 +478,7 @@ struct nleqreport {
    ae_int_t terminationtype;
 };
 void nleqreport_init(void *_p, bool make_automatic);
-void nleqreport_copy(void *_dst, void *_src, bool make_automatic);
+void nleqreport_copy(void *_dst, const void *_src, bool make_automatic);
 void nleqreport_free(void *_p, bool make_automatic);
 
 void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits);

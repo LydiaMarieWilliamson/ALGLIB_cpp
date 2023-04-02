@@ -28,7 +28,7 @@ struct barycentricinterpolant {
    ae_vector w;
 };
 void barycentricinterpolant_init(void *_p, bool make_automatic);
-void barycentricinterpolant_copy(void *_dst, void *_src, bool make_automatic);
+void barycentricinterpolant_copy(void *_dst, const void *_src, bool make_automatic);
 void barycentricinterpolant_free(void *_p, bool make_automatic);
 
 double barycentriccalc(barycentricinterpolant *b, double t);
@@ -69,7 +69,7 @@ struct idwcalcbuffer {
    kdtreerequestbuffer requestbuffer;
 };
 void idwcalcbuffer_init(void *_p, bool make_automatic);
-void idwcalcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void idwcalcbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void idwcalcbuffer_free(void *_p, bool make_automatic);
 
 struct idwmodel {
@@ -90,7 +90,7 @@ struct idwmodel {
    idwcalcbuffer buffer;
 };
 void idwmodel_init(void *_p, bool make_automatic);
-void idwmodel_copy(void *_dst, void *_src, bool make_automatic);
+void idwmodel_copy(void *_dst, const void *_src, bool make_automatic);
 void idwmodel_free(void *_p, bool make_automatic);
 void idwalloc(ae_serializer *s, idwmodel *model);
 void idwserialize(ae_serializer *s, idwmodel *model);
@@ -122,7 +122,7 @@ struct idwbuilder {
    ae_vector tmpmean;
 };
 void idwbuilder_init(void *_p, bool make_automatic);
-void idwbuilder_copy(void *_dst, void *_src, bool make_automatic);
+void idwbuilder_copy(void *_dst, const void *_src, bool make_automatic);
 void idwbuilder_free(void *_p, bool make_automatic);
 
 struct idwreport {
@@ -132,7 +132,7 @@ struct idwreport {
    double r2;
 };
 void idwreport_init(void *_p, bool make_automatic);
-void idwreport_copy(void *_dst, void *_src, bool make_automatic);
+void idwreport_copy(void *_dst, const void *_src, bool make_automatic);
 void idwreport_free(void *_p, bool make_automatic);
 
 void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf);
@@ -246,7 +246,7 @@ struct spline1dinterpolant {
    ae_vector c;
 };
 void spline1dinterpolant_init(void *_p, bool make_automatic);
-void spline1dinterpolant_copy(void *_dst, void *_src, bool make_automatic);
+void spline1dinterpolant_copy(void *_dst, const void *_src, bool make_automatic);
 void spline1dinterpolant_free(void *_p, bool make_automatic);
 
 struct spline1dfitreport {
@@ -257,7 +257,7 @@ struct spline1dfitreport {
    double maxerror;
 };
 void spline1dfitreport_init(void *_p, bool make_automatic);
-void spline1dfitreport_copy(void *_dst, void *_src, bool make_automatic);
+void spline1dfitreport_copy(void *_dst, const void *_src, bool make_automatic);
 void spline1dfitreport_free(void *_p, bool make_automatic);
 
 void heapsortdpoints(RVector *x, RVector *y, RVector *d, ae_int_t n);
@@ -340,7 +340,7 @@ struct polynomialfitreport {
    double maxerror;
 };
 void polynomialfitreport_init(void *_p, bool make_automatic);
-void polynomialfitreport_copy(void *_dst, void *_src, bool make_automatic);
+void polynomialfitreport_copy(void *_dst, const void *_src, bool make_automatic);
 void polynomialfitreport_free(void *_p, bool make_automatic);
 
 struct barycentricfitreport {
@@ -352,7 +352,7 @@ struct barycentricfitreport {
    double maxerror;
 };
 void barycentricfitreport_init(void *_p, bool make_automatic);
-void barycentricfitreport_copy(void *_dst, void *_src, bool make_automatic);
+void barycentricfitreport_copy(void *_dst, const void *_src, bool make_automatic);
 void barycentricfitreport_free(void *_p, bool make_automatic);
 
 struct lsfitreport {
@@ -371,7 +371,7 @@ struct lsfitreport {
    double r2;
 };
 void lsfitreport_init(void *_p, bool make_automatic);
-void lsfitreport_copy(void *_dst, void *_src, bool make_automatic);
+void lsfitreport_copy(void *_dst, const void *_src, bool make_automatic);
 void lsfitreport_free(void *_p, bool make_automatic);
 
 struct lsfitstate {
@@ -433,7 +433,7 @@ struct lsfitstate {
    ae_int_t PQ;
 };
 void lsfitstate_init(void *_p, bool make_automatic);
-void lsfitstate_copy(void *_dst, void *_src, bool make_automatic);
+void lsfitstate_copy(void *_dst, const void *_src, bool make_automatic);
 void lsfitstate_free(void *_p, bool make_automatic);
 
 void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t m, RVector *x2, RVector *y2, ae_int_t *nsections);
@@ -546,7 +546,7 @@ struct fitsphereinternalreport {
    ae_int_t iterationscount;
 };
 void fitsphereinternalreport_init(void *_p, bool make_automatic);
-void fitsphereinternalreport_copy(void *_dst, void *_src, bool make_automatic);
+void fitsphereinternalreport_copy(void *_dst, const void *_src, bool make_automatic);
 void fitsphereinternalreport_free(void *_p, bool make_automatic);
 
 void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, ae_int_t solvertype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, fitsphereinternalreport *rep);
@@ -577,7 +577,7 @@ struct pspline2interpolant {
    spline1dinterpolant y;
 };
 void pspline2interpolant_init(void *_p, bool make_automatic);
-void pspline2interpolant_copy(void *_dst, void *_src, bool make_automatic);
+void pspline2interpolant_copy(void *_dst, const void *_src, bool make_automatic);
 void pspline2interpolant_free(void *_p, bool make_automatic);
 
 struct pspline3interpolant {
@@ -589,7 +589,7 @@ struct pspline3interpolant {
    spline1dinterpolant z;
 };
 void pspline3interpolant_init(void *_p, bool make_automatic);
-void pspline3interpolant_copy(void *_dst, void *_src, bool make_automatic);
+void pspline3interpolant_copy(void *_dst, const void *_src, bool make_automatic);
 void pspline3interpolant_free(void *_p, bool make_automatic);
 
 void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p);
@@ -645,7 +645,7 @@ struct rbfv1calcbuffer {
    kdtreerequestbuffer requestbuffer;
 };
 void rbfv1calcbuffer_init(void *_p, bool make_automatic);
-void rbfv1calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv1calcbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv1calcbuffer_free(void *_p, bool make_automatic);
 
 struct rbfv1model {
@@ -663,7 +663,7 @@ struct rbfv1model {
    ae_vector calcbuftags;
 };
 void rbfv1model_init(void *_p, bool make_automatic);
-void rbfv1model_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv1model_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv1model_free(void *_p, bool make_automatic);
 void rbfv1alloc(ae_serializer *s, rbfv1model *model);
 void rbfv1serialize(ae_serializer *s, rbfv1model *model);
@@ -685,7 +685,7 @@ struct gridcalc3v1buf {
    ae_vector calcbuftags;
 };
 void gridcalc3v1buf_init(void *_p, bool make_automatic);
-void gridcalc3v1buf_copy(void *_dst, void *_src, bool make_automatic);
+void gridcalc3v1buf_copy(void *_dst, const void *_src, bool make_automatic);
 void gridcalc3v1buf_free(void *_p, bool make_automatic);
 
 struct rbfv1report {
@@ -697,7 +697,7 @@ struct rbfv1report {
    ae_int_t terminationtype;
 };
 void rbfv1report_init(void *_p, bool make_automatic);
-void rbfv1report_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv1report_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv1report_free(void *_p, bool make_automatic);
 
 void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s);
@@ -734,7 +734,7 @@ struct rbf3evaluator {
    ae_vector chunk1;
 };
 void rbf3evaluator_init(void *_p, bool make_automatic);
-void rbf3evaluator_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3evaluator_copy(void *_dst, const void *_src, bool make_automatic);
 void rbf3evaluator_free(void *_p, bool make_automatic);
 
 struct rbf3evaluatorbuffer {
@@ -748,7 +748,7 @@ struct rbf3evaluatorbuffer {
    ae_matrix deltabuf;
 };
 void rbf3evaluatorbuffer_init(void *_p, bool make_automatic);
-void rbf3evaluatorbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3evaluatorbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbf3evaluatorbuffer_free(void *_p, bool make_automatic);
 
 struct rbfv3calcbuffer {
@@ -760,7 +760,7 @@ struct rbfv3calcbuffer {
    ae_vector yg;
 };
 void rbfv3calcbuffer_init(void *_p, bool make_automatic);
-void rbfv3calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv3calcbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv3calcbuffer_free(void *_p, bool make_automatic);
 
 struct acbfbuilder {
@@ -788,7 +788,7 @@ struct acbfbuilder {
    ae_vector wrkidx;
 };
 void acbfbuilder_init(void *_p, bool make_automatic);
-void acbfbuilder_copy(void *_dst, void *_src, bool make_automatic);
+void acbfbuilder_copy(void *_dst, const void *_src, bool make_automatic);
 void acbfbuilder_free(void *_p, bool make_automatic);
 
 struct acbfbuffer {
@@ -817,7 +817,7 @@ struct acbfbuffer {
    ae_vector perm;
 };
 void acbfbuffer_init(void *_p, bool make_automatic);
-void acbfbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void acbfbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void acbfbuffer_free(void *_p, bool make_automatic);
 
 struct acbfchunk {
@@ -828,7 +828,7 @@ struct acbfchunk {
    ae_matrix s;
 };
 void acbfchunk_init(void *_p, bool make_automatic);
-void acbfchunk_copy(void *_dst, void *_src, bool make_automatic);
+void acbfchunk_copy(void *_dst, const void *_src, bool make_automatic);
 void acbfchunk_free(void *_p, bool make_automatic);
 
 struct rbf3ddmbuffer {
@@ -839,7 +839,7 @@ struct rbf3ddmbuffer {
    ae_vector tmpboxmax;
 };
 void rbf3ddmbuffer_init(void *_p, bool make_automatic);
-void rbf3ddmbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3ddmbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbf3ddmbuffer_free(void *_p, bool make_automatic);
 
 struct rbf3ddmsubproblem {
@@ -860,7 +860,7 @@ struct rbf3ddmsubproblem {
    ae_matrix wrkr;
 };
 void rbf3ddmsubproblem_init(void *_p, bool make_automatic);
-void rbf3ddmsubproblem_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3ddmsubproblem_copy(void *_dst, const void *_src, bool make_automatic);
 void rbf3ddmsubproblem_free(void *_p, bool make_automatic);
 
 struct rbf3ddmsolver {
@@ -881,7 +881,7 @@ struct rbf3ddmsolver {
    ae_int_t cntregqr;
 };
 void rbf3ddmsolver_init(void *_p, bool make_automatic);
-void rbf3ddmsolver_copy(void *_dst, void *_src, bool make_automatic);
+void rbf3ddmsolver_copy(void *_dst, const void *_src, bool make_automatic);
 void rbf3ddmsolver_free(void *_p, bool make_automatic);
 
 struct rbfv3model {
@@ -900,7 +900,7 @@ struct rbfv3model {
    bool dbgregqrusedforddm;
 };
 void rbfv3model_init(void *_p, bool make_automatic);
-void rbfv3model_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv3model_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv3model_free(void *_p, bool make_automatic);
 
 struct rbfv3report {
@@ -910,7 +910,7 @@ struct rbfv3report {
    ae_int_t iterationscount;
 };
 void rbfv3report_init(void *_p, bool make_automatic);
-void rbfv3report_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv3report_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv3report_free(void *_p, bool make_automatic);
 void rbfv3alloc(ae_serializer *s, rbfv3model *model);
 void rbfv3serialize(ae_serializer *s, rbfv3model *model);
@@ -943,7 +943,7 @@ struct spline2dinterpolant {
    ae_vector f;
 };
 void spline2dinterpolant_init(void *_p, bool make_automatic);
-void spline2dinterpolant_copy(void *_dst, void *_src, bool make_automatic);
+void spline2dinterpolant_copy(void *_dst, const void *_src, bool make_automatic);
 void spline2dinterpolant_free(void *_p, bool make_automatic);
 void spline2dalloc(ae_serializer *s, spline2dinterpolant *spline);
 void spline2dserialize(ae_serializer *s, spline2dinterpolant *spline);
@@ -975,7 +975,7 @@ struct spline2dbuilder {
    ae_int_t maxcoresize;
 };
 void spline2dbuilder_init(void *_p, bool make_automatic);
-void spline2dbuilder_copy(void *_dst, void *_src, bool make_automatic);
+void spline2dbuilder_copy(void *_dst, const void *_src, bool make_automatic);
 void spline2dbuilder_free(void *_p, bool make_automatic);
 
 struct spline2dfitreport {
@@ -985,7 +985,7 @@ struct spline2dfitreport {
    double r2;
 };
 void spline2dfitreport_init(void *_p, bool make_automatic);
-void spline2dfitreport_copy(void *_dst, void *_src, bool make_automatic);
+void spline2dfitreport_copy(void *_dst, const void *_src, bool make_automatic);
 void spline2dfitreport_free(void *_p, bool make_automatic);
 
 struct spline2dxdesignmatrix {
@@ -1007,7 +1007,7 @@ struct spline2dxdesignmatrix {
    ae_matrix tmp2;
 };
 void spline2dxdesignmatrix_init(void *_p, bool make_automatic);
-void spline2dxdesignmatrix_copy(void *_dst, void *_src, bool make_automatic);
+void spline2dxdesignmatrix_copy(void *_dst, const void *_src, bool make_automatic);
 void spline2dxdesignmatrix_free(void *_p, bool make_automatic);
 
 struct spline2dblockllsbuf {
@@ -1021,7 +1021,7 @@ struct spline2dblockllsbuf {
    ae_vector tmp1;
 };
 void spline2dblockllsbuf_init(void *_p, bool make_automatic);
-void spline2dblockllsbuf_copy(void *_dst, void *_src, bool make_automatic);
+void spline2dblockllsbuf_copy(void *_dst, const void *_src, bool make_automatic);
 void spline2dblockllsbuf_free(void *_p, bool make_automatic);
 
 struct spline2dfastddmbuf {
@@ -1033,7 +1033,7 @@ struct spline2dfastddmbuf {
    spline2dblockllsbuf blockllsbuf;
 };
 void spline2dfastddmbuf_init(void *_p, bool make_automatic);
-void spline2dfastddmbuf_copy(void *_dst, void *_src, bool make_automatic);
+void spline2dfastddmbuf_copy(void *_dst, const void *_src, bool make_automatic);
 void spline2dfastddmbuf_free(void *_p, bool make_automatic);
 
 double spline2dcalc(spline2dinterpolant *c, double x, double y);
@@ -1122,7 +1122,7 @@ struct rbfv2calcbuffer {
    ae_vector y123;
 };
 void rbfv2calcbuffer_init(void *_p, bool make_automatic);
-void rbfv2calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2calcbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv2calcbuffer_free(void *_p, bool make_automatic);
 
 struct rbfv2model {
@@ -1146,7 +1146,7 @@ struct rbfv2model {
    rbfv2calcbuffer calcbuf;
 };
 void rbfv2model_init(void *_p, bool make_automatic);
-void rbfv2model_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2model_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv2model_free(void *_p, bool make_automatic);
 void rbfv2alloc(ae_serializer *s, rbfv2model *model);
 void rbfv2serialize(ae_serializer *s, rbfv2model *model);
@@ -1162,7 +1162,7 @@ struct rbfv2gridcalcbuffer {
    ae_vector rf;
 };
 void rbfv2gridcalcbuffer_init(void *_p, bool make_automatic);
-void rbfv2gridcalcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2gridcalcbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv2gridcalcbuffer_free(void *_p, bool make_automatic);
 
 struct rbfv2report {
@@ -1171,7 +1171,7 @@ struct rbfv2report {
    double rmserror;
 };
 void rbfv2report_init(void *_p, bool make_automatic);
-void rbfv2report_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2report_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfv2report_free(void *_p, bool make_automatic);
 
 void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s);
@@ -1210,7 +1210,7 @@ struct spline3dinterpolant {
    ae_vector f;
 };
 void spline3dinterpolant_init(void *_p, bool make_automatic);
-void spline3dinterpolant_copy(void *_dst, void *_src, bool make_automatic);
+void spline3dinterpolant_copy(void *_dst, const void *_src, bool make_automatic);
 void spline3dinterpolant_free(void *_p, bool make_automatic);
 
 void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVector *f);
@@ -1266,7 +1266,7 @@ struct rbfcalcbuffer {
    ae_vector dy;
 };
 void rbfcalcbuffer_init(void *_p, bool make_automatic);
-void rbfcalcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfcalcbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfcalcbuffer_free(void *_p, bool make_automatic);
 
 struct rbfmodel {
@@ -1298,7 +1298,7 @@ struct rbfmodel {
    bool terminationrequest;
 };
 void rbfmodel_init(void *_p, bool make_automatic);
-void rbfmodel_copy(void *_dst, void *_src, bool make_automatic);
+void rbfmodel_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfmodel_free(void *_p, bool make_automatic);
 void rbfalloc(ae_serializer *s, rbfmodel *model);
 void rbfserialize(ae_serializer *s, rbfmodel *model);
@@ -1315,7 +1315,7 @@ struct rbfreport {
    ae_int_t terminationtype;
 };
 void rbfreport_init(void *_p, bool make_automatic);
-void rbfreport_copy(void *_dst, void *_src, bool make_automatic);
+void rbfreport_copy(void *_dst, const void *_src, bool make_automatic);
 void rbfreport_free(void *_p, bool make_automatic);
 
 void rbfcreatecalcbuffer(rbfmodel *s, rbfcalcbuffer *buf);

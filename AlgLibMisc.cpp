@@ -389,9 +389,9 @@ double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n) {
 void hqrndstate_init(void *_p, bool make_automatic) {
 }
 
-void hqrndstate_copy(void *_dst, void *_src, bool make_automatic) {
+void hqrndstate_copy(void *_dst, const void *_src, bool make_automatic) {
    hqrndstate *dst = (hqrndstate *)_dst;
-   hqrndstate *src = (hqrndstate *)_src;
+   const hqrndstate *src = (const hqrndstate *)_src;
    dst->s1 = src->s1;
    dst->s2 = src->s2;
    dst->magicv = src->magicv;
@@ -1091,9 +1091,9 @@ void xdebugrecord1_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->a, 0, DT_REAL, make_automatic);
 }
 
-void xdebugrecord1_copy(void *_dst, void *_src, bool make_automatic) {
+void xdebugrecord1_copy(void *_dst, const void *_src, bool make_automatic) {
    xdebugrecord1 *dst = (xdebugrecord1 *)_dst;
-   xdebugrecord1 *src = (xdebugrecord1 *)_src;
+   const xdebugrecord1 *src = (const xdebugrecord1 *)_src;
    dst->i = src->i;
    dst->c = src->c;
    ae_vector_copy(&dst->a, &src->a, make_automatic);
@@ -3302,9 +3302,9 @@ void kdtreerequestbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->curboxmax, 0, DT_REAL, make_automatic);
 }
 
-void kdtreerequestbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void kdtreerequestbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    kdtreerequestbuffer *dst = (kdtreerequestbuffer *)_dst;
-   kdtreerequestbuffer *src = (kdtreerequestbuffer *)_src;
+   const kdtreerequestbuffer *src = (const kdtreerequestbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->boxmin, &src->boxmin, make_automatic);
    ae_vector_copy(&dst->boxmax, &src->boxmax, make_automatic);
@@ -3344,9 +3344,9 @@ void kdtree_init(void *_p, bool make_automatic) {
    kdtreerequestbuffer_init(&p->innerbuf, make_automatic);
 }
 
-void kdtree_copy(void *_dst, void *_src, bool make_automatic) {
+void kdtree_copy(void *_dst, const void *_src, bool make_automatic) {
    kdtree *dst = (kdtree *)_dst;
-   kdtree *src = (kdtree *)_src;
+   const kdtree *src = (const kdtree *)_src;
    dst->n = src->n;
    dst->nx = src->nx;
    dst->ny = src->ny;

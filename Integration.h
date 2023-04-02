@@ -67,7 +67,7 @@ struct autogkreport {
    ae_int_t nintervals;
 };
 void autogkreport_init(void *_p, bool make_automatic);
-void autogkreport_copy(void *_dst, void *_src, bool make_automatic);
+void autogkreport_copy(void *_dst, const void *_src, bool make_automatic);
 void autogkreport_free(void *_p, bool make_automatic);
 
 struct autogkinternalstate {
@@ -93,7 +93,7 @@ struct autogkinternalstate {
    ae_int_t PQ;
 };
 void autogkinternalstate_init(void *_p, bool make_automatic);
-void autogkinternalstate_copy(void *_dst, void *_src, bool make_automatic);
+void autogkinternalstate_copy(void *_dst, const void *_src, bool make_automatic);
 void autogkinternalstate_free(void *_p, bool make_automatic);
 
 struct autogkstate {
@@ -116,7 +116,7 @@ struct autogkstate {
    ae_int_t nintervals;
 };
 void autogkstate_init(void *_p, bool make_automatic);
-void autogkstate_copy(void *_dst, void *_src, bool make_automatic);
+void autogkstate_copy(void *_dst, const void *_src, bool make_automatic);
 void autogkstate_free(void *_p, bool make_automatic);
 
 void autogksmoothw(double a, double b, double xwidth, autogkstate *state);

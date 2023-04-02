@@ -201,7 +201,7 @@ struct sparsematrix {
    ae_int_t tablesize;
 };
 void sparsematrix_init(void *_p, bool make_automatic);
-void sparsematrix_copy(void *_dst, void *_src, bool make_automatic);
+void sparsematrix_copy(void *_dst, const void *_src, bool make_automatic);
 void sparsematrix_free(void *_p, bool make_automatic);
 void sparsealloc(ae_serializer *s, sparsematrix *a);
 void sparseserialize(ae_serializer *s, sparsematrix *a);
@@ -213,7 +213,7 @@ struct sparsebuffers {
    sparsematrix s;
 };
 void sparsebuffers_init(void *_p, bool make_automatic);
-void sparsebuffers_copy(void *_dst, void *_src, bool make_automatic);
+void sparsebuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void sparsebuffers_free(void *_p, bool make_automatic);
 
 void sparseinitduidx(sparsematrix *s);
@@ -400,14 +400,14 @@ struct eigsubspacestate {
    ae_int_t PQ;
 };
 void eigsubspacestate_init(void *_p, bool make_automatic);
-void eigsubspacestate_copy(void *_dst, void *_src, bool make_automatic);
+void eigsubspacestate_copy(void *_dst, const void *_src, bool make_automatic);
 void eigsubspacestate_free(void *_p, bool make_automatic);
 
 struct eigsubspacereport {
    ae_int_t iterationscount;
 };
 void eigsubspacereport_init(void *_p, bool make_automatic);
-void eigsubspacereport_copy(void *_dst, void *_src, bool make_automatic);
+void eigsubspacereport_copy(void *_dst, const void *_src, bool make_automatic);
 void eigsubspacereport_free(void *_p, bool make_automatic);
 
 bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *wi, RMatrix *vl, RMatrix *vr);
@@ -485,7 +485,7 @@ struct sluv2list1matrix {
    ae_int_t nused;
 };
 void sluv2list1matrix_init(void *_p, bool make_automatic);
-void sluv2list1matrix_copy(void *_dst, void *_src, bool make_automatic);
+void sluv2list1matrix_copy(void *_dst, const void *_src, bool make_automatic);
 void sluv2list1matrix_free(void *_p, bool make_automatic);
 
 struct sluv2sparsetrail {
@@ -506,7 +506,7 @@ struct sluv2sparsetrail {
    ae_vector tmp0;
 };
 void sluv2sparsetrail_init(void *_p, bool make_automatic);
-void sluv2sparsetrail_copy(void *_dst, void *_src, bool make_automatic);
+void sluv2sparsetrail_copy(void *_dst, const void *_src, bool make_automatic);
 void sluv2sparsetrail_free(void *_p, bool make_automatic);
 
 struct sluv2densetrail {
@@ -516,7 +516,7 @@ struct sluv2densetrail {
    ae_vector did;
 };
 void sluv2densetrail_init(void *_p, bool make_automatic);
-void sluv2densetrail_copy(void *_dst, void *_src, bool make_automatic);
+void sluv2densetrail_copy(void *_dst, const void *_src, bool make_automatic);
 void sluv2densetrail_free(void *_p, bool make_automatic);
 
 struct sluv2buffer {
@@ -538,7 +538,7 @@ struct sluv2buffer {
    ae_vector tmpp;
 };
 void sluv2buffer_init(void *_p, bool make_automatic);
-void sluv2buffer_copy(void *_dst, void *_src, bool make_automatic);
+void sluv2buffer_copy(void *_dst, const void *_src, bool make_automatic);
 void sluv2buffer_free(void *_p, bool make_automatic);
 
 bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv2buffer *buf);
@@ -555,7 +555,7 @@ struct amdnset {
    ae_int_t iteridx;
 };
 void amdnset_init(void *_p, bool make_automatic);
-void amdnset_copy(void *_dst, void *_src, bool make_automatic);
+void amdnset_copy(void *_dst, const void *_src, bool make_automatic);
 void amdnset_free(void *_p, bool make_automatic);
 
 struct amdknset {
@@ -571,7 +571,7 @@ struct amdknset {
    ae_int_t iteridx;
 };
 void amdknset_init(void *_p, bool make_automatic);
-void amdknset_copy(void *_dst, void *_src, bool make_automatic);
+void amdknset_copy(void *_dst, const void *_src, bool make_automatic);
 void amdknset_free(void *_p, bool make_automatic);
 
 struct amdvertexset {
@@ -586,7 +586,7 @@ struct amdvertexset {
    ae_vector vnext;
 };
 void amdvertexset_init(void *_p, bool make_automatic);
-void amdvertexset_copy(void *_dst, void *_src, bool make_automatic);
+void amdvertexset_copy(void *_dst, const void *_src, bool make_automatic);
 void amdvertexset_free(void *_p, bool make_automatic);
 
 struct amdllmatrix {
@@ -597,7 +597,7 @@ struct amdllmatrix {
    ae_int_t entriesinitialized;
 };
 void amdllmatrix_init(void *_p, bool make_automatic);
-void amdllmatrix_copy(void *_dst, void *_src, bool make_automatic);
+void amdllmatrix_copy(void *_dst, const void *_src, bool make_automatic);
 void amdllmatrix_free(void *_p, bool make_automatic);
 
 struct amdbuffer {
@@ -632,7 +632,7 @@ struct amdbuffer {
    ae_matrix dbga;
 };
 void amdbuffer_init(void *_p, bool make_automatic);
-void amdbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void amdbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void amdbuffer_free(void *_p, bool make_automatic);
 
 ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf);
@@ -701,7 +701,7 @@ struct spcholanalysis {
    ae_vector simdbuf;
 };
 void spcholanalysis_init(void *_p, bool make_automatic);
-void spcholanalysis_copy(void *_dst, void *_src, bool make_automatic);
+void spcholanalysis_copy(void *_dst, const void *_src, bool make_automatic);
 void spcholanalysis_free(void *_p, bool make_automatic);
 
 ae_int_t spsymmgetmaxfastkernel();
@@ -730,7 +730,7 @@ struct sparsedecompositionanalysis {
    sparsematrix crsat;
 };
 void sparsedecompositionanalysis_init(void *_p, bool make_automatic);
-void sparsedecompositionanalysis_copy(void *_dst, void *_src, bool make_automatic);
+void sparsedecompositionanalysis_copy(void *_dst, const void *_src, bool make_automatic);
 void sparsedecompositionanalysis_free(void *_p, bool make_automatic);
 
 void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
@@ -864,7 +864,7 @@ struct fblslincgstate {
    ae_vector tmp2;
 };
 void fblslincgstate_init(void *_p, bool make_automatic);
-void fblslincgstate_copy(void *_dst, void *_src, bool make_automatic);
+void fblslincgstate_copy(void *_dst, const void *_src, bool make_automatic);
 void fblslincgstate_free(void *_p, bool make_automatic);
 
 struct fblsgmresstate {
@@ -893,7 +893,7 @@ struct fblsgmresstate {
    ae_int_t PQ;
 };
 void fblsgmresstate_init(void *_p, bool make_automatic);
-void fblsgmresstate_copy(void *_dst, void *_src, bool make_automatic);
+void fblsgmresstate_copy(void *_dst, const void *_src, bool make_automatic);
 void fblsgmresstate_free(void *_p, bool make_automatic);
 
 void fblscholeskysolve(RMatrix *cha, double sqrtscalea, ae_int_t n, bool isupper, RVector *xb, RVector *tmp);
@@ -928,7 +928,7 @@ struct normestimatorstate {
    ae_int_t PQ;
 };
 void normestimatorstate_init(void *_p, bool make_automatic);
-void normestimatorstate_copy(void *_dst, void *_src, bool make_automatic);
+void normestimatorstate_copy(void *_dst, const void *_src, bool make_automatic);
 void normestimatorstate_free(void *_p, bool make_automatic);
 
 void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits, normestimatorstate *state);
@@ -956,7 +956,7 @@ struct matinvreport {
    double rinf;
 };
 void matinvreport_init(void *_p, bool make_automatic);
-void matinvreport_copy(void *_dst, void *_src, bool make_automatic);
+void matinvreport_copy(void *_dst, const void *_src, bool make_automatic);
 void matinvreport_free(void *_p, bool make_automatic);
 
 void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep);

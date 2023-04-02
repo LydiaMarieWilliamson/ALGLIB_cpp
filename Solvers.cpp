@@ -131,9 +131,9 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
 void polynomialsolverreport_init(void *_p, bool make_automatic) {
 }
 
-void polynomialsolverreport_copy(void *_dst, void *_src, bool make_automatic) {
+void polynomialsolverreport_copy(void *_dst, const void *_src, bool make_automatic) {
    polynomialsolverreport *dst = (polynomialsolverreport *)_dst;
-   polynomialsolverreport *src = (polynomialsolverreport *)_src;
+   const polynomialsolverreport *src = (const polynomialsolverreport *)_src;
    dst->maxerr = src->maxerr;
 }
 
@@ -3164,9 +3164,9 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
 void densesolverreport_init(void *_p, bool make_automatic) {
 }
 
-void densesolverreport_copy(void *_dst, void *_src, bool make_automatic) {
+void densesolverreport_copy(void *_dst, const void *_src, bool make_automatic) {
    densesolverreport *dst = (densesolverreport *)_dst;
-   densesolverreport *src = (densesolverreport *)_src;
+   const densesolverreport *src = (const densesolverreport *)_src;
    dst->r1 = src->r1;
    dst->rinf = src->rinf;
 }
@@ -3179,9 +3179,9 @@ void densesolverlsreport_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->cx, 0, 0, DT_REAL, make_automatic);
 }
 
-void densesolverlsreport_copy(void *_dst, void *_src, bool make_automatic) {
+void densesolverlsreport_copy(void *_dst, const void *_src, bool make_automatic) {
    densesolverlsreport *dst = (densesolverlsreport *)_dst;
-   densesolverlsreport *src = (densesolverlsreport *)_src;
+   const densesolverlsreport *src = (const densesolverlsreport *)_src;
    dst->r2 = src->r2;
    ae_matrix_copy(&dst->cx, &src->cx, make_automatic);
    dst->n = src->n;
@@ -3777,9 +3777,9 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
 void sparsesolverreport_init(void *_p, bool make_automatic) {
 }
 
-void sparsesolverreport_copy(void *_dst, void *_src, bool make_automatic) {
+void sparsesolverreport_copy(void *_dst, const void *_src, bool make_automatic) {
    sparsesolverreport *dst = (sparsesolverreport *)_dst;
-   sparsesolverreport *src = (sparsesolverreport *)_src;
+   const sparsesolverreport *src = (const sparsesolverreport *)_src;
    dst->terminationtype = src->terminationtype;
    dst->nmv = src->nmv;
    dst->iterationscount = src->iterationscount;
@@ -4703,9 +4703,9 @@ void sparsesolverstate_init(void *_p, bool make_automatic) {
    fblsgmresstate_init(&p->gmressolver, make_automatic);
 }
 
-void sparsesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
+void sparsesolverstate_copy(void *_dst, const void *_src, bool make_automatic) {
    sparsesolverstate *dst = (sparsesolverstate *)_dst;
-   sparsesolverstate *src = (sparsesolverstate *)_src;
+   const sparsesolverstate *src = (const sparsesolverstate *)_src;
    dst->n = src->n;
    ae_vector_copy(&dst->x0, &src->x0, make_automatic);
    dst->epsf = src->epsf;
@@ -5435,9 +5435,9 @@ void lincgstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmpd, 0, DT_REAL, make_automatic);
 }
 
-void lincgstate_copy(void *_dst, void *_src, bool make_automatic) {
+void lincgstate_copy(void *_dst, const void *_src, bool make_automatic) {
    lincgstate *dst = (lincgstate *)_dst;
-   lincgstate *src = (lincgstate *)_src;
+   const lincgstate *src = (const lincgstate *)_src;
    ae_vector_copy(&dst->rx, &src->rx, make_automatic);
    ae_vector_copy(&dst->b, &src->b, make_automatic);
    dst->n = src->n;
@@ -5496,9 +5496,9 @@ void lincgstate_free(void *_p, bool make_automatic) {
 void lincgreport_init(void *_p, bool make_automatic) {
 }
 
-void lincgreport_copy(void *_dst, void *_src, bool make_automatic) {
+void lincgreport_copy(void *_dst, const void *_src, bool make_automatic) {
    lincgreport *dst = (lincgreport *)_dst;
-   lincgreport *src = (lincgreport *)_src;
+   const lincgreport *src = (const lincgreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nmv = src->nmv;
    dst->terminationtype = src->terminationtype;
@@ -6228,9 +6228,9 @@ void linlsqrstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmpx, 0, DT_REAL, make_automatic);
 }
 
-void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic) {
+void linlsqrstate_copy(void *_dst, const void *_src, bool make_automatic) {
    linlsqrstate *dst = (linlsqrstate *)_dst;
-   linlsqrstate *src = (linlsqrstate *)_src;
+   const linlsqrstate *src = (const linlsqrstate *)_src;
    normestimatorstate_copy(&dst->nes, &src->nes, make_automatic);
    ae_vector_copy(&dst->rx, &src->rx, make_automatic);
    ae_vector_copy(&dst->b, &src->b, make_automatic);
@@ -6308,9 +6308,9 @@ void linlsqrstate_free(void *_p, bool make_automatic) {
 void linlsqrreport_init(void *_p, bool make_automatic) {
 }
 
-void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic) {
+void linlsqrreport_copy(void *_dst, const void *_src, bool make_automatic) {
    linlsqrreport *dst = (linlsqrreport *)_dst;
-   linlsqrreport *src = (linlsqrreport *)_src;
+   const linlsqrreport *src = (const linlsqrreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nmv = src->nmv;
    dst->terminationtype = src->terminationtype;
@@ -6822,9 +6822,9 @@ void nleqstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->cgbuf, 0, DT_REAL, make_automatic);
 }
 
-void nleqstate_copy(void *_dst, void *_src, bool make_automatic) {
+void nleqstate_copy(void *_dst, const void *_src, bool make_automatic) {
    nleqstate *dst = (nleqstate *)_dst;
-   nleqstate *src = (nleqstate *)_src;
+   const nleqstate *src = (const nleqstate *)_src;
    dst->n = src->n;
    dst->m = src->m;
    dst->epsf = src->epsf;
@@ -6865,9 +6865,9 @@ void nleqstate_free(void *_p, bool make_automatic) {
 void nleqreport_init(void *_p, bool make_automatic) {
 }
 
-void nleqreport_copy(void *_dst, void *_src, bool make_automatic) {
+void nleqreport_copy(void *_dst, const void *_src, bool make_automatic) {
    nleqreport *dst = (nleqreport *)_dst;
-   nleqreport *src = (nleqreport *)_src;
+   const nleqreport *src = (const nleqreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfunc = src->nfunc;
    dst->njac = src->njac;

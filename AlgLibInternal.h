@@ -32,12 +32,12 @@ struct apbuffers {
    ae_matrix rm1;
 };
 void apbuffers_init(void *_p, bool make_automatic);
-void apbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void apbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void apbuffers_free(void *_p, bool make_automatic);
 
 // typedef ae_vector RVector; //(@) In Ap.h.
 void RVector_init(void *_p, bool make_automatic);
-void RVector_copy(void *_dst, void *_src, bool make_automatic);
+void RVector_copy(void *_dst, const void *_src, bool make_automatic);
 void RVector_free(void *_p, bool make_automatic);
 
 double coalesce(double a, double b);
@@ -385,7 +385,7 @@ struct linminstate {
    double xtrapf;
 };
 void linminstate_init(void *_p, bool make_automatic);
-void linminstate_copy(void *_dst, void *_src, bool make_automatic);
+void linminstate_copy(void *_dst, const void *_src, bool make_automatic);
 void linminstate_free(void *_p, bool make_automatic);
 
 struct armijostate {
@@ -404,7 +404,7 @@ struct armijostate {
    ae_int_t PQ;
 };
 void armijostate_init(void *_p, bool make_automatic);
-void armijostate_copy(void *_dst, void *_src, bool make_automatic);
+void armijostate_copy(void *_dst, const void *_src, bool make_automatic);
 void armijostate_free(void *_p, bool make_automatic);
 
 void linminnormalized(RVector *d, double *stp, ae_int_t n);
@@ -438,7 +438,7 @@ struct fasttransformplan {
    ae_shared_pool bluesteinpool;
 };
 void fasttransformplan_init(void *_p, bool make_automatic);
-void fasttransformplan_copy(void *_dst, void *_src, bool make_automatic);
+void fasttransformplan_copy(void *_dst, const void *_src, bool make_automatic);
 void fasttransformplan_free(void *_p, bool make_automatic);
 
 double ftbasegetflopestimate(ae_int_t n);
@@ -471,7 +471,7 @@ struct mlpbuffers {
    ae_vector tmp0;
 };
 void mlpbuffers_init(void *_p, bool make_automatic);
-void mlpbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void mlpbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void mlpbuffers_free(void *_p, bool make_automatic);
 
 void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf);

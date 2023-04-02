@@ -20,7 +20,7 @@ Further details on integrating ALGLIB++ into applications may be found in the AL
 
 ALGLIB++ is based on ALGLIB and tracks its upgrades which were, themselves, automatically translated from an internal codebase written in AlgoPascal.
 The most recent upgrades are the following:
-∙	ALGLIB 3.20.0 (forthcoming)
+∙	ALGLIB 3.20.0 (source code generated 2022-12-19)
 ∙	ALGLIB 3.19.0 (source code generated 2022-06-07)
 ∙	ALGLIB 3.18.0 (source code generated 2021-10-25)
 ∙	ALGLIB 3.17.0 (source code generated 2020-12-27)

@@ -1427,9 +1427,9 @@ void apbuffers_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->rm1, 0, 0, DT_REAL, make_automatic);
 }
 
-void apbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void apbuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    apbuffers *dst = (apbuffers *)_dst;
-   apbuffers *src = (apbuffers *)_src;
+   const apbuffers *src = (const apbuffers *)_src;
    ae_vector_copy(&dst->ba0, &src->ba0, make_automatic);
    ae_vector_copy(&dst->ia0, &src->ia0, make_automatic);
    ae_vector_copy(&dst->ia1, &src->ia1, make_automatic);
@@ -1463,9 +1463,9 @@ void RVector_init(void *_p, bool make_automatic) {
    ae_vector_init(p, 0, DT_REAL, make_automatic);
 }
 
-void RVector_copy(void *_dst, void *_src, bool make_automatic) {
+void RVector_copy(void *_dst, const void *_src, bool make_automatic) {
    RVector *dst = (RVector *)_dst;
-   RVector *src = (RVector *)_src;
+   const RVector *src = (const RVector *)_src;
    ae_vector_copy(dst, src, make_automatic);
 }
 
@@ -7282,9 +7282,9 @@ void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f) {
 void linminstate_init(void *_p, bool make_automatic) {
 }
 
-void linminstate_copy(void *_dst, void *_src, bool make_automatic) {
+void linminstate_copy(void *_dst, const void *_src, bool make_automatic) {
    linminstate *dst = (linminstate *)_dst;
-   linminstate *src = (linminstate *)_src;
+   const linminstate *src = (const linminstate *)_src;
    dst->brackt = src->brackt;
    dst->stage1 = src->stage1;
    dst->infoc = src->infoc;
@@ -7322,9 +7322,9 @@ void armijostate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->s, 0, DT_REAL, make_automatic);
 }
 
-void armijostate_copy(void *_dst, void *_src, bool make_automatic) {
+void armijostate_copy(void *_dst, const void *_src, bool make_automatic) {
    armijostate *dst = (armijostate *)_dst;
-   armijostate *src = (armijostate *)_src;
+   const armijostate *src = (const armijostate *)_src;
    dst->needf = src->needf;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    dst->f = src->f;
@@ -8836,9 +8836,9 @@ void fasttransformplan_init(void *_p, bool make_automatic) {
    ae_shared_pool_init(&p->bluesteinpool, make_automatic);
 }
 
-void fasttransformplan_copy(void *_dst, void *_src, bool make_automatic) {
+void fasttransformplan_copy(void *_dst, const void *_src, bool make_automatic) {
    fasttransformplan *dst = (fasttransformplan *)_dst;
-   fasttransformplan *src = (fasttransformplan *)_src;
+   const fasttransformplan *src = (const fasttransformplan *)_src;
    ae_matrix_copy(&dst->entries, &src->entries, make_automatic);
    ae_vector_copy(&dst->buffer, &src->buffer, make_automatic);
    ae_vector_copy(&dst->precr, &src->precr, make_automatic);
@@ -8978,9 +8978,9 @@ void mlpbuffers_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
 }
 
-void mlpbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void mlpbuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    mlpbuffers *dst = (mlpbuffers *)_dst;
-   mlpbuffers *src = (mlpbuffers *)_src;
+   const mlpbuffers *src = (const mlpbuffers *)_src;
    dst->chunksize = src->chunksize;
    dst->ntotal = src->ntotal;
    dst->nin = src->nin;

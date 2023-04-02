@@ -43,7 +43,7 @@ struct cvreport {
    double avgrelerror;
 };
 void cvreport_init(void *_p, bool make_automatic);
-void cvreport_copy(void *_dst, void *_src, bool make_automatic);
+void cvreport_copy(void *_dst, const void *_src, bool make_automatic);
 void cvreport_free(void *_p, bool make_automatic);
 
 void dserrallocate(ae_int_t nclasses, RVector *buf);
@@ -78,7 +78,7 @@ struct modelerrors {
    double avgrelerror;
 };
 void modelerrors_init(void *_p, bool make_automatic);
-void modelerrors_copy(void *_dst, void *_src, bool make_automatic);
+void modelerrors_copy(void *_dst, const void *_src, bool make_automatic);
 void modelerrors_free(void *_p, bool make_automatic);
 
 struct smlpgrad {
@@ -86,7 +86,7 @@ struct smlpgrad {
    ae_vector g;
 };
 void smlpgrad_init(void *_p, bool make_automatic);
-void smlpgrad_copy(void *_dst, void *_src, bool make_automatic);
+void smlpgrad_copy(void *_dst, const void *_src, bool make_automatic);
 void smlpgrad_free(void *_p, bool make_automatic);
 
 struct multilayerperceptron {
@@ -118,7 +118,7 @@ struct multilayerperceptron {
    ae_shared_pool dummypool;
 };
 void multilayerperceptron_init(void *_p, bool make_automatic);
-void multilayerperceptron_copy(void *_dst, void *_src, bool make_automatic);
+void multilayerperceptron_copy(void *_dst, const void *_src, bool make_automatic);
 void multilayerperceptron_free(void *_p, bool make_automatic);
 void mlpalloc(ae_serializer *s, multilayerperceptron *network);
 void mlpserialize(ae_serializer *s, multilayerperceptron *network);
@@ -287,7 +287,7 @@ struct mlpensemble {
    ae_vector y;
 };
 void mlpensemble_init(void *_p, bool make_automatic);
-void mlpensemble_copy(void *_dst, void *_src, bool make_automatic);
+void mlpensemble_copy(void *_dst, const void *_src, bool make_automatic);
 void mlpensemble_free(void *_p, bool make_automatic);
 void mlpealloc(ae_serializer *s, mlpensemble *ensemble);
 void mlpeserialize(ae_serializer *s, mlpensemble *ensemble);
@@ -369,7 +369,7 @@ struct kmeansbuffers {
    ae_shared_pool updatepool;
 };
 void kmeansbuffers_init(void *_p, bool make_automatic);
-void kmeansbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void kmeansbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void kmeansbuffers_free(void *_p, bool make_automatic);
 
 struct clusterizerstate {
@@ -389,7 +389,7 @@ struct clusterizerstate {
    kmeansbuffers kmeanstmp;
 };
 void clusterizerstate_init(void *_p, bool make_automatic);
-void clusterizerstate_copy(void *_dst, void *_src, bool make_automatic);
+void clusterizerstate_copy(void *_dst, const void *_src, bool make_automatic);
 void clusterizerstate_free(void *_p, bool make_automatic);
 
 struct ahcreport {
@@ -402,7 +402,7 @@ struct ahcreport {
    ae_vector mergedist;
 };
 void ahcreport_init(void *_p, bool make_automatic);
-void ahcreport_copy(void *_dst, void *_src, bool make_automatic);
+void ahcreport_copy(void *_dst, const void *_src, bool make_automatic);
 void ahcreport_free(void *_p, bool make_automatic);
 
 struct kmeansreport {
@@ -416,7 +416,7 @@ struct kmeansreport {
    ae_vector cidx;
 };
 void kmeansreport_init(void *_p, bool make_automatic);
-void kmeansreport_copy(void *_dst, void *_src, bool make_automatic);
+void kmeansreport_copy(void *_dst, const void *_src, bool make_automatic);
 void kmeansreport_free(void *_p, bool make_automatic);
 
 void kmeansinitbuf(kmeansbuffers *buf);
@@ -495,7 +495,7 @@ struct decisionforestbuilder {
    ae_vector varimpshuffle2;
 };
 void decisionforestbuilder_init(void *_p, bool make_automatic);
-void decisionforestbuilder_copy(void *_dst, void *_src, bool make_automatic);
+void decisionforestbuilder_copy(void *_dst, const void *_src, bool make_automatic);
 void decisionforestbuilder_free(void *_p, bool make_automatic);
 
 struct dfworkbuf {
@@ -525,7 +525,7 @@ struct dfworkbuf {
    ae_vector classtotals01;
 };
 void dfworkbuf_init(void *_p, bool make_automatic);
-void dfworkbuf_copy(void *_dst, void *_src, bool make_automatic);
+void dfworkbuf_copy(void *_dst, const void *_src, bool make_automatic);
 void dfworkbuf_free(void *_p, bool make_automatic);
 
 struct dfvotebuf {
@@ -536,7 +536,7 @@ struct dfvotebuf {
    ae_vector giniimportances;
 };
 void dfvotebuf_init(void *_p, bool make_automatic);
-void dfvotebuf_copy(void *_dst, void *_src, bool make_automatic);
+void dfvotebuf_copy(void *_dst, const void *_src, bool make_automatic);
 void dfvotebuf_free(void *_p, bool make_automatic);
 
 struct dfpermimpbuf {
@@ -550,7 +550,7 @@ struct dfpermimpbuf {
    ae_vector startnodes;
 };
 void dfpermimpbuf_init(void *_p, bool make_automatic);
-void dfpermimpbuf_copy(void *_dst, void *_src, bool make_automatic);
+void dfpermimpbuf_copy(void *_dst, const void *_src, bool make_automatic);
 void dfpermimpbuf_free(void *_p, bool make_automatic);
 
 struct dftreebuf {
@@ -558,7 +558,7 @@ struct dftreebuf {
    ae_int_t treeidx;
 };
 void dftreebuf_init(void *_p, bool make_automatic);
-void dftreebuf_copy(void *_dst, void *_src, bool make_automatic);
+void dftreebuf_copy(void *_dst, const void *_src, bool make_automatic);
 void dftreebuf_free(void *_p, bool make_automatic);
 
 struct decisionforestbuffer {
@@ -566,7 +566,7 @@ struct decisionforestbuffer {
    ae_vector y;
 };
 void decisionforestbuffer_init(void *_p, bool make_automatic);
-void decisionforestbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void decisionforestbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void decisionforestbuffer_free(void *_p, bool make_automatic);
 
 struct decisionforest {
@@ -581,7 +581,7 @@ struct decisionforest {
    ae_vector trees8;
 };
 void decisionforest_init(void *_p, bool make_automatic);
-void decisionforest_copy(void *_dst, void *_src, bool make_automatic);
+void decisionforest_copy(void *_dst, const void *_src, bool make_automatic);
 void decisionforest_free(void *_p, bool make_automatic);
 void dfalloc(ae_serializer *s, decisionforest *forest);
 void dfserialize(ae_serializer *s, decisionforest *forest);
@@ -602,7 +602,7 @@ struct dfreport {
    ae_vector varimportances;
 };
 void dfreport_init(void *_p, bool make_automatic);
-void dfreport_copy(void *_dst, void *_src, bool make_automatic);
+void dfreport_copy(void *_dst, const void *_src, bool make_automatic);
 void dfreport_free(void *_p, bool make_automatic);
 
 struct dfinternalbuffers {
@@ -620,7 +620,7 @@ struct dfinternalbuffers {
    ae_vector evssplits;
 };
 void dfinternalbuffers_init(void *_p, bool make_automatic);
-void dfinternalbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void dfinternalbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void dfinternalbuffers_free(void *_p, bool make_automatic);
 
 void dfcreatebuffer(decisionforest *model, decisionforestbuffer *buf);
@@ -709,7 +709,7 @@ struct linearmodel {
    ae_vector w;
 };
 void linearmodel_init(void *_p, bool make_automatic);
-void linearmodel_copy(void *_dst, void *_src, bool make_automatic);
+void linearmodel_copy(void *_dst, const void *_src, bool make_automatic);
 void linearmodel_free(void *_p, bool make_automatic);
 
 struct lrreport {
@@ -724,7 +724,7 @@ struct lrreport {
    ae_vector cvdefects;
 };
 void lrreport_init(void *_p, bool make_automatic);
-void lrreport_copy(void *_dst, void *_src, bool make_automatic);
+void lrreport_copy(void *_dst, const void *_src, bool make_automatic);
 void lrreport_free(void *_p, bool make_automatic);
 
 double lrrmserror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
@@ -822,7 +822,7 @@ struct ssamodel {
    ae_int_t uxbatchlimit;
 };
 void ssamodel_init(void *_p, bool make_automatic);
-void ssamodel_copy(void *_dst, void *_src, bool make_automatic);
+void ssamodel_copy(void *_dst, const void *_src, bool make_automatic);
 void ssamodel_free(void *_p, bool make_automatic);
 
 void ssacreate(ssamodel *s);
@@ -925,7 +925,7 @@ struct mcpdstate {
    ae_matrix p;
 };
 void mcpdstate_init(void *_p, bool make_automatic);
-void mcpdstate_copy(void *_dst, void *_src, bool make_automatic);
+void mcpdstate_copy(void *_dst, const void *_src, bool make_automatic);
 void mcpdstate_free(void *_p, bool make_automatic);
 
 struct mcpdreport {
@@ -935,7 +935,7 @@ struct mcpdreport {
    ae_int_t terminationtype;
 };
 void mcpdreport_init(void *_p, bool make_automatic);
-void mcpdreport_copy(void *_dst, void *_src, bool make_automatic);
+void mcpdreport_copy(void *_dst, const void *_src, bool make_automatic);
 void mcpdreport_free(void *_p, bool make_automatic);
 
 void mcpdcreate(ae_int_t n, mcpdstate *s);
@@ -986,7 +986,7 @@ struct logitmodel {
    ae_vector w;
 };
 void logitmodel_init(void *_p, bool make_automatic);
-void logitmodel_copy(void *_dst, void *_src, bool make_automatic);
+void logitmodel_copy(void *_dst, const void *_src, bool make_automatic);
 void logitmodel_free(void *_p, bool make_automatic);
 
 struct logitmcstate {
@@ -1017,7 +1017,7 @@ struct logitmcstate {
    double xtrapf;
 };
 void logitmcstate_init(void *_p, bool make_automatic);
-void logitmcstate_copy(void *_dst, void *_src, bool make_automatic);
+void logitmcstate_copy(void *_dst, const void *_src, bool make_automatic);
 void logitmcstate_free(void *_p, bool make_automatic);
 
 struct mnlreport {
@@ -1025,7 +1025,7 @@ struct mnlreport {
    ae_int_t nhess;
 };
 void mnlreport_init(void *_p, bool make_automatic);
-void mnlreport_copy(void *_dst, void *_src, bool make_automatic);
+void mnlreport_copy(void *_dst, const void *_src, bool make_automatic);
 void mnlreport_free(void *_p, bool make_automatic);
 
 void mnlprocess(logitmodel *lm, RVector *x, RVector *y);
@@ -1071,7 +1071,7 @@ struct knnbuffer {
    ae_matrix xy;
 };
 void knnbuffer_init(void *_p, bool make_automatic);
-void knnbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void knnbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void knnbuffer_free(void *_p, bool make_automatic);
 
 struct knnbuilder {
@@ -1086,7 +1086,7 @@ struct knnbuilder {
    ae_int_t knnnrm;
 };
 void knnbuilder_init(void *_p, bool make_automatic);
-void knnbuilder_copy(void *_dst, void *_src, bool make_automatic);
+void knnbuilder_copy(void *_dst, const void *_src, bool make_automatic);
 void knnbuilder_free(void *_p, bool make_automatic);
 
 struct knnmodel {
@@ -1100,7 +1100,7 @@ struct knnmodel {
    knnbuffer buffer;
 };
 void knnmodel_init(void *_p, bool make_automatic);
-void knnmodel_copy(void *_dst, void *_src, bool make_automatic);
+void knnmodel_copy(void *_dst, const void *_src, bool make_automatic);
 void knnmodel_free(void *_p, bool make_automatic);
 void knnalloc(ae_serializer *s, knnmodel *model);
 void knnserialize(ae_serializer *s, knnmodel *model);
@@ -1114,7 +1114,7 @@ struct knnreport {
    double avgrelerror;
 };
 void knnreport_init(void *_p, bool make_automatic);
-void knnreport_copy(void *_dst, void *_src, bool make_automatic);
+void knnreport_copy(void *_dst, const void *_src, bool make_automatic);
 void knnreport_free(void *_p, bool make_automatic);
 
 void knncreatebuffer(knnmodel *model, knnbuffer *buf);
@@ -1183,7 +1183,7 @@ struct mlpreport {
    ae_int_t ncholesky;
 };
 void mlpreport_init(void *_p, bool make_automatic);
-void mlpreport_copy(void *_dst, void *_src, bool make_automatic);
+void mlpreport_copy(void *_dst, const void *_src, bool make_automatic);
 void mlpreport_free(void *_p, bool make_automatic);
 
 struct mlpcvreport {
@@ -1194,7 +1194,7 @@ struct mlpcvreport {
    double avgrelerror;
 };
 void mlpcvreport_init(void *_p, bool make_automatic);
-void mlpcvreport_copy(void *_dst, void *_src, bool make_automatic);
+void mlpcvreport_copy(void *_dst, const void *_src, bool make_automatic);
 void mlpcvreport_free(void *_p, bool make_automatic);
 
 struct smlptrnsession {
@@ -1214,7 +1214,7 @@ struct smlptrnsession {
    hqrndstate generator;
 };
 void smlptrnsession_init(void *_p, bool make_automatic);
-void smlptrnsession_copy(void *_dst, void *_src, bool make_automatic);
+void smlptrnsession_copy(void *_dst, const void *_src, bool make_automatic);
 void smlptrnsession_free(void *_p, bool make_automatic);
 
 struct mlpetrnsession {
@@ -1225,7 +1225,7 @@ struct mlpetrnsession {
    multilayerperceptron network;
 };
 void mlpetrnsession_init(void *_p, bool make_automatic);
-void mlpetrnsession_copy(void *_dst, void *_src, bool make_automatic);
+void mlpetrnsession_copy(void *_dst, const void *_src, bool make_automatic);
 void mlpetrnsession_free(void *_p, bool make_automatic);
 
 struct mlptrainer {
@@ -1250,7 +1250,7 @@ struct mlptrainer {
    ae_int_t minibatchsize;
 };
 void mlptrainer_init(void *_p, bool make_automatic);
-void mlptrainer_copy(void *_dst, void *_src, bool make_automatic);
+void mlptrainer_copy(void *_dst, const void *_src, bool make_automatic);
 void mlptrainer_free(void *_p, bool make_automatic);
 
 struct mlpparallelizationcv {
@@ -1264,7 +1264,7 @@ struct mlpparallelizationcv {
    ae_shared_pool trnpool;
 };
 void mlpparallelizationcv_init(void *_p, bool make_automatic);
-void mlpparallelizationcv_copy(void *_dst, void *_src, bool make_automatic);
+void mlpparallelizationcv_copy(void *_dst, const void *_src, bool make_automatic);
 void mlpparallelizationcv_free(void *_p, bool make_automatic);
 
 void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep);

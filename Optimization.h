@@ -37,7 +37,7 @@ struct optguardreport {
    ae_matrix badgradnum;
 };
 void optguardreport_init(void *_p, bool make_automatic);
-void optguardreport_copy(void *_dst, void *_src, bool make_automatic);
+void optguardreport_copy(void *_dst, const void *_src, bool make_automatic);
 void optguardreport_free(void *_p, bool make_automatic);
 
 struct optguardnonc0report {
@@ -53,7 +53,7 @@ struct optguardnonc0report {
    ae_int_t stpidxb;
 };
 void optguardnonc0report_init(void *_p, bool make_automatic);
-void optguardnonc0report_copy(void *_dst, void *_src, bool make_automatic);
+void optguardnonc0report_copy(void *_dst, const void *_src, bool make_automatic);
 void optguardnonc0report_free(void *_p, bool make_automatic);
 
 struct optguardnonc1test0report {
@@ -69,7 +69,7 @@ struct optguardnonc1test0report {
    ae_int_t stpidxb;
 };
 void optguardnonc1test0report_init(void *_p, bool make_automatic);
-void optguardnonc1test0report_copy(void *_dst, void *_src, bool make_automatic);
+void optguardnonc1test0report_copy(void *_dst, const void *_src, bool make_automatic);
 void optguardnonc1test0report_free(void *_p, bool make_automatic);
 
 struct optguardnonc1test1report {
@@ -86,7 +86,7 @@ struct optguardnonc1test1report {
    ae_int_t stpidxb;
 };
 void optguardnonc1test1report_init(void *_p, bool make_automatic);
-void optguardnonc1test1report_copy(void *_dst, void *_src, bool make_automatic);
+void optguardnonc1test1report_copy(void *_dst, const void *_src, bool make_automatic);
 void optguardnonc1test1report_free(void *_p, bool make_automatic);
 
 void optguardinitinternal(optguardreport *rep, ae_int_t n, ae_int_t k);
@@ -117,7 +117,7 @@ struct precbuflbfgs {
    ae_vector bufb;
 };
 void precbuflbfgs_init(void *_p, bool make_automatic);
-void precbuflbfgs_copy(void *_dst, void *_src, bool make_automatic);
+void precbuflbfgs_copy(void *_dst, const void *_src, bool make_automatic);
 void precbuflbfgs_free(void *_p, bool make_automatic);
 
 struct precbuflowrank {
@@ -131,7 +131,7 @@ struct precbuflowrank {
    ae_vector tmp;
 };
 void precbuflowrank_init(void *_p, bool make_automatic);
-void precbuflowrank_copy(void *_dst, void *_src, bool make_automatic);
+void precbuflowrank_copy(void *_dst, const void *_src, bool make_automatic);
 void precbuflowrank_free(void *_p, bool make_automatic);
 
 struct smoothnessmonitor {
@@ -204,7 +204,7 @@ struct smoothnessmonitor {
    ae_matrix j0;
 };
 void smoothnessmonitor_init(void *_p, bool make_automatic);
-void smoothnessmonitor_copy(void *_dst, void *_src, bool make_automatic);
+void smoothnessmonitor_copy(void *_dst, const void *_src, bool make_automatic);
 void smoothnessmonitor_free(void *_p, bool make_automatic);
 
 void checkbcviolation(BVector *hasbndl, RVector *bndl, BVector *hasbndu, RVector *bndu, RVector *x, ae_int_t n, RVector *s, bool nonunits, double *bcerr, ae_int_t *bcidx);
@@ -304,7 +304,7 @@ struct minlbfgsstate {
    ae_vector lastscaleused;
 };
 void minlbfgsstate_init(void *_p, bool make_automatic);
-void minlbfgsstate_copy(void *_dst, void *_src, bool make_automatic);
+void minlbfgsstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minlbfgsstate_free(void *_p, bool make_automatic);
 
 struct minlbfgsreport {
@@ -313,7 +313,7 @@ struct minlbfgsreport {
    ae_int_t terminationtype;
 };
 void minlbfgsreport_init(void *_p, bool make_automatic);
-void minlbfgsreport_copy(void *_dst, void *_src, bool make_automatic);
+void minlbfgsreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minlbfgsreport_free(void *_p, bool make_automatic);
 
 void minlbfgssetcond(minlbfgsstate *state, double epsg, double epsf, double epsx, ae_int_t maxits);
@@ -415,7 +415,7 @@ struct convexquadraticmodel {
    bool isactivesetchanged;
 };
 void convexquadraticmodel_init(void *_p, bool make_automatic);
-void convexquadraticmodel_copy(void *_dst, void *_src, bool make_automatic);
+void convexquadraticmodel_copy(void *_dst, const void *_src, bool make_automatic);
 void convexquadraticmodel_free(void *_p, bool make_automatic);
 
 void cqminit(ae_int_t n, convexquadraticmodel *s);
@@ -489,7 +489,7 @@ struct snnlssolver {
    ae_vector rdtmprowmap;
 };
 void snnlssolver_init(void *_p, bool make_automatic);
-void snnlssolver_copy(void *_dst, void *_src, bool make_automatic);
+void snnlssolver_copy(void *_dst, const void *_src, bool make_automatic);
 void snnlssolver_free(void *_p, bool make_automatic);
 
 void snnlsinit(ae_int_t nsmax, ae_int_t ndmax, ae_int_t nrmax, snnlssolver *s);
@@ -555,7 +555,7 @@ struct sactiveset {
    ae_vector tmpci;
 };
 void sactiveset_init(void *_p, bool make_automatic);
-void sactiveset_copy(void *_dst, void *_src, bool make_automatic);
+void sactiveset_copy(void *_dst, const void *_src, bool make_automatic);
 void sactiveset_free(void *_p, bool make_automatic);
 
 void sasinit(ae_int_t n, sactiveset *s);
@@ -598,7 +598,7 @@ struct qqpsettings {
    ae_int_t sparsesolver;
 };
 void qqpsettings_init(void *_p, bool make_automatic);
-void qqpsettings_copy(void *_dst, void *_src, bool make_automatic);
+void qqpsettings_copy(void *_dst, const void *_src, bool make_automatic);
 void qqpsettings_free(void *_p, bool make_automatic);
 
 struct qqpbuffers {
@@ -645,7 +645,7 @@ struct qqpbuffers {
    ae_int_t repncupdates;
 };
 void qqpbuffers_init(void *_p, bool make_automatic);
-void qqpbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void qqpbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void qqpbuffers_free(void *_p, bool make_automatic);
 
 void qqploaddefaults(ae_int_t n, qqpsettings *s);
@@ -664,7 +664,7 @@ struct qpdenseaulsettings {
    double rho;
 };
 void qpdenseaulsettings_init(void *_p, bool make_automatic);
-void qpdenseaulsettings_copy(void *_dst, void *_src, bool make_automatic);
+void qpdenseaulsettings_copy(void *_dst, const void *_src, bool make_automatic);
 void qpdenseaulsettings_free(void *_p, bool make_automatic);
 
 struct qpdenseaulbuffers {
@@ -714,7 +714,7 @@ struct qpdenseaulbuffers {
    ae_int_t repnmv;
 };
 void qpdenseaulbuffers_init(void *_p, bool make_automatic);
-void qpdenseaulbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void qpdenseaulbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void qpdenseaulbuffers_free(void *_p, bool make_automatic);
 
 void qpdenseaulloaddefaults(ae_int_t nmain, qpdenseaulsettings *s);
@@ -818,7 +818,7 @@ struct minbleicstate {
    ae_vector invs;
 };
 void minbleicstate_init(void *_p, bool make_automatic);
-void minbleicstate_copy(void *_dst, void *_src, bool make_automatic);
+void minbleicstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minbleicstate_free(void *_p, bool make_automatic);
 
 struct minbleicreport {
@@ -836,7 +836,7 @@ struct minbleicreport {
    ae_int_t outeriterationscount;
 };
 void minbleicreport_init(void *_p, bool make_automatic);
-void minbleicreport_copy(void *_dst, void *_src, bool make_automatic);
+void minbleicreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minbleicreport_free(void *_p, bool make_automatic);
 
 void minbleicsetbc(minbleicstate *state, RVector *bndl, RVector *bndu);
@@ -907,7 +907,7 @@ struct qpbleicsettings {
    ae_int_t maxits;
 };
 void qpbleicsettings_init(void *_p, bool make_automatic);
-void qpbleicsettings_copy(void *_dst, void *_src, bool make_automatic);
+void qpbleicsettings_copy(void *_dst, const void *_src, bool make_automatic);
 void qpbleicsettings_free(void *_p, bool make_automatic);
 
 struct qpbleicbuffers {
@@ -920,7 +920,7 @@ struct qpbleicbuffers {
    ae_int_t repouteriterationscount;
 };
 void qpbleicbuffers_init(void *_p, bool make_automatic);
-void qpbleicbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void qpbleicbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void qpbleicbuffers_free(void *_p, bool make_automatic);
 
 void qpbleicloaddefaults(ae_int_t nmain, qpbleicsettings *s);
@@ -947,7 +947,7 @@ struct vipmvars {
    ae_vector q;
 };
 void vipmvars_init(void *_p, bool make_automatic);
-void vipmvars_copy(void *_dst, void *_src, bool make_automatic);
+void vipmvars_copy(void *_dst, const void *_src, bool make_automatic);
 void vipmvars_free(void *_p, bool make_automatic);
 
 struct vipmreducedsparsesystem {
@@ -961,7 +961,7 @@ struct vipmreducedsparsesystem {
    ae_vector priorities;
 };
 void vipmreducedsparsesystem_init(void *_p, bool make_automatic);
-void vipmreducedsparsesystem_copy(void *_dst, void *_src, bool make_automatic);
+void vipmreducedsparsesystem_copy(void *_dst, const void *_src, bool make_automatic);
 void vipmreducedsparsesystem_free(void *_p, bool make_automatic);
 
 struct vipmrighthandside {
@@ -977,7 +977,7 @@ struct vipmrighthandside {
    ae_vector gammaq;
 };
 void vipmrighthandside_init(void *_p, bool make_automatic);
-void vipmrighthandside_copy(void *_dst, void *_src, bool make_automatic);
+void vipmrighthandside_copy(void *_dst, const void *_src, bool make_automatic);
 void vipmrighthandside_free(void *_p, bool make_automatic);
 
 struct vipmstate {
@@ -1077,7 +1077,7 @@ struct vipmstate {
    sparsematrix tmpsparse0;
 };
 void vipmstate_init(void *_p, bool make_automatic);
-void vipmstate_copy(void *_dst, void *_src, bool make_automatic);
+void vipmstate_copy(void *_dst, const void *_src, bool make_automatic);
 void vipmstate_free(void *_p, bool make_automatic);
 
 void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *sparseh, ae_int_t hkind, bool isupper, RVector *c);
@@ -1153,7 +1153,7 @@ struct minqpstate {
    vipmstate vsolver;
 };
 void minqpstate_init(void *_p, bool make_automatic);
-void minqpstate_copy(void *_dst, void *_src, bool make_automatic);
+void minqpstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minqpstate_free(void *_p, bool make_automatic);
 
 struct minqpreport {
@@ -1166,7 +1166,7 @@ struct minqpreport {
    ae_vector laglc;
 };
 void minqpreport_init(void *_p, bool make_automatic);
-void minqpreport_copy(void *_dst, void *_src, bool make_automatic);
+void minqpreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minqpreport_free(void *_p, bool make_automatic);
 
 void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx, ae_int_t maxits);
@@ -1280,7 +1280,7 @@ struct minlmstepfinder {
    sparsematrix tmpsp;
 };
 void minlmstepfinder_init(void *_p, bool make_automatic);
-void minlmstepfinder_copy(void *_dst, void *_src, bool make_automatic);
+void minlmstepfinder_copy(void *_dst, const void *_src, bool make_automatic);
 void minlmstepfinder_free(void *_p, bool make_automatic);
 
 struct minlmstate {
@@ -1362,7 +1362,7 @@ struct minlmstate {
    minlmstepfinder finderstate;
 };
 void minlmstate_init(void *_p, bool make_automatic);
-void minlmstate_copy(void *_dst, void *_src, bool make_automatic);
+void minlmstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minlmstate_free(void *_p, bool make_automatic);
 
 struct minlmreport {
@@ -1375,7 +1375,7 @@ struct minlmreport {
    ae_int_t ncholesky;
 };
 void minlmreport_init(void *_p, bool make_automatic);
-void minlmreport_copy(void *_dst, void *_src, bool make_automatic);
+void minlmreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minlmreport_free(void *_p, bool make_automatic);
 
 void minlmsetcond(minlmstate *state, double epsx, ae_int_t maxits);
@@ -1512,7 +1512,7 @@ struct mincgstate {
    ae_vector lastscaleused;
 };
 void mincgstate_init(void *_p, bool make_automatic);
-void mincgstate_copy(void *_dst, void *_src, bool make_automatic);
+void mincgstate_copy(void *_dst, const void *_src, bool make_automatic);
 void mincgstate_free(void *_p, bool make_automatic);
 
 struct mincgreport {
@@ -1521,7 +1521,7 @@ struct mincgreport {
    ae_int_t terminationtype;
 };
 void mincgreport_init(void *_p, bool make_automatic);
-void mincgreport_copy(void *_dst, void *_src, bool make_automatic);
+void mincgreport_copy(void *_dst, const void *_src, bool make_automatic);
 void mincgreport_free(void *_p, bool make_automatic);
 
 void mincgsetcond(mincgstate *state, double epsg, double epsf, double epsx, ae_int_t maxits);
@@ -1616,7 +1616,7 @@ struct minsqpsubsolver {
    ae_int_t activesetsize;
 };
 void minsqpsubsolver_init(void *_p, bool make_automatic);
-void minsqpsubsolver_copy(void *_dst, void *_src, bool make_automatic);
+void minsqpsubsolver_copy(void *_dst, const void *_src, bool make_automatic);
 void minsqpsubsolver_free(void *_p, bool make_automatic);
 
 struct minsqptmplagrangian {
@@ -1624,14 +1624,14 @@ struct minsqptmplagrangian {
    ae_vector sclagtmp1;
 };
 void minsqptmplagrangian_init(void *_p, bool make_automatic);
-void minsqptmplagrangian_copy(void *_dst, void *_src, bool make_automatic);
+void minsqptmplagrangian_copy(void *_dst, const void *_src, bool make_automatic);
 void minsqptmplagrangian_free(void *_p, bool make_automatic);
 
 struct minsqptmpmerit {
    ae_vector mftmp0;
 };
 void minsqptmpmerit_init(void *_p, bool make_automatic);
-void minsqptmpmerit_copy(void *_dst, void *_src, bool make_automatic);
+void minsqptmpmerit_copy(void *_dst, const void *_src, bool make_automatic);
 void minsqptmpmerit_free(void *_p, bool make_automatic);
 
 struct minsqpmeritphasestate {
@@ -1663,7 +1663,7 @@ struct minsqpmeritphasestate {
    ae_int_t PQ;
 };
 void minsqpmeritphasestate_init(void *_p, bool make_automatic);
-void minsqpmeritphasestate_copy(void *_dst, void *_src, bool make_automatic);
+void minsqpmeritphasestate_copy(void *_dst, const void *_src, bool make_automatic);
 void minsqpmeritphasestate_free(void *_p, bool make_automatic);
 
 struct minsqpstate {
@@ -1722,7 +1722,7 @@ struct minsqpstate {
    ae_int_t PQ;
 };
 void minsqpstate_init(void *_p, bool make_automatic);
-void minsqpstate_copy(void *_dst, void *_src, bool make_automatic);
+void minsqpstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minsqpstate_free(void *_p, bool make_automatic);
 
 void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minsqpstate *state);
@@ -1750,7 +1750,7 @@ struct presolveinfo {
    ae_vector au;
 };
 void presolveinfo_init(void *_p, bool make_automatic);
-void presolveinfo_copy(void *_dst, void *_src, bool make_automatic);
+void presolveinfo_copy(void *_dst, const void *_src, bool make_automatic);
 void presolveinfo_free(void *_p, bool make_automatic);
 
 void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, sparsematrix *sparsea, RVector *al, RVector *au, ae_int_t k, presolveinfo *info);
@@ -1774,7 +1774,7 @@ struct dualsimplexsettings {
    double dtolabs;
 };
 void dualsimplexsettings_init(void *_p, bool make_automatic);
-void dualsimplexsettings_copy(void *_dst, void *_src, bool make_automatic);
+void dualsimplexsettings_copy(void *_dst, const void *_src, bool make_automatic);
 void dualsimplexsettings_free(void *_p, bool make_automatic);
 
 struct dssvector {
@@ -1785,7 +1785,7 @@ struct dssvector {
    ae_vector dense;
 };
 void dssvector_init(void *_p, bool make_automatic);
-void dssvector_copy(void *_dst, void *_src, bool make_automatic);
+void dssvector_copy(void *_dst, const void *_src, bool make_automatic);
 void dssvector_free(void *_p, bool make_automatic);
 
 struct dualsimplexbasis {
@@ -1830,7 +1830,7 @@ struct dualsimplexbasis {
    sparsematrix sparseludbg;
 };
 void dualsimplexbasis_init(void *_p, bool make_automatic);
-void dualsimplexbasis_copy(void *_dst, void *_src, bool make_automatic);
+void dualsimplexbasis_copy(void *_dst, const void *_src, bool make_automatic);
 void dualsimplexbasis_free(void *_p, bool make_automatic);
 
 struct dualsimplexsubproblem {
@@ -1852,7 +1852,7 @@ struct dualsimplexsubproblem {
    ae_vector effc;
 };
 void dualsimplexsubproblem_init(void *_p, bool make_automatic);
-void dualsimplexsubproblem_copy(void *_dst, void *_src, bool make_automatic);
+void dualsimplexsubproblem_copy(void *_dst, const void *_src, bool make_automatic);
 void dualsimplexsubproblem_free(void *_p, bool make_automatic);
 
 struct dualsimplexstate {
@@ -1906,7 +1906,7 @@ struct dualsimplexstate {
    ae_vector harrisset;
 };
 void dualsimplexstate_init(void *_p, bool make_automatic);
-void dualsimplexstate_copy(void *_dst, void *_src, bool make_automatic);
+void dualsimplexstate_copy(void *_dst, const void *_src, bool make_automatic);
 void dualsimplexstate_free(void *_p, bool make_automatic);
 
 void dsssettingsinit(dualsimplexsettings *settings);
@@ -1957,7 +1957,7 @@ struct minlpstate {
    sparsematrix ipmquadratic;
 };
 void minlpstate_init(void *_p, bool make_automatic);
-void minlpstate_copy(void *_dst, void *_src, bool make_automatic);
+void minlpstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minlpstate_free(void *_p, bool make_automatic);
 
 struct minlpreport {
@@ -1973,7 +1973,7 @@ struct minlpreport {
    ae_int_t terminationtype;
 };
 void minlpreport_init(void *_p, bool make_automatic);
-void minlpreport_copy(void *_dst, void *_src, bool make_automatic);
+void minlpreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minlpreport_free(void *_p, bool make_automatic);
 
 void minlpsetalgodss(minlpstate *state, double eps);
@@ -2053,7 +2053,7 @@ struct minslpsubsolver {
    ae_vector cs;
 };
 void minslpsubsolver_init(void *_p, bool make_automatic);
-void minslpsubsolver_copy(void *_dst, void *_src, bool make_automatic);
+void minslpsubsolver_copy(void *_dst, const void *_src, bool make_automatic);
 void minslpsubsolver_free(void *_p, bool make_automatic);
 
 struct minslptmplagrangian {
@@ -2061,14 +2061,14 @@ struct minslptmplagrangian {
    ae_vector sclagtmp1;
 };
 void minslptmplagrangian_init(void *_p, bool make_automatic);
-void minslptmplagrangian_copy(void *_dst, void *_src, bool make_automatic);
+void minslptmplagrangian_copy(void *_dst, const void *_src, bool make_automatic);
 void minslptmplagrangian_free(void *_p, bool make_automatic);
 
 struct minslptmpmerit {
    ae_vector mftmp0;
 };
 void minslptmpmerit_init(void *_p, bool make_automatic);
-void minslptmpmerit_copy(void *_dst, void *_src, bool make_automatic);
+void minslptmpmerit_copy(void *_dst, const void *_src, bool make_automatic);
 void minslptmpmerit_free(void *_p, bool make_automatic);
 
 struct minslpphase13state {
@@ -2086,7 +2086,7 @@ struct minslpphase13state {
    ae_int_t Ph13PQ;
 };
 void minslpphase13state_init(void *_p, bool make_automatic);
-void minslpphase13state_copy(void *_dst, void *_src, bool make_automatic);
+void minslpphase13state_copy(void *_dst, const void *_src, bool make_automatic);
 void minslpphase13state_free(void *_p, bool make_automatic);
 
 struct minslpphase2state {
@@ -2112,7 +2112,7 @@ struct minslpphase2state {
    ae_int_t Ph2PQ;
 };
 void minslpphase2state_init(void *_p, bool make_automatic);
-void minslpphase2state_copy(void *_dst, void *_src, bool make_automatic);
+void minslpphase2state_copy(void *_dst, const void *_src, bool make_automatic);
 void minslpphase2state_free(void *_p, bool make_automatic);
 
 struct minslpstate {
@@ -2176,7 +2176,7 @@ struct minslpstate {
    ae_int_t PQ;
 };
 void minslpstate_init(void *_p, bool make_automatic);
-void minslpstate_copy(void *_dst, void *_src, bool make_automatic);
+void minslpstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minslpstate_free(void *_p, bool make_automatic);
 
 void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minslpstate *state);
@@ -2270,7 +2270,7 @@ struct minnlcstate {
    ae_int_t repdbgphase0its;
 };
 void minnlcstate_init(void *_p, bool make_automatic);
-void minnlcstate_copy(void *_dst, void *_src, bool make_automatic);
+void minnlcstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minnlcstate_free(void *_p, bool make_automatic);
 
 struct minnlcreport {
@@ -2286,7 +2286,7 @@ struct minnlcreport {
    ae_int_t dbgphase0its;
 };
 void minnlcreport_init(void *_p, bool make_automatic);
-void minnlcreport_copy(void *_dst, void *_src, bool make_automatic);
+void minnlcreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minnlcreport_free(void *_p, bool make_automatic);
 
 void minnlcsetbc(minnlcstate *state, RVector *bndl, RVector *bndu);
@@ -2383,7 +2383,7 @@ struct minnsqp {
    snnlssolver nnls;
 };
 void minnsqp_init(void *_p, bool make_automatic);
-void minnsqp_copy(void *_dst, void *_src, bool make_automatic);
+void minnsqp_copy(void *_dst, const void *_src, bool make_automatic);
 void minnsqp_free(void *_p, bool make_automatic);
 
 struct minnsstate {
@@ -2473,7 +2473,7 @@ struct minnsstate {
    ae_int_t dbgncholesky;
 };
 void minnsstate_init(void *_p, bool make_automatic);
-void minnsstate_copy(void *_dst, void *_src, bool make_automatic);
+void minnsstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minnsstate_free(void *_p, bool make_automatic);
 
 struct minnsreport {
@@ -2487,7 +2487,7 @@ struct minnsreport {
    ae_int_t funcidx;
 };
 void minnsreport_init(void *_p, bool make_automatic);
-void minnsreport_copy(void *_dst, void *_src, bool make_automatic);
+void minnsreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minnsreport_free(void *_p, bool make_automatic);
 
 void minnssetbc(minnsstate *state, RVector *bndl, RVector *bndu);
@@ -2581,7 +2581,7 @@ struct minasastate {
    double betady;
 };
 void minasastate_init(void *_p, bool make_automatic);
-void minasastate_copy(void *_dst, void *_src, bool make_automatic);
+void minasastate_copy(void *_dst, const void *_src, bool make_automatic);
 void minasastate_free(void *_p, bool make_automatic);
 
 struct minasareport {
@@ -2591,7 +2591,7 @@ struct minasareport {
    ae_int_t activeconstraints;
 };
 void minasareport_init(void *_p, bool make_automatic);
-void minasareport_copy(void *_dst, void *_src, bool make_automatic);
+void minasareport_copy(void *_dst, const void *_src, bool make_automatic);
 void minasareport_free(void *_p, bool make_automatic);
 
 void minlbfgssetdefaultpreconditioner(minlbfgsstate *state);
@@ -2706,7 +2706,7 @@ struct minbcstate {
    ae_vector invs;
 };
 void minbcstate_init(void *_p, bool make_automatic);
-void minbcstate_copy(void *_dst, void *_src, bool make_automatic);
+void minbcstate_copy(void *_dst, const void *_src, bool make_automatic);
 void minbcstate_free(void *_p, bool make_automatic);
 
 struct minbcreport {
@@ -2716,7 +2716,7 @@ struct minbcreport {
    ae_int_t terminationtype;
 };
 void minbcreport_init(void *_p, bool make_automatic);
-void minbcreport_copy(void *_dst, void *_src, bool make_automatic);
+void minbcreport_copy(void *_dst, const void *_src, bool make_automatic);
 void minbcreport_free(void *_p, bool make_automatic);
 
 void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu);
@@ -2789,7 +2789,7 @@ struct lptestproblem {
    ae_vector au;
 };
 void lptestproblem_init(void *_p, bool make_automatic);
-void lptestproblem_copy(void *_dst, void *_src, bool make_automatic);
+void lptestproblem_copy(void *_dst, const void *_src, bool make_automatic);
 void lptestproblem_free(void *_p, bool make_automatic);
 void lptestproblemalloc(ae_serializer *s, lptestproblem *p);
 void lptestproblemserialize(ae_serializer *s, lptestproblem *p);

@@ -192,9 +192,9 @@ void optguardreport_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->badgradnum, 0, 0, DT_REAL, make_automatic);
 }
 
-void optguardreport_copy(void *_dst, void *_src, bool make_automatic) {
+void optguardreport_copy(void *_dst, const void *_src, bool make_automatic) {
    optguardreport *dst = (optguardreport *)_dst;
-   optguardreport *src = (optguardreport *)_src;
+   const optguardreport *src = (const optguardreport *)_src;
    dst->nonc0suspected = src->nonc0suspected;
    dst->nonc0test0positive = src->nonc0test0positive;
    dst->nonc0fidx = src->nonc0fidx;
@@ -227,9 +227,9 @@ void optguardnonc0report_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->f, 0, DT_REAL, make_automatic);
 }
 
-void optguardnonc0report_copy(void *_dst, void *_src, bool make_automatic) {
+void optguardnonc0report_copy(void *_dst, const void *_src, bool make_automatic) {
    optguardnonc0report *dst = (optguardnonc0report *)_dst;
-   optguardnonc0report *src = (optguardnonc0report *)_src;
+   const optguardnonc0report *src = (const optguardnonc0report *)_src;
    dst->positive = src->positive;
    dst->fidx = src->fidx;
    ae_vector_copy(&dst->x0, &src->x0, make_automatic);
@@ -258,9 +258,9 @@ void optguardnonc1test0report_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->f, 0, DT_REAL, make_automatic);
 }
 
-void optguardnonc1test0report_copy(void *_dst, void *_src, bool make_automatic) {
+void optguardnonc1test0report_copy(void *_dst, const void *_src, bool make_automatic) {
    optguardnonc1test0report *dst = (optguardnonc1test0report *)_dst;
-   optguardnonc1test0report *src = (optguardnonc1test0report *)_src;
+   const optguardnonc1test0report *src = (const optguardnonc1test0report *)_src;
    dst->positive = src->positive;
    dst->fidx = src->fidx;
    ae_vector_copy(&dst->x0, &src->x0, make_automatic);
@@ -289,9 +289,9 @@ void optguardnonc1test1report_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->g, 0, DT_REAL, make_automatic);
 }
 
-void optguardnonc1test1report_copy(void *_dst, void *_src, bool make_automatic) {
+void optguardnonc1test1report_copy(void *_dst, const void *_src, bool make_automatic) {
    optguardnonc1test1report *dst = (optguardnonc1test1report *)_dst;
-   optguardnonc1test1report *src = (optguardnonc1test1report *)_src;
+   const optguardnonc1test1report *src = (const optguardnonc1test1report *)_src;
    dst->positive = src->positive;
    dst->fidx = src->fidx;
    dst->vidx = src->vidx;
@@ -3158,9 +3158,9 @@ void precbuflbfgs_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->bufb, 0, DT_INT, make_automatic);
 }
 
-void precbuflbfgs_copy(void *_dst, void *_src, bool make_automatic) {
+void precbuflbfgs_copy(void *_dst, const void *_src, bool make_automatic) {
    precbuflbfgs *dst = (precbuflbfgs *)_dst;
-   precbuflbfgs *src = (precbuflbfgs *)_src;
+   const precbuflbfgs *src = (const precbuflbfgs *)_src;
    ae_vector_copy(&dst->norms, &src->norms, make_automatic);
    ae_vector_copy(&dst->alpha, &src->alpha, make_automatic);
    ae_vector_copy(&dst->rho, &src->rho, make_automatic);
@@ -3191,9 +3191,9 @@ void precbuflowrank_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmp, 0, DT_REAL, make_automatic);
 }
 
-void precbuflowrank_copy(void *_dst, void *_src, bool make_automatic) {
+void precbuflowrank_copy(void *_dst, const void *_src, bool make_automatic) {
    precbuflowrank *dst = (precbuflowrank *)_dst;
-   precbuflowrank *src = (precbuflowrank *)_src;
+   const precbuflowrank *src = (const precbuflowrank *)_src;
    dst->n = src->n;
    dst->k = src->k;
    ae_vector_copy(&dst->d, &src->d, make_automatic);
@@ -3261,9 +3261,9 @@ void smoothnessmonitor_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->j0, 0, 0, DT_REAL, make_automatic);
 }
 
-void smoothnessmonitor_copy(void *_dst, void *_src, bool make_automatic) {
+void smoothnessmonitor_copy(void *_dst, const void *_src, bool make_automatic) {
    smoothnessmonitor *dst = (smoothnessmonitor *)_dst;
-   smoothnessmonitor *src = (smoothnessmonitor *)_src;
+   const smoothnessmonitor *src = (const smoothnessmonitor *)_src;
    dst->n = src->n;
    dst->k = src->k;
    dst->checksmoothness = src->checksmoothness;
@@ -4602,9 +4602,9 @@ void minlbfgsstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, make_automatic);
 }
 
-void minlbfgsstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minlbfgsstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minlbfgsstate *dst = (minlbfgsstate *)_dst;
-   minlbfgsstate *src = (minlbfgsstate *)_src;
+   const minlbfgsstate *src = (const minlbfgsstate *)_src;
    dst->n = src->n;
    dst->m = src->m;
    dst->epsg = src->epsg;
@@ -4696,9 +4696,9 @@ void minlbfgsstate_free(void *_p, bool make_automatic) {
 void minlbfgsreport_init(void *_p, bool make_automatic) {
 }
 
-void minlbfgsreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minlbfgsreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minlbfgsreport *dst = (minlbfgsreport *)_dst;
-   minlbfgsreport *src = (minlbfgsreport *)_src;
+   const minlbfgsreport *src = (const minlbfgsreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfev = src->nfev;
    dst->terminationtype = src->terminationtype;
@@ -6167,9 +6167,9 @@ void convexquadraticmodel_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->tmp2, 0, 0, DT_REAL, make_automatic);
 }
 
-void convexquadraticmodel_copy(void *_dst, void *_src, bool make_automatic) {
+void convexquadraticmodel_copy(void *_dst, const void *_src, bool make_automatic) {
    convexquadraticmodel *dst = (convexquadraticmodel *)_dst;
-   convexquadraticmodel *src = (convexquadraticmodel *)_src;
+   const convexquadraticmodel *src = (const convexquadraticmodel *)_src;
    dst->n = src->n;
    dst->k = src->k;
    dst->alpha = src->alpha;
@@ -7502,9 +7502,9 @@ void snnlssolver_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->rdtmprowmap, 0, DT_INT, make_automatic);
 }
 
-void snnlssolver_copy(void *_dst, void *_src, bool make_automatic) {
+void snnlssolver_copy(void *_dst, const void *_src, bool make_automatic) {
    snnlssolver *dst = (snnlssolver *)_dst;
-   snnlssolver *src = (snnlssolver *)_src;
+   const snnlssolver *src = (const snnlssolver *)_src;
    dst->ns = src->ns;
    dst->nd = src->nd;
    dst->nr = src->nr;
@@ -9467,9 +9467,9 @@ void sactiveset_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmpci, 0, DT_REAL, make_automatic);
 }
 
-void sactiveset_copy(void *_dst, void *_src, bool make_automatic) {
+void sactiveset_copy(void *_dst, const void *_src, bool make_automatic) {
    sactiveset *dst = (sactiveset *)_dst;
-   sactiveset *src = (sactiveset *)_src;
+   const sactiveset *src = (const sactiveset *)_src;
    dst->n = src->n;
    dst->algostate = src->algostate;
    ae_vector_copy(&dst->xc, &src->xc, make_automatic);
@@ -11025,9 +11025,9 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 void qqpsettings_init(void *_p, bool make_automatic) {
 }
 
-void qqpsettings_copy(void *_dst, void *_src, bool make_automatic) {
+void qqpsettings_copy(void *_dst, const void *_src, bool make_automatic) {
    qqpsettings *dst = (qqpsettings *)_dst;
-   qqpsettings *src = (qqpsettings *)_src;
+   const qqpsettings *src = (const qqpsettings *)_src;
    dst->epsg = src->epsg;
    dst->epsf = src->epsf;
    dst->epsx = src->epsx;
@@ -11076,9 +11076,9 @@ void qqpbuffers_init(void *_p, bool make_automatic) {
    sparsebuffers_init(&p->sbuf, make_automatic);
 }
 
-void qqpbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void qqpbuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    qqpbuffers *dst = (qqpbuffers *)_dst;
-   qqpbuffers *src = (qqpbuffers *)_src;
+   const qqpbuffers *src = (const qqpbuffers *)_src;
    dst->n = src->n;
    dst->akind = src->akind;
    ae_matrix_copy(&dst->densea, &src->densea, make_automatic);
@@ -12215,9 +12215,9 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
 void qpdenseaulsettings_init(void *_p, bool make_automatic) {
 }
 
-void qpdenseaulsettings_copy(void *_dst, void *_src, bool make_automatic) {
+void qpdenseaulsettings_copy(void *_dst, const void *_src, bool make_automatic) {
    qpdenseaulsettings *dst = (qpdenseaulsettings *)_dst;
-   qpdenseaulsettings *src = (qpdenseaulsettings *)_src;
+   const qpdenseaulsettings *src = (const qpdenseaulsettings *)_src;
    dst->epsx = src->epsx;
    dst->outerits = src->outerits;
    dst->rho = src->rho;
@@ -12266,9 +12266,9 @@ void qpdenseaulbuffers_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->nicnact, 0, DT_INT, make_automatic);
 }
 
-void qpdenseaulbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void qpdenseaulbuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    qpdenseaulbuffers *dst = (qpdenseaulbuffers *)_dst;
-   qpdenseaulbuffers *src = (qpdenseaulbuffers *)_src;
+   const qpdenseaulbuffers *src = (const qpdenseaulbuffers *)_src;
    ae_vector_copy(&dst->nulc, &src->nulc, make_automatic);
    ae_matrix_copy(&dst->sclsfta, &src->sclsfta, make_automatic);
    ae_vector_copy(&dst->sclsftb, &src->sclsftb, make_automatic);
@@ -14019,9 +14019,9 @@ void minbleicstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->invs, 0, DT_REAL, make_automatic);
 }
 
-void minbleicstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minbleicstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minbleicstate *dst = (minbleicstate *)_dst;
-   minbleicstate *src = (minbleicstate *)_src;
+   const minbleicstate *src = (const minbleicstate *)_src;
    dst->nmain = src->nmain;
    dst->nslack = src->nslack;
    dst->epsg = src->epsg;
@@ -14151,9 +14151,9 @@ void minbleicstate_free(void *_p, bool make_automatic) {
 void minbleicreport_init(void *_p, bool make_automatic) {
 }
 
-void minbleicreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minbleicreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minbleicreport *dst = (minbleicreport *)_dst;
-   minbleicreport *src = (minbleicreport *)_src;
+   const minbleicreport *src = (const minbleicreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfev = src->nfev;
    dst->varidx = src->varidx;
@@ -14777,9 +14777,9 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
 void qpbleicsettings_init(void *_p, bool make_automatic) {
 }
 
-void qpbleicsettings_copy(void *_dst, void *_src, bool make_automatic) {
+void qpbleicsettings_copy(void *_dst, const void *_src, bool make_automatic) {
    qpbleicsettings *dst = (qpbleicsettings *)_dst;
-   qpbleicsettings *src = (qpbleicsettings *)_src;
+   const qpbleicsettings *src = (const qpbleicsettings *)_src;
    dst->epsg = src->epsg;
    dst->epsf = src->epsf;
    dst->epsx = src->epsx;
@@ -14798,9 +14798,9 @@ void qpbleicbuffers_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmpi, 0, DT_INT, make_automatic);
 }
 
-void qpbleicbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void qpbleicbuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    qpbleicbuffers *dst = (qpbleicbuffers *)_dst;
-   qpbleicbuffers *src = (qpbleicbuffers *)_src;
+   const qpbleicbuffers *src = (const qpbleicbuffers *)_src;
    minbleicstate_copy(&dst->solver, &src->solver, make_automatic);
    minbleicreport_copy(&dst->solverrep, &src->solverrep, make_automatic);
    ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
@@ -17820,9 +17820,9 @@ void vipmvars_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->q, 0, DT_REAL, make_automatic);
 }
 
-void vipmvars_copy(void *_dst, void *_src, bool make_automatic) {
+void vipmvars_copy(void *_dst, const void *_src, bool make_automatic) {
    vipmvars *dst = (vipmvars *)_dst;
-   vipmvars *src = (vipmvars *)_src;
+   const vipmvars *src = (const vipmvars *)_src;
    dst->n = src->n;
    dst->m = src->m;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
@@ -17862,9 +17862,9 @@ void vipmreducedsparsesystem_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->priorities, 0, DT_INT, make_automatic);
 }
 
-void vipmreducedsparsesystem_copy(void *_dst, void *_src, bool make_automatic) {
+void vipmreducedsparsesystem_copy(void *_dst, const void *_src, bool make_automatic) {
    vipmreducedsparsesystem *dst = (vipmreducedsparsesystem *)_dst;
-   vipmreducedsparsesystem *src = (vipmreducedsparsesystem *)_src;
+   const vipmreducedsparsesystem *src = (const vipmreducedsparsesystem *)_src;
    sparsematrix_copy(&dst->rawsystem, &src->rawsystem, make_automatic);
    ae_vector_copy(&dst->effectivediag, &src->effectivediag, make_automatic);
    ae_vector_copy(&dst->isdiagonal, &src->isdiagonal, make_automatic);
@@ -17900,9 +17900,9 @@ void vipmrighthandside_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->gammaq, 0, DT_REAL, make_automatic);
 }
 
-void vipmrighthandside_copy(void *_dst, void *_src, bool make_automatic) {
+void vipmrighthandside_copy(void *_dst, const void *_src, bool make_automatic) {
    vipmrighthandside *dst = (vipmrighthandside *)_dst;
-   vipmrighthandside *src = (vipmrighthandside *)_src;
+   const vipmrighthandside *src = (const vipmrighthandside *)_src;
    ae_vector_copy(&dst->sigma, &src->sigma, make_automatic);
    ae_vector_copy(&dst->beta, &src->beta, make_automatic);
    ae_vector_copy(&dst->rho, &src->rho, make_automatic);
@@ -18006,9 +18006,9 @@ void vipmstate_init(void *_p, bool make_automatic) {
    sparsematrix_init(&p->tmpsparse0, make_automatic);
 }
 
-void vipmstate_copy(void *_dst, void *_src, bool make_automatic) {
+void vipmstate_copy(void *_dst, const void *_src, bool make_automatic) {
    vipmstate *dst = (vipmstate *)_dst;
-   vipmstate *src = (vipmstate *)_src;
+   const vipmstate *src = (const vipmstate *)_src;
    dst->slacksforequalityconstraints = src->slacksforequalityconstraints;
    dst->n = src->n;
    dst->nmain = src->nmain;
@@ -20298,9 +20298,9 @@ void minqpstate_init(void *_p, bool make_automatic) {
    vipmstate_init(&p->vsolver, make_automatic);
 }
 
-void minqpstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minqpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minqpstate *dst = (minqpstate *)_dst;
-   minqpstate *src = (minqpstate *)_src;
+   const minqpstate *src = (const minqpstate *)_src;
    dst->n = src->n;
    qqpsettings_copy(&dst->qqpsettingsuser, &src->qqpsettingsuser, make_automatic);
    qpbleicsettings_copy(&dst->qpbleicsettingsuser, &src->qpbleicsettingsuser, make_automatic);
@@ -20410,9 +20410,9 @@ void minqpreport_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->laglc, 0, DT_REAL, make_automatic);
 }
 
-void minqpreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minqpreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minqpreport *dst = (minqpreport *)_dst;
-   minqpreport *src = (minqpreport *)_src;
+   const minqpreport *src = (const minqpreport *)_src;
    dst->inneriterationscount = src->inneriterationscount;
    dst->outeriterationscount = src->outeriterationscount;
    dst->nmv = src->nmv;
@@ -22819,9 +22819,9 @@ void minlmstepfinder_init(void *_p, bool make_automatic) {
    sparsematrix_init(&p->tmpsp, make_automatic);
 }
 
-void minlmstepfinder_copy(void *_dst, void *_src, bool make_automatic) {
+void minlmstepfinder_copy(void *_dst, const void *_src, bool make_automatic) {
    minlmstepfinder *dst = (minlmstepfinder *)_dst;
-   minlmstepfinder *src = (minlmstepfinder *)_src;
+   const minlmstepfinder *src = (const minlmstepfinder *)_src;
    dst->n = src->n;
    dst->m = src->m;
    dst->stpmax = src->stpmax;
@@ -22914,9 +22914,9 @@ void minlmstate_init(void *_p, bool make_automatic) {
    minlmstepfinder_init(&p->finderstate, make_automatic);
 }
 
-void minlmstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minlmstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minlmstate *dst = (minlmstate *)_dst;
-   minlmstate *src = (minlmstate *)_src;
+   const minlmstate *src = (const minlmstate *)_src;
    dst->n = src->n;
    dst->m = src->m;
    dst->diffstep = src->diffstep;
@@ -23036,9 +23036,9 @@ void minlmstate_free(void *_p, bool make_automatic) {
 void minlmreport_init(void *_p, bool make_automatic) {
 }
 
-void minlmreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minlmreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minlmreport *dst = (minlmreport *)_dst;
-   minlmreport *src = (minlmreport *)_src;
+   const minlmreport *src = (const minlmreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->terminationtype = src->terminationtype;
    dst->nfunc = src->nfunc;
@@ -24782,9 +24782,9 @@ void mincgstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, make_automatic);
 }
 
-void mincgstate_copy(void *_dst, void *_src, bool make_automatic) {
+void mincgstate_copy(void *_dst, const void *_src, bool make_automatic) {
    mincgstate *dst = (mincgstate *)_dst;
-   mincgstate *src = (mincgstate *)_src;
+   const mincgstate *src = (const mincgstate *)_src;
    dst->n = src->n;
    dst->epsg = src->epsg;
    dst->epsf = src->epsf;
@@ -24880,9 +24880,9 @@ void mincgstate_free(void *_p, bool make_automatic) {
 void mincgreport_init(void *_p, bool make_automatic) {
 }
 
-void mincgreport_copy(void *_dst, void *_src, bool make_automatic) {
+void mincgreport_copy(void *_dst, const void *_src, bool make_automatic) {
    mincgreport *dst = (mincgreport *)_dst;
-   mincgreport *src = (mincgreport *)_src;
+   const mincgreport *src = (const mincgreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfev = src->nfev;
    dst->terminationtype = src->terminationtype;
@@ -26757,9 +26757,9 @@ void minsqpsubsolver_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->activeidx, 0, DT_INT, make_automatic);
 }
 
-void minsqpsubsolver_copy(void *_dst, void *_src, bool make_automatic) {
+void minsqpsubsolver_copy(void *_dst, const void *_src, bool make_automatic) {
    minsqpsubsolver *dst = (minsqpsubsolver *)_dst;
-   minsqpsubsolver *src = (minsqpsubsolver *)_src;
+   const minsqpsubsolver *src = (const minsqpsubsolver *)_src;
    dst->algokind = src->algokind;
    vipmstate_copy(&dst->ipmsolver, &src->ipmsolver, make_automatic);
    ae_vector_copy(&dst->curb, &src->curb, make_automatic);
@@ -26822,9 +26822,9 @@ void minsqptmplagrangian_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, make_automatic);
 }
 
-void minsqptmplagrangian_copy(void *_dst, void *_src, bool make_automatic) {
+void minsqptmplagrangian_copy(void *_dst, const void *_src, bool make_automatic) {
    minsqptmplagrangian *dst = (minsqptmplagrangian *)_dst;
-   minsqptmplagrangian *src = (minsqptmplagrangian *)_src;
+   const minsqptmplagrangian *src = (const minsqptmplagrangian *)_src;
    ae_vector_copy(&dst->sclagtmp0, &src->sclagtmp0, make_automatic);
    ae_vector_copy(&dst->sclagtmp1, &src->sclagtmp1, make_automatic);
 }
@@ -26840,9 +26840,9 @@ void minsqptmpmerit_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->mftmp0, 0, DT_REAL, make_automatic);
 }
 
-void minsqptmpmerit_copy(void *_dst, void *_src, bool make_automatic) {
+void minsqptmpmerit_copy(void *_dst, const void *_src, bool make_automatic) {
    minsqptmpmerit *dst = (minsqptmpmerit *)_dst;
-   minsqptmpmerit *src = (minsqptmpmerit *)_src;
+   const minsqptmpmerit *src = (const minsqptmpmerit *)_src;
    ae_vector_copy(&dst->mftmp0, &src->mftmp0, make_automatic);
 }
 
@@ -26873,9 +26873,9 @@ void minsqpmeritphasestate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->stepknlaggrad, 0, DT_REAL, make_automatic);
 }
 
-void minsqpmeritphasestate_copy(void *_dst, void *_src, bool make_automatic) {
+void minsqpmeritphasestate_copy(void *_dst, const void *_src, bool make_automatic) {
    minsqpmeritphasestate *dst = (minsqpmeritphasestate *)_dst;
-   minsqpmeritphasestate *src = (minsqpmeritphasestate *)_src;
+   const minsqpmeritphasestate *src = (const minsqpmeritphasestate *)_src;
    dst->n = src->n;
    dst->nec = src->nec;
    dst->nic = src->nic;
@@ -26955,9 +26955,9 @@ void minsqpstate_init(void *_p, bool make_automatic) {
    minsqptmpmerit_init(&p->tmpmerit, make_automatic);
 }
 
-void minsqpstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minsqpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minsqpstate *dst = (minsqpstate *)_dst;
-   minsqpstate *src = (minsqpstate *)_src;
+   const minsqpstate *src = (const minsqpstate *)_src;
    dst->n = src->n;
    dst->nec = src->nec;
    dst->nic = src->nic;
@@ -27225,9 +27225,9 @@ void presolveinfo_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->au, 0, DT_REAL, make_automatic);
 }
 
-void presolveinfo_copy(void *_dst, void *_src, bool make_automatic) {
+void presolveinfo_copy(void *_dst, const void *_src, bool make_automatic) {
    presolveinfo *dst = (presolveinfo *)_dst;
-   presolveinfo *src = (presolveinfo *)_src;
+   const presolveinfo *src = (const presolveinfo *)_src;
    dst->newn = src->newn;
    dst->oldn = src->oldn;
    dst->newm = src->newm;
@@ -30760,9 +30760,9 @@ void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings) {
 void dualsimplexsettings_init(void *_p, bool make_automatic) {
 }
 
-void dualsimplexsettings_copy(void *_dst, void *_src, bool make_automatic) {
+void dualsimplexsettings_copy(void *_dst, const void *_src, bool make_automatic) {
    dualsimplexsettings *dst = (dualsimplexsettings *)_dst;
-   dualsimplexsettings *src = (dualsimplexsettings *)_src;
+   const dualsimplexsettings *src = (const dualsimplexsettings *)_src;
    dst->pivottol = src->pivottol;
    dst->perturbmag = src->perturbmag;
    dst->maxtrfage = src->maxtrfage;
@@ -30785,9 +30785,9 @@ void dssvector_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->dense, 0, DT_REAL, make_automatic);
 }
 
-void dssvector_copy(void *_dst, void *_src, bool make_automatic) {
+void dssvector_copy(void *_dst, const void *_src, bool make_automatic) {
    dssvector *dst = (dssvector *)_dst;
-   dssvector *src = (dssvector *)_src;
+   const dssvector *src = (const dssvector *)_src;
    dst->n = src->n;
    dst->k = src->k;
    ae_vector_copy(&dst->idx, &src->idx, make_automatic);
@@ -30835,9 +30835,9 @@ void dualsimplexbasis_init(void *_p, bool make_automatic) {
    sparsematrix_init(&p->sparseludbg, make_automatic);
 }
 
-void dualsimplexbasis_copy(void *_dst, void *_src, bool make_automatic) {
+void dualsimplexbasis_copy(void *_dst, const void *_src, bool make_automatic) {
    dualsimplexbasis *dst = (dualsimplexbasis *)_dst;
-   dualsimplexbasis *src = (dualsimplexbasis *)_src;
+   const dualsimplexbasis *src = (const dualsimplexbasis *)_src;
    dst->ns = src->ns;
    dst->m = src->m;
    ae_vector_copy(&dst->idx, &src->idx, make_automatic);
@@ -30929,9 +30929,9 @@ void dualsimplexsubproblem_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->effc, 0, DT_REAL, make_automatic);
 }
 
-void dualsimplexsubproblem_copy(void *_dst, void *_src, bool make_automatic) {
+void dualsimplexsubproblem_copy(void *_dst, const void *_src, bool make_automatic) {
    dualsimplexsubproblem *dst = (dualsimplexsubproblem *)_dst;
-   dualsimplexsubproblem *src = (dualsimplexsubproblem *)_src;
+   const dualsimplexsubproblem *src = (const dualsimplexsubproblem *)_src;
    dst->ns = src->ns;
    dst->m = src->m;
    ae_vector_copy(&dst->rawc, &src->rawc, make_automatic);
@@ -31005,9 +31005,9 @@ void dualsimplexstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->harrisset, 0, DT_INT, make_automatic);
 }
 
-void dualsimplexstate_copy(void *_dst, void *_src, bool make_automatic) {
+void dualsimplexstate_copy(void *_dst, const void *_src, bool make_automatic) {
    dualsimplexstate *dst = (dualsimplexstate *)_dst;
-   dualsimplexstate *src = (dualsimplexstate *)_src;
+   const dualsimplexstate *src = (const dualsimplexstate *)_src;
    ae_vector_copy(&dst->rowscales, &src->rowscales, make_automatic);
    ae_vector_copy(&dst->rawbndl, &src->rawbndl, make_automatic);
    ae_vector_copy(&dst->rawbndu, &src->rawbndu, make_automatic);
@@ -32050,9 +32050,9 @@ void minlpstate_init(void *_p, bool make_automatic) {
    sparsematrix_init(&p->ipmquadratic, make_automatic);
 }
 
-void minlpstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minlpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minlpstate *dst = (minlpstate *)_dst;
-   minlpstate *src = (minlpstate *)_src;
+   const minlpstate *src = (const minlpstate *)_src;
    dst->n = src->n;
    dst->algokind = src->algokind;
    dst->ipmlambda = src->ipmlambda;
@@ -32123,9 +32123,9 @@ void minlpreport_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->stats, 0, DT_INT, make_automatic);
 }
 
-void minlpreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minlpreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minlpreport *dst = (minlpreport *)_dst;
-   minlpreport *src = (minlpreport *)_src;
+   const minlpreport *src = (const minlpreport *)_src;
    dst->f = src->f;
    ae_vector_copy(&dst->lagbc, &src->lagbc, make_automatic);
    ae_vector_copy(&dst->laglc, &src->laglc, make_automatic);
@@ -34238,9 +34238,9 @@ void minslpsubsolver_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->cs, 0, DT_INT, make_automatic);
 }
 
-void minslpsubsolver_copy(void *_dst, void *_src, bool make_automatic) {
+void minslpsubsolver_copy(void *_dst, const void *_src, bool make_automatic) {
    minslpsubsolver *dst = (minslpsubsolver *)_dst;
-   minslpsubsolver *src = (minslpsubsolver *)_src;
+   const minslpsubsolver *src = (const minslpsubsolver *)_src;
    presolveinfo_copy(&dst->presolver, &src->presolver, make_automatic);
    dualsimplexstate_copy(&dst->dss, &src->dss, make_automatic);
    dualsimplexsettings_copy(&dst->dsssettings, &src->dsssettings, make_automatic);
@@ -34304,9 +34304,9 @@ void minslptmplagrangian_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, make_automatic);
 }
 
-void minslptmplagrangian_copy(void *_dst, void *_src, bool make_automatic) {
+void minslptmplagrangian_copy(void *_dst, const void *_src, bool make_automatic) {
    minslptmplagrangian *dst = (minslptmplagrangian *)_dst;
-   minslptmplagrangian *src = (minslptmplagrangian *)_src;
+   const minslptmplagrangian *src = (const minslptmplagrangian *)_src;
    ae_vector_copy(&dst->sclagtmp0, &src->sclagtmp0, make_automatic);
    ae_vector_copy(&dst->sclagtmp1, &src->sclagtmp1, make_automatic);
 }
@@ -34322,9 +34322,9 @@ void minslptmpmerit_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->mftmp0, 0, DT_REAL, make_automatic);
 }
 
-void minslptmpmerit_copy(void *_dst, void *_src, bool make_automatic) {
+void minslptmpmerit_copy(void *_dst, const void *_src, bool make_automatic) {
    minslptmpmerit *dst = (minslptmpmerit *)_dst;
-   minslptmpmerit *src = (minslptmpmerit *)_src;
+   const minslptmpmerit *src = (const minslptmpmerit *)_src;
    ae_vector_copy(&dst->mftmp0, &src->mftmp0, make_automatic);
 }
 
@@ -34347,9 +34347,9 @@ void minslpphase13state_init(void *_p, bool make_automatic) {
    minslptmpmerit_init(&p->tmpmerit, make_automatic);
 }
 
-void minslpphase13state_copy(void *_dst, void *_src, bool make_automatic) {
+void minslpphase13state_copy(void *_dst, const void *_src, bool make_automatic) {
    minslpphase13state *dst = (minslpphase13state *)_dst;
-   minslpphase13state *src = (minslpphase13state *)_src;
+   const minslpphase13state *src = (const minslpphase13state *)_src;
    dst->usecorrection = src->usecorrection;
    ae_vector_copy(&dst->d, &src->d, make_automatic);
    ae_vector_copy(&dst->dx, &src->dx, make_automatic);
@@ -34397,9 +34397,9 @@ void minslpphase2state_init(void *_p, bool make_automatic) {
    minslptmpmerit_init(&p->tmpmerit, make_automatic);
 }
 
-void minslpphase2state_copy(void *_dst, void *_src, bool make_automatic) {
+void minslpphase2state_copy(void *_dst, const void *_src, bool make_automatic) {
    minslpphase2state *dst = (minslpphase2state *)_dst;
-   minslpphase2state *src = (minslpphase2state *)_src;
+   const minslpphase2state *src = (const minslpphase2state *)_src;
    ae_vector_copy(&dst->stepkxn, &src->stepkxn, make_automatic);
    ae_vector_copy(&dst->stepkxc, &src->stepkxc, make_automatic);
    ae_vector_copy(&dst->stepkfin, &src->stepkfin, make_automatic);
@@ -34473,9 +34473,9 @@ void minslpstate_init(void *_p, bool make_automatic) {
    minslptmpmerit_init(&p->tmpmerit, make_automatic);
 }
 
-void minslpstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minslpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minslpstate *dst = (minslpstate *)_dst;
-   minslpstate *src = (minslpstate *)_src;
+   const minslpstate *src = (const minslpstate *)_src;
    dst->n = src->n;
    dst->nec = src->nec;
    dst->nic = src->nic;
@@ -37168,9 +37168,9 @@ void minnlcstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, make_automatic);
 }
 
-void minnlcstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minnlcstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minnlcstate *dst = (minnlcstate *)_dst;
-   minnlcstate *src = (minnlcstate *)_src;
+   const minnlcstate *src = (const minnlcstate *)_src;
    dst->stabilizingpoint = src->stabilizingpoint;
    dst->initialinequalitymultiplier = src->initialinequalitymultiplier;
    dst->solvertype = src->solvertype;
@@ -37303,9 +37303,9 @@ void minnlcstate_free(void *_p, bool make_automatic) {
 void minnlcreport_init(void *_p, bool make_automatic) {
 }
 
-void minnlcreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minnlcreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minnlcreport *dst = (minnlcreport *)_dst;
-   minnlcreport *src = (minnlcreport *)_src;
+   const minnlcreport *src = (const minnlcreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfev = src->nfev;
    dst->terminationtype = src->terminationtype;
@@ -39491,9 +39491,9 @@ void minnsqp_init(void *_p, bool make_automatic) {
    snnlssolver_init(&p->nnls, make_automatic);
 }
 
-void minnsqp_copy(void *_dst, void *_src, bool make_automatic) {
+void minnsqp_copy(void *_dst, const void *_src, bool make_automatic) {
    minnsqp *dst = (minnsqp *)_dst;
-   minnsqp *src = (minnsqp *)_src;
+   const minnsqp *src = (const minnsqp *)_src;
    dst->fc = src->fc;
    dst->fn = src->fn;
    ae_vector_copy(&dst->xc, &src->xc, make_automatic);
@@ -39577,9 +39577,9 @@ void minnsstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->xscaled, 0, DT_REAL, make_automatic);
 }
 
-void minnsstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minnsstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minnsstate *dst = (minnsstate *)_dst;
-   minnsstate *src = (minnsstate *)_src;
+   const minnsstate *src = (const minnsstate *)_src;
    dst->solvertype = src->solvertype;
    dst->n = src->n;
    dst->epsx = src->epsx;
@@ -39710,9 +39710,9 @@ void minnsstate_free(void *_p, bool make_automatic) {
 void minnsreport_init(void *_p, bool make_automatic) {
 }
 
-void minnsreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minnsreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minnsreport *dst = (minnsreport *)_dst;
-   minnsreport *src = (minnsreport *)_src;
+   const minnsreport *src = (const minnsreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfev = src->nfev;
    dst->cerr = src->cerr;
@@ -40642,9 +40642,9 @@ void minasastate_init(void *_p, bool make_automatic) {
    linminstate_init(&p->lstate, make_automatic);
 }
 
-void minasastate_copy(void *_dst, void *_src, bool make_automatic) {
+void minasastate_copy(void *_dst, const void *_src, bool make_automatic) {
    minasastate *dst = (minasastate *)_dst;
-   minasastate *src = (minasastate *)_src;
+   const minasastate *src = (const minasastate *)_src;
    dst->n = src->n;
    dst->epsg = src->epsg;
    dst->epsf = src->epsf;
@@ -40713,9 +40713,9 @@ void minasastate_free(void *_p, bool make_automatic) {
 void minasareport_init(void *_p, bool make_automatic) {
 }
 
-void minasareport_copy(void *_dst, void *_src, bool make_automatic) {
+void minasareport_copy(void *_dst, const void *_src, bool make_automatic) {
    minasareport *dst = (minasareport *)_dst;
-   minasareport *src = (minasareport *)_src;
+   const minasareport *src = (const minasareport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfev = src->nfev;
    dst->terminationtype = src->terminationtype;
@@ -42435,9 +42435,9 @@ void minbcstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->invs, 0, DT_REAL, make_automatic);
 }
 
-void minbcstate_copy(void *_dst, void *_src, bool make_automatic) {
+void minbcstate_copy(void *_dst, const void *_src, bool make_automatic) {
    minbcstate *dst = (minbcstate *)_dst;
-   minbcstate *src = (minbcstate *)_src;
+   const minbcstate *src = (const minbcstate *)_src;
    dst->nmain = src->nmain;
    dst->epsg = src->epsg;
    dst->epsf = src->epsf;
@@ -42544,9 +42544,9 @@ void minbcstate_free(void *_p, bool make_automatic) {
 void minbcreport_init(void *_p, bool make_automatic) {
 }
 
-void minbcreport_copy(void *_dst, void *_src, bool make_automatic) {
+void minbcreport_copy(void *_dst, const void *_src, bool make_automatic) {
    minbcreport *dst = (minbcreport *)_dst;
-   minbcreport *src = (minbcreport *)_src;
+   const minbcreport *src = (const minbcreport *)_src;
    dst->iterationscount = src->iterationscount;
    dst->nfev = src->nfev;
    dst->varidx = src->varidx;
@@ -43056,9 +43056,9 @@ void lptestproblem_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->au, 0, DT_REAL, make_automatic);
 }
 
-void lptestproblem_copy(void *_dst, void *_src, bool make_automatic) {
+void lptestproblem_copy(void *_dst, const void *_src, bool make_automatic) {
    lptestproblem *dst = (lptestproblem *)_dst;
-   lptestproblem *src = (lptestproblem *)_src;
+   const lptestproblem *src = (const lptestproblem *)_src;
    dst->n = src->n;
    dst->hasknowntarget = src->hasknowntarget;
    dst->targetf = src->targetf;

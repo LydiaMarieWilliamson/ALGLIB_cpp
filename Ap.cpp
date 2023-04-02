@@ -830,7 +830,7 @@ void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool ma
 // The fields copied to dst are to be managed and owned by dst.
 // make_automatic indicates whether or not the vector is to be added to the dynamic block list.
 // Upon allocation failure, call ae_break().
-void ae_vector_copy(ae_vector *dst, ae_vector *src, bool make_automatic) {
+void ae_vector_copy(ae_vector *dst, const ae_vector *src, bool make_automatic) {
 //(@) TopFr != NULL check removed.
    ae_vector_init(dst, src->cnt, src->datatype, make_automatic);
    if (src->cnt != 0) memmove(dst->xX, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
@@ -944,7 +944,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
 // make_automatic indicates whether or not dst is to be added to the dynamic block list,
 // as opposed to being a global object or field of some other object.
 // Upon allocation failure, call ae_break().
-void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic) {
+void ae_matrix_copy(ae_matrix *dst, const ae_matrix *src, bool make_automatic) {
    ae_matrix_init(dst, src->rows, src->cols, src->datatype, make_automatic);
    if (src->cols > 0 && src->rows > 0)
       if (dst->stride == src->stride)
@@ -1050,7 +1050,7 @@ void ae_smart_ptr_free(void *_dst) {
 // is_dynamic indicates whether dst is to be dynamic,
 // so that clearing dst would require BOTH calling ae_free() on it AND free() on the memory occupied by dst.
 // You can specify NULL new_ptr, in which case is_owner, free() and is_dynamic are all ignored.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic)) {
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, ae_free_op free) {
    if (dst->is_owner && dst->ptr != NULL) {
       dst->free(dst->ptr, false);
       if (dst->is_dynamic) ae_free(dst->ptr);
@@ -1841,10 +1841,10 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
 // NOTE:
 // *	This function is NOT thread-safe.
 //	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
-void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
+void ae_shared_pool_copy(void *_dst, const void *_src, bool make_automatic) {
 //(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
    ae_shared_pool *dst = (ae_shared_pool *)_dst;
-   ae_shared_pool *src = (ae_shared_pool *)_src;
+   const ae_shared_pool *src = (const ae_shared_pool *)_src;
    ae_shared_pool_init(dst, make_automatic);
 // Copy the non-pointer fields.
    dst->size_of_object = src->size_of_object;
@@ -1913,7 +1913,7 @@ bool ae_shared_pool_is_initialized(ae_shared_pool *dst) {
 // NOTE:
 // *	This function is NOT thread-safe.
 //	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic)) {
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, size_t size_of_object, ae_init_op init, ae_copy_op copy, ae_free_op free) {
 //(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
 // Free the internal objects.
    ae_shared_pool_internalclear(dst, false);

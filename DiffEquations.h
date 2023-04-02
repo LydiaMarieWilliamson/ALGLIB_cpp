@@ -47,7 +47,7 @@ struct odesolverstate {
    ae_int_t PQ;
 };
 void odesolverstate_init(void *_p, bool make_automatic);
-void odesolverstate_copy(void *_dst, void *_src, bool make_automatic);
+void odesolverstate_copy(void *_dst, const void *_src, bool make_automatic);
 void odesolverstate_free(void *_p, bool make_automatic);
 
 struct odesolverreport {
@@ -55,7 +55,7 @@ struct odesolverreport {
    ae_int_t terminationtype;
 };
 void odesolverreport_init(void *_p, bool make_automatic);
-void odesolverreport_copy(void *_dst, void *_src, bool make_automatic);
+void odesolverreport_copy(void *_dst, const void *_src, bool make_automatic);
 void odesolverreport_free(void *_p, bool make_automatic);
 
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state);

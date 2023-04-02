@@ -593,9 +593,9 @@ void barycentricinterpolant_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->w, 0, DT_REAL, make_automatic);
 }
 
-void barycentricinterpolant_copy(void *_dst, void *_src, bool make_automatic) {
+void barycentricinterpolant_copy(void *_dst, const void *_src, bool make_automatic) {
    barycentricinterpolant *dst = (barycentricinterpolant *)_dst;
-   barycentricinterpolant *src = (barycentricinterpolant *)_src;
+   const barycentricinterpolant *src = (const barycentricinterpolant *)_src;
    dst->n = src->n;
    dst->sy = src->sy;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
@@ -1833,9 +1833,9 @@ void idwcalcbuffer_init(void *_p, bool make_automatic) {
    kdtreerequestbuffer_init(&p->requestbuffer, make_automatic);
 }
 
-void idwcalcbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void idwcalcbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    idwcalcbuffer *dst = (idwcalcbuffer *)_dst;
-   idwcalcbuffer *src = (idwcalcbuffer *)_src;
+   const idwcalcbuffer *src = (const idwcalcbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->y, &src->y, make_automatic);
    ae_vector_copy(&dst->tsyw, &src->tsyw, make_automatic);
@@ -1864,9 +1864,9 @@ void idwmodel_init(void *_p, bool make_automatic) {
    idwcalcbuffer_init(&p->buffer, make_automatic);
 }
 
-void idwmodel_copy(void *_dst, void *_src, bool make_automatic) {
+void idwmodel_copy(void *_dst, const void *_src, bool make_automatic) {
    idwmodel *dst = (idwmodel *)_dst;
-   idwmodel *src = (idwmodel *)_src;
+   const idwmodel *src = (const idwmodel *)_src;
    dst->nx = src->nx;
    dst->ny = src->ny;
    ae_vector_copy(&dst->globalprior, &src->globalprior, make_automatic);
@@ -1907,9 +1907,9 @@ void idwbuilder_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmpmean, 0, DT_REAL, make_automatic);
 }
 
-void idwbuilder_copy(void *_dst, void *_src, bool make_automatic) {
+void idwbuilder_copy(void *_dst, const void *_src, bool make_automatic) {
    idwbuilder *dst = (idwbuilder *)_dst;
-   idwbuilder *src = (idwbuilder *)_src;
+   const idwbuilder *src = (const idwbuilder *)_src;
    dst->priortermtype = src->priortermtype;
    ae_vector_copy(&dst->priortermval, &src->priortermval, make_automatic);
    dst->algotype = src->algotype;
@@ -1953,9 +1953,9 @@ void idwbuilder_free(void *_p, bool make_automatic) {
 void idwreport_init(void *_p, bool make_automatic) {
 }
 
-void idwreport_copy(void *_dst, void *_src, bool make_automatic) {
+void idwreport_copy(void *_dst, const void *_src, bool make_automatic) {
    idwreport *dst = (idwreport *)_dst;
-   idwreport *src = (idwreport *)_src;
+   const idwreport *src = (const idwreport *)_src;
    dst->rmserror = src->rmserror;
    dst->avgerror = src->avgerror;
    dst->maxerror = src->maxerror;
@@ -7245,9 +7245,9 @@ void spline1dinterpolant_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->c, 0, DT_REAL, make_automatic);
 }
 
-void spline1dinterpolant_copy(void *_dst, void *_src, bool make_automatic) {
+void spline1dinterpolant_copy(void *_dst, const void *_src, bool make_automatic) {
    spline1dinterpolant *dst = (spline1dinterpolant *)_dst;
-   spline1dinterpolant *src = (spline1dinterpolant *)_src;
+   const spline1dinterpolant *src = (const spline1dinterpolant *)_src;
    dst->periodic = src->periodic;
    dst->n = src->n;
    dst->k = src->k;
@@ -7265,9 +7265,9 @@ void spline1dinterpolant_free(void *_p, bool make_automatic) {
 void spline1dfitreport_init(void *_p, bool make_automatic) {
 }
 
-void spline1dfitreport_copy(void *_dst, void *_src, bool make_automatic) {
+void spline1dfitreport_copy(void *_dst, const void *_src, bool make_automatic) {
    spline1dfitreport *dst = (spline1dfitreport *)_dst;
-   spline1dfitreport *src = (spline1dfitreport *)_src;
+   const spline1dfitreport *src = (const spline1dfitreport *)_src;
    dst->taskrcond = src->taskrcond;
    dst->rmserror = src->rmserror;
    dst->avgerror = src->avgerror;
@@ -12811,9 +12811,9 @@ void lsfitresults(lsfitstate *state, ae_int_t *info, RVector *c, lsfitreport *re
 void polynomialfitreport_init(void *_p, bool make_automatic) {
 }
 
-void polynomialfitreport_copy(void *_dst, void *_src, bool make_automatic) {
+void polynomialfitreport_copy(void *_dst, const void *_src, bool make_automatic) {
    polynomialfitreport *dst = (polynomialfitreport *)_dst;
-   polynomialfitreport *src = (polynomialfitreport *)_src;
+   const polynomialfitreport *src = (const polynomialfitreport *)_src;
    dst->taskrcond = src->taskrcond;
    dst->rmserror = src->rmserror;
    dst->avgerror = src->avgerror;
@@ -12827,9 +12827,9 @@ void polynomialfitreport_free(void *_p, bool make_automatic) {
 void barycentricfitreport_init(void *_p, bool make_automatic) {
 }
 
-void barycentricfitreport_copy(void *_dst, void *_src, bool make_automatic) {
+void barycentricfitreport_copy(void *_dst, const void *_src, bool make_automatic) {
    barycentricfitreport *dst = (barycentricfitreport *)_dst;
-   barycentricfitreport *src = (barycentricfitreport *)_src;
+   const barycentricfitreport *src = (const barycentricfitreport *)_src;
    dst->taskrcond = src->taskrcond;
    dst->dbest = src->dbest;
    dst->rmserror = src->rmserror;
@@ -12849,9 +12849,9 @@ void lsfitreport_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->noise, 0, DT_REAL, make_automatic);
 }
 
-void lsfitreport_copy(void *_dst, void *_src, bool make_automatic) {
+void lsfitreport_copy(void *_dst, const void *_src, bool make_automatic) {
    lsfitreport *dst = (lsfitreport *)_dst;
-   lsfitreport *src = (lsfitreport *)_src;
+   const lsfitreport *src = (const lsfitreport *)_src;
    dst->taskrcond = src->taskrcond;
    dst->iterationscount = src->iterationscount;
    dst->varidx = src->varidx;
@@ -12902,9 +12902,9 @@ void lsfitstate_init(void *_p, bool make_automatic) {
    minlmreport_init(&p->optrep, make_automatic);
 }
 
-void lsfitstate_copy(void *_dst, void *_src, bool make_automatic) {
+void lsfitstate_copy(void *_dst, const void *_src, bool make_automatic) {
    lsfitstate *dst = (lsfitstate *)_dst;
-   lsfitstate *src = (lsfitstate *)_src;
+   const lsfitstate *src = (const lsfitstate *)_src;
    dst->optalgo = src->optalgo;
    dst->m = src->m;
    dst->k = src->k;
@@ -14342,9 +14342,9 @@ void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 void fitsphereinternalreport_init(void *_p, bool make_automatic) {
 }
 
-void fitsphereinternalreport_copy(void *_dst, void *_src, bool make_automatic) {
+void fitsphereinternalreport_copy(void *_dst, const void *_src, bool make_automatic) {
    fitsphereinternalreport *dst = (fitsphereinternalreport *)_dst;
-   fitsphereinternalreport *src = (fitsphereinternalreport *)_src;
+   const fitsphereinternalreport *src = (const fitsphereinternalreport *)_src;
    dst->nfev = src->nfev;
    dst->iterationscount = src->iterationscount;
 }
@@ -15372,9 +15372,9 @@ void pspline2interpolant_init(void *_p, bool make_automatic) {
    spline1dinterpolant_init(&p->y, make_automatic);
 }
 
-void pspline2interpolant_copy(void *_dst, void *_src, bool make_automatic) {
+void pspline2interpolant_copy(void *_dst, const void *_src, bool make_automatic) {
    pspline2interpolant *dst = (pspline2interpolant *)_dst;
-   pspline2interpolant *src = (pspline2interpolant *)_src;
+   const pspline2interpolant *src = (const pspline2interpolant *)_src;
    dst->n = src->n;
    dst->periodic = src->periodic;
    ae_vector_copy(&dst->p, &src->p, make_automatic);
@@ -15397,9 +15397,9 @@ void pspline3interpolant_init(void *_p, bool make_automatic) {
    spline1dinterpolant_init(&p->z, make_automatic);
 }
 
-void pspline3interpolant_copy(void *_dst, void *_src, bool make_automatic) {
+void pspline3interpolant_copy(void *_dst, const void *_src, bool make_automatic) {
    pspline3interpolant *dst = (pspline3interpolant *)_dst;
-   pspline3interpolant *src = (pspline3interpolant *)_src;
+   const pspline3interpolant *src = (const pspline3interpolant *)_src;
    dst->n = src->n;
    dst->periodic = src->periodic;
    ae_vector_copy(&dst->p, &src->p, make_automatic);
@@ -17353,9 +17353,9 @@ void rbfv1calcbuffer_init(void *_p, bool make_automatic) {
    kdtreerequestbuffer_init(&p->requestbuffer, make_automatic);
 }
 
-void rbfv1calcbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv1calcbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv1calcbuffer *dst = (rbfv1calcbuffer *)_dst;
-   rbfv1calcbuffer *src = (rbfv1calcbuffer *)_src;
+   const rbfv1calcbuffer *src = (const rbfv1calcbuffer *)_src;
    ae_vector_copy(&dst->calcbufxcx, &src->calcbufxcx, make_automatic);
    ae_matrix_copy(&dst->calcbufx, &src->calcbufx, make_automatic);
    ae_vector_copy(&dst->calcbuftags, &src->calcbuftags, make_automatic);
@@ -17381,9 +17381,9 @@ void rbfv1model_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->calcbuftags, 0, DT_INT, make_automatic);
 }
 
-void rbfv1model_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv1model_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv1model *dst = (rbfv1model *)_dst;
-   rbfv1model *src = (rbfv1model *)_src;
+   const rbfv1model *src = (const rbfv1model *)_src;
    dst->ny = src->ny;
    dst->nx = src->nx;
    dst->nc = src->nc;
@@ -17426,9 +17426,9 @@ void gridcalc3v1buf_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->calcbuftags, 0, DT_INT, make_automatic);
 }
 
-void gridcalc3v1buf_copy(void *_dst, void *_src, bool make_automatic) {
+void gridcalc3v1buf_copy(void *_dst, const void *_src, bool make_automatic) {
    gridcalc3v1buf *dst = (gridcalc3v1buf *)_dst;
-   gridcalc3v1buf *src = (gridcalc3v1buf *)_src;
+   const gridcalc3v1buf *src = (const gridcalc3v1buf *)_src;
    ae_vector_copy(&dst->tx, &src->tx, make_automatic);
    ae_vector_copy(&dst->cx, &src->cx, make_automatic);
    ae_vector_copy(&dst->ty, &src->ty, make_automatic);
@@ -17464,9 +17464,9 @@ void gridcalc3v1buf_free(void *_p, bool make_automatic) {
 void rbfv1report_init(void *_p, bool make_automatic) {
 }
 
-void rbfv1report_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv1report_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv1report *dst = (rbfv1report *)_dst;
-   rbfv1report *src = (rbfv1report *)_src;
+   const rbfv1report *src = (const rbfv1report *)_src;
    dst->arows = src->arows;
    dst->acols = src->acols;
    dst->annz = src->annz;
@@ -20741,9 +20741,9 @@ void rbf3evaluator_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->chunk1, 0, DT_REAL, make_automatic);
 }
 
-void rbf3evaluator_copy(void *_dst, void *_src, bool make_automatic) {
+void rbf3evaluator_copy(void *_dst, const void *_src, bool make_automatic) {
    rbf3evaluator *dst = (rbf3evaluator *)_dst;
-   rbf3evaluator *src = (rbf3evaluator *)_src;
+   const rbf3evaluator *src = (const rbf3evaluator *)_src;
    dst->n = src->n;
    dst->storagetype = src->storagetype;
    ae_matrix_copy(&dst->f, &src->f, make_automatic);
@@ -20780,9 +20780,9 @@ void rbf3evaluatorbuffer_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->deltabuf, 0, 0, DT_REAL, make_automatic);
 }
 
-void rbf3evaluatorbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void rbf3evaluatorbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbf3evaluatorbuffer *dst = (rbf3evaluatorbuffer *)_dst;
-   rbf3evaluatorbuffer *src = (rbf3evaluatorbuffer *)_src;
+   const rbf3evaluatorbuffer *src = (const rbf3evaluatorbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->coeffbuf, &src->coeffbuf, make_automatic);
    ae_vector_copy(&dst->funcbuf, &src->funcbuf, make_automatic);
@@ -20815,9 +20815,9 @@ void rbfv3calcbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->yg, 0, DT_REAL, make_automatic);
 }
 
-void rbfv3calcbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv3calcbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv3calcbuffer *dst = (rbfv3calcbuffer *)_dst;
-   rbfv3calcbuffer *src = (rbfv3calcbuffer *)_src;
+   const rbfv3calcbuffer *src = (const rbfv3calcbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    rbf3evaluatorbuffer_copy(&dst->evalbuf, &src->evalbuf, make_automatic);
    ae_vector_copy(&dst->x123, &src->x123, make_automatic);
@@ -20849,9 +20849,9 @@ void acbfbuilder_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->wrkidx, 0, DT_INT, make_automatic);
 }
 
-void acbfbuilder_copy(void *_dst, void *_src, bool make_automatic) {
+void acbfbuilder_copy(void *_dst, const void *_src, bool make_automatic) {
    acbfbuilder *dst = (acbfbuilder *)_dst;
-   acbfbuilder *src = (acbfbuilder *)_src;
+   const acbfbuilder *src = (const acbfbuilder *)_src;
    dst->ntotal = src->ntotal;
    dst->nx = src->nx;
    ae_matrix_copy(&dst->xx, &src->xx, make_automatic);
@@ -20916,9 +20916,9 @@ void acbfbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->perm, 0, DT_INT, make_automatic);
 }
 
-void acbfbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void acbfbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    acbfbuffer *dst = (acbfbuffer *)_dst;
-   acbfbuffer *src = (acbfbuffer *)_src;
+   const acbfbuffer *src = (const acbfbuffer *)_src;
    ae_vector_copy(&dst->bflags, &src->bflags, make_automatic);
    kdtreerequestbuffer_copy(&dst->kdtbuf, &src->kdtbuf, make_automatic);
    kdtreerequestbuffer_copy(&dst->kdt1buf, &src->kdt1buf, make_automatic);
@@ -20978,9 +20978,9 @@ void acbfchunk_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->s, 0, 0, DT_REAL, make_automatic);
 }
 
-void acbfchunk_copy(void *_dst, void *_src, bool make_automatic) {
+void acbfchunk_copy(void *_dst, const void *_src, bool make_automatic) {
    acbfchunk *dst = (acbfchunk *)_dst;
-   acbfchunk *src = (acbfchunk *)_src;
+   const acbfchunk *src = (const acbfchunk *)_src;
    dst->ntargetrows = src->ntargetrows;
    dst->ntargetcols = src->ntargetcols;
    ae_vector_copy(&dst->targetrows, &src->targetrows, make_automatic);
@@ -21004,9 +21004,9 @@ void rbf3ddmbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmpboxmax, 0, DT_REAL, make_automatic);
 }
 
-void rbf3ddmbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void rbf3ddmbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbf3ddmbuffer *dst = (rbf3ddmbuffer *)_dst;
-   rbf3ddmbuffer *src = (rbf3ddmbuffer *)_src;
+   const rbf3ddmbuffer *src = (const rbf3ddmbuffer *)_src;
    ae_vector_copy(&dst->bflags, &src->bflags, make_automatic);
    ae_vector_copy(&dst->idx2preccol, &src->idx2preccol, make_automatic);
    kdtreerequestbuffer_copy(&dst->kdtbuf, &src->kdtbuf, make_automatic);
@@ -21038,9 +21038,9 @@ void rbf3ddmsubproblem_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->wrkr, 0, 0, DT_REAL, make_automatic);
 }
 
-void rbf3ddmsubproblem_copy(void *_dst, void *_src, bool make_automatic) {
+void rbf3ddmsubproblem_copy(void *_dst, const void *_src, bool make_automatic) {
    rbf3ddmsubproblem *dst = (rbf3ddmsubproblem *)_dst;
-   rbf3ddmsubproblem *src = (rbf3ddmsubproblem *)_src;
+   const rbf3ddmsubproblem *src = (const rbf3ddmsubproblem *)_src;
    dst->isvalid = src->isvalid;
    dst->ntarget = src->ntarget;
    ae_vector_copy(&dst->targetnodes, &src->targetnodes, make_automatic);
@@ -21087,9 +21087,9 @@ void rbf3ddmsolver_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->tmpupd1, 0, 0, DT_REAL, make_automatic);
 }
 
-void rbf3ddmsolver_copy(void *_dst, void *_src, bool make_automatic) {
+void rbf3ddmsolver_copy(void *_dst, const void *_src, bool make_automatic) {
    rbf3ddmsolver *dst = (rbf3ddmsolver *)_dst;
-   rbf3ddmsolver *src = (rbf3ddmsolver *)_src;
+   const rbf3ddmsolver *src = (const rbf3ddmsolver *)_src;
    dst->lambdav = src->lambdav;
    kdtree_copy(&dst->kdt, &src->kdt, make_automatic);
    ae_shared_pool_copy(&dst->bufferpool, &src->bufferpool, make_automatic);
@@ -21132,9 +21132,9 @@ void rbfv3model_init(void *_p, bool make_automatic) {
    rbfv3calcbuffer_init(&p->calcbuf, make_automatic);
 }
 
-void rbfv3model_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv3model_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv3model *dst = (rbfv3model *)_dst;
-   rbfv3model *src = (rbfv3model *)_src;
+   const rbfv3model *src = (const rbfv3model *)_src;
    dst->ny = src->ny;
    dst->nx = src->nx;
    dst->bftype = src->bftype;
@@ -21164,9 +21164,9 @@ void rbfv3model_free(void *_p, bool make_automatic) {
 void rbfv3report_init(void *_p, bool make_automatic) {
 }
 
-void rbfv3report_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv3report_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv3report *dst = (rbfv3report *)_dst;
-   rbfv3report *src = (rbfv3report *)_src;
+   const rbfv3report *src = (const rbfv3report *)_src;
    dst->terminationtype = src->terminationtype;
    dst->maxerror = src->maxerror;
    dst->rmserror = src->rmserror;
@@ -25625,9 +25625,9 @@ void spline2dinterpolant_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->f, 0, DT_REAL, make_automatic);
 }
 
-void spline2dinterpolant_copy(void *_dst, void *_src, bool make_automatic) {
+void spline2dinterpolant_copy(void *_dst, const void *_src, bool make_automatic) {
    spline2dinterpolant *dst = (spline2dinterpolant *)_dst;
-   spline2dinterpolant *src = (spline2dinterpolant *)_src;
+   const spline2dinterpolant *src = (const spline2dinterpolant *)_src;
    dst->stype = src->stype;
    dst->n = src->n;
    dst->m = src->m;
@@ -25649,9 +25649,9 @@ void spline2dbuilder_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->xy, 0, DT_REAL, make_automatic);
 }
 
-void spline2dbuilder_copy(void *_dst, void *_src, bool make_automatic) {
+void spline2dbuilder_copy(void *_dst, const void *_src, bool make_automatic) {
    spline2dbuilder *dst = (spline2dbuilder *)_dst;
-   spline2dbuilder *src = (spline2dbuilder *)_src;
+   const spline2dbuilder *src = (const spline2dbuilder *)_src;
    dst->priorterm = src->priorterm;
    dst->priortermval = src->priortermval;
    dst->areatype = src->areatype;
@@ -25685,9 +25685,9 @@ void spline2dbuilder_free(void *_p, bool make_automatic) {
 void spline2dfitreport_init(void *_p, bool make_automatic) {
 }
 
-void spline2dfitreport_copy(void *_dst, void *_src, bool make_automatic) {
+void spline2dfitreport_copy(void *_dst, const void *_src, bool make_automatic) {
    spline2dfitreport *dst = (spline2dfitreport *)_dst;
-   spline2dfitreport *src = (spline2dfitreport *)_src;
+   const spline2dfitreport *src = (const spline2dfitreport *)_src;
    dst->rmserror = src->rmserror;
    dst->avgerror = src->avgerror;
    dst->maxerror = src->maxerror;
@@ -25707,9 +25707,9 @@ void spline2dxdesignmatrix_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->tmp2, 0, 0, DT_REAL, make_automatic);
 }
 
-void spline2dxdesignmatrix_copy(void *_dst, void *_src, bool make_automatic) {
+void spline2dxdesignmatrix_copy(void *_dst, const void *_src, bool make_automatic) {
    spline2dxdesignmatrix *dst = (spline2dxdesignmatrix *)_dst;
-   spline2dxdesignmatrix *src = (spline2dxdesignmatrix *)_src;
+   const spline2dxdesignmatrix *src = (const spline2dxdesignmatrix *)_src;
    dst->blockwidth = src->blockwidth;
    dst->kx = src->kx;
    dst->ky = src->ky;
@@ -25750,9 +25750,9 @@ void spline2dblockllsbuf_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->tmp1, 0, DT_REAL, make_automatic);
 }
 
-void spline2dblockllsbuf_copy(void *_dst, void *_src, bool make_automatic) {
+void spline2dblockllsbuf_copy(void *_dst, const void *_src, bool make_automatic) {
    spline2dblockllsbuf *dst = (spline2dblockllsbuf *)_dst;
-   spline2dblockllsbuf *src = (spline2dblockllsbuf *)_src;
+   const spline2dblockllsbuf *src = (const spline2dblockllsbuf *)_src;
    linlsqrstate_copy(&dst->solver, &src->solver, make_automatic);
    linlsqrreport_copy(&dst->solverrep, &src->solverrep, make_automatic);
    ae_matrix_copy(&dst->blockata, &src->blockata, make_automatic);
@@ -25785,9 +25785,9 @@ void spline2dfastddmbuf_init(void *_p, bool make_automatic) {
    spline2dblockllsbuf_init(&p->blockllsbuf, make_automatic);
 }
 
-void spline2dfastddmbuf_copy(void *_dst, void *_src, bool make_automatic) {
+void spline2dfastddmbuf_copy(void *_dst, const void *_src, bool make_automatic) {
    spline2dfastddmbuf *dst = (spline2dfastddmbuf *)_dst;
-   spline2dfastddmbuf *src = (spline2dfastddmbuf *)_src;
+   const spline2dfastddmbuf *src = (const spline2dfastddmbuf *)_src;
    spline2dxdesignmatrix_copy(&dst->xdesignmatrix, &src->xdesignmatrix, make_automatic);
    ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
    ae_vector_copy(&dst->tmpz, &src->tmpz, make_automatic);
@@ -28857,9 +28857,9 @@ void rbfv2calcbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->y123, 0, DT_REAL, make_automatic);
 }
 
-void rbfv2calcbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv2calcbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv2calcbuffer *dst = (rbfv2calcbuffer *)_dst;
-   rbfv2calcbuffer *src = (rbfv2calcbuffer *)_src;
+   const rbfv2calcbuffer *src = (const rbfv2calcbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->curboxmin, &src->curboxmin, make_automatic);
    ae_vector_copy(&dst->curboxmax, &src->curboxmax, make_automatic);
@@ -28891,9 +28891,9 @@ void rbfv2model_init(void *_p, bool make_automatic) {
    rbfv2calcbuffer_init(&p->calcbuf, make_automatic);
 }
 
-void rbfv2model_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv2model_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv2model *dst = (rbfv2model *)_dst;
-   rbfv2model *src = (rbfv2model *)_src;
+   const rbfv2model *src = (const rbfv2model *)_src;
    dst->ny = src->ny;
    dst->nx = src->nx;
    dst->bf = src->bf;
@@ -28939,9 +28939,9 @@ void rbfv2gridcalcbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->rf, 0, DT_BOOL, make_automatic);
 }
 
-void rbfv2gridcalcbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv2gridcalcbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv2gridcalcbuffer *dst = (rbfv2gridcalcbuffer *)_dst;
-   rbfv2gridcalcbuffer *src = (rbfv2gridcalcbuffer *)_src;
+   const rbfv2gridcalcbuffer *src = (const rbfv2gridcalcbuffer *)_src;
    rbfv2calcbuffer_copy(&dst->calcbuf, &src->calcbuf, make_automatic);
    ae_vector_copy(&dst->cx, &src->cx, make_automatic);
    ae_vector_copy(&dst->rx, &src->rx, make_automatic);
@@ -28965,9 +28965,9 @@ void rbfv2gridcalcbuffer_free(void *_p, bool make_automatic) {
 void rbfv2report_init(void *_p, bool make_automatic) {
 }
 
-void rbfv2report_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfv2report_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfv2report *dst = (rbfv2report *)_dst;
-   rbfv2report *src = (rbfv2report *)_src;
+   const rbfv2report *src = (const rbfv2report *)_src;
    dst->terminationtype = src->terminationtype;
    dst->maxerror = src->maxerror;
    dst->rmserror = src->rmserror;
@@ -29771,9 +29771,9 @@ void spline3dinterpolant_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->f, 0, DT_REAL, make_automatic);
 }
 
-void spline3dinterpolant_copy(void *_dst, void *_src, bool make_automatic) {
+void spline3dinterpolant_copy(void *_dst, const void *_src, bool make_automatic) {
    spline3dinterpolant *dst = (spline3dinterpolant *)_dst;
-   spline3dinterpolant *src = (spline3dinterpolant *)_src;
+   const spline3dinterpolant *src = (const spline3dinterpolant *)_src;
    dst->k = src->k;
    dst->stype = src->stype;
    dst->n = src->n;
@@ -32698,9 +32698,9 @@ void rbfcalcbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->dy, 0, DT_REAL, make_automatic);
 }
 
-void rbfcalcbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfcalcbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfcalcbuffer *dst = (rbfcalcbuffer *)_dst;
-   rbfcalcbuffer *src = (rbfcalcbuffer *)_src;
+   const rbfcalcbuffer *src = (const rbfcalcbuffer *)_src;
    dst->modelversion = src->modelversion;
    rbfv1calcbuffer_copy(&dst->bufv1, &src->bufv1, make_automatic);
    rbfv2calcbuffer_copy(&dst->bufv2, &src->bufv2, make_automatic);
@@ -32731,9 +32731,9 @@ void rbfmodel_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->s, 0, DT_REAL, make_automatic);
 }
 
-void rbfmodel_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfmodel_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfmodel *dst = (rbfmodel *)_dst;
-   rbfmodel *src = (rbfmodel *)_src;
+   const rbfmodel *src = (const rbfmodel *)_src;
    dst->nx = src->nx;
    dst->ny = src->ny;
    dst->modelversion = src->modelversion;
@@ -32776,9 +32776,9 @@ void rbfmodel_free(void *_p, bool make_automatic) {
 void rbfreport_init(void *_p, bool make_automatic) {
 }
 
-void rbfreport_copy(void *_dst, void *_src, bool make_automatic) {
+void rbfreport_copy(void *_dst, const void *_src, bool make_automatic) {
    rbfreport *dst = (rbfreport *)_dst;
-   rbfreport *src = (rbfreport *)_src;
+   const rbfreport *src = (const rbfreport *)_src;
    dst->rmserror = src->rmserror;
    dst->maxerror = src->maxerror;
    dst->arows = src->arows;

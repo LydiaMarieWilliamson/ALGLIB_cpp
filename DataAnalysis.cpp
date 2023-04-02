@@ -1386,9 +1386,9 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
 void cvreport_init(void *_p, bool make_automatic) {
 }
 
-void cvreport_copy(void *_dst, void *_src, bool make_automatic) {
+void cvreport_copy(void *_dst, const void *_src, bool make_automatic) {
    cvreport *dst = (cvreport *)_dst;
-   cvreport *src = (cvreport *)_src;
+   const cvreport *src = (const cvreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -6787,9 +6787,9 @@ void mlpunserialize(ae_serializer *s, multilayerperceptron *network) {
 void modelerrors_init(void *_p, bool make_automatic) {
 }
 
-void modelerrors_copy(void *_dst, void *_src, bool make_automatic) {
+void modelerrors_copy(void *_dst, const void *_src, bool make_automatic) {
    modelerrors *dst = (modelerrors *)_dst;
-   modelerrors *src = (modelerrors *)_src;
+   const modelerrors *src = (const modelerrors *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -6805,9 +6805,9 @@ void smlpgrad_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->g, 0, DT_REAL, make_automatic);
 }
 
-void smlpgrad_copy(void *_dst, void *_src, bool make_automatic) {
+void smlpgrad_copy(void *_dst, const void *_src, bool make_automatic) {
    smlpgrad *dst = (smlpgrad *)_dst;
-   smlpgrad *src = (smlpgrad *)_src;
+   const smlpgrad *src = (const smlpgrad *)_src;
    dst->f = src->f;
    ae_vector_copy(&dst->g, &src->g, make_automatic);
 }
@@ -6845,9 +6845,9 @@ void multilayerperceptron_init(void *_p, bool make_automatic) {
    ae_shared_pool_init(&p->dummypool, make_automatic);
 }
 
-void multilayerperceptron_copy(void *_dst, void *_src, bool make_automatic) {
+void multilayerperceptron_copy(void *_dst, const void *_src, bool make_automatic) {
    multilayerperceptron *dst = (multilayerperceptron *)_dst;
-   multilayerperceptron *src = (multilayerperceptron *)_src;
+   const multilayerperceptron *src = (const multilayerperceptron *)_src;
    dst->hlnetworktype = src->hlnetworktype;
    dst->hlnormtype = src->hlnormtype;
    ae_vector_copy(&dst->hllayersizes, &src->hllayersizes, make_automatic);
@@ -8052,9 +8052,9 @@ void mlpensemble_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->y, 0, DT_REAL, make_automatic);
 }
 
-void mlpensemble_copy(void *_dst, void *_src, bool make_automatic) {
+void mlpensemble_copy(void *_dst, const void *_src, bool make_automatic) {
    mlpensemble *dst = (mlpensemble *)_dst;
-   mlpensemble *src = (mlpensemble *)_src;
+   const mlpensemble *src = (const mlpensemble *)_src;
    dst->ensemblesize = src->ensemblesize;
    ae_vector_copy(&dst->weights, &src->weights, make_automatic);
    ae_vector_copy(&dst->columnmeans, &src->columnmeans, make_automatic);
@@ -10373,9 +10373,9 @@ void kmeansbuffers_init(void *_p, bool make_automatic) {
    ae_shared_pool_init(&p->updatepool, make_automatic);
 }
 
-void kmeansbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void kmeansbuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    kmeansbuffers *dst = (kmeansbuffers *)_dst;
-   kmeansbuffers *src = (kmeansbuffers *)_src;
+   const kmeansbuffers *src = (const kmeansbuffers *)_src;
    ae_matrix_copy(&dst->ct, &src->ct, make_automatic);
    ae_matrix_copy(&dst->ctbest, &src->ctbest, make_automatic);
    ae_vector_copy(&dst->xycbest, &src->xycbest, make_automatic);
@@ -10407,9 +10407,9 @@ void clusterizerstate_init(void *_p, bool make_automatic) {
    kmeansbuffers_init(&p->kmeanstmp, make_automatic);
 }
 
-void clusterizerstate_copy(void *_dst, void *_src, bool make_automatic) {
+void clusterizerstate_copy(void *_dst, const void *_src, bool make_automatic) {
    clusterizerstate *dst = (clusterizerstate *)_dst;
-   clusterizerstate *src = (clusterizerstate *)_src;
+   const clusterizerstate *src = (const clusterizerstate *)_src;
    dst->npoints = src->npoints;
    dst->nfeatures = src->nfeatures;
    dst->disttype = src->disttype;
@@ -10444,9 +10444,9 @@ void ahcreport_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->mergedist, 0, DT_REAL, make_automatic);
 }
 
-void ahcreport_copy(void *_dst, void *_src, bool make_automatic) {
+void ahcreport_copy(void *_dst, const void *_src, bool make_automatic) {
    ahcreport *dst = (ahcreport *)_dst;
-   ahcreport *src = (ahcreport *)_src;
+   const ahcreport *src = (const ahcreport *)_src;
    dst->terminationtype = src->terminationtype;
    dst->npoints = src->npoints;
    ae_vector_copy(&dst->p, &src->p, make_automatic);
@@ -10471,9 +10471,9 @@ void kmeansreport_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->cidx, 0, DT_INT, make_automatic);
 }
 
-void kmeansreport_copy(void *_dst, void *_src, bool make_automatic) {
+void kmeansreport_copy(void *_dst, const void *_src, bool make_automatic) {
    kmeansreport *dst = (kmeansreport *)_dst;
-   kmeansreport *src = (kmeansreport *)_src;
+   const kmeansreport *src = (const kmeansreport *)_src;
    dst->npoints = src->npoints;
    dst->nfeatures = src->nfeatures;
    dst->terminationtype = src->terminationtype;
@@ -14257,9 +14257,9 @@ void decisionforestbuilder_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->varimpshuffle2, 0, DT_INT, make_automatic);
 }
 
-void decisionforestbuilder_copy(void *_dst, void *_src, bool make_automatic) {
+void decisionforestbuilder_copy(void *_dst, const void *_src, bool make_automatic) {
    decisionforestbuilder *dst = (decisionforestbuilder *)_dst;
-   decisionforestbuilder *src = (decisionforestbuilder *)_src;
+   const decisionforestbuilder *src = (const decisionforestbuilder *)_src;
    dst->dstype = src->dstype;
    dst->npoints = src->npoints;
    dst->nvars = src->nvars;
@@ -14331,9 +14331,9 @@ void dfworkbuf_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->classtotals01, 0, DT_INT, make_automatic);
 }
 
-void dfworkbuf_copy(void *_dst, void *_src, bool make_automatic) {
+void dfworkbuf_copy(void *_dst, const void *_src, bool make_automatic) {
    dfworkbuf *dst = (dfworkbuf *)_dst;
-   dfworkbuf *src = (dfworkbuf *)_src;
+   const dfworkbuf *src = (const dfworkbuf *)_src;
    ae_vector_copy(&dst->classpriors, &src->classpriors, make_automatic);
    ae_vector_copy(&dst->varpool, &src->varpool, make_automatic);
    dst->varpoolsize = src->varpoolsize;
@@ -14394,9 +14394,9 @@ void dfvotebuf_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->giniimportances, 0, DT_REAL, make_automatic);
 }
 
-void dfvotebuf_copy(void *_dst, void *_src, bool make_automatic) {
+void dfvotebuf_copy(void *_dst, const void *_src, bool make_automatic) {
    dfvotebuf *dst = (dfvotebuf *)_dst;
-   dfvotebuf *src = (dfvotebuf *)_src;
+   const dfvotebuf *src = (const dfvotebuf *)_src;
    ae_vector_copy(&dst->trntotals, &src->trntotals, make_automatic);
    ae_vector_copy(&dst->oobtotals, &src->oobtotals, make_automatic);
    ae_vector_copy(&dst->trncounts, &src->trncounts, make_automatic);
@@ -14425,9 +14425,9 @@ void dfpermimpbuf_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->startnodes, 0, DT_INT, make_automatic);
 }
 
-void dfpermimpbuf_copy(void *_dst, void *_src, bool make_automatic) {
+void dfpermimpbuf_copy(void *_dst, const void *_src, bool make_automatic) {
    dfpermimpbuf *dst = (dfpermimpbuf *)_dst;
-   dfpermimpbuf *src = (dfpermimpbuf *)_src;
+   const dfpermimpbuf *src = (const dfpermimpbuf *)_src;
    ae_vector_copy(&dst->losses, &src->losses, make_automatic);
    ae_vector_copy(&dst->xraw, &src->xraw, make_automatic);
    ae_vector_copy(&dst->xdist, &src->xdist, make_automatic);
@@ -14455,9 +14455,9 @@ void dftreebuf_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->treebuf, 0, DT_REAL, make_automatic);
 }
 
-void dftreebuf_copy(void *_dst, void *_src, bool make_automatic) {
+void dftreebuf_copy(void *_dst, const void *_src, bool make_automatic) {
    dftreebuf *dst = (dftreebuf *)_dst;
-   dftreebuf *src = (dftreebuf *)_src;
+   const dftreebuf *src = (const dftreebuf *)_src;
    ae_vector_copy(&dst->treebuf, &src->treebuf, make_automatic);
    dst->treeidx = src->treeidx;
 }
@@ -14473,9 +14473,9 @@ void decisionforestbuffer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->y, 0, DT_REAL, make_automatic);
 }
 
-void decisionforestbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void decisionforestbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    decisionforestbuffer *dst = (decisionforestbuffer *)_dst;
-   decisionforestbuffer *src = (decisionforestbuffer *)_src;
+   const decisionforestbuffer *src = (const decisionforestbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->y, &src->y, make_automatic);
 }
@@ -14493,9 +14493,9 @@ void decisionforest_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->trees8, 0, DT_BYTE, make_automatic);
 }
 
-void decisionforest_copy(void *_dst, void *_src, bool make_automatic) {
+void decisionforest_copy(void *_dst, const void *_src, bool make_automatic) {
    decisionforest *dst = (decisionforest *)_dst;
-   decisionforest *src = (decisionforest *)_src;
+   const decisionforest *src = (const decisionforest *)_src;
    dst->forestformat = src->forestformat;
    dst->usemantissa8 = src->usemantissa8;
    dst->nvars = src->nvars;
@@ -14520,9 +14520,9 @@ void dfreport_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->varimportances, 0, DT_REAL, make_automatic);
 }
 
-void dfreport_copy(void *_dst, void *_src, bool make_automatic) {
+void dfreport_copy(void *_dst, const void *_src, bool make_automatic) {
    dfreport *dst = (dfreport *)_dst;
-   dfreport *src = (dfreport *)_src;
+   const dfreport *src = (const dfreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -14559,9 +14559,9 @@ void dfinternalbuffers_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->evssplits, 0, DT_REAL, make_automatic);
 }
 
-void dfinternalbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+void dfinternalbuffers_copy(void *_dst, const void *_src, bool make_automatic) {
    dfinternalbuffers *dst = (dfinternalbuffers *)_dst;
-   dfinternalbuffers *src = (dfinternalbuffers *)_src;
+   const dfinternalbuffers *src = (const dfinternalbuffers *)_src;
    ae_vector_copy(&dst->treebuf, &src->treebuf, make_automatic);
    ae_vector_copy(&dst->idxbuf, &src->idxbuf, make_automatic);
    ae_vector_copy(&dst->tmpbufr, &src->tmpbufr, make_automatic);
@@ -15812,9 +15812,9 @@ void linearmodel_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->w, 0, DT_REAL, make_automatic);
 }
 
-void linearmodel_copy(void *_dst, void *_src, bool make_automatic) {
+void linearmodel_copy(void *_dst, const void *_src, bool make_automatic) {
    linearmodel *dst = (linearmodel *)_dst;
-   linearmodel *src = (linearmodel *)_src;
+   const linearmodel *src = (const linearmodel *)_src;
    ae_vector_copy(&dst->w, &src->w, make_automatic);
 }
 
@@ -15829,9 +15829,9 @@ void lrreport_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->cvdefects, 0, DT_INT, make_automatic);
 }
 
-void lrreport_copy(void *_dst, void *_src, bool make_automatic) {
+void lrreport_copy(void *_dst, const void *_src, bool make_automatic) {
    lrreport *dst = (lrreport *)_dst;
-   lrreport *src = (lrreport *)_src;
+   const lrreport *src = (const lrreport *)_src;
    ae_matrix_copy(&dst->c, &src->c, make_automatic);
    dst->rmserror = src->rmserror;
    dst->avgerror = src->avgerror;
@@ -18449,9 +18449,9 @@ void ssamodel_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->uxbatch, 0, 0, DT_REAL, make_automatic);
 }
 
-void ssamodel_copy(void *_dst, void *_src, bool make_automatic) {
+void ssamodel_copy(void *_dst, const void *_src, bool make_automatic) {
    ssamodel *dst = (ssamodel *)_dst;
-   ssamodel *src = (ssamodel *)_src;
+   const ssamodel *src = (const ssamodel *)_src;
    dst->nsequences = src->nsequences;
    ae_vector_copy(&dst->sequenceidx, &src->sequenceidx, make_automatic);
    ae_vector_copy(&dst->sequencedata, &src->sequencedata, make_automatic);
@@ -20038,9 +20038,9 @@ void mcpdstate_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->p, 0, 0, DT_REAL, make_automatic);
 }
 
-void mcpdstate_copy(void *_dst, void *_src, bool make_automatic) {
+void mcpdstate_copy(void *_dst, const void *_src, bool make_automatic) {
    mcpdstate *dst = (mcpdstate *)_dst;
-   mcpdstate *src = (mcpdstate *)_src;
+   const mcpdstate *src = (const mcpdstate *)_src;
    dst->n = src->n;
    ae_vector_copy(&dst->states, &src->states, make_automatic);
    dst->npairs = src->npairs;
@@ -20096,9 +20096,9 @@ void mcpdstate_free(void *_p, bool make_automatic) {
 void mcpdreport_init(void *_p, bool make_automatic) {
 }
 
-void mcpdreport_copy(void *_dst, void *_src, bool make_automatic) {
+void mcpdreport_copy(void *_dst, const void *_src, bool make_automatic) {
    mcpdreport *dst = (mcpdreport *)_dst;
-   mcpdreport *src = (mcpdreport *)_src;
+   const mcpdreport *src = (const mcpdreport *)_src;
    dst->inneriterationscount = src->inneriterationscount;
    dst->outeriterationscount = src->outeriterationscount;
    dst->nfev = src->nfev;
@@ -21056,9 +21056,9 @@ void logitmodel_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->w, 0, DT_REAL, make_automatic);
 }
 
-void logitmodel_copy(void *_dst, void *_src, bool make_automatic) {
+void logitmodel_copy(void *_dst, const void *_src, bool make_automatic) {
    logitmodel *dst = (logitmodel *)_dst;
-   logitmodel *src = (logitmodel *)_src;
+   const logitmodel *src = (const logitmodel *)_src;
    ae_vector_copy(&dst->w, &src->w, make_automatic);
 }
 
@@ -21070,9 +21070,9 @@ void logitmodel_free(void *_p, bool make_automatic) {
 void logitmcstate_init(void *_p, bool make_automatic) {
 }
 
-void logitmcstate_copy(void *_dst, void *_src, bool make_automatic) {
+void logitmcstate_copy(void *_dst, const void *_src, bool make_automatic) {
    logitmcstate *dst = (logitmcstate *)_dst;
-   logitmcstate *src = (logitmcstate *)_src;
+   const logitmcstate *src = (const logitmcstate *)_src;
    dst->brackt = src->brackt;
    dst->stage1 = src->stage1;
    dst->infoc = src->infoc;
@@ -21106,9 +21106,9 @@ void logitmcstate_free(void *_p, bool make_automatic) {
 void mnlreport_init(void *_p, bool make_automatic) {
 }
 
-void mnlreport_copy(void *_dst, void *_src, bool make_automatic) {
+void mnlreport_copy(void *_dst, const void *_src, bool make_automatic) {
    mnlreport *dst = (mnlreport *)_dst;
-   mnlreport *src = (mnlreport *)_src;
+   const mnlreport *src = (const mnlreport *)_src;
    dst->ngrad = src->ngrad;
    dst->nhess = src->nhess;
 }
@@ -22092,9 +22092,9 @@ void knnbuffer_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->xy, 0, 0, DT_REAL, make_automatic);
 }
 
-void knnbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+void knnbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    knnbuffer *dst = (knnbuffer *)_dst;
-   knnbuffer *src = (knnbuffer *)_src;
+   const knnbuffer *src = (const knnbuffer *)_src;
    kdtreerequestbuffer_copy(&dst->treebuf, &src->treebuf, make_automatic);
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->y, &src->y, make_automatic);
@@ -22118,9 +22118,9 @@ void knnbuilder_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->dsival, 0, DT_INT, make_automatic);
 }
 
-void knnbuilder_copy(void *_dst, void *_src, bool make_automatic) {
+void knnbuilder_copy(void *_dst, const void *_src, bool make_automatic) {
    knnbuilder *dst = (knnbuilder *)_dst;
-   knnbuilder *src = (knnbuilder *)_src;
+   const knnbuilder *src = (const knnbuilder *)_src;
    dst->dstype = src->dstype;
    dst->npoints = src->npoints;
    dst->nvars = src->nvars;
@@ -22145,9 +22145,9 @@ void knnmodel_init(void *_p, bool make_automatic) {
    knnbuffer_init(&p->buffer, make_automatic);
 }
 
-void knnmodel_copy(void *_dst, void *_src, bool make_automatic) {
+void knnmodel_copy(void *_dst, const void *_src, bool make_automatic) {
    knnmodel *dst = (knnmodel *)_dst;
-   knnmodel *src = (knnmodel *)_src;
+   const knnmodel *src = (const knnmodel *)_src;
    dst->nvars = src->nvars;
    dst->nout = src->nout;
    dst->k = src->k;
@@ -22167,9 +22167,9 @@ void knnmodel_free(void *_p, bool make_automatic) {
 void knnreport_init(void *_p, bool make_automatic) {
 }
 
-void knnreport_copy(void *_dst, void *_src, bool make_automatic) {
+void knnreport_copy(void *_dst, const void *_src, bool make_automatic) {
    knnreport *dst = (knnreport *)_dst;
-   knnreport *src = (knnreport *)_src;
+   const knnreport *src = (const knnreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -24883,9 +24883,9 @@ void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts
 void mlpreport_init(void *_p, bool make_automatic) {
 }
 
-void mlpreport_copy(void *_dst, void *_src, bool make_automatic) {
+void mlpreport_copy(void *_dst, const void *_src, bool make_automatic) {
    mlpreport *dst = (mlpreport *)_dst;
-   mlpreport *src = (mlpreport *)_src;
+   const mlpreport *src = (const mlpreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -24902,9 +24902,9 @@ void mlpreport_free(void *_p, bool make_automatic) {
 void mlpcvreport_init(void *_p, bool make_automatic) {
 }
 
-void mlpcvreport_copy(void *_dst, void *_src, bool make_automatic) {
+void mlpcvreport_copy(void *_dst, const void *_src, bool make_automatic) {
    mlpcvreport *dst = (mlpcvreport *)_dst;
-   mlpcvreport *src = (mlpcvreport *)_src;
+   const mlpcvreport *src = (const mlpcvreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -24928,9 +24928,9 @@ void smlptrnsession_init(void *_p, bool make_automatic) {
    hqrndstate_init(&p->generator, make_automatic);
 }
 
-void smlptrnsession_copy(void *_dst, void *_src, bool make_automatic) {
+void smlptrnsession_copy(void *_dst, const void *_src, bool make_automatic) {
    smlptrnsession *dst = (smlptrnsession *)_dst;
-   smlptrnsession *src = (smlptrnsession *)_src;
+   const smlptrnsession *src = (const smlptrnsession *)_src;
    ae_vector_copy(&dst->bestparameters, &src->bestparameters, make_automatic);
    dst->bestrmserror = src->bestrmserror;
    dst->randomizenetwork = src->randomizenetwork;
@@ -24969,9 +24969,9 @@ void mlpetrnsession_init(void *_p, bool make_automatic) {
    multilayerperceptron_init(&p->network, make_automatic);
 }
 
-void mlpetrnsession_copy(void *_dst, void *_src, bool make_automatic) {
+void mlpetrnsession_copy(void *_dst, const void *_src, bool make_automatic) {
    mlpetrnsession *dst = (mlpetrnsession *)_dst;
-   mlpetrnsession *src = (mlpetrnsession *)_src;
+   const mlpetrnsession *src = (const mlpetrnsession *)_src;
    ae_vector_copy(&dst->trnsubset, &src->trnsubset, make_automatic);
    ae_vector_copy(&dst->valsubset, &src->valsubset, make_automatic);
    ae_shared_pool_copy(&dst->mlpsessions, &src->mlpsessions, make_automatic);
@@ -24997,9 +24997,9 @@ void mlptrainer_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->valsubset, 0, DT_INT, make_automatic);
 }
 
-void mlptrainer_copy(void *_dst, void *_src, bool make_automatic) {
+void mlptrainer_copy(void *_dst, const void *_src, bool make_automatic) {
    mlptrainer *dst = (mlptrainer *)_dst;
-   mlptrainer *src = (mlptrainer *)_src;
+   const mlptrainer *src = (const mlptrainer *)_src;
    dst->nin = src->nin;
    dst->nout = src->nout;
    dst->rcpar = src->rcpar;
@@ -25040,9 +25040,9 @@ void mlpparallelizationcv_init(void *_p, bool make_automatic) {
    ae_shared_pool_init(&p->trnpool, make_automatic);
 }
 
-void mlpparallelizationcv_copy(void *_dst, void *_src, bool make_automatic) {
+void mlpparallelizationcv_copy(void *_dst, const void *_src, bool make_automatic) {
    mlpparallelizationcv *dst = (mlpparallelizationcv *)_dst;
-   mlpparallelizationcv *src = (mlpparallelizationcv *)_src;
+   const mlpparallelizationcv *src = (const mlpparallelizationcv *)_src;
    multilayerperceptron_copy(&dst->network, &src->network, make_automatic);
    mlpreport_copy(&dst->rep, &src->rep, make_automatic);
    ae_vector_copy(&dst->subset, &src->subset, make_automatic);

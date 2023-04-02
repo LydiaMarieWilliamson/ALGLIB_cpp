@@ -2017,9 +2017,9 @@ void autogkresults(autogkstate *state, double *v, autogkreport *rep) {
 void autogkreport_init(void *_p, bool make_automatic) {
 }
 
-void autogkreport_copy(void *_dst, void *_src, bool make_automatic) {
+void autogkreport_copy(void *_dst, const void *_src, bool make_automatic) {
    autogkreport *dst = (autogkreport *)_dst;
-   autogkreport *src = (autogkreport *)_src;
+   const autogkreport *src = (const autogkreport *)_src;
    dst->terminationtype = src->terminationtype;
    dst->nfev = src->nfev;
    dst->nintervals = src->nintervals;
@@ -2037,9 +2037,9 @@ void autogkinternalstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->wr, 0, DT_REAL, make_automatic);
 }
 
-void autogkinternalstate_copy(void *_dst, void *_src, bool make_automatic) {
+void autogkinternalstate_copy(void *_dst, const void *_src, bool make_automatic) {
    autogkinternalstate *dst = (autogkinternalstate *)_dst;
-   autogkinternalstate *src = (autogkinternalstate *)_src;
+   const autogkinternalstate *src = (const autogkinternalstate *)_src;
    dst->a = src->a;
    dst->b = src->b;
    dst->eps = src->eps;
@@ -2076,9 +2076,9 @@ void autogkstate_init(void *_p, bool make_automatic) {
    autogkinternalstate_init(&p->internalstate, make_automatic);
 }
 
-void autogkstate_copy(void *_dst, void *_src, bool make_automatic) {
+void autogkstate_copy(void *_dst, const void *_src, bool make_automatic) {
    autogkstate *dst = (autogkstate *)_dst;
-   autogkstate *src = (autogkstate *)_src;
+   const autogkstate *src = (const autogkstate *)_src;
    dst->a = src->a;
    dst->b = src->b;
    dst->alpha = src->alpha;

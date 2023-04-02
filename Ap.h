@@ -304,7 +304,7 @@ struct ae_dyn_block {
 // The next block in the stack unwinding list; or NULL if this block is not in the list.
    struct ae_dyn_block *volatile p_next;
 // The block deallocation function; or NULL for the stack frame/boundary "special" blocks.
-   ae_deallocator deallocator; // Was: void *deallocator;
+   ae_deallocator deallocator;
 // The argument for deallocator(); or NULL for 0-sized blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
    void *volatile ptr;
 };
@@ -337,7 +337,7 @@ struct ae_vector {
    };
 };
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool make_automatic);
-void ae_vector_copy(ae_vector *dst, ae_vector *src, bool make_automatic);
+void ae_vector_copy(ae_vector *dst, const ae_vector *src, bool make_automatic);
 void ae_vector_set_length(ae_vector *dst, ae_int_t newsize);
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize);
 void ae_vector_free(ae_vector *dst, bool make_automatic);
@@ -365,7 +365,7 @@ struct ae_matrix {
    };
 };
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, bool make_automatic);
-void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic);
+void ae_matrix_copy(ae_matrix *dst, const ae_matrix *src, bool make_automatic);
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols);
 void ae_matrix_free(ae_matrix *dst, bool make_automatic);
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
@@ -378,6 +378,10 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
 typedef ae_vector BVector, ZVector, RVector, CVector;
 typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
 
+typedef void (*ae_init_op)(void *, bool);
+typedef void (*ae_copy_op)(void *, const void *, bool);
+typedef void (*ae_free_op)(void *, bool);
+
 struct ae_smart_ptr {
 // Pointers respectively to the subscriber and the object; all changes in ptr are translated to the subscriber.
    void **subscriber, *ptr;
@@ -386,13 +390,13 @@ struct ae_smart_ptr {
 // True if ptr points to a dynamic object, whose clearing requires calling both .free() and ae_free().
    bool is_dynamic;
 // The deallocation function for the pointer; clears all dynamically allocated memory.
-   void (*free)(void *, bool make_automatic);
+   ae_free_op free;
 // The frame entry; used to ensure automatic deallocation of the smart pointer in case of an exception/exit.
    ae_dyn_block frame_entry;
 };
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
 void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic));
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, ae_free_op free);
 void ae_smart_ptr_release(ae_smart_ptr *dst);
 #define NewObj(Type, P)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, true)
 #define RefObj(Type, P)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, true)
@@ -539,19 +543,19 @@ struct ae_shared_pool {
 // The size of the object; used when we call malloc() for new objects.
    ae_int_t size_of_object;
 // The initializer function; accepts a pointer to the malloc'ed object, initializes its fields.
-   void (*init)(void *dst, bool make_automatic);
+   ae_init_op init;
 // The copy constructor; accepts a pointer to the malloc'ed object, but not to the initialized object.
-   void (*copy)(void *dst, void *src, bool make_automatic);
+   ae_copy_op copy;
 // The destructor function.
-   void (*free)(void *ptr, bool make_automatic);
+   ae_free_op free;
 // The frame entry; points to the pool object itself.
    ae_frame frame_entry;
 };
 void ae_shared_pool_init(void *_dst, bool make_automatic);
-void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic);
+void ae_shared_pool_copy(void *_dst, const void *_src, bool make_automatic);
 void ae_shared_pool_free(void *_dst, bool make_automatic);
 bool ae_shared_pool_is_initialized(ae_shared_pool *dst);
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic));
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, size_t size_of_object, ae_init_op init, ae_copy_op copy, ae_free_op free);
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic);

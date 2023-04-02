@@ -490,6 +490,13 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	∙	TestC.cpp: a hidden bug was inherited from the distribution version of ALGLIB
 		for version 3 RBF routines from somewhere in rbfv3build().
 	∙	It has not been resolved; the suppression of the testing errors are tagged as "//@@" in TestC.cpp.
+42	Integration of structural and layout changes made in 3.20.0.
+	∙	Adding and Renaming/redeclaring "Class" constructors/destructors:
+		―	ae_init_op: inherited from ae_constructor in ALGLIB 3.20.0.
+		―	ae_copy_op: inherited from ae_copy_constructor in ALGLIB 3.20.0.
+		―	ae_free_op: inherited from ae_destructor in ALGLIB 3.20.0, and redefined as void (*ae_free_op)(void *, bool).
+		―       ae_deallocator: defined as void (*ae_deallocator)(void *), retained in place of ae_destructor for ae_dyn_block and ae_db_swap().
+		―       The source pointer in all the *_copy constructors has been made const.
 </pre>
 </p>
 <p>

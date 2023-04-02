@@ -40,9 +40,9 @@ static void ablasfplayground_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->a1, 0, 0, DT_REAL, make_automatic);
 }
 
-static void ablasfplayground_copy(void *_dst, void *_src, bool make_automatic) {
+static void ablasfplayground_copy(void *_dst, const void *_src, bool make_automatic) {
    ablasfplayground *dst = (ablasfplayground *)_dst;
-   ablasfplayground *src = (ablasfplayground *)_src;
+   const ablasfplayground *src = (const ablasfplayground *)_src;
    dst->v0 = src->v0;
    ae_vector_copy(&dst->x0, &src->x0, make_automatic);
    ae_vector_copy(&dst->x1, &src->x1, make_automatic);
@@ -7089,9 +7089,9 @@ static void sparsegenerator_init(void *_p, bool make_automatic) {
    hqrndstate_init(&p->rs, make_automatic);
 }
 
-static void sparsegenerator_copy(void *_dst, void *_src, bool make_automatic) {
+static void sparsegenerator_copy(void *_dst, const void *_src, bool make_automatic) {
    sparsegenerator *dst = (sparsegenerator *)_dst;
-   sparsegenerator *src = (sparsegenerator *)_src;
+   const sparsegenerator *src = (const sparsegenerator *)_src;
    dst->n = src->n;
    dst->m = src->m;
    dst->matkind = src->matkind;
@@ -87197,9 +87197,9 @@ static void rec4serialization_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->r, 0, DT_REAL, make_automatic);
 }
 
-static void rec4serialization_copy(void *_dst, void *_src, bool make_automatic) {
+static void rec4serialization_copy(void *_dst, const void *_src, bool make_automatic) {
    rec4serialization *dst = (rec4serialization *)_dst;
-   rec4serialization *src = (rec4serialization *)_src;
+   const rec4serialization *src = (const rec4serialization *)_src;
    ae_vector_copy(&dst->b, &src->b, make_automatic);
    ae_vector_copy(&dst->i, &src->i, make_automatic);
    ae_vector_copy(&dst->r, &src->r, make_automatic);
@@ -87293,9 +87293,9 @@ static void poolrec1_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->i1val, 0, DT_INT, make_automatic);
 }
 
-static void poolrec1_copy(void *_dst, void *_src, bool make_automatic) {
+static void poolrec1_copy(void *_dst, const void *_src, bool make_automatic) {
    poolrec1 *dst = (poolrec1 *)_dst;
-   poolrec1 *src = (poolrec1 *)_src;
+   const poolrec1 *src = (const poolrec1 *)_src;
    dst->cval = src->cval;
    dst->rval = src->rval;
    dst->ival = src->ival;
@@ -87320,9 +87320,9 @@ static void poolrec2_init(void *_p, bool make_automatic) {
    ae_shared_pool_init(&p->pool, make_automatic);
 }
 
-static void poolrec2_copy(void *_dst, void *_src, bool make_automatic) {
+static void poolrec2_copy(void *_dst, const void *_src, bool make_automatic) {
    poolrec2 *dst = (poolrec2 *)_dst;
-   poolrec2 *src = (poolrec2 *)_src;
+   const poolrec2 *src = (const poolrec2 *)_src;
    dst->bval = src->bval;
    poolrec1_copy(&dst->recval, &src->recval, make_automatic);
    ae_shared_pool_copy(&dst->pool, &src->pool, make_automatic);
@@ -87341,9 +87341,9 @@ struct poolsummand {
 static void poolsummand_init(void *_p, bool make_automatic) {
 }
 
-static void poolsummand_copy(void *_dst, void *_src, bool make_automatic) {
+static void poolsummand_copy(void *_dst, const void *_src, bool make_automatic) {
    poolsummand *dst = (poolsummand *)_dst;
-   poolsummand *src = (poolsummand *)_src;
+   const poolsummand *src = (const poolsummand *)_src;
    dst->val = src->val;
 }
 

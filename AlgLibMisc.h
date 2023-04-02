@@ -25,7 +25,7 @@ struct hqrndstate {
    ae_int_t magicv;
 };
 void hqrndstate_init(void *_p, bool make_automatic);
-void hqrndstate_copy(void *_dst, void *_src, bool make_automatic);
+void hqrndstate_copy(void *_dst, const void *_src, bool make_automatic);
 void hqrndstate_free(void *_p, bool make_automatic);
 
 void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state);
@@ -69,7 +69,7 @@ struct xdebugrecord1 {
    ae_vector a;
 };
 void xdebugrecord1_init(void *_p, bool make_automatic);
-void xdebugrecord1_copy(void *_dst, void *_src, bool make_automatic);
+void xdebugrecord1_copy(void *_dst, const void *_src, bool make_automatic);
 void xdebugrecord1_free(void *_p, bool make_automatic);
 
 void xdebuginitrecord1(xdebugrecord1 *rec1);
@@ -167,7 +167,7 @@ struct kdtreerequestbuffer {
    double curdist;
 };
 void kdtreerequestbuffer_init(void *_p, bool make_automatic);
-void kdtreerequestbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void kdtreerequestbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void kdtreerequestbuffer_free(void *_p, bool make_automatic);
 
 struct kdtree {
@@ -185,7 +185,7 @@ struct kdtree {
    ae_int_t debugcounter;
 };
 void kdtree_init(void *_p, bool make_automatic);
-void kdtree_copy(void *_dst, void *_src, bool make_automatic);
+void kdtree_copy(void *_dst, const void *_src, bool make_automatic);
 void kdtree_free(void *_p, bool make_automatic);
 void kdtreealloc(ae_serializer *s, kdtree *tree);
 void kdtreeserialize(ae_serializer *s, kdtree *tree);
