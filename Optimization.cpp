@@ -19140,47 +19140,6 @@ void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu) {
    state->havebndu.xB[i] = isfinite(bndu);
 }
 
-// This function sets sparse linear constraints for QP optimizer.
-//
-// This  function  overrides  results  of  previous  calls  to  minqpsetlc(),
-// minqpsetlcsparse() and minqpsetlcmixed().  After  call  to  this  function
-// all non-box constraints are dropped, and you have only  those  constraints
-// which were specified in the present call.
-//
-// If you want  to  specify  mixed  (with  dense  and  sparse  terms)  linear
-// constraints, you should call minqpsetlcmixed().
-//
-// Inputs:
-//     State   -   structure previously allocated with MinQPCreate call.
-//     C       -   linear  constraints,  sparse  matrix  with  dimensions  at
-//                 least [K,N+1]. If matrix has  larger  size,  only  leading
-//                 Kx(N+1) rectangle is used.
-//                 Each row of C represents one constraint, either equality
-//                 or inequality (see below):
-//                 * first N elements correspond to coefficients,
-//                 * last element corresponds to the right part.
-//                 All elements of C (including right part) must be finite.
-//     CT      -   type of constraints, array[K]:
-//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K >= 0
-//
-// NOTE 1: linear (non-bound) constraints are satisfied only approximately  -
-//         there always exists some violation due  to  numerical  errors  and
-//         algorithmic limitations (BLEIC-QP solver is most  precise,  AUL-QP
-//         solver is less precise).
-// ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
-// API: void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k);
-void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t k) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   NewMatrix(dummyc, 0, 0, DT_REAL);
-   NewVector(dummyct, 0, DT_INT);
-   minqpsetlcmixed(state, c, ct, k, &dummyc, &dummyct, 0);
-   ae_frame_leave();
-}
-
 // This function sets mixed linear constraints, which include a set of  dense
 // rows, and a set of sparse rows.
 //
@@ -19376,6 +19335,47 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
 // API: void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek);
 void minqpsetlcmixedlegacy(minqpstate *state, RMatrix *densec, ZVector *densect, ae_int_t densek, sparsematrix *sparsec, ZVector *sparsect, ae_int_t sparsek) {
    minqpsetlcmixed(state, sparsec, sparsect, sparsek, densec, densect, densek);
+}
+
+// This function sets sparse linear constraints for QP optimizer.
+//
+// This  function  overrides  results  of  previous  calls  to  minqpsetlc(),
+// minqpsetlcsparse() and minqpsetlcmixed().  After  call  to  this  function
+// all non-box constraints are dropped, and you have only  those  constraints
+// which were specified in the present call.
+//
+// If you want  to  specify  mixed  (with  dense  and  sparse  terms)  linear
+// constraints, you should call minqpsetlcmixed().
+//
+// Inputs:
+//     State   -   structure previously allocated with MinQPCreate call.
+//     C       -   linear  constraints,  sparse  matrix  with  dimensions  at
+//                 least [K,N+1]. If matrix has  larger  size,  only  leading
+//                 Kx(N+1) rectangle is used.
+//                 Each row of C represents one constraint, either equality
+//                 or inequality (see below):
+//                 * first N elements correspond to coefficients,
+//                 * last element corresponds to the right part.
+//                 All elements of C (including right part) must be finite.
+//     CT      -   type of constraints, array[K]:
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//     K       -   number of equality/inequality constraints, K >= 0
+//
+// NOTE 1: linear (non-bound) constraints are satisfied only approximately  -
+//         there always exists some violation due  to  numerical  errors  and
+//         algorithmic limitations (BLEIC-QP solver is most  precise,  AUL-QP
+//         solver is less precise).
+// ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
+// API: void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k);
+void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t k) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   NewMatrix(dummyc, 0, 0, DT_REAL);
+   NewVector(dummyct, 0, DT_INT);
+   minqpsetlcmixed(state, c, ct, k, &dummyc, &dummyct, 0);
+   ae_frame_leave();
 }
 
 // This function sets dense linear constraints for QP optimizer.
@@ -20610,13 +20610,6 @@ void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, c
    alglib_impl::ae_state_clear();
 }
 
-void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::minqpsetlcsparse(ConstT(minqpstate, state), ConstT(sparsematrix, c), ConstT(ae_vector, ct), k);
-   alglib_impl::ae_state_clear();
-}
-
 void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -20628,6 +20621,13 @@ void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec,
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minqpsetlcmixedlegacy(ConstT(minqpstate, state), ConstT(ae_matrix, densec), ConstT(ae_vector, densect), densek, ConstT(sparsematrix, sparsec), ConstT(ae_vector, sparsect), sparsek);
+   alglib_impl::ae_state_clear();
+}
+
+void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::minqpsetlcsparse(ConstT(minqpstate, state), ConstT(sparsematrix, c), ConstT(ae_vector, ct), k);
    alglib_impl::ae_state_clear();
 }
 
@@ -33622,11 +33622,11 @@ Spawn:
          smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state2->stepkxc, &state2->stepkfic, lagmult, &state2->tmpmerit);
          smonitor->probingf.xR[1] = state2->stepkfic.xR[0];
       }
+#   endif
       mx = 0.0;
       for (i = 0; i < n; i++) {
          mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad);
       }
-#   endif
       f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit);
       f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit);
 #endif

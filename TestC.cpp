@@ -1492,7 +1492,6 @@ static bool testablasfunit_testxtrsv(ae_int_t maxn, double tol) {
 bool testablasf() {
    ae_int_t maxn;
    double tol;
-   bool Ok;
    bool xdotOk;
    bool xsetOk;
    bool xaddOk;
@@ -1505,6 +1504,7 @@ bool testablasf() {
    bool xgemvOk;
    bool xgerOk;
    bool xtrsvOk;
+   bool Ok;
    maxn = 100;
    tol = 10000.0 * machineepsilon;
    xdotOk = testablasfunit_testxdot(maxn, tol);
@@ -1733,7 +1733,6 @@ static void testhqrndunit_unsetstate(hqrndstate *state) {
 
 bool testhqrnd() {
    ae_frame _frame_block;
-   bool Ok;
    ae_int_t samplesize;
    double sigmathreshold;
    ae_int_t passcount;
@@ -1767,6 +1766,7 @@ bool testhqrnd() {
    double expsigmaerr;
    bool discreteOk;
    bool continuousOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    if (!silent) printf("Random Number Generator Test Breakdown\n");
    NewVector(x, 0, DT_REAL);
@@ -4253,11 +4253,11 @@ bool testhblas() {
    ae_int_t j;
    ae_int_t i1;
    ae_int_t i2;
-   bool Ok;
    double mverr;
    double threshold;
    complex alpha;
    complex v;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_COMPLEX);
    NewMatrix(ua, 0, 0, DT_COMPLEX);
@@ -4361,8 +4361,8 @@ bool testcreflections() {
    double meg;
    ae_int_t pass;
    ae_int_t passcount;
-   bool Ok;
    double threshold;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_COMPLEX);
    NewVector(v, 0, DT_COMPLEX);
@@ -4523,11 +4523,11 @@ bool testsblas() {
    ae_int_t j;
    ae_int_t i1;
    ae_int_t i2;
-   bool Ok;
    double mverr;
    double threshold;
    double alpha;
    double v;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
    NewMatrix(ua, 0, 0, DT_REAL);
@@ -6285,7 +6285,6 @@ bool testmatgen() {
    ae_int_t j;
    ae_int_t pass;
    ae_int_t passcount;
-   bool Ok;
    double cond;
    double threshold;
    double vt;
@@ -6299,6 +6298,7 @@ bool testmatgen() {
    bool rOk;
    bool cOk;
    bool eulOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
    NewMatrix(b, 0, 0, DT_REAL);
@@ -6782,7 +6782,6 @@ static bool testtsortunit_testsortresults(RVector *asorted, ZVector *p1, ZVector
 // Testing tag sort
 bool testtsort() {
    ae_frame _frame_block;
-   bool Ok;
    ae_int_t n;
    ae_int_t i;
    ae_int_t m;
@@ -6791,6 +6790,7 @@ bool testtsort() {
    ae_int_t passcount;
    ae_int_t maxn;
    bool distinctvals;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(a, 0, DT_REAL);
    NewVector(a0, 0, DT_REAL);
@@ -10188,7 +10188,6 @@ static bool testsparseunit_testgcmatrixtype() {
 }
 
 bool testsparse() {
-   bool Ok;
    bool basicOk;
    bool linearOk;
    bool basicrndOk;
@@ -10209,6 +10208,7 @@ bool testsparse() {
    bool rewriteexistingOk;
    bool sksOk;
    bool crsOk;
+   bool Ok;
    if (!silent) printf("Sparse Matrix Test Breakdown\n");
    getrowOk = true;
    crsOk = true;
@@ -12675,7 +12675,6 @@ bool testevd() {
    double failthreshold;
    double threshold;
    double bithreshold;
-   bool Ok;
    bool nsOk;
    bool sOk;
    bool hOk;
@@ -12685,6 +12684,7 @@ bool testevd() {
    bool tdbiOk;
    bool sisymmOk;
    bool wOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(ra, 0, 0, DT_REAL);
    failthreshold = 0.005;
@@ -14155,7 +14155,6 @@ bool testtrfac() {
    ae_int_t j;
    complex vc;
    double vr;
-   bool Ok;
    bool dspdOk;
    bool sspdOk;
    bool srOk;
@@ -14166,6 +14165,7 @@ bool testtrfac() {
    bool dspdupdOk;
    double threshold;
    ae_int_t pass;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(ra, 0, 0, DT_REAL);
    NewMatrix(ral, 0, 0, DT_REAL);
@@ -14398,9 +14398,9 @@ bool testtrfac() {
 // Test
 bool testpolynomialsolver() {
    ae_frame _frame_block;
-   bool Ok;
    double eps;
    ae_int_t n;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(a, 0, DT_REAL);
    NewVector(x, 0, DT_COMPLEX);
@@ -14798,7 +14798,6 @@ bool testbdsvd() {
    ae_int_t maxn;
    ae_int_t i;
    ae_int_t pass;
-   bool Ok;
    bool sortOk;
    bool convOk;
    double materr;
@@ -14807,6 +14806,7 @@ bool testbdsvd() {
    double failr;
    ae_int_t failcount;
    ae_int_t succcount;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(d, 0, DT_REAL);
    NewVector(e, 0, DT_REAL);
@@ -15036,7 +15036,6 @@ bool testsvd() {
    ae_int_t j;
    ae_int_t gpass;
    ae_int_t pass;
-   bool Ok;
    bool sortOk;
    bool convOk;
    double materr;
@@ -15046,6 +15045,7 @@ bool testsvd() {
    double failr;
    ae_int_t failcount;
    ae_int_t succcount;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
    failcount = 0;
@@ -15153,12 +15153,12 @@ bool testtrlinsolve() {
    ae_int_t cntu;
    ae_int_t cntt;
    ae_int_t cntm;
-   bool Ok;
    bool isupper;
    bool istrans;
    bool isunit;
    double v;
    double s;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(aeffective, 0, 0, DT_REAL);
    NewMatrix(aparam, 0, 0, DT_REAL);
@@ -15300,7 +15300,6 @@ bool testsafesolve() {
    double threshold;
    bool rOk;
    bool cOk;
-   bool Ok;
    bool isupper;
    ae_int_t trans;
    bool isunit;
@@ -15313,6 +15312,7 @@ bool testsafesolve() {
    ae_int_t j2;
    complex cv;
    double rv;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(ca, 0, 0, DT_COMPLEX);
    NewMatrix(cea, 0, 0, DT_COMPLEX);
@@ -16723,13 +16723,13 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
 bool testrcond() {
    ae_int_t maxn;
    ae_int_t passcount;
-   bool Ok;
    bool rtrOk;
    bool ctrOk;
    bool rOk;
    bool cOk;
    bool spdOk;
    bool hpdOk;
+   bool Ok;
    maxn = 10;
    passcount = 100;
    rtrOk = testrcondunit_testrmatrixtrrcond(maxn, passcount);
@@ -16758,7 +16758,6 @@ bool testxblas() {
    ae_frame _frame_block;
    bool approxOk;
    bool exactnessOk;
-   bool Ok;
    double approxthreshold;
    ae_int_t maxn;
    ae_int_t passcount;
@@ -16772,6 +16771,7 @@ bool testxblas() {
    complex cv2;
    double cv2err;
    double s;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(rx, 0, DT_REAL);
    NewVector(ry, 0, DT_REAL);
@@ -19137,7 +19137,6 @@ bool testfbls() {
    ae_int_t mx;
    ae_int_t i;
    ae_int_t j;
-   bool Ok;
    bool cgOk;
    bool lsOk;
    bool cholOk;
@@ -19151,6 +19150,7 @@ bool testfbls() {
    double alpha;
    double e1;
    double e2;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(tmp0, 0, DT_REAL);
    NewVector(tmp1, 0, DT_REAL);
@@ -22851,7 +22851,6 @@ static void testnlequnit_testfuncshbm(nleqstate *state) {
 
 bool testnleq() {
    ae_frame _frame_block;
-   bool Ok;
    bool basicsOk;
    bool convOk;
    bool otherOk;
@@ -22868,6 +22867,7 @@ bool testnleq() {
    ae_int_t passcount;
    double epsf;
    double stpmax;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(xlast, 0, DT_REAL);
@@ -25653,7 +25653,6 @@ static bool testminlbfgsunit_testoptguard() {
 
 bool testminlbfgs() {
    ae_frame _frame_block;
-   bool Ok;
    bool refOk;
    bool nonconvOk;
    bool eqOk;
@@ -25671,6 +25670,7 @@ bool testminlbfgs() {
    ae_int_t maxits;
    double diffstep;
    ae_int_t dkind;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(xe, 0, DT_REAL);
@@ -25954,7 +25954,6 @@ bool testcqmodels() {
    bool newton0Ok;
    bool newton1Ok;
    bool newton2Ok;
-   bool Ok;
    ae_int_t nkind;
    ae_int_t kmax;
    ae_int_t n;
@@ -25972,6 +25971,7 @@ bool testcqmodels() {
    double mkind;
    double xtadx2;
    double noise;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(convexquadraticmodel, s);
    NewMatrix(a, 0, 0, DT_REAL);
@@ -26550,7 +26550,6 @@ bool testsnnls() {
    bool test1Ok;
    bool test2Ok;
    bool testnewtonOk;
-   bool Ok;
    double eps;
    ae_int_t i;
    ae_int_t j;
@@ -26562,6 +26561,7 @@ bool testsnnls() {
    double rho;
    double xtol;
    ae_int_t nmax;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(densea, 0, 0, DT_REAL);
    NewMatrix(effectivea, 0, 0, DT_REAL);
@@ -27068,8 +27068,8 @@ static bool testsactivesetsunit_testspecproperties() {
 }
 
 bool testsactivesets() {
-   bool Ok;
    bool specOk;
+   bool Ok;
    specOk = true;
    specOk = specOk && testsactivesetsunit_testspecproperties();
 // The final report.
@@ -30248,7 +30248,6 @@ static bool testminbleicunit_testoptguard() {
 }
 
 bool testminbleic() {
-   bool Ok;
    bool feasibilityOk;
    bool otherOk;
    bool precOk;
@@ -30256,6 +30255,7 @@ bool testminbleic() {
    bool convOk;
    bool optguardOk;
    bool bugsOk;
+   bool Ok;
    Ok = true;
    feasibilityOk = true;
    otherOk = true;
@@ -36744,9 +36744,9 @@ static bool testminqpunit_generallcqptest() {
 // This function tests special inequality constrained QP problems.
 static bool testminqpunit_specialicqptests() {
    ae_frame _frame_block;
-   bool Ok;
    ae_int_t i;
    ae_int_t j;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
    NewMatrix(c, 0, 0, DT_REAL);
@@ -39698,13 +39698,13 @@ static bool testminlmunit_tryreproducefixedbugs() {
 }
 
 bool testminlm() {
-   bool Ok;
    bool uOk;
    bool bcOk;
    bool lcOk;
    bool scOk;
    bool otherOk;
    bool optguardOk;
+   bool Ok;
    Ok = true;
    scOk = true;
    otherOk = true;
@@ -41092,7 +41092,6 @@ static bool testmincgunit_testoptguard() {
 
 bool testmincg() {
    ae_frame _frame_block;
-   bool Ok;
    bool refOk;
    bool eqOk;
    bool lin1Ok;
@@ -41109,6 +41108,7 @@ bool testmincg() {
    ae_int_t cgtype;
    ae_int_t difftype;
    double diffstep;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(xe, 0, DT_REAL);
@@ -47643,13 +47643,13 @@ static bool testminnlcunit_testoptguard() {
 }
 
 bool testminnlc() {
-   bool Ok;
    bool bcOk;
    bool lcOk;
    bool nlcOk;
    bool otherOk;
    bool optguardOk;
    bool bugsOk;
+   bool Ok;
    Ok = true;
    bcOk = true;
    lcOk = true;
@@ -49404,12 +49404,12 @@ static bool testminnsunit_testother() {
 }
 
 bool testminns() {
-   bool Ok;
    bool ucOk;
    bool bcOk;
    bool lcOk;
    bool nlcOk;
    bool otherOk;
+   bool Ok;
    Ok = true;
    ucOk = true;
    bcOk = true;
@@ -51159,13 +51159,13 @@ static bool testminbcunit_testoptguard() {
 }
 
 bool testminbc() {
-   bool Ok;
    bool feasibilityOk;
    bool otherOk;
    bool precOk;
    bool intOk;
    bool convOk;
    bool optguardOk;
+   bool Ok;
    Ok = true;
    feasibilityOk = true;
    otherOk = true;
@@ -52167,8 +52167,8 @@ bool testnearestneighbor() {
    ae_int_t largen;
    ae_int_t passcount;
    ae_int_t pass;
-   bool Ok;
    bool kdtOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(xy, 0, 0, DT_REAL);
    kdtOk = true;
@@ -52235,7 +52235,6 @@ bool testodesolver() {
    ae_int_t passcount;
    bool curOk;
    bool rkckOk;
-   bool Ok;
    double h;
    double eps;
    ae_int_t solver;
@@ -52246,6 +52245,7 @@ bool testodesolver() {
    ae_int_t m2;
    ae_int_t i;
    double err;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(xtbl, 0, DT_REAL);
    NewMatrix(ytbl, 0, 0, DT_REAL);
@@ -52746,9 +52746,9 @@ bool testinverseupdate() {
    double val;
    ae_int_t pass;
    ae_int_t passcount;
-   bool Ok;
    double threshold;
    double c;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
    NewMatrix(inva, 0, 0, DT_REAL);
@@ -52938,12 +52938,12 @@ bool testschur() {
    ae_int_t j;
    ae_int_t pass;
    ae_int_t passcount;
-   bool Ok;
    bool structOk;
    bool convOk;
    double materr;
    double orterr;
    double threshold;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
    materr = 0.0;
@@ -53017,9 +53017,9 @@ bool testspdgevd() {
    double err;
    double valerr;
    double threshold;
-   bool Ok;
    bool convOk;
    bool sortOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(d, 0, DT_REAL);
    NewVector(t1, 0, DT_REAL);
@@ -53167,9 +53167,9 @@ bool testgammafunc() {
    double threshold;
    double v;
    double s;
-   bool Ok;
    bool gammaOk;
    bool lngammaOk;
+   bool Ok;
    gammaOk = true;
    lngammaOk = true;
    Ok = true;
@@ -54548,7 +54548,6 @@ static bool testbasestatunit_testranking() {
 
 bool testbasestat() {
    ae_frame _frame_block;
-   bool Ok;
    bool s1Ok;
    bool covcorrOk;
    bool rankOk;
@@ -54573,6 +54572,7 @@ bool testbasestat() {
    double tvariance;
    double tskewness;
    double tkurtosis;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -54778,7 +54778,6 @@ bool testbasestat() {
 // === wsr testing unit ===
 bool testwsr() {
    ae_frame _frame_block;
-   bool Ok;
    ae_int_t n;
    ae_int_t i;
    double taill;
@@ -54788,6 +54787,7 @@ bool testwsr() {
    double tailrprev;
    double ebase;
    double eshift;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(xa, 0, DT_REAL);
    Ok = true;
@@ -54840,7 +54840,6 @@ bool testwsr() {
 // === mannwhitneyu testing unit ===
 bool testmannwhitneyu() {
    ae_frame _frame_block;
-   bool Ok;
    ae_int_t testmin;
    ae_int_t testmax;
    ae_int_t testcnt;
@@ -54862,6 +54861,7 @@ bool testmannwhitneyu() {
    ae_int_t ecnt;
    double worsterr;
    double v;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -54993,8 +54993,8 @@ bool teststest() {
    double taill;
    double tailr;
    double tailb;
-   bool Ok;
    double eps;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    Ok = true;
@@ -55044,7 +55044,6 @@ bool teststest() {
 // === studentttests testing unit ===
 bool teststudentttests() {
    ae_frame _frame_block;
-   bool Ok;
    double eps;
    ae_int_t n;
    ae_int_t i;
@@ -55054,6 +55053,7 @@ bool teststudentttests() {
    double taill1;
    double tailr1;
    double tailb1;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -55377,7 +55377,6 @@ static void testratintunit_brcunset(barycentricinterpolant *b) {
 
 bool testratint() {
    ae_frame _frame_block;
-   bool Ok;
    bool bcOk;
    bool npOk;
    double threshold;
@@ -55405,6 +55404,7 @@ bool testratint() {
    double d0;
    double d1;
    double d2;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(barycentricinterpolant, b1);
    NewObj(barycentricinterpolant, b2);
@@ -56509,9 +56509,9 @@ static bool testidwunit_testmstab() {
 
 // Testing IDW interpolation
 bool testidw() {
-   bool Ok;
    bool commonOk;
    bool mstabOk;
+   bool Ok;
    commonOk = true;
    mstabOk = true;
    commonOk = commonOk && testidwunit_testcommon();
@@ -56565,7 +56565,6 @@ static void testpolintunit_brcunset(barycentricinterpolant *b) {
 // Unit test
 bool testpolint() {
    ae_frame _frame_block;
-   bool Ok;
    bool intOk;
    double threshold;
    double a;
@@ -56586,6 +56585,7 @@ bool testpolint() {
    ae_int_t maxn;
    ae_int_t pass;
    ae_int_t passcount;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -61767,7 +61767,6 @@ static bool testlsfitunit_testgradientcheck() {
 }
 
 bool testlsfit() {
-   bool Ok;
    bool llsOk;
    bool nlsOk;
    bool polfitOk;
@@ -61776,6 +61775,7 @@ bool testlsfit() {
    bool gradOk;
    bool logisticOk;
    bool rdpOk;
+   bool Ok;
    Ok = true;
    polfitOk = true;
    ratfitOk = true;
@@ -62564,7 +62564,6 @@ static void testparametricunit_unsetp3(pspline3interpolant *p) {
 
 bool testparametric() {
    ae_frame _frame_block;
-   bool Ok;
    bool p2Ok;
    bool p3Ok;
    bool rdpOk;
@@ -62600,6 +62599,7 @@ bool testparametric() {
    double vd2z2;
    double v0;
    double v1;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -64699,7 +64699,6 @@ static bool testspline2dunit_testfittingfastddmsolver() {
 
 bool testspline2d() {
    ae_frame _frame_block;
-   bool Ok;
    bool blOk;
    bool bcOk;
    bool dsOk;
@@ -64757,6 +64756,7 @@ bool testspline2d() {
    double v2y;
    double v2xy;
    double mf;
+   bool Ok;
    ae_frame_make(&_frame_block);
    if (!silent) printf("2D Spline Test Breakdown\n");
    NewVector(x, 0, DT_REAL);
@@ -65656,11 +65656,11 @@ static bool testspline3dunit_testtrilinearresample() {
 }
 
 bool testspline3d() {
-   bool Ok;
    bool basicOk;
    bool unpackOk;
    bool lintransfOk;
    bool trilinresOk;
+   bool Ok;
    basicOk = testspline3dunit_basictest();
    unpackOk = testspline3dunit_testunpack();
    lintransfOk = testspline3dunit_testlintrans();
@@ -73513,11 +73513,11 @@ bool testbdss() {
    double threshold;
    double rms;
    double cvrms;
-   bool Ok;
    bool tiesOk;
    bool split2Ok;
    bool optimalsplitkOk;
    bool splitkOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(a, 0, DT_REAL);
    NewVector(a0, 0, DT_REAL);
@@ -76110,7 +76110,6 @@ static bool testmlpbaseunit_testmlpgbsubset() {
 
 bool testmlpbase() {
    ae_frame _frame_block;
-   bool Ok;
    ae_int_t passcount;
    ae_int_t maxn;
    ae_int_t maxhid;
@@ -76126,6 +76125,7 @@ bool testmlpbase() {
    bool gradOk;
    bool hessOk;
    bool errOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(multilayerperceptron, network);
    NewObj(multilayerperceptron, network2);
@@ -76690,7 +76690,6 @@ static bool testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
 }
 
 bool testmlpe() {
-   bool Ok;
    bool infOk;
    bool procOk;
    bool errOk;
@@ -76705,6 +76704,7 @@ bool testmlpe() {
    ae_int_t nkind;
    ae_int_t sizemin;
    ae_int_t sizemax;
+   bool Ok;
    Ok = true;
    infOk = true;
    procOk = true;
@@ -78715,10 +78715,10 @@ static bool testclusteringunit_kmeansrestartstest(bool *convOkP) {
 
 // Testing clustering
 bool testclustering() {
-   bool Ok;
    ae_int_t passcount;
    ae_int_t nf;
    ae_int_t nc;
+   bool Ok;
 // AHC tests
    bool basicahcOk = testclusteringunit_basicahctests();
    bool generalahcOk = testclusteringunit_advancedahctests();
@@ -81512,10 +81512,10 @@ static bool testlrma() {
 }
 
 bool testfilters() {
-   bool Ok;
    bool smaOk;
    bool emaOk;
    bool lrmaOk;
+   bool Ok;
    if (!silent) printf("Filter Test Breakdown\n");
    smaOk = testsma();
    emaOk = testema();
@@ -83872,7 +83872,6 @@ bool testlda() {
    ae_int_t passcount;
    bool ldanOk;
    bool lda1Ok;
-   bool Ok;
    ae_int_t nf;
    ae_int_t nc;
    ae_int_t ns;
@@ -83880,6 +83879,7 @@ bool testlda() {
    ae_int_t info;
    ae_int_t pass;
    ae_int_t axis;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(xy, 0, 0, DT_REAL);
    NewMatrix(wn, 0, 0, DT_REAL);
@@ -84978,13 +84978,13 @@ static bool testmcpdunit_testlc() {
 }
 
 bool testmcpd() {
-   bool Ok;
    bool simpleOk;
    bool entryexitOk;
    bool ecOk;
    bool bcOk;
    bool lcOk;
    bool otherOk;
+   bool Ok;
 // Init
    Ok = true;
    otherOk = true;
@@ -85662,8 +85662,8 @@ static bool testknnunit_testknnalgo() {
 }
 
 bool testknn() {
-   bool Ok;
    bool knnOk;
+   bool Ok;
 // Primary settings
    knnOk = true;
    Ok = true;
@@ -87104,7 +87104,6 @@ static bool testmlptrainunit_testmlptrainenscls() {
 
 bool testmlptrain() {
    ae_frame _frame_block;
-   bool Ok;
    ae_int_t info;
    bool trnOk;
    bool mlpcverrorOk;
@@ -87114,6 +87113,7 @@ bool testmlptrain() {
    bool mlpxorregrOk;
    bool mlpxorclsOk;
    bool mlptrainensOk;
+   bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(multilayerperceptron, network);
    NewObj(multilayerperceptron, network2);

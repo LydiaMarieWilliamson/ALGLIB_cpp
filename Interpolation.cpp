@@ -17468,14 +17468,10 @@ void rbfv1report_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === RBFV3 Package ===
+// Depends on: (AlgLibMisc) NEARESTNEIGHBOR
+// Depends on: (LinAlg) RCOND
+// Depends on: (Solvers) ITERATIVESPARSE
 namespace alglib_impl {
-static const double rbfv3_epsred = 0.999999;
-static const ae_int_t rbfv3_maxddmits = 50;
-static const double rbfv3_polyharmonic2scale = 4.0;
-static const ae_int_t rbfv3_acbfparallelthreshold = 512;
-static const ae_int_t rbfv3_ddmparallelthreshold = 512;
-static const ae_int_t rbfv3_bfparallelthreshold = 512;
-
 // Reallocates calcBuf if necessary, reuses previously allocated space if
 // possible.
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
@@ -17568,6 +17564,9 @@ void rbfv3createcalcbuffer(rbfv3model *s, rbfv3calcbuffer *buf) {
 // Recursive functions matrix computation
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
 static void rbfv3_computebfmatrixrec(RMatrix *xx, ae_int_t range0, ae_int_t range1, ae_int_t n, ae_int_t nx, ae_int_t functype, double funcparam, RMatrix *f) {
+#if 0 //(@) Used only for a parallelism check.
+   const ae_int_t bfparallelthreshold = 512;
+#endif
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -17578,7 +17577,7 @@ static void rbfv3_computebfmatrixrec(RMatrix *xx, ae_int_t range0, ae_int_t rang
    ae_assert(functype == 1 || functype == 2 || functype == 3, "RBFV3.ComputeTransposedDesignSystem: unexpected FuncType");
 // Try to parallelize
    elemcost = 10.0;
-// Parallelism was tried if: range0 == 0 && range1 == n && 0.5 * n * n * elemcost >= smpactivationlevel() && n >= rbfv3_bfparallelthreshold
+// Parallelism was tried if: range0 == 0 && range1 == n && 0.5 * n * n * elemcost >= smpactivationlevel() && n >= bfparallelthreshold
 // Try recursive splits
    if (range1 - range0 > 16) {
       k = range0 + (range1 - range0) / 2;
@@ -17892,6 +17891,7 @@ static void rbfv3_preprocessdatasetrec(RMatrix *xbuf, RMatrix *ybuf, ZVector *in
 //     AddXRescaleAplied-additional scaling applied after user scaling
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
 static void rbfv3_preprocessdataset(RMatrix *xraw, double mergetol, RMatrix *yraw, RVector *xscaleraw, ae_int_t nraw, ae_int_t nx, ae_int_t ny, ae_int_t bftype, double bfparamraw, double lambdavraw, RMatrix *xwrk, RMatrix *ywrk, ZVector *raw2wrkmap, ZVector *wrk2rawmap, ae_int_t *nwrk, RVector *xscalewrk, RVector *xshift, double *bfparamwrk, double *lambdavwrk, double *addxrescaleaplied) {
+   const double polyharmonic2scale = 4.0;
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -17955,7 +17955,7 @@ static void rbfv3_preprocessdataset(RMatrix *xraw, double mergetol, RMatrix *yra
    } else {
       if (bftype == 2) {
       // Thin plate splines need special scaling; no params to rescale
-         *addxrescaleaplied *= rbfv3_polyharmonic2scale;
+         *addxrescaleaplied *= polyharmonic2scale;
       } else {
          ae_assert(false, "RBFV3: integrity check 0632 failed");
       }
@@ -18611,6 +18611,9 @@ static void rbfv3_computeacbfpreconditionerbasecase(acbfbuilder *builder, acbfbu
 //     Builder.OutputPool is updated with new chunks
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
 static void rbfv3_computeacbfpreconditionerrecv2(acbfbuilder *builder, ae_int_t wrk0, ae_int_t wrk1) {
+#if 0 //(@) Used only for a parallelism check.
+   const ae_int_t acbfparallelthreshold = 512;
+#endif
    ae_frame _frame_block;
    ae_int_t nx;
    ae_int_t i;
@@ -18628,7 +18631,7 @@ static void rbfv3_computeacbfpreconditionerrecv2(acbfbuilder *builder, ae_int_t 
       return;
    }
    basecasecomplexity = (double)(builder->nglobal + builder->nlocal + 2 * builder->ncorrection) * (builder->nglobal + builder->nlocal + 2 * builder->ncorrection) * (builder->nglobal + builder->nlocal + 2 * builder->ncorrection);
-// Parallelism was tried if: (double)builder->ntotal * basecasecomplexity >= smpactivationlevel() && builder->ntotal >= rbfv3_acbfparallelthreshold
+// Parallelism was tried if: (double)builder->ntotal * basecasecomplexity >= smpactivationlevel() && builder->ntotal >= acbfparallelthreshold
 // Retrieve temporary buffer
    ae_shared_pool_retrieve(&builder->bufferpool, &_buf);
 // Analyze current working set
@@ -19314,6 +19317,9 @@ static void rbfv3_ddmsolverinitbasecase(rbf3ddmsolver *solver, RMatrix *x, ae_in
 //     NBatch      -   batch size
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
 static void rbfv3_ddmsolverinitrec(rbf3ddmsolver *solver, RMatrix *x, ae_int_t n, ae_int_t nx, rbf3evaluator *bfmatrix, double lambdav, sparsematrix *sp, ZVector *wrkidx, ae_int_t wrk0, ae_int_t wrk1, ae_int_t nneighbors, ae_int_t nbatch) {
+#if 0 //(@) Used only for a parallelism check.
+   const ae_int_t ddmparallelthreshold = 512;
+#endif
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -19329,7 +19335,7 @@ static void rbfv3_ddmsolverinitrec(rbf3ddmsolver *solver, RMatrix *x, ae_int_t n
       return;
    }
    basecasecomplexity = (double)(nbatch + nneighbors + nx + 1) * (nbatch + nneighbors + nx + 1) * (nbatch + nneighbors + nx + 1);
-// Parallelism was tried if: basecasecomplexity * ((double)n / nbatch) >= smpactivationlevel() && (double)n / nbatch >= 2.0 && n >= rbfv3_ddmparallelthreshold
+// Parallelism was tried if: basecasecomplexity * ((double)n / nbatch) >= smpactivationlevel() && (double)n / nbatch >= 2.0 && n >= ddmparallelthreshold
 // Retrieve temporary buffer
    ae_shared_pool_retrieve(&solver->bufferpool, &_buf);
 // Analyze current working set
@@ -19739,6 +19745,8 @@ static void rbfv3_ddmsolverrun1(rbf3ddmsolver *solver, RVector *res, ae_int_t n,
 // unchanged.
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
 void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, ae_int_t bftype, double bfparamraw, double lambdavraw, ae_int_t aterm, rbfv3model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv3report *rep) {
+   const double epsred = 0.999999;
+   const ae_int_t maxddmits = 50;
    ae_frame _frame_block;
    double tol;
    ae_int_t n;
@@ -19882,9 +19890,9 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
       rsetallocv(n + nx + 1, 0.0, &y0);
       rsetallocv(n + nx + 1, 0.0, &y1);
       rcopycv(n, &yscaled, yidx, &y0);
-      fblsgmrescreate(&y0, n, imin2(rbfv3_maxddmits, n), &gmressolver);
+      fblsgmrescreate(&y0, n, imin2(maxddmits, n), &gmressolver);
       gmressolver.epsres = tol;
-      gmressolver.epsred = rbfv3_epsred;
+      gmressolver.epsred = epsred;
       iteridx = 0;
       while (fblsgmresiteration(&gmressolver)) {
          allocv(n + nx + 1, &y0);
@@ -20719,43 +20727,6 @@ void rbfv3unserialize(ae_serializer *s, rbfv3model *model) {
    rbfv3_createfastevaluator(model);
 }
 
-void rbf3evaluator_init(void *_p, bool make_automatic) {
-   rbf3evaluator *p = (rbf3evaluator *)_p;
-   ae_matrix_init(&p->f, 0, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->entireset, 0, DT_INT, make_automatic);
-   ae_matrix_init(&p->x, 0, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->xtchunked, 0, 0, DT_REAL, make_automatic);
-   ae_shared_pool_init(&p->bufferpool, make_automatic);
-   ae_vector_init(&p->chunk1, 0, DT_REAL, make_automatic);
-}
-
-void rbf3evaluator_copy(void *_dst, const void *_src, bool make_automatic) {
-   rbf3evaluator *dst = (rbf3evaluator *)_dst;
-   const rbf3evaluator *src = (const rbf3evaluator *)_src;
-   dst->n = src->n;
-   dst->storagetype = src->storagetype;
-   ae_matrix_copy(&dst->f, &src->f, make_automatic);
-   dst->nx = src->nx;
-   dst->functype = src->functype;
-   dst->funcparam = src->funcparam;
-   dst->chunksize = src->chunksize;
-   ae_vector_copy(&dst->entireset, &src->entireset, make_automatic);
-   ae_matrix_copy(&dst->x, &src->x, make_automatic);
-   ae_matrix_copy(&dst->xtchunked, &src->xtchunked, make_automatic);
-   ae_shared_pool_copy(&dst->bufferpool, &src->bufferpool, make_automatic);
-   ae_vector_copy(&dst->chunk1, &src->chunk1, make_automatic);
-}
-
-void rbf3evaluator_free(void *_p, bool make_automatic) {
-   rbf3evaluator *p = (rbf3evaluator *)_p;
-   ae_matrix_free(&p->f, make_automatic);
-   ae_vector_free(&p->entireset, make_automatic);
-   ae_matrix_free(&p->x, make_automatic);
-   ae_matrix_free(&p->xtchunked, make_automatic);
-   ae_shared_pool_free(&p->bufferpool, make_automatic);
-   ae_vector_free(&p->chunk1, make_automatic);
-}
-
 void rbf3evaluatorbuffer_init(void *_p, bool make_automatic) {
    rbf3evaluatorbuffer *p = (rbf3evaluatorbuffer *)_p;
    ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
@@ -20791,6 +20762,43 @@ void rbf3evaluatorbuffer_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->df1, make_automatic);
    ae_vector_free(&p->df2, make_automatic);
    ae_matrix_free(&p->deltabuf, make_automatic);
+}
+
+void rbf3evaluator_init(void *_p, bool make_automatic) {
+   rbf3evaluator *p = (rbf3evaluator *)_p;
+   ae_matrix_init(&p->f, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->entireset, 0, DT_INT, make_automatic);
+   ae_matrix_init(&p->x, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->xtchunked, 0, 0, DT_REAL, make_automatic);
+   ae_shared_pool_init(&p->bufferpool, make_automatic);
+   ae_vector_init(&p->chunk1, 0, DT_REAL, make_automatic);
+}
+
+void rbf3evaluator_copy(void *_dst, const void *_src, bool make_automatic) {
+   rbf3evaluator *dst = (rbf3evaluator *)_dst;
+   const rbf3evaluator *src = (const rbf3evaluator *)_src;
+   dst->n = src->n;
+   dst->storagetype = src->storagetype;
+   ae_matrix_copy(&dst->f, &src->f, make_automatic);
+   dst->nx = src->nx;
+   dst->functype = src->functype;
+   dst->funcparam = src->funcparam;
+   dst->chunksize = src->chunksize;
+   ae_vector_copy(&dst->entireset, &src->entireset, make_automatic);
+   ae_matrix_copy(&dst->x, &src->x, make_automatic);
+   ae_matrix_copy(&dst->xtchunked, &src->xtchunked, make_automatic);
+   ae_shared_pool_copy(&dst->bufferpool, &src->bufferpool, make_automatic);
+   ae_vector_copy(&dst->chunk1, &src->chunk1, make_automatic);
+}
+
+void rbf3evaluator_free(void *_p, bool make_automatic) {
+   rbf3evaluator *p = (rbf3evaluator *)_p;
+   ae_matrix_free(&p->f, make_automatic);
+   ae_vector_free(&p->entireset, make_automatic);
+   ae_matrix_free(&p->x, make_automatic);
+   ae_matrix_free(&p->xtchunked, make_automatic);
+   ae_shared_pool_free(&p->bufferpool, make_automatic);
+   ae_vector_free(&p->chunk1, make_automatic);
 }
 
 void rbfv3calcbuffer_init(void *_p, bool make_automatic) {

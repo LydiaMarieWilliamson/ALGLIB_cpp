@@ -5301,6 +5301,8 @@ const complex operator/(const complex &A, const complex &B) {
    }
 }
 
+const complex operator/(const complex &A, const double &B) { return complex(A.x / B, A.y / B); }
+
 const complex operator/(const double &A, const complex &B) {
    double Bx = B.x, By = B.y;
    if (fabs(By) < fabs(Bx)) {
@@ -5311,8 +5313,6 @@ const complex operator/(const double &A, const complex &B) {
       return complex(A * e / f, -A / f);
    }
 }
-
-const complex operator/(const complex &A, const double &B) { return complex(A.x / B, A.y / B); }
 
 double abscomplex(const complex &A) {
    double Ax = fabs(A.x), Ay = fabs(A.y), Lo = Ax < Ay ? Ax : Ay, Hi = Ax > Ay ? Ax : Ay;

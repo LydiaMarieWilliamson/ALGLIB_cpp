@@ -2095,6 +2095,7 @@ void bsetv(ae_int_t n, bool v, BVector *y) {
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xB[j] = v;
 }
+
 // Integer:
 void isetv(ae_int_t n, ae_int_t v, ZVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
@@ -2104,6 +2105,7 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *y) {
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xZ[j] = v;
 }
+
 // Real:
 void rsetv(ae_int_t n, double v, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS

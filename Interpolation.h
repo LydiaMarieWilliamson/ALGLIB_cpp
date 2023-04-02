@@ -719,6 +719,20 @@ void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 // Depends on: (LinAlg) RCOND
 // Depends on: (Solvers) ITERATIVESPARSE
 namespace alglib_impl {
+struct rbf3evaluatorbuffer {
+   ae_vector x;
+   ae_vector coeffbuf;
+   ae_vector funcbuf;
+   ae_vector wrkbuf;
+   ae_vector mindist2;
+   ae_vector df1;
+   ae_vector df2;
+   ae_matrix deltabuf;
+};
+void rbf3evaluatorbuffer_init(void *_p, bool make_automatic);
+void rbf3evaluatorbuffer_copy(void *_dst, const void *_src, bool make_automatic);
+void rbf3evaluatorbuffer_free(void *_p, bool make_automatic);
+
 struct rbf3evaluator {
    ae_int_t n;
    ae_int_t storagetype;
@@ -736,20 +750,6 @@ struct rbf3evaluator {
 void rbf3evaluator_init(void *_p, bool make_automatic);
 void rbf3evaluator_copy(void *_dst, const void *_src, bool make_automatic);
 void rbf3evaluator_free(void *_p, bool make_automatic);
-
-struct rbf3evaluatorbuffer {
-   ae_vector x;
-   ae_vector coeffbuf;
-   ae_vector funcbuf;
-   ae_vector wrkbuf;
-   ae_vector mindist2;
-   ae_vector df1;
-   ae_vector df2;
-   ae_matrix deltabuf;
-};
-void rbf3evaluatorbuffer_init(void *_p, bool make_automatic);
-void rbf3evaluatorbuffer_copy(void *_dst, const void *_src, bool make_automatic);
-void rbf3evaluatorbuffer_free(void *_p, bool make_automatic);
 
 struct rbfv3calcbuffer {
    ae_vector x;

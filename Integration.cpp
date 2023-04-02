@@ -2161,4 +2161,3 @@ void autogkresults(const autogkstate &state, double &v, autogkreport &rep) {
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
-   const double polyharmonic2scale = 4.0;
