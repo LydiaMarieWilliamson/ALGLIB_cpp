@@ -12408,7 +12408,7 @@ bool lsfititeration(lsfitstate *state) {
    AutoS ae_int_t j1;
    AutoS ae_int_t info;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -12420,18 +12420,6 @@ bool lsfititeration(lsfitstate *state) {
       default: goto Exit;
    }
 Spawn:
-   j = 81;
-   j1 = 255;
-   info = 74;
-   lx = -788;
-   lf = 809;
-   ld = 205;
-   rx = -838;
-   rf = 939;
-   rd = -526;
-   v = 763;
-   vv = -541;
-   relcnt = -698;
 // Init
    if (state->wkind == 1) {
       ae_assert(state->npoints == state->nweights, "LSFitFit: number of points is not equal to the number of weights");

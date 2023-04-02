@@ -23265,7 +23265,7 @@ static bool mlptrain_mlpcontinuetrainingx(mlptrainer *s, ZVector *subset, ae_int
    AutoS ae_int_t idx0;
    AutoS ae_int_t idx1;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -23274,20 +23274,6 @@ static bool mlptrain_mlpcontinuetrainingx(mlptrainer *s, ZVector *subset, ae_int
       default: goto Exit;
    }
 Spawn:
-   nin = 359;
-   nout = -58;
-   wcount = -919;
-   twcount = -909;
-   j = -788;
-   k = 809;
-   trnsetsize = 205;
-   epoch = -838;
-   minibatchcount = 939;
-   minibatchidx = -526;
-   cursize = 763;
-   idx0 = -541;
-   idx1 = -698;
-   v = -318;
 // Check correctness of inputs
    ae_assert(s->npoints >= 0, "MLPContinueTrainingX: internal error - parameter S is not initialized or is spoiled(S.NPoints < 0).");
    if (s->rcpar) {

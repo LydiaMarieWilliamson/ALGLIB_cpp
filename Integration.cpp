@@ -1641,7 +1641,7 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
    AutoS double qeps;
    AutoS ae_int_t info;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -1650,18 +1650,6 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
       default: goto Exit;
    }
 Spawn:
-   j = -526;
-   ns = 763;
-   info = -541;
-   c1 = -698;
-   c2 = -900;
-   intg = -318;
-   intk = -940;
-   inta = 1016;
-   v = -229;
-   ta = -536;
-   tb = 487;
-   qeps = -115;
 // initialize quadratures.
 // use 15-point Gauss-Kronrod formula.
    state->n = 15;
@@ -1867,7 +1855,7 @@ bool autogkiteration(autogkstate *state) {
    AutoS double v1;
    AutoS double v2;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -1876,12 +1864,6 @@ bool autogkiteration(autogkstate *state) {
       default: goto Exit;
    }
 Spawn:
-   s = 359.0;
-   x = 255.0;
-   t = 74.0;
-   v1 = 205.0;
-   v2 = -838.0;
-   eps = 0.0;
    a = state->a;
    b = state->b;
    alpha = state->alpha;

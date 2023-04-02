@@ -2897,7 +2897,7 @@ bool smoothnessmonitorprobe(smoothnessmonitor *monitor) {
    AutoS double v0;
    AutoS double v1;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -2906,12 +2906,6 @@ bool smoothnessmonitorprobe(smoothnessmonitor *monitor) {
       default: goto Exit;
    }
 Spawn:
-   j = -58;
-   idx = -919;
-   vlargest = -909;
-   v = 81;
-   v0 = 255;
-   v1 = 74;
    for (i = 0; i < 40; i++) {
    // Increase storage size
       rvectorgrowto(&monitor->probingsteps, monitor->probingnstepsstored + 1);
@@ -3019,7 +3013,7 @@ bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *uns
    AutoS double vm;
    AutoS double vc;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -3028,12 +3022,6 @@ bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *uns
       default: goto Exit;
    }
 Spawn:
-   j = -838;
-   varidx = 939;
-   v = -526;
-   vp = 763;
-   vm = -541;
-   vc = -698;
    n = monitor->n;
    k = monitor->k;
    monitor->needfij = false;
@@ -3873,7 +3861,7 @@ bool minlbfgsiteration(minlbfgsstate *state) {
    AutoS double v;
    AutoS double vv;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -3885,11 +3873,6 @@ bool minlbfgsiteration(minlbfgsstate *state) {
       default: goto Exit;
    }
 Spawn:
-   j = -909;
-   ic = 81;
-   mcinfo = 255;
-   v = 74;
-   vv = -788;
 // Unload frequently used variables from State structure
 // (just for typing convenience)
    n = state->n;
@@ -12968,7 +12951,7 @@ bool minbleiciteration(minbleicstate *state) {
    AutoS double ginit;
    AutoS double gdecay;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -12982,16 +12965,6 @@ bool minbleiciteration(minbleicstate *state) {
       default: goto Exit;
    }
 Spawn:
-   j = -909;
-   mcinfo = 81;
-   actstatus = 255;
-   itidx = 74;
-   b = false;
-   v = 809;
-   vv = 205;
-   v0 = -838;
-   penalty = 939;
-   ginit = -526;
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
 //              This coefficient remains fixed during iterations.
@@ -21660,7 +21633,7 @@ static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambd
    AutoS ae_int_t n;
    AutoS ae_int_t m;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -21669,10 +21642,6 @@ static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambd
       default: goto Exit;
    }
 Spawn:
-   i = -838;
-   bflag = true;
-   v = -541;
-   *iflag = -99;
    n = state->n;
    m = state->m;
    state->needfi = state->needf = false;
@@ -21837,7 +21806,7 @@ bool minlmiteration(minlmstate *state) {
    AutoS ae_int_t i;
    AutoS ae_int_t k;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -21852,13 +21821,6 @@ bool minlmiteration(minlmstate *state) {
       default: goto Exit;
    }
 Spawn:
-   iflag = -919;
-   k = 81;
-   bflag = true;
-   v = 74;
-   s = -788;
-   t = 809;
-   fnew = 205;
 // prepare
    n = state->n;
    m = state->m;
@@ -24045,7 +24007,7 @@ bool mincgiteration(mincgstate *state) {
    AutoS double v;
    AutoS double vv;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -24058,9 +24020,6 @@ bool mincgiteration(mincgstate *state) {
       default: goto Exit;
    }
 Spawn:
-   betak = -919;
-   v = -909;
-   vv = 81;
 // Prepare
    n = state->n;
    state->algpowerup = state->lsend = state->lsstart = state->xupdated = state->needfg = state->needf = false;
@@ -26091,7 +26050,7 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    AutoS double stp;
    AutoS double expandedrad;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -26100,15 +26059,6 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
       default: goto Exit;
    }
 Spawn:
-   hessianupdateperformed = true;
-   v = 306;
-   vv = -1011;
-   f1 = 88;
-   nu = -861;
-   tol = -731;
-   stepklagval = -675;
-   stepknlagval = -763;
-   expandedrad = -936;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -26537,7 +26487,7 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
    AutoS bool trustradstagnated;
    AutoS bool increasebigc;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -26546,17 +26496,6 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
       default: goto Exit;
    }
 Spawn:
-   j = -788;
-   subiterationidx = 205;
-   trustradstagnated = false;
-   increasebigc = true;
-   v = -541;
-   vv = -698;
-   mx = -900;
-   deltamax = -318;
-   multiplyby = -940;
-   setscaleto = 1016;
-   prevtrustrad = -229;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33222,7 +33161,7 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    AutoS double localstp;
    AutoS double mu;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -33231,14 +33170,6 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       default: goto Exit;
    }
 Spawn:
-   i = -861;
-   j = -678;
-   v = -233;
-   f0 = -279;
-   f1 = 94;
-   nu = -812;
-   localstp = 427;
-   mu = 178;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33528,7 +33459,7 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
    AutoS double f1;
    AutoS double mu;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -33537,20 +33468,6 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
       default: goto Exit;
    }
 Spawn:
-   mcinfo = 14;
-   mcnfev = 386;
-   mcstage = -908;
-   i = 577;
-   j = 289;
-   stp = -962;
-   v = 161;
-   vv = -447;
-   mx = -799;
-   stepklagval = 508;
-   stepknlagval = -153;
-   gammaprev = -450;
-   f0 = 769;
-   f1 = 638;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33926,7 +33843,7 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
    AutoS double maxlag;
    AutoS double maxhist;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -33936,25 +33853,6 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
       default: goto Exit;
    }
 Spawn:
-   j = -788;
-   innerk = 809;
-   lpstagesuccess = false;
-   increasebigc = true;
-   v = -541;
-   vv = -698;
-   mx = -900;
-   f1 = -940;
-   f2 = 1016;
-   deltamax = -536;
-   multiplyby = 487;
-   setscaleto = -115;
-   prevtrustrad = 886;
-   d1nrm = 346;
-   mu = -722;
-   expandedrad = -413;
-   tol = -461;
-   maxlag = 927;
-   maxhist = 201;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -36022,7 +35920,7 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor)
    AutoS double v1;
    AutoS double v2;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -36031,17 +35929,6 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor)
       default: goto Exit;
    }
 Spawn:
-   j = -541;
-   outerit = -698;
-   preccounter = -900;
-   v = -318;
-   vv = -940;
-   p = 1016;
-   dp = -229;
-   d2p = -536;
-   v0 = 487;
-   v1 = -115;
-   v2 = 886;
    ae_assert(state->solvertype == 0, "MinNLC: internal error");
    n = state->n;
    nec = state->nec;
@@ -36371,7 +36258,7 @@ bool minnlciteration(minnlcstate *state) {
    AutoS double vleft;
    AutoS double vright;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -36386,9 +36273,6 @@ bool minnlciteration(minnlcstate *state) {
       default: goto Exit;
    }
 Spawn:
-   k = -58;
-   vleft = 74;
-   vright = -788;
 // Init
    state->xupdated = state->needfij = state->needfi = false;
    state->userterminationneeded = false;
@@ -38775,7 +38659,7 @@ static bool minns_agsiteration(minnsstate *state) {
    AutoS bool fullsample;
    AutoS double currentf0;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -38784,27 +38668,6 @@ static bool minns_agsiteration(minnsstate *state) {
       default: goto Exit;
    }
 Spawn:
-   j = -318;
-   k = -940;
-   radiusdecays = 1016;
-   cursamplesize = -536;
-   shortstepscnt = 487;
-   backtrackits = -115;
-   maxbacktrackits = 886;
-   b = false;
-   alphadecreased = false;
-   fullsample = true;
-   radius0 = 922;
-   radius = -154;
-   alpha = 306;
-   recommendedstep = -1011;
-   dhd = 951;
-   dnrminf = -463;
-   v = 88;
-   vv = -861;
-   v0 = -678;
-   v1 = -731;
-   currentf0 = -675;
    ae_assert(state->solvertype == 0, "MinNS: internal error");
    n = state->n;
    nec = state->nec;
@@ -39284,7 +39147,7 @@ bool minnsiteration(minnsstate *state) {
    AutoS double xp;
    AutoS double xm;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -39293,12 +39156,6 @@ bool minnsiteration(minnsstate *state) {
       default: goto Exit;
    }
 Spawn:
-   i = 359;
-   j = -58;
-   k = -919;
-   v = 809;
-   xp = 205;
-   xm = -838;
 // Init
    state->xupdated = state->needfij = state->needfi = false;
    state->replcerr = 0.0;
@@ -40210,7 +40067,7 @@ bool minasaiteration(minasastate *state) {
    AutoS bool stepfound;
    AutoS ae_int_t diffcnt;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -40222,13 +40079,6 @@ bool minasaiteration(minasastate *state) {
       default: goto Exit;
    }
 Spawn:
-   mcinfo = -919;
-   diffcnt = -909;
-   b = true;
-   stepfound = true;
-   betak = 74;
-   v = -788;
-   vv = 809;
 // Prepare
    n = state->n;
    state->xupdated = state->needfg = false;
@@ -41331,7 +41181,7 @@ bool minbciteration(minbcstate *state) {
    AutoS bool activationstatus;
    AutoS double activationstep;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -41347,19 +41197,6 @@ bool minbciteration(minbcstate *state) {
       default: goto Exit;
    }
 Spawn:
-   freezeidx = 359;
-   j = 81;
-   mcinfo = 255;
-   itidx = 74;
-   b = false;
-   activationstatus = true;
-   freezeval = 205;
-   scaleddnorm = -838;
-   v = 939;
-   vv = -526;
-   v0 = 763;
-   ginit = -541;
-   activationstep = -900;
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
 //              This coefficient remains fixed during iterations.

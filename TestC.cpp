@@ -7707,7 +7707,7 @@ static bool testsparseunit_generatenext(sparsegenerator *g, RMatrix *da, sparsem
    SetMatrix(da);
    SetObj(sparsematrix, sa);
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -7716,12 +7716,6 @@ static bool testsparseunit_generatenext(sparsegenerator *g, RMatrix *da, sparsem
       default: goto Exit;
    }
 Spawn:
-   nz = -919;
-   nzd = -909;
-   i = 81;
-   j = 255;
-   pnz = 74;
-   v = -788;
    n = g->n;
    if (g->m == 0) {
       m = n;

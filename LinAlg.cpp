@@ -16789,7 +16789,7 @@ bool eigsubspaceiteration(eigsubspacestate *state) {
    AutoS double v;
    AutoS ae_int_t convcnt;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -16798,12 +16798,6 @@ bool eigsubspaceiteration(eigsubspacestate *state) {
       default: goto Exit;
    }
 Spawn:
-   cnt = -909;
-   i1 = 255;
-   j = 74;
-   convcnt = -788;
-   vv = 809;
-   v = 205;
    n = state->n;
    k = state->k;
    nwork = state->nwork;
@@ -27237,6 +27231,7 @@ static bool rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
    AutoS double temp;
    const ae_int_t itmax = 5;
 // Manually threaded two-way signalling.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -27355,6 +27350,7 @@ static bool rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double
    const ae_int_t itmax = 5;
    const double safmin = minrealnumber;
 // Manually threaded two-way signalling.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -29343,7 +29339,7 @@ bool fblscgiteration(fblslincgstate *state) {
    AutoS double v1;
    AutoS double v2;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -29352,13 +29348,6 @@ bool fblscgiteration(fblslincgstate *state) {
       default: goto Exit;
    }
 Spawn:
-   k = -58;
-   rk2 = -919;
-   rk12 = -909;
-   pap = 81;
-   s = 255;
-   betak = 74;
-   v2 = 809;
 // prepare locals
    n = state->n;
 // Test for special case: B == 0
@@ -29506,7 +29495,7 @@ bool fblsgmresiteration(fblsgmresstate *state) {
    AutoS ae_int_t i;
    AutoS ae_int_t j;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -29515,14 +29504,6 @@ bool fblsgmresiteration(fblsgmresstate *state) {
       default: goto Exit;
    }
 Spawn:
-   j = 763;
-   cs = -900;
-   sn = -318;
-   v = -940;
-   vv = 1016;
-   anrm = -229;
-   qnrm = -536;
-   prevresnrm = 886;
    n = state->n;
    state->retcode = 1;
 // Set up Q0
@@ -29890,7 +29871,7 @@ bool normestimatoriteration(normestimatorstate *state) {
    AutoS double growth;
    AutoS double bestgrowth;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -29899,8 +29880,6 @@ bool normestimatoriteration(normestimatorstate *state) {
       default: goto Exit;
    }
 Spawn:
-   v = 81;
-   growth = 255;
    n = state->n;
    m = state->m;
    if (state->seedval > 0) {

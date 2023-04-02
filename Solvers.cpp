@@ -4040,7 +4040,7 @@ static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state) {
    AutoS double prevres;
    AutoS double res0;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -4050,10 +4050,6 @@ static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state) {
       default: goto Exit;
    }
 Spawn:
-   outeridx = 359;
-   res = -58;
-   prevres = -919;
-   res0 = -909;
    state->running = true;
    iterativesparse_clearrequestfields(state);
    iterativesparse_clearreportfields(state);
@@ -5050,7 +5046,7 @@ bool lincgiteration(lincgstate *state) {
    AutoS double bnorm;
    AutoS double v;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -5060,10 +5056,6 @@ bool lincgiteration(lincgstate *state) {
       default: goto Exit;
    }
 Spawn:
-   i = 359;
-   uvar = -58;
-   bnorm = -919;
-   v = -909;
    ae_assert(state->b.cnt > 0, "LinCGIteration: B is not initialized (you must initialize B by LinCGSetB() call");
    state->needprec = state->needvmv = state->needmv2 = state->needmtv = state->needmv = state->xupdated = false;
    state->running = true;
@@ -5754,7 +5746,7 @@ bool linlsqriteration(linlsqrstate *state) {
    AutoS double bnorm;
    AutoS ae_int_t i;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -5764,7 +5756,6 @@ bool linlsqriteration(linlsqrstate *state) {
       default: goto Exit;
    }
 Spawn:
-   i = -58;
    ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B");
    summn = state->m + state->n;
    bnorm = sqrt(state->bnorm2);
@@ -6623,7 +6614,7 @@ bool nleqiteration(nleqstate *state) {
    AutoS double stepnorm;
    AutoS bool b;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -6633,13 +6624,6 @@ bool nleqiteration(nleqstate *state) {
       default: goto Exit;
    }
 Spawn:
-   i = -919;
-   b = true;
-   lambdaup = 81;
-   lambdadown = 255;
-   lambdav = 74;
-   rho = -788;
-   stepnorm = 205;
 // Prepare
    n = state->n;
    m = state->m;

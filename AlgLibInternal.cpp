@@ -6940,6 +6940,7 @@ bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *st
       *stp = stpmax;
    }
 // Manually threaded two-way signalling.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -7154,7 +7155,7 @@ bool armijoiteration(armijostate *state) {
    AutoS double v;
    AutoS ae_int_t n;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.

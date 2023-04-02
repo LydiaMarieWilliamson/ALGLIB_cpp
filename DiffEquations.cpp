@@ -164,7 +164,7 @@ bool odesolveriteration(odesolverstate *state) {
    AutoS double maxgrowpow;
    AutoS ae_int_t klimit;
 // Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
@@ -173,15 +173,6 @@ bool odesolveriteration(odesolverstate *state) {
       default: goto Exit;
    }
 Spawn:
-   i = -919;
-   j = -909;
-   k = 81;
-   klimit = 255;
-   gridpoint = false;
-   xc = -788;
-   v = 809;
-   h2 = -838;
-   err = 939;
 // prepare
    if (state->repterminationtype != 0) {
       goto Exit;
