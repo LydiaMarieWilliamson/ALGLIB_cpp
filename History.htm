@@ -506,6 +506,9 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	∙	The (randomized) initializations of local variables in iteration routines have all been removed.
 		They are (for now) static local variables, which are already initialized to 0.
 	∙	Reorder the routines to match the topological sorting for 3.20.0; and fix the vertical layout.
+	∙	AlgLibInternal.{cpp,h}, TestC.cpp
+        	―	Restored unsetintegerarray(), unsetrealarray(): it was changed in 3.20.0 so that it is no longer a duplicate of SetVector().
+        	―	Restored unsetrealmatrix(): it was changed in 3.20.0 so that it is no longer a duplicate of SetMatrix().
 </pre>
 </p>
 <p>

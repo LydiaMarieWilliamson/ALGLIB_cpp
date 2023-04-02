@@ -51367,19 +51367,19 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_frame_leave();
          return Ok;
       }
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreequeryresultsxi(&treex, &qx);
       kdtreequeryresultsxyi(&treexy, &qxy);
       kdtreequeryresultstagsi(&treext, &qtags);
       kdtreequeryresultsdistancesi(&treext, &qr);
       Ok = Ok && testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, k, nx, ny);
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreequeryresultsx(&treex, &qx);
       kdtreequeryresultsxy(&treexy, &qxy);
       kdtreequeryresultstags(&treext, &qtags);
@@ -51432,10 +51432,10 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_frame_leave();
          return Ok;
       }
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreetsqueryresultsx(&treex, &bufx, &qx);
       kdtreetsqueryresultsxy(&treexy, &bufxy, &qxy);
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
@@ -51588,19 +51588,19 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_frame_leave();
          return Ok;
       }
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreequeryresultsxi(&treex, &qx);
       kdtreequeryresultsxyi(&treexy, &qxy);
       kdtreequeryresultstagsi(&treext, &qtags);
       kdtreequeryresultsdistancesi(&treext, &qr);
       Ok = Ok && testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, k, nx, ny);
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreequeryresultsx(&treex, &qx);
       kdtreequeryresultsxy(&treexy, &qxy);
       kdtreequeryresultstags(&treext, &qtags);
@@ -51653,10 +51653,10 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_frame_leave();
          return Ok;
       }
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreetsqueryresultsx(&treex, &bufx, &qx);
       kdtreetsqueryresultsxy(&treexy, &bufxy, &qxy);
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
@@ -51730,19 +51730,19 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_frame_leave();
          return Ok;
       }
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreequeryresultsxi(&treex, &qx);
       kdtreequeryresultsxyi(&treexy, &qxy);
       kdtreequeryresultstagsi(&treext, &qtags);
       kdtreequeryresultsdistancesi(&treext, &qr);
       Ok = Ok && testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, kx, nx, ny);
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreequeryresultsx(&treex, &qx);
       kdtreequeryresultsxy(&treexy, &qxy);
       kdtreequeryresultstags(&treext, &qtags);
@@ -51796,10 +51796,10 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_frame_leave();
          return Ok;
       }
-      SetMatrix(&qx);
-      SetMatrix(&qxy);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetrealmatrix(&qxy);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreetsqueryresultsx(&treex, &bufx, &qx);
       kdtreetsqueryresultsxy(&treexy, &bufxy, &qxy);
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
@@ -51845,9 +51845,9 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_frame_leave();
          return Ok;
       }
-      SetMatrix(&qx);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreetsqueryresultsx(&treext, &bufxt, &qx);
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
       kdtreetsqueryresultsdistances(&treext, &bufxt, &qr);
@@ -51869,9 +51869,9 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          qmax.xR[j] += v;
       }
       kx = kdtreetsquerybox(&treext, &bufxt, &qmin, &qmax);
-      SetMatrix(&qx);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreetsqueryresultsx(&treext, &bufxt, &qx);
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
       kdtreetsqueryresultsdistances(&treext, &bufxt, &qr);
@@ -51905,9 +51905,9 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          qmax.xR[j] += v;
       }
       kx = kdtreequerybox(&treext, &qmin, &qmax);
-      SetMatrix(&qx);
-      SetVector(&qtags);
-      SetVector(&qr);
+      unsetrealmatrix(&qx);
+      unsetintegerarray(&qtags);
+      unsetrealarray(&qr);
       kdtreequeryresultsx(&treext, &qx);
       kdtreequeryresultstags(&treext, &qtags);
       kdtreequeryresultsdistances(&treext, &qr);
@@ -61901,7 +61901,7 @@ static bool testfitsphereunit_testspherefittingls() {
          }
       }
    // Solve with generic solver, check
-      SetVector(&cx);
+      unsetrealarray(&cx);
       rlo = 0.0;
       rhi = 0.0;
       problemtype = 0;
@@ -61998,7 +61998,7 @@ static bool testfitsphereunit_testspherefittingns() {
    // Perform various kinds of fit, NLC solver is used
       for (problemtype = 1; problemtype <= 3; problemtype++) {
       // Solve with generic solver
-         SetVector(&cx);
+         unsetrealarray(&cx);
          rlo = 0.0;
          rhi = 0.0;
          fitspherex(&xy, npoints, nx, problemtype, 0.0, 0, 0.0, &cx, &rlo, &rhi);
@@ -62166,7 +62166,7 @@ static bool testfitsphereunit_testspherefittingvosswinkel2() {
    testfitsphereunit_addvalue(&xy, &cnt, -0.012918);
    tol = 0.0000001;
 // MZ problem, NLC solver
-   SetVector(&cx);
+   unsetrealarray(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspheremz(&xy, xy.rows, xy.cols, &cx, &rlo, &rhi);
@@ -62179,7 +62179,7 @@ static bool testfitsphereunit_testspherefittingvosswinkel2() {
    Ok = Ok && NearAtR(cx.xR[1], -0.011472328, tol);
    Ok = Ok && NearAtR(rlo, 0.150973382, tol);
    Ok = Ok && NearAtR(rhi, 0.164374709, tol);
-   SetVector(&cx);
+   unsetrealarray(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspherex(&xy, xy.rows, xy.cols, 3, 0.0, 0, 0.0, &cx, &rlo, &rhi);
@@ -62193,7 +62193,7 @@ static bool testfitsphereunit_testspherefittingvosswinkel2() {
    Ok = Ok && NearAtR(rlo, 0.150973382, tol);
    Ok = Ok && NearAtR(rhi, 0.164374709, tol);
 // MC problem, NLC solver
-   SetVector(&cx);
+   unsetrealarray(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspheremc(&xy, xy.rows, xy.cols, &cx, &rhi);
@@ -62206,7 +62206,7 @@ static bool testfitsphereunit_testspherefittingvosswinkel2() {
    Ok = Ok && NearAtR(cx.xR[1], -0.011680985, tol);
    Ok = Ok && rlo == 0.0;
    Ok = Ok && NearAtR(rhi, 0.164365735, tol);
-   SetVector(&cx);
+   unsetrealarray(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspherex(&xy, xy.rows, xy.cols, 1, 0.0, 0, 0.0, &cx, &rlo, &rhi);
@@ -62220,7 +62220,7 @@ static bool testfitsphereunit_testspherefittingvosswinkel2() {
    Ok = Ok && rlo == 0.0;
    Ok = Ok && NearAtR(rhi, 0.164365735, tol);
 // MI problem, NLC solver
-   SetVector(&cx);
+   unsetrealarray(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspheremi(&xy, xy.rows, xy.cols, &cx, &rlo);
@@ -62233,7 +62233,7 @@ static bool testfitsphereunit_testspherefittingvosswinkel2() {
    Ok = Ok && NearAtR(cx.xR[1], -0.007459466, tol);
    Ok = Ok && NearAtR(rlo, 0.152429205, tol);
    Ok = Ok && rhi == 0.0;
-   SetVector(&cx);
+   unsetrealarray(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspherex(&xy, xy.rows, xy.cols, 2, 0.0, 0, 0.0, &cx, &rlo, &rhi);
@@ -68132,7 +68132,7 @@ static bool testrbfunit_gridcalc23test() {
    // Test calculation on grid
       ae_vector_set_length(&x, nx);
       ae_vector_set_length(&y, ny);
-      SetVector(&gy);
+      unsetrealarray(&gy);
       rbfgridcalc3v(&s, &x0, kx.xZ[0], &x1, kx.xZ[1], &x2, kx.xZ[2], &gy);
       for (i = 0; i < kx.xZ[0]; i++) {
          for (j = 0; j < kx.xZ[1]; j++) {
@@ -68173,8 +68173,8 @@ static bool testrbfunit_gridcalc23test() {
       }
       ae_vector_set_length(&x, nx);
       ae_vector_set_length(&y, ny);
-      SetVector(&gy);
-      SetVector(&gy2);
+      unsetrealarray(&gy);
+      unsetrealarray(&gy2);
       rbfgridcalc3vsubset(&s, &x0, kx.xZ[0], &x1, kx.xZ[1], &x2, kx.xZ[2], &gf, &gy);
       rbfgridcalc3v(&s, &x0, kx.xZ[0], &x1, kx.xZ[1], &x2, kx.xZ[2], &gy2);
       for (i = 0; i < ny * kx.xZ[0] * kx.xZ[1] * kx.xZ[2]; i++) {
@@ -69380,7 +69380,7 @@ static bool testrbfunit_gridxrbftest() {
       //   that it is not processed. So, we check empty (completely
       //   unflagged) rows
       //
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc2vsubset(&s, &x0, n0, &x1, n1, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
             Ok = Ok && (!needy.xB[i / ny] || NearAtR(yv.xR[i], yv2.xR[i], errtol));
@@ -69512,7 +69512,7 @@ static bool testrbfunit_gridxrbftest() {
                rowflags.xB[i / n0] = true;
             }
          }
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc3vsubset(&s, &x0, n0, &x1, n1, &x2, n2, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
             Ok = Ok && (!needy.xB[i / ny] || NearAtR(yv.xR[i], yv2.xR[i], errtol));
@@ -70660,7 +70660,7 @@ static bool testrbfunit_gridhrbftest() {
       //   that it is not processed. So, we check empty (completely
       //   unflagged) rows
       //
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc2vsubset(&s, &x0, n0, &x1, n1, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
             Ok = Ok && (!needy.xB[i / ny] || NearAtR(yv.xR[i], yv2.xR[i], errtol));
@@ -70708,7 +70708,7 @@ static bool testrbfunit_gridhrbftest() {
             ae_frame_leave();
             return Ok;
          }
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc2v(&s, &x02, n0, &x12, n1, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
             Ok = Ok && yv.xR[i] == yv2.xR[i];
@@ -70736,7 +70736,7 @@ static bool testrbfunit_gridhrbftest() {
             ae_frame_leave();
             return Ok;
          }
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc2v(&s, &x0, n0, &x1, n1, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
             Ok = Ok && NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));
@@ -70874,7 +70874,7 @@ static bool testrbfunit_gridhrbftest() {
                rowflags.xB[i / n0] = true;
             }
          }
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc3vsubset(&s, &x0, n0, &x1, n1, &x2, n2, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
             Ok = Ok && (!needy.xB[i / ny] || NearAtR(yv.xR[i], yv2.xR[i], errtol));
@@ -70918,7 +70918,7 @@ static bool testrbfunit_gridhrbftest() {
             ae_frame_leave();
             return Ok;
          }
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc3v(&s, &x02, n0, &x12, n1, &x22, n2, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
             Ok = Ok && yv.xR[i] == yv2.xR[i];
@@ -70946,7 +70946,7 @@ static bool testrbfunit_gridhrbftest() {
             ae_frame_leave();
             return Ok;
          }
-         SetVector(&yv2);
+         unsetrealarray(&yv2);
          rbfgridcalc3v(&s, &x0, n0, &x1, n1, &x2, n2, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
             Ok = Ok && NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));

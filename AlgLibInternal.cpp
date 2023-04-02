@@ -1217,6 +1217,21 @@ void copyrealmatrix(RMatrix *src, RMatrix *dst) {
    }
 }
 
+// Clears integer array
+void unsetintegerarray(ZVector *a) {
+   SetVector(a);
+}
+
+// Clears real array
+void unsetrealarray(RVector *a) {
+   SetVector(a);
+}
+
+// Clears real matrix
+void unsetrealmatrix(RMatrix *a) {
+   SetMatrix(a);
+}
+
 // This function is used to calculate number of chunks (including partial,
 // non-complete chunks) in some set. It expects that ChunkSize >= 1, TaskSize >= 0.
 // Assertion is thrown otherwise.
