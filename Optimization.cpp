@@ -7408,7 +7408,7 @@ void snnlssolve(snnlssolver *s, RVector *x) {
          }
          dnrm = sqrt(dnrm);
          actidx = -1;
-         stpmax = 100000.0;
+         stpmax = 1.0E50;
          for (i = 0; i < ns + nd; i++) {
             if (s->nnc.xB[i] && s->d.xR[i] < 0.0) {
                v = stpmax;
