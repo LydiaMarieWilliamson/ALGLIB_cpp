@@ -1491,7 +1491,6 @@ void RVector_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === ABLASF Package ===
-// Depends on: APSERV
 namespace alglib_impl {
 // The dot product of elements [0,n) of vectors x and y.
 // Inputs:
@@ -4272,7 +4271,7 @@ ae_int_t getlptestserializationcode() {
 } // end of namespace alglib_impl
 
 // === TSORT Package ===
-// Depends on: ABLASF
+// Depends on: APSERV
 namespace alglib_impl {
 // Internal versions respectively of tagsortfasti(), tagsortfastr() and tagsortfast():
 // sort the n-vector ap and apply the same permutations to abp (and to bp and bbp, if present).
@@ -5536,6 +5535,11 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
       x->xR[buf->ia1.xZ[i]] = i;
    }
 }
+} // end of namespace alglib_impl
+
+// === APSTRUCT Package ===
+// Depends on: ABLASF
+namespace alglib_impl {
 } // end of namespace alglib_impl
 
 // === TRLINSOLVE Package ===

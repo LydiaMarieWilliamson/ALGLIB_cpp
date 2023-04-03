@@ -15,7 +15,7 @@
 #include "AlgLibMisc.h"
 
 // === HQRND Package ===
-// Depends on: (AlgLibInternal) ABLASF
+// Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
 static const ae_int_t hqrnd_hqrndm1 = 1 + 2 * 3 * 7 * 631 * 81031; // == 2^31 - 85
 static const ae_int_t hqrnd_hqrndm2 = 1 + 2 * 19 * 31 * 1019 * 1789; // == 2^31 - 249

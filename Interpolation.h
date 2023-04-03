@@ -714,10 +714,16 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
 void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v);
 } // end of namespace alglib_impl
 
+// === RBFV3FARFIELDS Package ===
+// Depends on: (AlgLibInternal) SCODES, TSORT
+namespace alglib_impl {
+} // end of namespace alglib_impl
+
 // === RBFV3 Package ===
 // Depends on: (AlgLibMisc) NEARESTNEIGHBOR
 // Depends on: (LinAlg) RCOND
 // Depends on: (Solvers) ITERATIVESPARSE
+// Depends on: RBFV3FARFIELDS
 namespace alglib_impl {
 struct rbf3evaluatorbuffer {
    ae_vector x;

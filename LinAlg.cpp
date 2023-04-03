@@ -18,7 +18,7 @@
 #include "LinAlg.h"
 
 // === ABLAS Package ===
-// Depends on: (AlgLibInternal) ABLASF, ABLASMKL
+// Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
 namespace alglib_impl {
 static const ae_int_t ablas_blas2minvendorkernelsize = 8;
 

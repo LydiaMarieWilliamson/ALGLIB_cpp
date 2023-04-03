@@ -295,16 +295,17 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
 <ul>
 <li>AlgLibInternal:<ul>
    <li>APSERV:</li>
-   <li>ABLASF: APSERV</li>
+   <li>ABLASF:</li>
    <li>HBLAS:</li>
    <li>CREFLECTIONS:</li>
    <li>SBLAS: APSERV</li>
    <li>ABLASMKL:</li>
    <li>SCODES:</li>
-   <li>TSORT: ABLASF</li>
+   <li>TSORT: APSERV</li>
    <li>BLAS:</li>
    <li>ROTATIONS:</li>
    <li>BASICSTATOPS: TSORT</li>
+   <li>APSTRUCT: ABLASF</li>
    <li>TRLINSOLVE:</li>
    <li>SAFESOLVE:</li>
    <li>XBLAS:</li>
@@ -315,7 +316,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>HPCCORES:</li>
 </ul></li>
 <li>AlgLibMisc: AlgLibInternal<ul>
-   <li>HQRND: (AlgLibInternal) ABLASF</li>
+   <li>HQRND: (AlgLibInternal) APSERV, ABLASF</li>
    <li>XDEBUG:</li>
    <li>NEARESTNEIGHBOR: (AlgLibInternal) SCODES, TSORT</li>
 </ul></li>
@@ -354,7 +355,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>ELLIPTIC:</li>
 </ul></li>
 <li>LinAlg: AlgLibMisc [AlgLibInternal]<ul>
-   <li>ABLAS: (AlgLibInternal) ABLASF, ABLASMKL</li>
+   <li>ABLAS: (AlgLibInternal) APSERV, ABLASF, ABLASMKL</li>
    <li>ORTFAC: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS │ (AlgLibMisc) HQRND │ ABLAS</li>
    <li>MATGEN: (AlgLibInternal) CREFLECTIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
    <li>SPARSE: (AlgLibInternal) ABLASMKL, SCODES, TSORT │ (AlgLibMisc) HQRND</li>
@@ -362,7 +363,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>EVD: (AlgLibInternal) BASICSTATOPS │ ORTFAC, MATGEN, SPARSE, HSSCHUR</li>
    <li>DLU: ABLAS</li>
    <li>SPTRF: SPARSE, DLU</li>
-   <li>AMDORDERING: ABLAS, SPARSE</li>
+   <li>AMDORDERING: (AlgLibInternal) APSTRUCT │ ABLAS, SPARSE</li>
    <li>SPCHOL: AMDORDERING</li>
    <li>TRFAC: (AlgLibInternal) ROTATIONS │ MATGEN, SPTRF, SPCHOL</li>
    <li>BDSVD: (AlgLibInternal) ROTATIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
@@ -417,7 +418,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>MINLM: MINQP</li>
    <li>MINCG: (AlgLibInternal) LINMIN │ OPTSERV</li>
    <li>NLCSQP: VIPMSOLVER</li>
-   <li>LPQPPRESOLVE: (LinAlg) SPARSE</li>
+   <li>LPQPPRESOLVE: (AlgLibInternal) APSTRUCT │ (LinAlg) SPARSE</li>
    <li>REVISEDDUALSIMPLEX: (LinAlg) TRFAC │ LPQPPRESOLVE</li>
    <li>MINLP: VIPMSOLVER, REVISEDDUALSIMPLEX</li>
    <li>NLCSLP: (AlgLibInternal) LINMIN │ OPTSERV, REVISEDDUALSIMPLEX</li>
@@ -437,7 +438,8 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>FITSPHERE: (Optimization) MINLM, MINNLC</li>
    <li>PARAMETRIC: (Integration) AUTOGK │ SPLINE1D</li>
    <li>RBFV1: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
-   <li>RBFV3: (AlgLibMisc) NEARESTNEIGHBOR | (LinAlg) RCOND | (Solvers) ITERATIVESPARSE</li>
+   <li>RBFV3FARFIELDS: (AlgLibInternal) SCODES, TSORT</li>
+   <li>RBFV3: (AlgLibMisc) NEARESTNEIGHBOR │ (LinAlg) RCOND │ (Solvers) ITERATIVESPARSE │ RBFV3FARFIELDS</li>
    <li>SPLINE2D: SPLINE1D</li>
    <li>RBFV2: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
    <li>SPLINE3D: SPLINE1D</li>

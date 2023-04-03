@@ -17,7 +17,7 @@
 #include "AlgLibMisc.h"
 
 // === ABLAS Package ===
-// Depends on: (AlgLibInternal) ABLASF, ABLASMKL
+// Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
 namespace alglib_impl {
 ae_int_t ablasblocksize(RMatrix *a);
 ae_int_t ablascomplexblocksize(CMatrix *a);

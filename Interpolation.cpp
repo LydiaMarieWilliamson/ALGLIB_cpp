@@ -17460,10 +17460,16 @@ void rbfv1report_free(void *_p, bool make_automatic) {
 }
 } // end of namespace alglib_impl
 
+// === RBFV3FARFIELDS Package ===
+// Depends on: (AlgLibInternal) SCODES, TSORT
+namespace alglib_impl {
+} // end of namespace alglib_impl
+
 // === RBFV3 Package ===
 // Depends on: (AlgLibMisc) NEARESTNEIGHBOR
 // Depends on: (LinAlg) RCOND
 // Depends on: (Solvers) ITERATIVESPARSE
+// Depends on: RBFV3FARFIELDS
 namespace alglib_impl {
 // Reallocates calcBuf if necessary, reuses previously allocated space if
 // possible.

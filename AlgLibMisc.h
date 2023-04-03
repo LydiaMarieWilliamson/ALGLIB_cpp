@@ -17,7 +17,7 @@
 #include "AlgLibInternal.h"
 
 // === HQRND Package ===
-// Depends on: (AlgLibInternal) ABLASF
+// Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
 struct hqrndstate {
    ae_int_t s1;

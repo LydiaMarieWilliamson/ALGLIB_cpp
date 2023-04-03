@@ -132,7 +132,6 @@ double spawnlevel();
 } // end of namespace alglib_impl
 
 // === ABLASF Package ===
-// Depends on: APSERV
 namespace alglib_impl {
 double rdotv(ae_int_t n, RVector *x, RVector *y);
 double rdotvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy);
@@ -295,7 +294,7 @@ ae_int_t getlptestserializationcode();
 } // end of namespace alglib_impl
 
 // === TSORT Package ===
-// Depends on: ABLASF
+// Depends on: APSERV
 namespace alglib_impl {
 void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n);
 void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n);
@@ -338,6 +337,11 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r);
 namespace alglib_impl {
 void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf);
 void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf);
+} // end of namespace alglib_impl
+
+// === APSTRUCT Package ===
+// Depends on: ABLASF
+namespace alglib_impl {
 } // end of namespace alglib_impl
 
 // === TRLINSOLVE Package ===
