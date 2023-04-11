@@ -49,6 +49,12 @@
 #   include <process.h>
 #endif
 
+// Entropy source
+#if ALGLIB_ENTROPY_SRC == ALGLIB_ENTROPY_SRC_OPENSSL
+#   include <openssl/rand.h>
+#   define ALGLIB_OPENSSL_RAND_MAX             0x7fffffff
+#endif
+
 // Debugging helpers for Windows.
 #ifdef AE_DEBUG4WINDOWS
 #   include <windows.h>
@@ -446,7 +452,7 @@ ae_int_t tickcount() {
    gettimeofday(&now, NULL);
    v = now.tv_sec;
    r = v * 1000;
-   v = now.tv_usec / 1000;
+   v = now.tv_usec / (suseconds_t)1000;
    r += v;
    return (ae_int_t)r;
 #   if 0
@@ -667,7 +673,7 @@ void *aligned_malloc(size_t size, size_t alignment) {
    char *redzone0 = result;
    result = redzone0 + (ALGLIB_REDZONE);
    char *redzone1 = result + size;
-   ae_assert(ae_misalignment(result, alignment) == 0, "ALGLIB: improperly configured red zone size - is not multiple of the current alignment", NULL);
+   ae_assert(ae_misalignment(result, alignment) == 0, "ALGLIB: improperly configured red zone size - is not multiple of the current alignment");
    *(void **)(redzone0 - 2 * sizeof block) = redzone1;
    memset(redzone0, _ALGLIB_REDZONE_VAL, ALGLIB_REDZONE);
    memset(redzone1, _ALGLIB_REDZONE_VAL, ALGLIB_REDZONE);
@@ -729,6 +735,18 @@ void *ae_malloc(size_t size) {
    if (size == 0) return NULL;
    void *result = aligned_malloc(size, AE_DATA_ALIGN);
    if (result == NULL && TopFr != NULL) ae_break(ERR_OUT_OF_MEMORY, "ae_malloc: out of memory");
+   return result;
+}
+
+// Allocate memory with automatic alignment and zero-fill.
+// Returns NULL when zero size is specified.
+// Error handling:
+// *	if TopFr == NULL, return NULL on allocation error,
+// *	if TopFr != NULL, call ae_break() on allocation error.
+static void *ae_malloc_zero(size_t size) {
+   void *result = ae_malloc(size);
+   if (result != NULL)
+      memset(result, 0, size);
    return result;
 }
 
@@ -1028,6 +1046,9 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic
    if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
    dst->is_owner = false;
    dst->is_dynamic = false;
+   dst->size_of_object = 0;
+   dst->copy = NULL;
+   dst->free = NULL;
    dst->frame_entry.deallocator = ae_smart_ptr_free;
    dst->frame_entry.ptr = dst;
    if (make_automatic) ae_db_attach(&dst->frame_entry);
@@ -1044,6 +1065,8 @@ void ae_smart_ptr_free(void *_dst) {
    dst->is_owner = false;
    dst->is_dynamic = false;
    dst->ptr = NULL;
+   dst->size_of_object = 0;
+   dst->copy = NULL;
    dst->free = NULL;
    if (dst->subscriber != NULL) *dst->subscriber = NULL;
 }
@@ -1052,11 +1075,16 @@ void ae_smart_ptr_free(void *_dst) {
 // Any non-NULL value already contained in and owned by dst is freed beforehand.
 // The change is propagated to its subscriber, if dst was created with a non-NULL subscriber.
 // is_owner indicates whether dst is to own new_ptr.
-// free is the function used to free it.
+// obj_size is the in-memory size of the object. Ignored for is_owner == false.
+// copy is the function used to copy it; can not be NULL for new_ptr != NULL.
+// free is the function used to free it; can be NULL for is_owner == false.
 // is_dynamic indicates whether dst is to be dynamic,
 // so that clearing dst would require BOTH calling ae_free() on it AND free() on the memory occupied by dst.
 // You can specify NULL new_ptr, in which case is_owner, free() and is_dynamic are all ignored.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, ae_free_op free) {
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, size_t obj_size, ae_copy_op copy, ae_free_op free) {
+   ae_assert(new_ptr == NULL || !is_owner || copy != NULL, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but copy constructor is NULL");
+   ae_assert(new_ptr == NULL || !is_owner || free != NULL, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but destructor is NULL");
+   ae_assert(new_ptr == NULL || !is_owner || obj_size > 0, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but object size is zero");
    if (dst->is_owner && dst->ptr != NULL) {
       dst->free(dst->ptr, false);
       if (dst->is_dynamic) ae_free(dst->ptr);
@@ -1065,6 +1093,8 @@ void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool i
    dst->ptr = new_ptr;
    dst->is_owner = not_null && is_owner;
    dst->is_dynamic = not_null && is_dynamic;
+   dst->size_of_object = not_null && is_owner ? obj_size : 0;
+   dst->copy = not_null ? copy : NULL;
    dst->free = not_null ? free : NULL;
    if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
 }
@@ -1076,6 +1106,8 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
    dst->is_owner = false;
    dst->is_dynamic = false;
    dst->ptr = NULL;
+   dst->size_of_object = 0;
+   dst->copy = NULL;
    dst->free = NULL;
    if (dst->subscriber != NULL) *dst->subscriber = NULL;
 }
@@ -1796,6 +1828,10 @@ static void ae_shared_pool_destroy(void *_dst) { ae_shared_pool_free(_dst, false
 void ae_shared_pool_init(void *_dst, bool make_automatic) {
 //(@) TopFr != NULL check and zero-check removed.
    ae_shared_pool *dst = (ae_shared_pool *)_dst;
+// Attach to the frame first, just to be sure that if we fail within malloc(), we will be able to clean up the object.
+   dst->frame_entry.deallocator = ae_shared_pool_destroy;
+   dst->frame_entry.ptr = dst;
+   if (make_automatic) ae_db_attach(&dst->frame_entry);
 // Initialize.
    dst->seed_object = NULL;
    dst->recycled_objects = NULL;
@@ -1805,9 +1841,6 @@ void ae_shared_pool_init(void *_dst, bool make_automatic) {
    dst->init = NULL;
    dst->copy = NULL;
    dst->free = NULL;
-   dst->frame_entry.deallocator = ae_shared_pool_destroy;
-   dst->frame_entry.ptr = dst;
-   if (make_automatic) ae_db_attach(&dst->frame_entry);
    ae_init_lock(&dst->pool_lock, false, false);
 }
 
@@ -1957,7 +1990,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
    // Release the lock.
       ae_release_lock(&pool->pool_lock);
    // Assign the object to the smart pointer.
-      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
+      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->size_of_object, pool->copy, pool->free);
    } else {
    // Release the lock; we do not need it anymore because the copy constructor does not modify the source variable.
       ae_release_lock(&pool->pool_lock);
@@ -1965,7 +1998,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
       void *new_obj = ae_malloc(pool->size_of_object);
       memset(new_obj, 0, pool->size_of_object);
    // Immediately assign the object to the smart pointer (so as not to lose it, in case of future failures).
-      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
+      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->size_of_object, pool->copy, pool->free);
    // Do the actual copying.
    //(@) Before this line, the smart pointer points to a zero-filled instance. (No longer applicable.)
       pool->copy(new_obj, pool->seed_object, false);
@@ -2013,15 +2046,20 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // *	This function is NOT thread-safe.
 //	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
+// Acquire the pool lock, extract the list of recycled objects and immediately release the lock.
+// In the unlikely event we crash during memory deallocation, it is better to have the pool lock released first.
+   ae_acquire_lock(&pool->pool_lock);
+   ae_shared_pool_entry *ptr = pool->recycled_objects;
+   pool->recycled_objects = NULL;
+   ae_release_lock(&pool->pool_lock);
 // Clear the recycled objects.
-   for (ae_shared_pool_entry *ptr = pool->recycled_objects; ptr != NULL; ) {
+   while (ptr != NULL) {
       ae_shared_pool_entry *tmp = (ae_shared_pool_entry *)ptr->next_entry;
       pool->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
       ptr = tmp;
    }
-   pool->recycled_objects = NULL;
 }
 
 // Allow the recycled elements of the ae_shared_pool pool to be enumerated.
@@ -2037,10 +2075,10 @@ void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
    pool->enumeration_counter = pool->recycled_objects;
 // Exit on an empty list.
    if (pool->enumeration_counter == NULL)
-      ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
+      ae_smart_ptr_assign(pptr, NULL, false, false, 0, NULL, NULL);
 // Assign the object to a smart pointer.
    else
-      ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
+      ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, 0, NULL, NULL);
 }
 
 // Allow the recycled elements of the ae_shared_pool pool to be enumerated.
@@ -2049,17 +2087,17 @@ void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Exit on the end of list.
    if (pool->enumeration_counter == NULL) {
-      ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
+      ae_smart_ptr_assign(pptr, NULL, false, false, 0, NULL, NULL);
       return;
    }
 // Modify the internal enumeration counter.
    pool->enumeration_counter = (ae_shared_pool_entry *)pool->enumeration_counter->next_entry;
 // Exit on an empty list.
    if (pool->enumeration_counter == NULL)
-      ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
+      ae_smart_ptr_assign(pptr, NULL, false, false, 0, NULL, NULL);
 // Assign the object to a smart pointer.
    else
-      ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
+      ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, 0, NULL, NULL);
 }
 
 // Clear the internal list of recycled objects and the seed object from the ae_shared_pool pool,
@@ -2079,6 +2117,275 @@ void ae_shared_pool_reset(ae_shared_pool *pool) {
    pool->init = NULL;
    pool->copy = NULL;
    pool->free = NULL;
+}
+
+void ae_obj_array_free(ae_obj_array *dst, bool make_automatic);
+
+// A reduced form ae_obj_array_free() suitable for use as the deallocation function on a frame.
+static void ae_obj_array_destroy(void *dst) {
+   ae_obj_array_free((ae_obj_array *)dst, false);
+}
+
+// Make a new array of objects into a pre-allocated (zeroed-out) destination, dst.
+// Error handling:
+// *	TopFr != NULL is required, else abort().
+// *	Upon failure with TopFr != NULL, call ae_break().
+// After initialization, the smart pointer stores the NULL pointer.
+void ae_obj_array_init(ae_obj_array *dst, bool make_automatic) {
+   AE_CRITICAL_ASSERT(TopFr != NULL);
+// AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof *dst));
+// First, attach to the frame, just to be sure that we will clean everything if we generate an exception during initialization.
+   dst->frame_entry.deallocator = ae_obj_array_destroy;
+   dst->frame_entry.ptr = dst;
+   if (make_automatic) ae_db_attach(&dst->frame_entry);
+// Initialize.
+   dst->cnt = 0;
+   dst->capacity = 0;
+   dst->fixed_capacity = false;
+   dst->pp_obj_ptr = NULL;
+   dst->pp_obj_sizes = NULL;
+   dst->pp_copy = NULL;
+   dst->pp_free = NULL;
+   ae_init_lock(&dst->array_lock, false, false);
+   ae_init_lock(&dst->barrier_lock, false, false);
+}
+
+// Copy a new array of objects into a pre-allocated (zeroed-out) destination,
+// with independent copies of all objects owned by the array being created.
+// NOTES:
+// *	TopFr != NULL is required, else abort().
+// *	This function is NOT thread-safe.
+//	It does not acquire array lock, so you should NOT call it when array can be used by another thread.
+void ae_obj_array_copy(ae_obj_array *dst, const ae_obj_array *src, bool make_automatic) {
+   AE_CRITICAL_ASSERT(TopFr != NULL);
+// AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof *dst));
+// Initialize the array; we know that an empty array has NULL internal pointers.
+   ae_obj_array_init(dst, make_automatic);
+   AE_CRITICAL_ASSERT(dst->capacity == 0);
+   AE_CRITICAL_ASSERT(dst->pp_obj_ptr == NULL);
+   AE_CRITICAL_ASSERT(dst->pp_obj_sizes == NULL);
+   AE_CRITICAL_ASSERT(dst->pp_copy == NULL);
+   AE_CRITICAL_ASSERT(dst->pp_free == NULL);
+// Copy the fields.
+   dst->cnt = src->cnt;
+   dst->capacity = src->capacity;
+   dst->fixed_capacity = src->fixed_capacity;
+   AE_CRITICAL_ASSERT(src->cnt <= src->capacity);
+// Copy the data.
+   if (dst->capacity > 0) {
+      dst->pp_obj_ptr = (void **)ae_malloc_zero((size_t)dst->capacity * sizeof *dst->pp_obj_ptr);
+      dst->pp_obj_sizes = (ae_int_t *) ae_malloc_zero((size_t)dst->capacity * sizeof *dst->pp_obj_sizes);
+      dst->pp_copy = (ae_copy_op *) ae_malloc_zero((size_t)dst->capacity * sizeof *dst->pp_copy);
+      dst->pp_free = (ae_free_op *) ae_malloc_zero((size_t)dst->capacity * sizeof *dst->pp_free);
+      for (ae_int_t i = 0; i < dst->cnt; i++) {
+         dst->pp_free[i] = src->pp_free[i];
+         dst->pp_copy[i] = src->pp_copy[i];
+         dst->pp_obj_sizes[i] = src->pp_obj_sizes[i];
+         dst->pp_obj_ptr[i] = ae_malloc_zero((size_t)dst->pp_obj_sizes[i]);
+         dst->pp_copy[i](dst->pp_obj_ptr[i], src->pp_obj_ptr[i], false);
+      }
+   }
+}
+
+// Free a dynamic objects array.
+// Afterwards, all objects managed by the array are freed.
+// The array capacity does not change.
+// NOTE:
+// *	this function is thread-unsafe.
+void ae_obj_array_free(ae_obj_array *dst, bool make_automatic) {
+   for (ae_int_t i = 0; i < dst->cnt; i++) if (dst->pp_obj_ptr[i] != NULL) {
+      dst->pp_free[i](dst->pp_obj_ptr[i], make_automatic);
+      ae_free(dst->pp_obj_ptr[i]);
+      dst->pp_obj_ptr[i] = NULL;
+      dst->pp_obj_sizes[i] = 0;
+      dst->pp_copy[i] = NULL;
+      dst->pp_free[i] = NULL;
+   }
+   dst->cnt = 0;
+   if (!make_automatic) {
+      if (dst->pp_obj_ptr != NULL) ae_free(dst->pp_obj_ptr);
+      if (dst->pp_obj_sizes != NULL) ae_free(dst->pp_obj_sizes);
+      if (dst->pp_copy != NULL) ae_free(dst->pp_copy);
+      if (dst->pp_free != NULL) ae_free(dst->pp_free);
+      ae_free_lock(&dst->array_lock);
+      ae_free_lock(&dst->barrier_lock);
+   }
+}
+
+// The array length.
+// This function is thread-safe, i.e. it can be combined with functions adding elements to the array.
+// If it is called when another thread adds an element to the array, the function will either:
+// *	return the old array size
+// *	return the new array size, but ONLY after the new element is added to the array.
+ae_int_t ae_obj_array_get_length(ae_obj_array *dst) { return dst->cnt; }
+
+// Modify the array capacity, ignoring the fixed_capacity flag.
+// For internal use only.
+// Return false on memory reallocation failure, true otherwise.
+static bool _ae_obj_array_set_capacity(ae_obj_array *arr, ae_int_t new_capacity) {
+// Integrity checks.
+   ae_assert(arr->cnt <= new_capacity, "_ae_obj_array_set_capacity: new capacity is less than present size");
+// Quick exit.
+   if (arr->cnt == new_capacity) return true;
+// Increase the capacity.
+   arr->capacity = new_capacity;
+// Allocate a new memory, check its correctness.
+   void **new_pp_obj_ptr = (void **)ae_malloc((size_t)arr->capacity * sizeof *new_pp_obj_ptr);
+   ae_int_t *new_pp_obj_sizes = (ae_int_t *)ae_malloc((size_t)arr->capacity * sizeof *new_pp_obj_sizes);
+   ae_copy_op *new_pp_copy = (ae_copy_op *)ae_malloc((size_t)arr->capacity * sizeof *new_pp_copy);
+   ae_free_op *new_pp_free = (ae_free_op *)ae_malloc((size_t)arr->capacity * sizeof *new_pp_free);
+   if (new_pp_obj_ptr == NULL || new_pp_obj_sizes == NULL || new_pp_copy == NULL || new_pp_free == NULL) {
+   // malloc error: free all newly allocated memory, return.
+      ae_free(new_pp_obj_ptr);
+      ae_free(new_pp_obj_sizes);
+      ae_free(new_pp_copy);
+      ae_free(new_pp_free);
+      return false;
+   }
+// Move the data.
+   memmove(new_pp_obj_ptr, arr->pp_obj_ptr, (size_t)arr->cnt * sizeof *new_pp_obj_ptr);
+   memmove(new_pp_obj_sizes, arr->pp_obj_sizes, (size_t)arr->cnt * sizeof *new_pp_obj_sizes);
+   memmove(new_pp_copy, arr->pp_copy, (size_t)arr->cnt * sizeof *new_pp_copy);
+   memmove(new_pp_free, arr->pp_free, (size_t)arr->cnt * sizeof *new_pp_free);
+// Free the old memory, swap the pointers.
+   ae_free(arr->pp_obj_ptr), arr->pp_obj_ptr = new_pp_obj_ptr;
+   ae_free(arr->pp_obj_sizes), arr->pp_obj_sizes = new_pp_obj_sizes;
+   ae_free(arr->pp_copy), arr->pp_copy = new_pp_copy;
+   ae_free(arr->pp_free), arr->pp_free = new_pp_free;
+// Done.
+   return true;
+}
+
+// Configure the array into special fixed capacity mode, which allows concurrent appends, writes and reads to be performed.
+//	arr:		the array, can be in any mode - dynamic or fixed capacity,
+//	new_capacity:	the new capacity, must be at least as long as the current length.
+// On output:
+// *	the array capacity is increased to new_capacity exactly,
+// *	all present elements are retained,
+// *	if the array larger than new_capacity, an exception is thrown.
+void ae_obj_array_fixed_capacity(ae_obj_array *arr, ae_int_t new_capacity) {
+   ae_assert(arr->cnt <= new_capacity, "ae_obj_array_fixed_capacity: new capacity is less than present size");
+   if (!_ae_obj_array_set_capacity(arr, new_capacity))
+      ae_assert(false, "ae_obj_array_fixed_capacity: memory error during reallocation");
+   arr->fixed_capacity = true;
+}
+
+// Retrieve a given element from the array and assign it to a smart pointer.
+// On output:
+// *	the pointer with index idx is assigned to ptr,
+// *	ptr does NOT own new pointer,
+// *	whatever pointer ptr owns beforehand (if any) will be properly deallocated,
+// *	out-of-bounds accesses will result in an exception being thrown.
+void ae_obj_array_get(ae_obj_array *arr, ae_int_t idx, ae_smart_ptr *ptr) {
+   if (idx < 0 || idx >= arr->cnt)
+      ae_assert(false, "ObjArray: out of bounds read access was performed");
+   ae_smart_ptr_assign(ptr, arr->pp_obj_ptr[idx], false, false, 0, NULL, NULL);
+}
+
+// Set element idx of arr to the pointer ptr.
+// Notes:
+// *	the array must larger than idx in size, an exception will be thrown otherwise,
+// *	ptr can be NULL
+// *	non-NULL ptr MUST own its value before calling this function,
+//	and it will transfer ownership to arr afterwards (although it will still point to the object),
+// *	non-NULL ptr must point to a dynamically allocated object (on-stack objects are not supported),
+// *	out-of-bounds access will result in exception being thrown,
+// *	this function does NOT change array the size and capacity.
+// This function thread-safe as long as the array capacity is not changed by concurrently called functions.
+void ae_obj_array_set_transfer(ae_obj_array *arr, ae_int_t idx, ae_smart_ptr *ptr) {
+// Initial integrity checks.
+   if (idx < 0 || idx >= arr->cnt) ae_assert(false, "ae_obj_array_set_transfer: out of bounds idx");
+   ae_assert(ptr->ptr == NULL || ptr->is_owner, "ae_obj_array_set_transfer: ptr does not own its pointer");
+   ae_assert(ptr->ptr == NULL || ptr->is_dynamic, "ae_obj_array_set_transfer: ptr does not point to dynamic object");
+// Clean up existing pointer at location index, if needed.
+   if (arr->pp_obj_ptr[idx] != NULL) {
+      arr->pp_free[idx](arr->pp_obj_ptr[idx], false);
+      ae_free(arr->pp_obj_ptr[idx]);
+      arr->pp_obj_ptr[idx] = NULL;
+      arr->pp_obj_sizes[idx] = 0;
+      arr->pp_copy[idx] = NULL;
+      arr->pp_free[idx] = NULL;
+   }
+// If ptr is non-NULL, transfer it to the array.
+   if (ptr->ptr != NULL) {
+   // Move it to the array.
+      arr->pp_obj_ptr[idx] = ptr->ptr;
+      arr->pp_obj_sizes[idx] = ptr->size_of_object;
+      arr->pp_copy[idx] = ptr->copy;
+      arr->pp_free[idx] = ptr->free;
+   // Release ownership.
+      ptr->is_owner = false;
+      ptr->is_dynamic = false;
+      ptr->size_of_object = 0;
+      ptr->copy = NULL;
+      ptr->free = NULL;
+   }
+}
+
+// A portable full memory fence.
+// The current implementation issues a fence by acquiring and releasing a lock;
+// future implementations may add specialized code supported by the current compiler and/or OS.
+static void ae_mfence(ae_lock *lock) {
+   ae_acquire_lock(lock);
+   ae_release_lock(lock);
+}
+
+// Atomically append a pointer to arr, increasing the array length by 1, and return the index of the element being added.
+// Notes:
+// *	if the array has fixed capacity and its size is already at its limit, an exception will be thrown,
+// *	ptr can be NULL,
+// *	non-NULL P MUST own its value before calling this function,
+//	and it will transfer ownership to Vec afterwards (although it will still point to the object),
+// *	non-NULL P must point to a dynamically allocated object (on-stack objects are not supported),
+// This function is partially thread-safe:
+// *	parallel threads can concurrently append elements using this function
+// *	for fixed-capacity arrays it is possible to combine appends with reads, e.g. to use ae_obj_array_get()
+ae_int_t ae_obj_array_append_transfer(ae_obj_array *arr, ae_smart_ptr *ptr) {
+// Initial integrity checks.
+   ae_assert(ptr->ptr == NULL || ptr->is_owner, "ae_obj_array_append_transfer: ptr does not own its pointer");
+   ae_assert(ptr->ptr == NULL || ptr->is_dynamic, "ae_obj_array_append_transfer: ptr does not point to dynamic object");
+   ae_assert(!arr->fixed_capacity || arr->cnt < arr->capacity, "ae_obj_array_append_transfer: unable to append, all capacity is used up");
+// Get the primary lock.
+   ae_acquire_lock(&arr->array_lock);
+// Reallocate, if needed.
+   if (arr->cnt == arr->capacity) {
+   // One more integrity check.
+      AE_CRITICAL_ASSERT(!arr->fixed_capacity);
+   // Increase the capacity.
+      if (!_ae_obj_array_set_capacity(arr, 2 * arr->capacity + 8)) {
+      // malloc error: release the lock and throw an exception.
+         ae_release_lock(&arr->array_lock);
+         ae_assert(false, "ae_obj_array_append_transfer: malloc error");
+      }
+   }
+// Append ptr.
+   if (ptr->ptr != NULL) {
+   // Move it to the array.
+      arr->pp_obj_ptr[arr->cnt] = ptr->ptr;
+      arr->pp_obj_sizes[arr->cnt] = ptr->size_of_object;
+      arr->pp_copy[arr->cnt] = ptr->copy;
+      arr->pp_free[arr->cnt] = ptr->free;
+   // Release ownership.
+      ptr->is_owner = false;
+      ptr->is_dynamic = false;
+      ptr->size_of_object = 0;
+      ptr->copy = NULL;
+      ptr->free = NULL;
+   } else {
+   // Set to NULL.
+      arr->pp_obj_ptr[arr->cnt] = NULL;
+      arr->pp_obj_sizes[arr->cnt] = 0;
+      arr->pp_copy[arr->cnt] = NULL;
+      arr->pp_free[arr->cnt] = NULL;
+   }
+// Issue a memory fence (necessary for the correct ae_obj_array_get_length) and increase the array size.
+   ae_mfence(&arr->barrier_lock);
+   ae_int_t result = arr->cnt;
+   arr->cnt = result + 1;
+// Release the primary lock.
+   ae_release_lock(&arr->array_lock);
+// Done.
+   return result;
 }
 
 // Convert the six-bit value v in the range [0,0100) to digits, letters, minuses and underscores.
@@ -2814,24 +3121,54 @@ double rboundval(double x, double b1, double b2) {
    return x <= b1 ? b1 : x >= b2 ? b2 : x;
 }
 
+// RNG wrappers
+static ae_int_t ae_rand() {
+#if !defined ALGLIB_ENTROPY_SRC || ALGLIB_ENTROPY_SRC == ALGLIB_ENTROPY_SRC_STDRAND
+   return (ae_int_t)rand();
+#elif ALGLIB_ENTROPY_SRC == ALGLIB_ENTROPY_SRC_OPENSSL
+   ae_int32_t random_number;
+   unsigned char buf[sizeof random_number];
+   if (!RAND_bytes(buf, sizeof random_number)) {
+   // openSSL random number generator failed, default to standard random generator
+      return (ae_int_t)rand();
+   }
+   memcpy(&random_number, buf, sizeof random_number);
+   if (random_number < 0)
+      random_number = -(random_number + 1);
+   return (ae_int_t)random_number;
+#else
+#   error ALGLIB_ENTROPY_SRC is defined, but its value is not recognized.
+#endif
+}
+
+static ae_int_t ae_rand_max() {
+#if !defined ALGLIB_ENTROPY_SRC || ALGLIB_ENTROPY_SRC == ALGLIB_ENTROPY_SRC_STDRAND
+   return (ae_int_t)RAND_MAX;
+#elif ALGLIB_ENTROPY_SRC == ALGLIB_ENTROPY_SRC_OPENSSL
+   return (ae_int_t)ALGLIB_OPENSSL_RAND_MAX;
+#else
+#   error ALGLIB_ENTROPY_SRC is defined, but its value is not recognized.
+#endif
+}
+
 double randomreal() {
-   const double mx = RAND_MAX + 1.0;
-   int i = rand();
-   return (i + rand() / mx) / mx;
+   const double mx = ae_rand_max() + 1.0;
+   double i = ae_rand();
+   return (i + ae_rand() / mx) / mx;
 }
 
 double randommid() {
-   const double mx = RAND_MAX + 1.0;
-   int i = rand();
-   return 2.0 * (i + rand() / mx) / mx - 1.0;
+   const double mx = ae_rand_max() + 1.0;
+   double i = ae_rand();
+   return 2.0 * (i + ae_rand() / mx) / mx - 1.0;
 }
 
-ae_int_t randominteger(ae_int_t maxv) { return rand() % maxv; }
+ae_int_t randominteger(ae_int_t maxv) { return ae_rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
-   const double mx = RAND_MAX + 1.0;
-   int i = rand();
-   return i + rand() / mx <= p * mx;
+   const double mx = ae_rand_max() + 1.0;
+   double i = ae_rand();
+   return i + ae_rand() / mx <= p * mx;
 }
 
 // Complex math functions:
@@ -5197,23 +5534,23 @@ double maxreal(double x, double y) { return x > y ? x : y; }
 double sqr(double x) { return x * x; }
 
 double randomreal() {
-   const double mx = RAND_MAX + 1.0;
-   int i = rand();
-   return (i + rand() / mx) / mx;
+   const double mx = alglib_impl::ae_rand_max() + 1.0;
+   double i = alglib_impl::ae_rand();
+   return (i + alglib_impl::ae_rand() / mx) / mx;
 }
 
 double randommid() {
-   const double mx = RAND_MAX + 1.0;
-   int i = rand();
-   return 2.0 * (i + rand() / mx) / mx - 1.0;
+   const double mx = alglib_impl::ae_rand_max() + 1.0;
+   double i = alglib_impl::ae_rand();
+   return 2.0 * (i + alglib_impl::ae_rand() / mx) / mx - 1.0;
 }
 
-ae_int_t randominteger(ae_int_t maxv) { return (ae_int_t)rand() % maxv; }
+ae_int_t randominteger(ae_int_t maxv) { return alglib_impl::ae_rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
-   const double mx = RAND_MAX + 1.0;
-   int i = rand();
-   return i + rand() / mx <= p * mx;
+   const double mx = alglib_impl::ae_rand_max() + 1.0;
+   double i = alglib_impl::ae_rand();
+   return i + alglib_impl::ae_rand() / mx <= p * mx;
 }
 
 // Complex number with double precision.

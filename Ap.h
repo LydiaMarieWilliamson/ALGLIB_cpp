@@ -66,6 +66,10 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 #   define AE_THREADING ParTH
 #endif
 
+// Which entropy source to use.
+#define ALGLIB_ENTROPY_SRC_STDRAND	0
+#define ALGLIB_ENTROPY_SRC_OPENSSL	1
+
 // The memory allocation types for AE_MALLOC.
 #define AE_STDLIB_MALLOC	200
 #define AE_BASIC_STATIC_MALLOC	201
@@ -392,6 +396,10 @@ struct ae_smart_ptr {
    bool is_owner;
 // True if ptr points to a dynamic object, whose clearing requires calling both .free() and ae_free().
    bool is_dynamic;
+// The size of the object, if the pointer is owned, otherwise 0: used when we pass the object to ae_obj_array.
+   size_t size_of_object;
+// The copy constructor for the pointer.
+   ae_copy_op copy;
 // The deallocation function for the pointer; clears all dynamically allocated memory.
    ae_free_op free;
 // The frame entry; used to ensure automatic deallocation of the smart pointer in case of an exception/exit.
@@ -399,10 +407,11 @@ struct ae_smart_ptr {
 };
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
 void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, ae_free_op free);
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, size_t obj_size, ae_copy_op copy, ae_free_op free);
 void ae_smart_ptr_release(ae_smart_ptr *dst);
 #define NewObj(Type, P)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, true)
 #define RefObj(Type, P)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, true)
+#define RepObj(Type, P)	P = (Type *)ae_malloc(sizeof *P), memset(P, 0, sizeof *P), Type##_init(P, false), ae_smart_ptr_assign(&_##P, P, true, true, sizeof *P, Type##_copy, Type##_free)/* Use P as a temporary before assigning its value to _P.*/
 #define SetObj(Type, P)	Type##_free(P, true)
 
 // The X-interface.
@@ -565,6 +574,37 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic);
 void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_reset(ae_shared_pool *pool);
+
+struct ae_obj_array {
+// The number of elements.
+   ae_int_t cnt;
+// The storage size.
+   ae_int_t capacity;
+// True if and only if the capacity can be automatically increased.
+   bool fixed_capacity;
+// Pointers to the objects.
+   void **pp_obj_ptr;
+// Pointers to the object sizes.
+   ae_int_t *pp_obj_sizes;
+// Pointers to the copy functions.
+   ae_copy_op *pp_copy;
+// Pointers to the free functions.
+   ae_free_op *pp_free;
+// The primary synchronization lock, used for thread-safe appends.
+   ae_lock array_lock;
+// A lock used to emulate a full memory fence.
+   ae_lock barrier_lock;
+// A frame entry; used to ensure automatic deallocation of the array and its elements in case of exception/exit.
+   ae_frame frame_entry;
+};
+void ae_obj_array_init(ae_obj_array *dst, bool make_automatic);
+void ae_obj_array_copy(ae_obj_array *dst, const ae_obj_array *src, bool make_automatic);
+void ae_obj_array_free(ae_obj_array *dst, bool make_automatic);
+ae_int_t ae_obj_array_get_length(ae_obj_array *dst);
+void ae_obj_array_fixed_capacity(ae_obj_array *arr, ae_int_t new_capacity);
+void ae_obj_array_get(ae_obj_array *arr, ae_int_t idx, ae_smart_ptr *ptr);
+void ae_obj_array_set_transfer(ae_obj_array *arr, ae_int_t idx, ae_smart_ptr *ptr);
+ae_int_t ae_obj_array_append_transfer(ae_obj_array *arr, ae_smart_ptr *ptr);
 
 // Serializer:
 // *	ae_stream_writer is the type expected for pointers to serializer stream-writing functions,

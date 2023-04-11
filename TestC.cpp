@@ -87673,7 +87673,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       ae_frame_leave();
       return Ok;
    }
-   ae_smart_ptr_assign(&_p0, NULL, false, false, NULL);
+   ae_smart_ptr_assign(&_p0, NULL, false, false, 0, NULL, NULL);
    if (p0 != NULL) {
       ae_frame_leave();
       return Ok;

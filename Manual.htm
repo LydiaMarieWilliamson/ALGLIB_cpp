@@ -1358,6 +1358,7 @@ Future enhancements or additions include a larger set of DSP (and multi-precisio
 <a name=gs_advanced class=sheader></a><h2>7. Advanced Topics</h2>
 <font size=2>[
 <a href=#gs_redzones>Using Red Zones To Find Memory Access Violations</a> |
+<a href=#gs_std_rand>Replacing stdlib rand() As An Entropy Source With OpenSSL Implementation</a> |
 <a href=#gs_exceptionfree>Exception-Free Mode</a> |
 <a href=#gs_partial_compiling>Partial Compilation</a> |
 <a href=#gs_testing>Testing ALGLIB++</a>
@@ -1391,7 +1392,24 @@ Red zones add some memory overhead (insignificant for large arrays) and some mod
 Your program may become a few percent slower (in the very worst case - a few tens of percent).
 </p>
 <p>
-<a name=gs_exceptionfree class=sheader></a><h3>7.2. Exception-Free Mode</h3>
+<a name=gs_std_rand class=sheader></a><h3>7.2. Replacing stdlib rand() As An Entropy Source With OpenSSL Implementation</h3>
+ALGLIB++, like ALGLIB, uses its own random number generator, which suffices for scientific and numeric programming, but is not cryptographically secure.
+It is an implementation, optimized for 32-bit architectures, of a pseudo-random generator published in 1988 by P. L'Ecuyer, with a period just under 2⁶¹.
+</p>
+<p>
+However, it must be primed with an external entropy source, which provides random or pseudorandom seeds.
+By default, for portability reasons, they are obtained with stdlib <code>rand()</code>.
+In most cases it is acceptable - all we need are just two integers which will be used to prime the random number generator.
+However, some users may prefer to use other sources of entropy.
+As of version 3.20.0, entropy source can be configured by #defining <code>ALGLIB_ENTROPY_SRC</code> to be one of the following:
+<ul>
+<li><code>ALGLIB_ENTROPY_SRC_STDRAND</code> to use the default source - the <code>rand()</code> function declared in <code>stdlib.h</code>.</li>
+<li><code>ALGLIB_ENTROPY_SRC_OPENSSL</code> to use OpenSSL facilities as the entropy source.
+This requires that OpenSSL be installed on your system to use this option.</li>
+</ul>
+</p>
+<p>
+<a name=gs_exceptionfree class=sheader></a><h3>7.3. Exception-Free Mode</h3>
 ALGLIB++ can be compiled in exception-free mode, with exceptions
 (<code>throw</code>/<code>try</code>/<code>catch</code> constructs) being disabled at compiler level.
 Such a feature is sometimes used by developers of embedded software.
@@ -1465,7 +1483,7 @@ resizing arrays with <code>setlength()</code>/<code>setcontent()</code> and atta
 </ul>
 </p>
 <p>
-<a name=gs_partial_compiling class=sheader></a><h3>7.3. Partial Compilation</h3>
+<a name=gs_partial_compiling class=sheader></a><h3>7.4. Partial Compilation</h3>
 As of version 3.13.0, ALGLIB included the ability to selectively compile subpackages.
 It has been eliminated from ALGLIB++ with a possible future splitting into subpackage files in mind, as ALGLIB had before version 3.
 For those who wish to carry out partial compilation, each of the package files has been cleanly separated into their component subpackages, each occupying a contiguous section within the package file.
@@ -1503,7 +1521,7 @@ to reduce build time.
 </ul>
 Neither of these are as much an issue as they were with older machines and compilers, and it is just easier to work directly with the package files instead.
 <p>
-<a name=gs_testing class=sheader></a><h3>7.4. Testing ALGLIB++</h3>
+<a name=gs_testing class=sheader></a><h3>7.5. Testing ALGLIB++</h3>
 <b>Note:</b> In the original distribution of the GPL version of ALGLIB, the test suite is included separately under a different directory (tests/), the source being placed in its own directory (src/). Here, they are included together as part of one package, with the test suite being provided as an example implementation and use of the library itself. Although they provide, in many cases, stress tests of the various parts of the library that push it beyond conditions it was designed for, this can be illustrative in itself (to show you where the limits lie) and the methods used in the routines in many cases still exemplify the intended use of the library.
 </p>
 <p>
