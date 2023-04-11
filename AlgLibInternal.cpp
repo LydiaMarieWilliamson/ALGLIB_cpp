@@ -19,6 +19,8 @@
 
 // === APSERV Package ===
 namespace alglib_impl {
+static const ae_int_t apserv_maxtemporariesinnpool = 1000;
+
 // The function performs zero-coalescing on real value.
 //
 // NOTE: no check is performed for B != 0
@@ -559,6 +561,42 @@ bool isfinitecvector(CVector *z, ae_int_t n) {
    return result;
 }
 
+// This function checks that length(X) is at least N and first N values  from
+// X[] are finite or NANs
+// ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
+bool isfiniteornanvector(RVector *x, ae_int_t n) {
+   ae_int_t i;
+   double v;
+   bool result;
+   ae_assert(n >= 0, "APSERVIsFiniteVector: internal error (N < 0)");
+   if (n == 0) {
+      result = true;
+      return result;
+   }
+   if (x->cnt < n) {
+      result = false;
+      return result;
+   }
+// Is it entirely finite?
+   v = 0.0;
+   for (i = 0; i < n; i++) {
+      v = 0.01 * v + x->xR[i];
+   }
+   if (isfinite(v)) {
+      result = true;
+      return result;
+   }
+// OK, check that either finite or nan
+   for (i = 0; i < n; i++) {
+      if (!isfinite(x->xR[i]) && !isnan(x->xR[i])) {
+         result = false;
+         return result;
+      }
+   }
+   result = true;
+   return result;
+}
+
 // This function checks that size of X is at least MxN and values from
 // X[0..M-1,0..N-1] are finite.
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
@@ -976,6 +1014,22 @@ void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth) {
    }
 }
 
+// This function is used to swap two "entries" in 1-dimensional array composed
+// from D-element entries
+void swapentriesb(BVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth) {
+   ae_int_t offs0;
+   ae_int_t offs1;
+   ae_int_t j;
+   if (i0 == i1) {
+      return;
+   }
+   offs0 = i0 * entrywidth;
+   offs1 = i1 * entrywidth;
+   for (j = 0; j < entrywidth; j++) {
+      swapb(&a->xB[offs0 + j], &a->xB[offs1 + j]);
+   }
+}
+
 // This function is used to swap two elements of the vector
 void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1) {
    if (i0 == i1) {
@@ -1028,6 +1082,45 @@ complex unserializecomplex(ae_serializer *s) {
    result.x = ae_serializer_unserialize_double(s);
    result.y = ae_serializer_unserialize_double(s);
    return result;
+}
+
+// Allocation of serializer: boolean array
+void allocbooleanarray(ae_serializer *s, BVector *v, ae_int_t n) {
+   ae_int_t i;
+   if (n < 0) {
+      n = v->cnt;
+   }
+   ae_serializer_alloc_entry(s);
+   for (i = 0; i < n; i++) {
+      ae_serializer_alloc_entry(s);
+   }
+}
+
+// Serialization: boolean array
+void serializebooleanarray(ae_serializer *s, BVector *v, ae_int_t n) {
+   ae_int_t i;
+   if (n < 0) {
+      n = v->cnt;
+   }
+   ae_serializer_serialize_int(s, n);
+   for (i = 0; i < n; i++) {
+      ae_serializer_serialize_bool(s, v->xB[i]);
+   }
+}
+
+// Unserialization: boolean value
+void unserializebooleanarray(ae_serializer *s, BVector *v) {
+   ae_int_t n;
+   ae_int_t i;
+   SetVector(v);
+   n = ae_serializer_unserialize_int(s);
+   if (n == 0) {
+      return;
+   }
+   ae_vector_set_length(v, n);
+   for (i = 0; i < n; i++) {
+      v->xB[i] = ae_serializer_unserialize_bool(s);
+   }
 }
 
 // Allocation of serializer: real array
@@ -1219,17 +1312,248 @@ void copyrealmatrix(RMatrix *src, RMatrix *dst) {
 
 // Clears integer array
 void unsetintegerarray(ZVector *a) {
-   SetVector(a);
+   SetVector(a), ae_vector_set_length(a, 0);
 }
 
 // Clears real array
 void unsetrealarray(RVector *a) {
-   SetVector(a);
+   SetVector(a), ae_vector_set_length(a, 0);
 }
 
 // Clears real matrix
 void unsetrealmatrix(RMatrix *a) {
-   SetMatrix(a);
+   SetMatrix(a), ae_matrix_set_length(a, 0, 0);
+}
+
+// Initialize nbPool - prepare it to store N-length arrays, N >= 0.
+// Tries to reuse previously allocated memory as much as possible.
+void nbpoolinit(nbpool *pool, ae_int_t n) {
+   ae_assert(n >= 0, "niPoolInit: N < 0");
+   pool->n = n;
+   pool->temporariescount = 0;
+   if (n == 0) {
+      return;
+   }
+   if (pool->seed0.cnt != 0) {
+      ae_vector_set_length(&pool->seed0, 0);
+   }
+   if (pool->seedn.cnt != n) {
+      ae_vector_set_length(&pool->seedn, n);
+   }
+   ae_shared_pool_set_seed(&pool->sourcepool, &pool->seedn, sizeof(pool->seedn), BVector_init, BVector_copy, BVector_free);
+   ae_shared_pool_set_seed(&pool->temporarypool, &pool->seed0, sizeof(pool->seed0), BVector_init, BVector_copy, BVector_free);
+}
+
+// Thread-safe retrieval of array from the nbPool. If there are enough arrays
+// in the pool, it is performed without additional dynamic allocations.
+//
+// Inputs:
+//     Pool        -   nbPool properly initialized with nbPoolInit
+//     A           -   array[0], must have exactly zero length (exception will
+//                     be generated if length is different from zero)
+//
+// Outputs:
+//     A           -   array[N], contents undefined
+void nbpoolretrieve(nbpool *pool, BVector *a) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   RefObj(BVector, tmp);
+   ae_assert(a->cnt == 0, "nbPoolRetrieve: A has non-zero length on entry");
+   if (pool->n == 0) {
+      ae_frame_leave();
+      return;
+   }
+   ae_shared_pool_retrieve(&pool->sourcepool, &_tmp);
+   ae_swap_vectors(tmp, a);
+   ae_shared_pool_recycle(&pool->temporarypool, &_tmp);
+   pool->temporariescount++;
+   if (pool->temporariescount > apserv_maxtemporariesinnpool) {
+      pool->temporariescount = 0;
+      ae_shared_pool_clear_recycled(&pool->temporarypool, true);
+   }
+   ae_frame_leave();
+}
+
+// Thread-safe recycling of N-length array to the nbPool.
+//
+// Inputs:
+//     Pool        -   nbPool properly initialized with nbPoolInit
+//     A           -   array[N], length must be N exactly (exception will
+//                     be generated if length is different from N)
+//
+// Outputs:
+//     A           -   array[0], length is exactly zero on exit
+void nbpoolrecycle(nbpool *pool, BVector *a) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   RefObj(BVector, tmp);
+   ae_assert(a->cnt == pool->n, "nbPoolRecycle: A has length != N on entry");
+   if (pool->n == 0) {
+      ae_frame_leave();
+      return;
+   }
+   ae_shared_pool_retrieve(&pool->temporarypool, &_tmp);
+   ae_swap_vectors(tmp, a);
+   ae_shared_pool_recycle(&pool->sourcepool, &_tmp);
+   pool->temporariescount--;
+   if (pool->temporariescount < 0) {
+      pool->temporariescount = 0;
+   }
+   ae_frame_leave();
+}
+
+// Initialize niPool - prepare it to store N-length arrays, N >= 0.
+// Tries to reuse previously allocated memory as much as possible.
+void nipoolinit(nipool *pool, ae_int_t n) {
+   ae_assert(n >= 0, "niPoolInit: N < 0");
+   pool->n = n;
+   pool->temporariescount = 0;
+   if (n == 0) {
+      return;
+   }
+   if (pool->seed0.cnt != 0) {
+      ae_vector_set_length(&pool->seed0, 0);
+   }
+   if (pool->seedn.cnt != n) {
+      ae_vector_set_length(&pool->seedn, n);
+   }
+   ae_shared_pool_set_seed(&pool->sourcepool, &pool->seedn, sizeof(pool->seedn), ZVector_init, ZVector_copy, ZVector_free);
+   ae_shared_pool_set_seed(&pool->temporarypool, &pool->seed0, sizeof(pool->seed0), ZVector_init, ZVector_copy, ZVector_free);
+}
+
+// Thread-safe retrieval of array from the nrPool. If there are enough arrays
+// in the pool, it is performed without additional dynamic allocations.
+//
+// Inputs:
+//     Pool        -   niPool properly initialized with niPoolInit
+//     A           -   array[0], must have exactly zero length (exception will
+//                     be generated if length is different from zero)
+//
+// Outputs:
+//     A           -   array[N], contents undefined
+void nipoolretrieve(nipool *pool, ZVector *a) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   RefObj(ZVector, tmp);
+   ae_assert(a->cnt == 0, "niPoolRetrieve: A has non-zero length on entry");
+   if (pool->n == 0) {
+      ae_frame_leave();
+      return;
+   }
+   ae_shared_pool_retrieve(&pool->sourcepool, &_tmp);
+   ae_swap_vectors(tmp, a);
+   ae_shared_pool_recycle(&pool->temporarypool, &_tmp);
+   pool->temporariescount++;
+   if (pool->temporariescount > apserv_maxtemporariesinnpool) {
+      pool->temporariescount = 0;
+      ae_shared_pool_clear_recycled(&pool->temporarypool, true);
+   }
+   ae_frame_leave();
+}
+
+// Thread-safe recycling of N-length array to the niPool.
+//
+// Inputs:
+//     Pool        -   niPool properly initialized with niPoolInit
+//     A           -   array[N], length must be N exactly (exception will
+//                     be generated if length is different from N)
+//
+// Outputs:
+//     A           -   array[0], length is exactly zero on exit
+void nipoolrecycle(nipool *pool, ZVector *a) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   RefObj(ZVector, tmp);
+   ae_assert(a->cnt == pool->n, "niPoolRecycle: A has length != N on entry");
+   if (pool->n == 0) {
+      ae_frame_leave();
+      return;
+   }
+   ae_shared_pool_retrieve(&pool->temporarypool, &_tmp);
+   ae_swap_vectors(tmp, a);
+   ae_shared_pool_recycle(&pool->sourcepool, &_tmp);
+   pool->temporariescount--;
+   if (pool->temporariescount < 0) {
+      pool->temporariescount = 0;
+   }
+   ae_frame_leave();
+}
+
+// Initialize nrPool - prepare it to store N-length arrays, N >= 0.
+// Tries to reuse previously allocated memory as much as possible.
+void nrpoolinit(nrpool *pool, ae_int_t n) {
+   ae_assert(n >= 0, "nrPoolInit: N < 0");
+   pool->n = n;
+   pool->temporariescount = 0;
+   if (n == 0) {
+      return;
+   }
+   if (pool->seed0.cnt != 0) {
+      ae_vector_set_length(&pool->seed0, 0);
+   }
+   if (pool->seedn.cnt != n) {
+      ae_vector_set_length(&pool->seedn, n);
+   }
+   ae_shared_pool_set_seed(&pool->sourcepool, &pool->seedn, sizeof(pool->seedn), RVector_init, RVector_copy, RVector_free);
+   ae_shared_pool_set_seed(&pool->temporarypool, &pool->seed0, sizeof(pool->seed0), RVector_init, RVector_copy, RVector_free);
+}
+
+// Thread-safe retrieval of array from the nrPool. If there are enough arrays
+// in the pool, it is performed without additional dynamic allocations.
+//
+// Inputs:
+//     Pool        -   nrPool properly initialized with nrPoolInit
+//     A           -   array[0], must have exactly zero length (exception will
+//                     be generated if length is different from zero)
+//
+// Outputs:
+//     A           -   array[N], contents undefined
+void nrpoolretrieve(nrpool *pool, RVector *a) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   RefObj(RVector, tmp);
+   ae_assert(a->cnt == 0, "nrPoolRetrieve: A has non-zero length on entry");
+   if (pool->n == 0) {
+      ae_frame_leave();
+      return;
+   }
+   ae_shared_pool_retrieve(&pool->sourcepool, &_tmp);
+   ae_swap_vectors(tmp, a);
+   ae_shared_pool_recycle(&pool->temporarypool, &_tmp);
+   pool->temporariescount++;
+   if (pool->temporariescount > apserv_maxtemporariesinnpool) {
+      pool->temporariescount = 0;
+      ae_shared_pool_clear_recycled(&pool->temporarypool, true);
+   }
+   ae_frame_leave();
+}
+
+// Thread-safe recycling of N-length array to the nrPool.
+//
+// Inputs:
+//     Pool        -   nrPool properly initialized with nrPoolInit
+//     A           -   array[N], length must be N exactly (exception will
+//                     be generated if length is different from N)
+//
+// Outputs:
+//     A           -   array[0], length is exactly zero on exit
+void nrpoolrecycle(nrpool *pool, RVector *a) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   RefObj(RVector, tmp);
+   ae_assert(a->cnt == pool->n, "nrPoolRecycle: A has length != N on entry");
+   if (pool->n == 0) {
+      ae_frame_leave();
+      return;
+   }
+   ae_shared_pool_retrieve(&pool->temporarypool, &_tmp);
+   ae_swap_vectors(tmp, a);
+   ae_shared_pool_recycle(&pool->sourcepool, &_tmp);
+   pool->temporariescount--;
+   if (pool->temporariescount < 0) {
+      pool->temporariescount = 0;
+   }
+   ae_frame_leave();
 }
 
 // This function is used to calculate number of chunks (including partial,
@@ -1427,6 +1751,39 @@ double spawnlevel() {
    return result;
 }
 
+// Minimum speedup feasible for multithreading
+double minspeedup() {
+   double result;
+   result = 1.5;
+   return result;
+}
+
+// Initialize SAvgCounter
+//
+// Prior value is a value that is returned when no values are in the buffer
+void savgcounterinit(savgcounter *c, double priorvalue) {
+   c->rsum = 0.0;
+   c->rcnt = 0.0;
+   c->prior = priorvalue;
+}
+
+// Enqueue value into SAvgCounter
+void savgcounterenqueue(savgcounter *c, double v) {
+   c->rsum += v;
+   c->rcnt++;
+}
+
+// Enqueue value into SAvgCounter
+double savgcounterget(savgcounter *c) {
+   double result;
+   if (c->rcnt == 0.0) {
+      result = c->prior;
+   } else {
+      result = c->rsum / c->rcnt;
+   }
+   return result;
+}
+
 void apbuffers_init(void *_p, bool make_automatic) {
    apbuffers *p = (apbuffers *)_p;
    ae_vector_init(&p->ba0, 0, DT_BOOL, make_automatic);
@@ -1473,6 +1830,38 @@ void apbuffers_free(void *_p, bool make_automatic) {
    ae_matrix_free(&p->rm1, make_automatic);
 }
 
+void BVector_init(void *_p, bool make_automatic) {
+   BVector *p = (BVector *)_p;
+   ae_vector_init(p, 0, DT_BOOL, make_automatic);
+}
+
+void BVector_copy(void *_dst, const void *_src, bool make_automatic) {
+   BVector *dst = (BVector *)_dst;
+   const BVector *src = (const BVector *)_src;
+   ae_vector_copy(dst, src, make_automatic);
+}
+
+void BVector_free(void *_p, bool make_automatic) {
+   BVector *p = (BVector *)_p;
+   ae_vector_free(p, make_automatic);
+}
+
+void ZVector_init(void *_p, bool make_automatic) {
+   ZVector *p = (ZVector *)_p;
+   ae_vector_init(p, 0, DT_INT, make_automatic);
+}
+
+void ZVector_copy(void *_dst, const void *_src, bool make_automatic) {
+   ZVector *dst = (ZVector *)_dst;
+   const ZVector *src = (const ZVector *)_src;
+   ae_vector_copy(dst, src, make_automatic);
+}
+
+void ZVector_free(void *_p, bool make_automatic) {
+   ZVector *p = (ZVector *)_p;
+   ae_vector_free(p, make_automatic);
+}
+
 void RVector_init(void *_p, bool make_automatic) {
    RVector *p = (RVector *)_p;
    ae_vector_init(p, 0, DT_REAL, make_automatic);
@@ -1487,6 +1876,101 @@ void RVector_copy(void *_dst, const void *_src, bool make_automatic) {
 void RVector_free(void *_p, bool make_automatic) {
    RVector *p = (RVector *)_p;
    ae_vector_free(p, make_automatic);
+}
+
+void nbpool_init(void *_p, bool make_automatic) {
+   nbpool *p = (nbpool *)_p;
+   ae_shared_pool_init(&p->sourcepool, make_automatic);
+   ae_shared_pool_init(&p->temporarypool, make_automatic);
+   BVector_init(&p->seed0, make_automatic);
+   BVector_init(&p->seedn, make_automatic);
+}
+
+void nbpool_copy(void *_dst, const void *_src, bool make_automatic) {
+   nbpool *dst = (nbpool *)_dst;
+   const nbpool *src = (const nbpool *)_src;
+   dst->n = src->n;
+   dst->temporariescount = src->temporariescount;
+   ae_shared_pool_copy(&dst->sourcepool, &src->sourcepool, make_automatic);
+   ae_shared_pool_copy(&dst->temporarypool, &src->temporarypool, make_automatic);
+   BVector_copy(&dst->seed0, &src->seed0, make_automatic);
+   BVector_copy(&dst->seedn, &src->seedn, make_automatic);
+}
+
+void nbpool_free(void *_p, bool make_automatic) {
+   nbpool *p = (nbpool *)_p;
+   ae_shared_pool_free(&p->sourcepool, make_automatic);
+   ae_shared_pool_free(&p->temporarypool, make_automatic);
+   BVector_free(&p->seed0, make_automatic);
+   BVector_free(&p->seedn, make_automatic);
+}
+
+void nipool_init(void *_p, bool make_automatic) {
+   nipool *p = (nipool *)_p;
+   ae_shared_pool_init(&p->sourcepool, make_automatic);
+   ae_shared_pool_init(&p->temporarypool, make_automatic);
+   ZVector_init(&p->seed0, make_automatic);
+   ZVector_init(&p->seedn, make_automatic);
+}
+
+void nipool_copy(void *_dst, const void *_src, bool make_automatic) {
+   nipool *dst = (nipool *)_dst;
+   const nipool *src = (const nipool *)_src;
+   dst->n = src->n;
+   dst->temporariescount = src->temporariescount;
+   ae_shared_pool_copy(&dst->sourcepool, &src->sourcepool, make_automatic);
+   ae_shared_pool_copy(&dst->temporarypool, &src->temporarypool, make_automatic);
+   ZVector_copy(&dst->seed0, &src->seed0, make_automatic);
+   ZVector_copy(&dst->seedn, &src->seedn, make_automatic);
+}
+
+void nipool_free(void *_p, bool make_automatic) {
+   nipool *p = (nipool *)_p;
+   ae_shared_pool_free(&p->sourcepool, make_automatic);
+   ae_shared_pool_free(&p->temporarypool, make_automatic);
+   ZVector_free(&p->seed0, make_automatic);
+   ZVector_free(&p->seedn, make_automatic);
+}
+
+void nrpool_init(void *_p, bool make_automatic) {
+   nrpool *p = (nrpool *)_p;
+   ae_shared_pool_init(&p->sourcepool, make_automatic);
+   ae_shared_pool_init(&p->temporarypool, make_automatic);
+   RVector_init(&p->seed0, make_automatic);
+   RVector_init(&p->seedn, make_automatic);
+}
+
+void nrpool_copy(void *_dst, const void *_src, bool make_automatic) {
+   nrpool *dst = (nrpool *)_dst;
+   const nrpool *src = (const nrpool *)_src;
+   dst->n = src->n;
+   dst->temporariescount = src->temporariescount;
+   ae_shared_pool_copy(&dst->sourcepool, &src->sourcepool, make_automatic);
+   ae_shared_pool_copy(&dst->temporarypool, &src->temporarypool, make_automatic);
+   RVector_copy(&dst->seed0, &src->seed0, make_automatic);
+   RVector_copy(&dst->seedn, &src->seedn, make_automatic);
+}
+
+void nrpool_free(void *_p, bool make_automatic) {
+   nrpool *p = (nrpool *)_p;
+   ae_shared_pool_free(&p->sourcepool, make_automatic);
+   ae_shared_pool_free(&p->temporarypool, make_automatic);
+   RVector_free(&p->seed0, make_automatic);
+   RVector_free(&p->seedn, make_automatic);
+}
+
+void savgcounter_init(void *_p, bool make_automatic) {
+}
+
+void savgcounter_copy(void *_dst, const void *_src, bool make_automatic) {
+   savgcounter *dst = (savgcounter *)_dst;
+   const savgcounter *src = (const savgcounter *)_src;
+   dst->rsum = src->rsum;
+   dst->rcnt = src->rcnt;
+   dst->prior = src->prior;
+}
+
+void savgcounter_free(void *_p, bool make_automatic) {
 }
 } // end of namespace alglib_impl
 
@@ -2130,6 +2614,11 @@ void rsetv(ae_int_t n, double v, RVector *y) {
    for (ae_int_t j = 0; j < n; j++) y->xR[j] = v;
 }
 
+// Complex:
+void csetv(ae_int_t n, complex v, CVector *y) {
+   for (ae_int_t j = 0; j < n; j++) y->xC[j] = v;
+}
+
 // Set elements [y0,y0+n) of the vector y to v.
 // Inputs:
 //	n:	The sub-vector length.
@@ -2236,6 +2725,11 @@ void isetallocv(ae_int_t n, ae_int_t v, ZVector *y) {
 void rsetallocv(ae_int_t n, double v, RVector *y) {
    vectorsetlengthatleast(y, n);
    rsetv(n, v, y);
+}
+// Complex:
+void csetallocv(ae_int_t n, complex v, CVector *y) {
+   vectorsetlengthatleast(y, n);
+   csetv(n, v, y);
 }
 
 // Set elements [0,m) x [0,n) of the matrix y to v, reallocating y if it's too small.
@@ -4257,6 +4751,12 @@ ae_int_t getsparsematrixserializationcode() {
    return result;
 }
 
+ae_int_t getspline2dwithmissingnodesserializationcode() {
+   ae_int_t result;
+   result = 9;
+   return result;
+}
+
 ae_int_t getknnserializationcode() {
    ae_int_t result;
    result = 108;
@@ -4543,6 +5043,29 @@ void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset/* = 0*/
          if (ap[nl] >= ap[nm]) break;
          swapi(ap + nl, ap + nm);
          swapr(bp + nl, bp + nm);
+      }
+   }
+}
+
+void tagsortmiddleri(RVector *a, ZVector *b, ae_int_t n, ae_int_t offset/* = 0*/) {
+// Special case.
+   if (n <= 1) return;
+// General case, n > 1: sort, update bp.
+   double *ap = a->xR + offset;
+   ae_int_t *bp = b->xZ + offset;
+   for (ae_int_t nh = 1; nh < n; nh++)
+      for (ae_int_t nm = nh, nl = (nh - 1) / 2; nm > 0 && ap[nl] < ap[nm]; nm = nl, nl = (nl - 1) / 2) {
+         swapr(ap + nl, ap + nm);
+         swapi(bp + nl, bp + nm);
+      }
+   for (ae_int_t nh = n - 1; nh > 0; nh--) {
+      swapr(ap, ap + nh);
+      swapi(bp, bp + nh);
+      for (ae_int_t nl = 0, nm = 1; nm < nh; nl = nm, nm = 2 * nm + 1) {
+         if (nm + 1 < nh && ap[nm + 1] > ap[nm]) nm++;
+         if (ap[nl] >= ap[nm]) break;
+         swapr(ap + nl, ap + nm);
+         swapi(bp + nl, bp + nm);
       }
    }
 }
@@ -5540,6 +6063,246 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
 // === APSTRUCT Package ===
 // Depends on: ABLASF
 namespace alglib_impl {
+// Initializes n-set by empty structure.
+//
+// IMPORTANT: this function need O(N) time for initialization. It is recommended
+//            to reduce its usage as much as possible, and use nisClear()
+//            where possible.
+//
+// Inputs:
+//     N           -   possible set size
+//
+// Outputs:
+//     SA          -   empty N-set
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+void nisinitemptyslow(ae_int_t n, niset *sa) {
+   sa->n = n;
+   sa->nstored = 0;
+   isetallocv(n, -999999999, &sa->locationof);
+   isetallocv(n, -999999999, &sa->items);
+}
+
+// Clears set
+//
+// Inputs:
+//     SA          -   set to be cleared
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+void nisclear(niset *sa) {
+   ae_int_t i;
+   ae_int_t ns;
+   ns = sa->nstored;
+   for (i = 0; i < ns; i++) {
+      sa->locationof.xZ[sa->items.xZ[i]] = -1;
+   }
+   sa->nstored = 0;
+}
+
+// Copies n-set to properly initialized target set. The target set has to  be
+// properly initialized, and it can be non-empty. If  it  is  non-empty,  its
+// contents is quickly erased before copying.
+//
+// The cost of this function is O(max(SrcSize,DstSize))
+//
+// Inputs:
+//     SSrc        -   source N-set
+//     SDst        -   destination N-set (has same size as SSrc)
+//
+// Outputs:
+//     SDst        -   copy of SSrc
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+void niscopy(niset *ssrc, niset *sdst) {
+   ae_int_t ns;
+   ae_int_t i;
+   ae_int_t k;
+   nisclear(sdst);
+   ns = ssrc->nstored;
+   for (i = 0; i < ns; i++) {
+      k = ssrc->items.xZ[i];
+      sdst->items.xZ[i] = k;
+      sdst->locationof.xZ[k] = i;
+   }
+   sdst->nstored = ns;
+}
+
+// Add K-th element to the set. The element may already exist in the set.
+//
+// Inputs:
+//     SA          -   set
+//     K           -   element to add, 0 <= K < N.
+//
+// Outputs:
+//     SA          -   modified SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+void nisaddelement(niset *sa, ae_int_t k) {
+   ae_int_t ns;
+   if (sa->locationof.xZ[k] >= 0) {
+      return;
+   }
+   ns = sa->nstored;
+   sa->locationof.xZ[k] = ns;
+   sa->items.xZ[ns] = k;
+   sa->nstored = ns + 1;
+}
+
+// Subtracts K-th set from the source structure
+//
+// Inputs:
+//     SA          -   set
+//     Src, K      -   source kn-set and set index K
+//
+// Outputs:
+//     SA          -   modified SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+void nissubtract1(niset *sa, niset *src) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t loc;
+   ae_int_t item;
+   ae_int_t ns;
+   ae_int_t ss;
+   ns = sa->nstored;
+   ss = src->nstored;
+   if (ss < ns) {
+      for (i = 0; i < ss; i++) {
+         j = src->items.xZ[i];
+         loc = sa->locationof.xZ[j];
+         if (loc >= 0) {
+            item = sa->items.xZ[ns - 1];
+            sa->items.xZ[loc] = item;
+            sa->locationof.xZ[item] = loc;
+            sa->locationof.xZ[j] = -1;
+            ns--;
+         }
+      }
+   } else {
+      i = 0;
+      while (i < ns) {
+         j = sa->items.xZ[i];
+         loc = src->locationof.xZ[j];
+         if (loc >= 0) {
+            item = sa->items.xZ[ns - 1];
+            sa->items.xZ[i] = item;
+            sa->locationof.xZ[item] = i;
+            sa->locationof.xZ[j] = -1;
+            ns--;
+         } else {
+            i++;
+         }
+      }
+   }
+   sa->nstored = ns;
+}
+
+// Counts set elements
+//
+// Inputs:
+//     SA          -   set
+//
+// Result:
+//     number of elements in SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+ae_int_t niscount(niset *sa) {
+   ae_int_t result;
+   result = sa->nstored;
+   return result;
+}
+
+// Compare two sets, returns True for equal sets
+//
+// Inputs:
+//     S0          -   set 0
+//     S1          -   set 1, must have same parameter N as set 0
+//
+// Result:
+//     True, if sets are equal
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+bool nisequal(niset *s0, niset *s1) {
+   ae_int_t i;
+   ae_int_t ns0;
+   ae_int_t ns1;
+   bool result;
+   result = false;
+   if (s0->n != s1->n) {
+      return result;
+   }
+   if (s0->nstored != s1->nstored) {
+      return result;
+   }
+   ns0 = s0->nstored;
+   ns1 = s1->nstored;
+   for (i = 0; i < ns0; i++) {
+      if (s1->locationof.xZ[s0->items.xZ[i]] < 0) {
+         return result;
+      }
+   }
+   for (i = 0; i < ns1; i++) {
+      if (s0->locationof.xZ[s1->items.xZ[i]] < 0) {
+         return result;
+      }
+   }
+   result = true;
+   return result;
+}
+
+// Prepares iteration over set
+//
+// Inputs:
+//     SA          -   set
+//
+// Outputs:
+//     SA          -   SA ready for repeated calls of nisEnumerate()
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+void nisstartenumeration(niset *sa) {
+   sa->iteridx = 0;
+}
+
+// Iterates over the set. Subsequent calls return True and set J to  new  set
+// item until iteration stops and False is returned.
+//
+// Inputs:
+//     SA          -   n-set
+//
+// Outputs:
+//     J           -   if:
+//                     * Result=True - index of element in the set
+//                     * Result=False - not set
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov.
+bool nisenumerate(niset *sa, ae_int_t *i) {
+   ae_int_t k;
+   bool result;
+   *i = 0;
+   k = sa->iteridx;
+   if (k >= sa->nstored) {
+      result = false;
+      return result;
+   }
+   *i = sa->items.xZ[k];
+   sa->iteridx = k + 1;
+   result = true;
+   return result;
+}
+
+void niset_init(void *_p, bool make_automatic) {
+   niset *p = (niset *)_p;
+   ae_vector_init(&p->items, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->locationof, 0, DT_INT, make_automatic);
+}
+
+void niset_copy(void *_dst, const void *_src, bool make_automatic) {
+   niset *dst = (niset *)_dst;
+   const niset *src = (const niset *)_src;
+   dst->n = src->n;
+   dst->nstored = src->nstored;
+   ae_vector_copy(&dst->items, &src->items, make_automatic);
+   ae_vector_copy(&dst->locationof, &src->locationof, make_automatic);
+   dst->iteridx = src->iteridx;
+}
+
+void niset_free(void *_p, bool make_automatic) {
+   niset *p = (niset *)_p;
+   ae_vector_free(&p->items, make_automatic);
+   ae_vector_free(&p->locationof, make_automatic);
+}
 } // end of namespace alglib_impl
 
 // === TRLINSOLVE Package ===

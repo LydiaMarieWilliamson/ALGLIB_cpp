@@ -35,10 +35,65 @@ void apbuffers_init(void *_p, bool make_automatic);
 void apbuffers_copy(void *_dst, const void *_src, bool make_automatic);
 void apbuffers_free(void *_p, bool make_automatic);
 
+// typedef ae_vector BVector; //(@) In Ap.h.
+void BVector_init(void *_p, bool make_automatic);
+void BVector_copy(void *_dst, const void *_src, bool make_automatic);
+void BVector_free(void *_p, bool make_automatic);
+
+// typedef ae_vector ZVector; //(@) In Ap.h.
+void ZVector_init(void *_p, bool make_automatic);
+void ZVector_copy(void *_dst, const void *_src, bool make_automatic);
+void ZVector_free(void *_p, bool make_automatic);
+
 // typedef ae_vector RVector; //(@) In Ap.h.
 void RVector_init(void *_p, bool make_automatic);
 void RVector_copy(void *_dst, const void *_src, bool make_automatic);
 void RVector_free(void *_p, bool make_automatic);
+
+struct nbpool {
+   ae_int_t n;
+   ae_int_t temporariescount;
+   ae_shared_pool sourcepool;
+   ae_shared_pool temporarypool;
+   BVector seed0;
+   BVector seedn;
+};
+void nbpool_init(void *_p, bool make_automatic);
+void nbpool_copy(void *_dst, const void *_src, bool make_automatic);
+void nbpool_free(void *_p, bool make_automatic);
+
+struct nipool {
+   ae_int_t n;
+   ae_int_t temporariescount;
+   ae_shared_pool sourcepool;
+   ae_shared_pool temporarypool;
+   ZVector seed0;
+   ZVector seedn;
+};
+void nipool_init(void *_p, bool make_automatic);
+void nipool_copy(void *_dst, const void *_src, bool make_automatic);
+void nipool_free(void *_p, bool make_automatic);
+
+struct nrpool {
+   ae_int_t n;
+   ae_int_t temporariescount;
+   ae_shared_pool sourcepool;
+   ae_shared_pool temporarypool;
+   RVector seed0;
+   RVector seedn;
+};
+void nrpool_init(void *_p, bool make_automatic);
+void nrpool_copy(void *_dst, const void *_src, bool make_automatic);
+void nrpool_free(void *_p, bool make_automatic);
+
+struct savgcounter {
+   double rsum;
+   double rcnt;
+   double prior;
+};
+void savgcounter_init(void *_p, bool make_automatic);
+void savgcounter_copy(void *_dst, const void *_src, bool make_automatic);
+void savgcounter_free(void *_p, bool make_automatic);
 
 double coalesce(double a, double b);
 ae_int_t coalescei(ae_int_t a, ae_int_t b);
@@ -77,6 +132,7 @@ void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n);
 void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n);
 bool isfinitevector(RVector *x, ae_int_t n);
 bool isfinitecvector(CVector *z, ae_int_t n);
+bool isfiniteornanvector(RVector *x, ae_int_t n);
 bool apservisfinitematrix(RMatrix *x, ae_int_t m, ae_int_t n);
 bool apservisfinitecmatrix(CMatrix *x, ae_int_t m, ae_int_t n);
 bool isfinitertrmatrix(RMatrix *x, ae_int_t n, bool isupper);
@@ -96,6 +152,7 @@ void swapc(complex *v0, complex *v1);
 void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows);
 void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols);
 void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth);
+void swapentriesb(BVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth);
 void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1);
 void swapelements(RVector *a, ae_int_t i0, ae_int_t i1);
 double possign(double x);
@@ -103,6 +160,9 @@ ae_int_t idivup(ae_int_t a, ae_int_t b);
 void alloccomplex(ae_serializer *s, complex v);
 void serializecomplex(ae_serializer *s, complex v);
 complex unserializecomplex(ae_serializer *s);
+void allocbooleanarray(ae_serializer *s, BVector *v, ae_int_t n);
+void serializebooleanarray(ae_serializer *s, BVector *v, ae_int_t n);
+void unserializebooleanarray(ae_serializer *s, BVector *v);
 void allocrealarray(ae_serializer *s, RVector *v, ae_int_t n);
 void serializerealarray(ae_serializer *s, RVector *v, ae_int_t n);
 void unserializerealarray(ae_serializer *s, RVector *v);
@@ -119,6 +179,15 @@ void copyrealmatrix(RMatrix *src, RMatrix *dst);
 void unsetintegerarray(ZVector *a);
 void unsetrealarray(RVector *a);
 void unsetrealmatrix(RMatrix *a);
+void nbpoolinit(nbpool *pool, ae_int_t n);
+void nbpoolretrieve(nbpool *pool, BVector *a);
+void nbpoolrecycle(nbpool *pool, BVector *a);
+void nipoolinit(nipool *pool, ae_int_t n);
+void nipoolretrieve(nipool *pool, ZVector *a);
+void nipoolrecycle(nipool *pool, ZVector *a);
+void nrpoolinit(nrpool *pool, ae_int_t n);
+void nrpoolretrieve(nrpool *pool, RVector *a);
+void nrpoolrecycle(nrpool *pool, RVector *a);
 ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize);
 ae_int_t tiledsplit(ae_int_t tasksize, ae_int_t tilesize);
 ae_int_t splitlength(ae_int_t tasksize, ae_int_t chunksize);
@@ -129,6 +198,10 @@ ae_int_t matrixtilesizea();
 ae_int_t matrixtilesizeb();
 double smpactivationlevel();
 double spawnlevel();
+double minspeedup();
+void savgcounterinit(savgcounter *c, double priorvalue);
+void savgcounterenqueue(savgcounter *c, double v);
+double savgcounterget(savgcounter *c);
 } // end of namespace alglib_impl
 
 // === ABLASF Package ===
@@ -169,6 +242,7 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t ix);
 void bsetv(ae_int_t n, bool v, BVector *y);
 void isetv(ae_int_t n, ae_int_t v, ZVector *y);
 void rsetv(ae_int_t n, double v, RVector *y);
+void csetv(ae_int_t n, complex v, CVector *y);
 void rsetvx(ae_int_t n, double v, RVector *y, ae_int_t y0);
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *y);
 void rsetr(ae_int_t n, double v, RMatrix *y, ae_int_t iy);
@@ -176,6 +250,7 @@ void rsetc(ae_int_t n, double v, RMatrix *y, ae_int_t jy);
 void bsetallocv(ae_int_t n, bool v, BVector *y);
 void isetallocv(ae_int_t n, ae_int_t v, ZVector *y);
 void rsetallocv(ae_int_t n, double v, RVector *y);
+void csetallocv(ae_int_t n, complex v, CVector *y);
 void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *y);
 void allocv(ae_int_t n, ae_vector *x);
 void allocm(ae_int_t m, ae_int_t n, ae_matrix *x);
@@ -289,6 +364,7 @@ ae_int_t getrbfserializationcode();
 ae_int_t getspline2dserializationcode();
 ae_int_t getidwserializationcode();
 ae_int_t getsparsematrixserializationcode();
+ae_int_t getspline2dwithmissingnodesserializationcode();
 ae_int_t getknnserializationcode();
 ae_int_t getlptestserializationcode();
 } // end of namespace alglib_impl
@@ -301,6 +377,7 @@ void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t
 void tagsortfast(RVector *a, RVector *bufa, ae_int_t n);
 void tagsortmiddleii(ZVector *a, ZVector *b, ae_int_t n, ae_int_t offset = 0);
 void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset = 0);
+void tagsortmiddleri(RVector *a, ZVector *b, ae_int_t n, ae_int_t offset = 0);
 void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset = 0);
 void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf);
 void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2);
@@ -342,6 +419,26 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf);
 // === APSTRUCT Package ===
 // Depends on: ABLASF
 namespace alglib_impl {
+struct niset {
+   ae_int_t n;
+   ae_int_t nstored;
+   ae_vector items;
+   ae_vector locationof;
+   ae_int_t iteridx;
+};
+void niset_init(void *_p, bool make_automatic);
+void niset_copy(void *_dst, const void *_src, bool make_automatic);
+void niset_free(void *_p, bool make_automatic);
+
+void nisinitemptyslow(ae_int_t n, niset *sa);
+void nisclear(niset *sa);
+void niscopy(niset *ssrc, niset *sdst);
+void nisaddelement(niset *sa, ae_int_t k);
+void nissubtract1(niset *sa, niset *src);
+ae_int_t niscount(niset *sa);
+bool nisequal(niset *s0, niset *s1);
+void nisstartenumeration(niset *sa);
+bool nisenumerate(niset *sa, ae_int_t *i);
 } // end of namespace alglib_impl
 
 // === TRLINSOLVE Package ===

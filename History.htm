@@ -717,6 +717,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 42	7576 1.0x 11906 1.0x 11498 1.0x 9885 1.0x 1680377853 (642887fd) 76 // Partial inclusion of updates in 3.20.0. TestC minbc failed (Other Properties).
 42	7692 1.0x 11766 0.9x 11632 1.0x 9518 1.0x 1680482344 (642a2028) 78 // Partial inclusion of updates in 3.20.0 staged. TestC minbc error corrected.
 42	7634 1.0x 11629 1.0x 11769 1.0x 7742 1.0x 1680735245 (642dfc0d) 79 // Upgrade of Ap.{cpp,h} to 3.20.0.
+42	7519 1.0x 11365 1.0x 11769 1.0x 9690 1.0x 1680990464 (6431e100) 76 // Upgrade of AlgLibInternal.{cpp,h} to 3.20.0.
 </pre>
 </p>
 <p>
@@ -770,19 +771,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7634
+* RGEMM-SEQ-16   (MFLOPS)   7519
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  11629
+* RGEMM-SEQ-32   (MFLOPS)  11365
 * RGEMM-MTN-32              1.0x
 * RGEMM-SEQ-64   (MFLOPS)  11769
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   7742
+* RGEMM-SEQ-1024 (MFLOPS)   9690
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1680735245 (642dfc0d)
+Seed: 1680990464 (6431e100)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -882,7 +883,7 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 79 seconds
+Done in 76 seconds
 </pre>
 </p>
 </div>
