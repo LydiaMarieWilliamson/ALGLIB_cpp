@@ -80696,6 +80696,7 @@ bool testlinreg() {
    bool grestOk;
    bool grotherOk;
    bool grconvOk;
+   bool genOk;
    bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(xy, 0, 0, DT_REAL);
@@ -80732,6 +80733,7 @@ bool testlinreg() {
    grestOk = true;
    grotherOk = true;
    grconvOk = true;
+   genOk = true;
    Ok = true;
 // Quantiles table setup
    qcnt = 5;
@@ -81291,12 +81293,13 @@ bool testlinreg() {
    }
 // TODO: Degenerate tests (when design matrix and right part are zero)
 // The final report.
-   Ok = slOk && slcOk && groptOk && grcovOk && grestOk && grotherOk && grconvOk;
+   genOk = groptOk && grcovOk && grestOk && grotherOk && grconvOk;
+   Ok = slOk && slcOk && genOk;
    if (!Ok || !silent) {
       printf("Regression Tests\n");
       printf("Straight Line Regression:                 %s\n", slOk ? "Ok" : "Failed");
       printf("Straight Line Regression Convergence:     %s\n", slcOk ? "Ok" : "Failed");
-      printf("General Linear Regression:\n");
+      printf("General Linear Regression:                %s\n", genOk ? "Ok" : "Failed");
       printf("* Optimality:                             %s\n", groptOk ? "Ok" : "Failed");
       printf("* Covariance Matrix:                      %s\n", grcovOk ? "Ok" : "Failed");
       printf("* Error Estimates:                        %s\n", grestOk ? "Ok" : "Failed");

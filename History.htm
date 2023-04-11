@@ -241,10 +241,10 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 		_ialglib_rmatrixsyrk(), _ialglib_rmatrixrank1(),
 		_ialglib_cmatrixherk(), _ialglib_cmatrixrank1()
 		all made local to Ap.cpp.
-	― 	_dbg_alloc_total, _use_dbg_counters, _use_vendor_kernels
+	―	_dbg_alloc_total, _use_dbg_counters, _use_vendor_kernels
 		debug_workstealing, dbgws_pushroot_ok, dbgws_pushroot_failed
 		all made local in Ap.cpp.
-	― 	x_nb, alglib_simd_alignment
+	―	x_nb, alglib_simd_alignment
 		alglib_r_block, alglib_half_r_block/2, alglib_twice_r_block,
 		alglib_c_block, alglib_half_c_block/2, alglib_twice_c_block
 		all remade as ae_int_t constants.
@@ -505,6 +505,7 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	∙	(Belated) normalizaiton of layout (e.g. if (A) { ⋯ break; } if (B) ⋯ ⇒ if (A) { ⋯ break; } else if (B) ⋯.
 	∙	Layout of comments and documentation fixed up.
 	∙	Routines local in Kernel*.cpp declared as static.
+	∙	TestC.cpp: linreg testing - separated out general linear regression tests subset.
 42	Integration of structural and layout changes made in 3.20.0.
 	∙	Adding and Renaming/redeclaring "Class" constructors/destructors:
 		―	ae_init_op: inherited from ae_constructor in ALGLIB 3.20.0.
@@ -526,6 +527,15 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 		―	Restored unsetrealmatrix(): it was changed in 3.20.0 so that it is no longer a duplicate of SetMatrix().
 	∙	Creating stubs for the APSTRUCT (AlgLibInternal) and RBFV3FARFIELDS (LinAlg) sub-packages.
 		Updating the sub-package dependency list to that of 3.20.0.
+42	Proactive changes to 3.20.0:
+	∙	LinAlg.cpp: Minor changes in rcond_cmatrixrcond{tr,lu}internal inherited from 3.20.0.
+	∙	DataAnalysis.cpp: Minor change in dsoptimalsplit2 inherited from 3.20.0.
+	∙	Ap.cpp: Added a alglib_impl::complex → alglib::complex constructor.
+		Simplified Complex() to a typecast, using the constructor.
+	∙	Ap.cpp: maxconcurrency() inherited from 3.20.0, but moved from APSERV in AlgLibInternal.cpp to Ap.cpp
+		as a supplement to (the already-revised) ae_cores_count().
+	∙	Ap.cpp: tickcount() redeclared as ae_int_t, instead of as int.
+	∙	Ap.cpp: Modified the type-casting in ae_{s,g}et_dbg_value().
 </pre>
 </p>
 <p>
@@ -695,6 +705,8 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 41	6135 1.0x 10639 1.2x 12350 1.0x 9362 1.0x 1659305283 (62e6fd43) 79 // Updating {Kernels*,Ap,AlgLibInternal}.* to 3.19.0.
 41	7692 1.0x 11629 1.0x 11368 1.0x 9373 1.0x 1676490974 (63ed38de) 77 // Finishing 3.19.0 update, TestC rbf failed.
 41	7813 1.0x 11766 1.0x 11909 1.0x 9828 1.0x 1676680343 (63f01c97) 76 // Finished 3.19.0 update. TestC rbf failure due to a hidden bug inherited from ALGLIB_cpp.
+42	7576 1.0x 11906 1.0x 11498 1.0x 9885 1.0x 1680377853 (642887fd) 76 // Partial inclusion of updates in 3.20.0. TestC minbc failed (Other Properties).
+42	7692 1.0x 11766 0.9x 11632 1.0x 9518 1.0x 1680482344 (642a2028) 78 // Partial inclusion of updates in 3.20.0 staged. TestC minbc error corrected.
 </pre>
 </p>
 <p>
@@ -748,19 +760,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7813
+* RGEMM-SEQ-16   (MFLOPS)   7692
 * RGEMM-MTN-16              1.0x
 * RGEMM-SEQ-32   (MFLOPS)  11766
-* RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11909
+* RGEMM-MTN-32              0.9x
+* RGEMM-SEQ-64   (MFLOPS)  11632
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9828
+* RGEMM-SEQ-1024 (MFLOPS)   9518
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1676680343 (63f01c97)
+Seed: 1680482344 (642a2028)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -860,7 +872,7 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 76 seconds
+Done in 78 seconds
 </pre>
 </p>
 </div>

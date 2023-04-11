@@ -27559,7 +27559,7 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
 // RC == 0 if something happens
    *rc = 0.0;
 // init
-   if (n <= 0) {
+   if (n < 0) {
       ae_frame_leave();
       return;
    }
@@ -28099,17 +28099,17 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
    NewVector(cwork2, 0, DT_COMPLEX);
    NewVector(cwork3, 0, DT_COMPLEX);
    NewVector(cwork4, 0, DT_COMPLEX);
-   if (n <= 0) {
+   *rc = 0.0;
+   if (n < 0) {
       ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&cwork2, n + 1);
-   *rc = 0.0;
    if (n == 0) {
       *rc = 1.0;
       ae_frame_leave();
       return;
    }
+   ae_vector_set_length(&cwork2, n + 1);
 // prepare parameters for triangular solver
    maxgrowth = 1.0 / rcondthreshold();
    su = 0.0;

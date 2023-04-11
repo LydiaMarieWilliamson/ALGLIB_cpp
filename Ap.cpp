@@ -349,15 +349,21 @@ const/* AutoS */ae_cpuid_t CurCPU = ae_cpuid();
 ae_int_t ae_cores_count() {
 #if AE_OS == AE_POSIX
    return sysconf(_SC_NPROCESSORS_ONLN);
-#   if 0 //(@) Was:
-   long Cores = sysconf(_SC_NPROCESSORS_ONLN);
-   return Cores <= 0 ? 1 : Cores;
-#   endif
 #elif AE_OS == AE_WINDOWS
    SYSTEM_INFO sysInfo; GetSystemInfo(&sysInfo);
    return (ae_int_t)sysInfo.dwNumberOfProcessors;
 #else
    return 1;
+#endif
+}
+
+// The maximum concurrency on the given system, with the given compilation settings.
+// Set to 1 on error or if fast kernels are disabled.
+ae_int_t maxconcurrency() {
+#if defined ALGLIB_NO_FAST_KERNELS
+   return 1;
+#else
+   ae_int_t Cores = ae_cores_count(); return Cores < 0 ? 1 : Cores;
 #endif
 }
 
@@ -414,8 +420,8 @@ ae_int64_t ae_get_dbg_value(debug_flag_t id) {
 #if defined AE_SMP
       case _ALGLIB_CORES_COUNT: return ae_cores_count();
 #endif
-      case _ALGLIB_GLOBAL_THREADING: return (ae_int64_t)ae_get_global_threading();
-      case _ALGLIB_NWORKERS: return (ae_int64_t)_alglib_cores_to_use;
+      case _ALGLIB_GLOBAL_THREADING: return ae_get_global_threading();
+      case _ALGLIB_NWORKERS: return _alglib_cores_to_use;
    // Unknown value.
       default: return 0;
    }
@@ -434,7 +440,7 @@ void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
 
 // A wrapper around OS-dependent clock routines.
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-int tickcount() {
+ae_int_t tickcount() {
    struct timeval now;
    ae_int64_t r, v;
    gettimeofday(&now, NULL);
@@ -442,18 +448,18 @@ int tickcount() {
    r = v * 1000;
    v = now.tv_usec / 1000;
    r += v;
-   return r;
+   return (ae_int_t)r;
 #   if 0
    struct timespec now;
    return clock_gettime(CLOCK_MONOTONIC, &now) ? 0 : now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
 #   endif
 }
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-int tickcount() {
-   return (int)GetTickCount();
+ae_int_t tickcount() {
+   return (ae_int_t)GetTickCount();
 }
 #else
-int tickcount() {
+ae_int_t tickcount() {
    return 0;
 }
 #endif
@@ -464,7 +470,7 @@ ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
       ae_int_t iptr;
    } u;
    u.ptr = ptr;
-   return (ae_int_t)(u.iptr % alignment);
+   return u.iptr % (ae_int_t)alignment;
 }
 
 void *ae_align(void *ptr, size_t alignment) {
@@ -2206,7 +2212,7 @@ static bool cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
 
 static bool cpp_writer(const char *p_string, ae_int_t aux) {
    std::ostream *stream = reinterpret_cast<std::ostream *>(aux);
-   stream->write(p_string, strlen(p_string));
+   stream->write(p_string, (std::streamsize)strlen(p_string));
    return !stream->bad();
 }
 
@@ -6183,7 +6189,7 @@ std::string boolean_1d_array::tostring() const { return length() == 0 ? "[]" : a
 #endif
 boolean_1d_array::~boolean_1d_array() { }
 
-const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) { return static_cast<const boolean_1d_array &>(assign(rhs)); }
+const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) { assign(rhs); return *this; }
 const bool &boolean_1d_array::operator()(ae_int_t i) const { return This->xB[i]; }
 bool &boolean_1d_array::operator()(ae_int_t i) { return This->xB[i]; }
 const bool &boolean_1d_array::operator[](ae_int_t i) const { return This->xB[i]; }
@@ -6209,7 +6215,7 @@ std::string integer_1d_array::tostring() const { return length() == 0 ? "[]" : a
 #endif
 integer_1d_array::~integer_1d_array() { }
 
-const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) { return static_cast<const integer_1d_array &>(assign(rhs)); }
+const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) { assign(rhs); return *this; }
 const ae_int_t &integer_1d_array::operator()(ae_int_t i) const { return This->xZ[i]; }
 ae_int_t &integer_1d_array::operator()(ae_int_t i) { return This->xZ[i]; }
 const ae_int_t &integer_1d_array::operator[](ae_int_t i) const { return This->xZ[i]; }
@@ -6235,7 +6241,7 @@ std::string real_1d_array::tostring(int dps) const { return length() == 0 ? "[]"
 #endif
 real_1d_array::~real_1d_array() { }
 
-const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) { return static_cast<const real_1d_array &>(assign(rhs)); }
+const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) { assign(rhs); return *this; }
 const double &real_1d_array::operator()(ae_int_t i) const { return This->xR[i]; }
 double &real_1d_array::operator()(ae_int_t i) { return This->xR[i]; }
 const double &real_1d_array::operator[](ae_int_t i) const { return This->xR[i]; }
@@ -6283,7 +6289,7 @@ std::string complex_1d_array::tostring(int dps) const { return length() == 0 ? "
 #endif
 complex_1d_array::~complex_1d_array() { }
 
-const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) { return static_cast<const complex_1d_array &>(assign(rhs)); }
+const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) { assign(rhs); return *this; }
 const complex &complex_1d_array::operator()(ae_int_t i) const { return *(const complex *)(This->xC + i); }
 complex &complex_1d_array::operator()(ae_int_t i) { return *(complex *)(This->xC + i); }
 const complex &complex_1d_array::operator[](ae_int_t i) const { return *(const complex *)(This->xC + i); }
@@ -6425,7 +6431,7 @@ std::string boolean_2d_array::tostring() const {
 #endif
 boolean_2d_array::~boolean_2d_array() { }
 
-const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs) { return static_cast<const boolean_2d_array &>(assign(rhs)); }
+const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs) { assign(rhs); return *this; }
 const bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyB[i][j]; }
 bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyB[i][j]; }
 const bool *boolean_2d_array::operator[](ae_int_t i) const { return This->xyB[i]; }
@@ -6456,7 +6462,7 @@ std::string integer_2d_array::tostring() const {
 #endif
 integer_2d_array::~integer_2d_array() { }
 
-const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs) { return static_cast<const integer_2d_array &>(assign(rhs)); }
+const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs) { assign(rhs); return *this; }
 const ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyZ[i][j]; }
 ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyZ[i][j]; }
 const ae_int_t *integer_2d_array::operator[](ae_int_t i) const { return This->xyZ[i]; }
@@ -6487,7 +6493,7 @@ std::string real_2d_array::tostring(int dps) const {
 #endif
 real_2d_array::~real_2d_array() { }
 
-const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) { return static_cast<const real_2d_array &>(assign(rhs)); }
+const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) { assign(rhs); return *this; }
 const double &real_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyR[i][j]; }
 double &real_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyR[i][j]; }
 const double *real_2d_array::operator[](ae_int_t i) const { return This->xyR[i]; }
@@ -6541,7 +6547,7 @@ std::string complex_2d_array::tostring(int dps) const {
 #endif
 complex_2d_array::~complex_2d_array() { }
 
-const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs) { return static_cast<const complex_2d_array &>(assign(rhs)); }
+const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs) { assign(rhs); return *this; }
 const complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) const { return *(const complex *)(This->xyC[i] + j); }
 complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) { return *(complex *)(This->xyC[i] + j); }
 const complex *complex_2d_array::operator[](ae_int_t i) const { return (const complex *)This->xyC[i]; }

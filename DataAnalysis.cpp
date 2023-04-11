@@ -794,7 +794,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // Test for errors in inputs
-   if (n < 0) {
+   if (n <= 0) {
       *info = -1;
       ae_frame_leave();
       return;

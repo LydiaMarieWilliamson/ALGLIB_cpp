@@ -251,6 +251,7 @@ void ae_set_global_threading(ae_uint64_t flg_value);
 typedef enum { CPU_SSE2 = 0x1, CPU_AVX2 = 0x2, CPU_FMA = 0x4 } ae_cpuid_t;
 extern const ae_cpuid_t CurCPU;
 ae_int_t ae_cores_count();
+ae_int_t maxconcurrency();
 ae_int_t ae_get_effective_workers(ae_int_t nworkers);
 
 // Id values for ae_[sg]et_dbg_value().
@@ -286,7 +287,7 @@ typedef enum {
 ae_int64_t ae_get_dbg_value(debug_flag_t id);
 void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
 
-int tickcount();
+ae_int_t tickcount();
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment);
 void *ae_align(void *ptr, size_t alignment);
@@ -875,7 +876,7 @@ void clear_error_flag();
 #define DecVar(X)	, X(&Obj.X)
 #define DecComplex(X)	, X(*(complex *)&Obj.X)
 #define ConstT(T, Val)	(const_cast<alglib_impl::T *>((Val).c_ptr()))
-#define ComplexOf(Val)	(*reinterpret_cast<complex *>(&(Val)))
+#define ComplexOf(Val)	((alglib::complex)(Val))
 
 // Pseudo-templates for ALGLIB++ "Class" types:
 // The triple-layering -- also present in the distribution version of ALGLIB --
@@ -967,6 +968,7 @@ struct complex {
    complex(const double &X): x(X), y(0.0) { }
    complex(const double &X, const double &Y): x(X), y(Y) { }
    complex(const complex &Z): x(Z.x), y(Z.y) { }
+   complex(const alglib_impl::complex &Z): x(Z.x), y(Z.y) { }
    complex &operator=(const double &v);
    complex &operator=(const complex &z);
    complex &operator+=(const double &v);
