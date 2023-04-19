@@ -6803,11 +6803,13 @@ bool testtsort() {
    NewVector(a4, 0, DT_INT);
    NewVector(a5, 0, DT_INT);
    NewVector(a6, 0, DT_INT);
+   NewVector(a7, 0, DT_REAL);
    NewVector(pa4, 0, DT_INT);
    NewVector(ar, 0, DT_REAL);
    NewVector(ar2, 0, DT_REAL);
    NewVector(ai, 0, DT_INT);
    NewVector(ai2, 0, DT_INT);
+   NewVector(ai3, 0, DT_INT);
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
    NewVector(bufr1, 0, DT_REAL);
@@ -6835,10 +6837,12 @@ bool testtsort() {
          ae_vector_set_length(&a4, n);
          ae_vector_set_length(&a5, n);
          ae_vector_set_length(&a6, n);
+         ae_vector_set_length(&a7, n);
          ae_vector_set_length(&ar, n);
          ae_vector_set_length(&ar2, n);
          ae_vector_set_length(&ai, n);
          ae_vector_set_length(&ai2, n);
+         ae_vector_set_length(&ai3, n);
          for (i = 0; i < n; i++) {
             a.xR[i] = randominteger(100000000);
             a0.xR[i] = a.xR[i];
@@ -6848,10 +6852,12 @@ bool testtsort() {
             a4.xZ[i] = iround(a.xR[i]);
             a5.xZ[i] = iround(a.xR[i]);
             a6.xZ[i] = iround(a.xR[i]);
+            a7.xR[i] = a.xR[i];
             ar.xR[i] = i;
             ar2.xR[i] = i;
             ai.xZ[i] = i;
             ai2.xZ[i] = i;
+            ai3.xZ[i] = i;
          }
          tagsort(&a0, n, &p1, &p2);
          Ok = Ok && testtsortunit_testsortresults(&a0, &p1, &p2, &a, n);
@@ -6883,6 +6889,10 @@ bool testtsort() {
             tagsortmiddleii(&a6, &ai2, n);
             for (i = 0; i < n; i++) {
                Ok = Ok && a6.xZ[i] == a0.xR[i] && ai2.xZ[i] == p1.xZ[i];
+            }
+            tagsortmiddleri(&a7, &ai3, n);
+            for (i = 0; i < n; i++) {
+               Ok = Ok && a7.xR[i] == a0.xR[i] && ai3.xZ[i] == p1.xZ[i];
             }
          }
       // Non-distinct sort.
@@ -7032,16 +7042,20 @@ bool testtsort() {
          ae_vector_set_length(&i1, m);
          ae_vector_set_length(&i2, m);
          ae_vector_set_length(&i3, m);
+         ae_vector_set_length(&a7, m);
          ae_vector_set_length(&ar, m);
          ae_vector_set_length(&ar2, m);
          ae_vector_set_length(&ai2, m);
+         ae_vector_set_length(&ai3, m);
          for (i = 0; i < m; i++) {
             i1.xZ[i] = randominteger(100000000);
             i2.xZ[i] = i1.xZ[i];
             i3.xZ[i] = i1.xZ[i];
+            a7.xR[i] = i1.xZ[i];
             ar.xR[i] = i;
             ar2.xR[i] = i;
             ai2.xZ[i] = i;
+            ai3.xZ[i] = i;
          }
          for (i = 0; i < n; i++) {
             i1.xZ[i] = i1.xZ[offs + i];
@@ -7060,6 +7074,11 @@ bool testtsort() {
          for (i = 0; i < n; i++) {
             Ok = Ok && i3.xZ[offs + i] == i1.xZ[i];
             Ok = Ok && (!distinctvals || ai2.xZ[offs + i] == ar.xR[i]);
+         }
+         tagsortmiddleri(&a7, &ai3, n, offs);
+         for (i = 0; i < n; i++) {
+            Ok = Ok && a7.xR[offs + i] == i1.xZ[i];
+            Ok = Ok && (!distinctvals || ai3.xZ[offs + i] == ar.xR[i]);
          }
       }
    }
@@ -87180,6 +87199,42 @@ bool testmlptrain() {
 }
 
 // === alglibbasics testing unit ===
+struct basicssint {
+   ae_int_t ival;
+};
+
+static void basicssint_init(void *_p, bool make_automatic) {
+}
+
+static void basicssint_copy(void *_dst, const void *_src, bool make_automatic) {
+   basicssint *dst = (basicssint *)_dst;
+   const basicssint *src = (const basicssint *)_src;
+   dst->ival = src->ival;
+}
+
+static void basicssint_free(void *_p, bool make_automatic) {
+}
+
+struct basicssintarr {
+   ae_vector arr;
+};
+
+static void basicssintarr_init(void *_p, bool make_automatic) {
+   basicssintarr *p = (basicssintarr *)_p;
+   ae_vector_init(&p->arr, 0, DT_INT, make_automatic);
+}
+
+static void basicssintarr_copy(void *_dst, const void *_src, bool make_automatic) {
+   basicssintarr *dst = (basicssintarr *)_dst;
+   const basicssintarr *src = (const basicssintarr *)_src;
+   ae_vector_copy(&dst->arr, &src->arr, make_automatic);
+}
+
+static void basicssintarr_free(void *_p, bool make_automatic) {
+   basicssintarr *p = (basicssintarr *)_p;
+   ae_vector_free(&p->arr, make_automatic);
+}
+
 struct rec4serialization {
    ae_vector b;
    ae_vector i;
@@ -88464,10 +88519,24 @@ static bool testalglibbasicsunit_testswapfunctions() {
 
 // Tests for standard functions
 static bool testalglibbasicsunit_teststandardfunctions() {
+   ae_int_t k;
+   ae_int_t n;
+   double v;
    bool Ok;
    Ok = true;
 // Test sign()
    Ok = Ok && sign(+1.2) == +1 && sign(0.0) == 0 && sign(-1.2) == -1;
+// Test random real/integer
+   for (k = 0; k <= 99; k++) {
+      v = randomreal();
+      Ok = Ok && v >= 0.0;
+      Ok = Ok && v <= 1.0;
+   }
+   for (k = 1; k <= 100; k++) {
+      n = randominteger(k);
+      Ok = Ok && n >= 0;
+      Ok = Ok && n < k;
+   }
 // summary
    if (!silent) {
       printf("Standard Functions:                       %s\n", Ok ? "Ok" : "Failed");
@@ -88575,6 +88644,296 @@ static void testalglibbasicsunit_parallelpoolsum(ae_shared_pool *sumpool, ae_int
    ae_frame_leave();
 }
 
+static bool testalglibbasicsunit_dotestpointers() {
+   ae_frame _frame_block;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   RefObj(poolrec2, ptr);
+// Test 1: test that:
+// a) smart pointer is null by default
+// b) New makes it non-null
+// c) setNull makes it null again
+   Ok = Ok && ptr == NULL;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   RepObj(poolrec2, ptr);
+   Ok = Ok && ptr != NULL;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   ae_smart_ptr_assign(&_ptr, NULL, false, false, 0, NULL, NULL);
+   Ok = Ok && ptr == NULL;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+// Test 2: reallocating pointer creates new instance
+   RepObj(poolrec2, ptr);
+   Ok = Ok && ptr != NULL;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   Ok = Ok && ptr->recval.i1val.cnt == 0;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   ae_vector_set_length(&ptr->recval.i1val, 1);
+   Ok = Ok && ptr->recval.i1val.cnt == 1;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   RepObj(poolrec2, ptr);
+   Ok = Ok && ptr != NULL;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   Ok = Ok && ptr->recval.i1val.cnt == 0;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testalglibbasicsunit_testpointers() {
+   bool Ok;
+   Ok = true;
+   Ok = Ok && testalglibbasicsunit_dotestpointers();
+   if (!Ok || !silent) {
+      if (Ok) {
+         printf("POINTERS:                                OK\n");
+      } else {
+         printf("POINTERS:                                FAILED\n");
+      }
+   }
+   return Ok;
+}
+
+static void testalglibbasicsunit_parallelappendobjarray(ae_obj_array *arr, ae_int_t i0, ae_int_t i1, bool rootcall) {
+   ae_frame _frame_block;
+   ae_int_t imid;
+   ae_frame_make(&_frame_block);
+   RefObj(basicssint, pint);
+   if (rootcall) {
+   }
+   if (i1 > i0 + 1) {
+      imid = i0 + (i1 - i0) / 2;
+      testalglibbasicsunit_parallelappendobjarray(arr, i0, imid, false);
+      testalglibbasicsunit_parallelappendobjarray(arr, imid, i1, false);
+      ae_frame_leave();
+      return;
+   }
+   RepObj(basicssint, pint);
+   pint->ival = i0;
+   ae_obj_array_append_transfer(arr, &_pint);
+   ae_frame_leave();
+}
+
+static void testalglibbasicsunit_parallelappendmodifyobjarray(ae_obj_array *arr, ae_int_t i0, ae_int_t i1, bool rootcall, ZVector *idxmap, ae_int_t n, ae_int_t target) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t k;
+   ae_int_t imid;
+   ae_frame_make(&_frame_block);
+   RefObj(basicssint, pint);
+   RefObj(basicssint, pint2);
+   if (rootcall) {
+   }
+   if (i1 > i0 + 1) {
+      imid = i0 + (i1 - i0) / 2;
+      testalglibbasicsunit_parallelappendmodifyobjarray(arr, i0, imid, false, idxmap, n, target + 1);
+      testalglibbasicsunit_parallelappendmodifyobjarray(arr, imid, i1, false, idxmap, n, target + 1);
+      for (i = i0; i < i1; i++) {
+         k = idxmap->xZ[i];
+         ae_assert(k >= 0 && k < n, "ParallelAppendObjArray: IdxMap[] corrupted");
+         ae_obj_array_get(arr, k, &_pint);
+         RepObj(basicssint, pint2);
+         pint2->ival = pint->ival - 1;
+         ae_obj_array_set_transfer(arr, k, &_pint2);
+      }
+      ae_frame_leave();
+      return;
+   }
+   RepObj(basicssint, pint);
+   pint->ival = target;
+   k = ae_obj_array_append_transfer(arr, &_pint);
+   ae_assert(k >= 0 && k < n, "ParallelAppendObjArray: incorrect K");
+   idxmap->xZ[i0] = k;
+   ae_frame_leave();
+}
+
+static bool testalglibbasicsunit_dotestobjarray() {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t n;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewObj(ae_obj_array, arr0);
+   NewObj(ae_obj_array, arr1);
+   NewObj(ae_obj_array, arr2);
+   NewObj(ae_obj_array, arr3);
+   RefObj(ae_obj_array, parr3);
+   NewObj(ae_shared_pool, pool3);
+   RefObj(basicssint, pint);
+   RefObj(basicssint, pint2);
+   RefObj(basicssintarr, pintarra);
+   RefObj(basicssintarr, pintarrb);
+   NewVector(bflag, 0, DT_BOOL);
+   NewVector(idxmap, 0, DT_INT);
+// Test 1: test that:
+// a) object array length is zero by default
+// b) appending element increases it by 1
+// c) elements that were added can be read and contain correct values
+// d) clearing array results in zero length
+   Ok = Ok && ae_obj_array_get_length(&arr0) == 0;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   n = 99;
+   for (i = 0; i < n; i++) {
+   // Prepare pointer to add
+      if (i % 2 != 0) {
+         RepObj(basicssint, pint);
+         pint->ival = i;
+      } else {
+         ae_smart_ptr_assign(&_pint, NULL, false, false, 0, NULL, NULL);
+      }
+   // Append, check length and contents
+      if (i % 5 == 0) {
+         ae_obj_array_append_transfer(&arr0, &_pint);
+         Ok = Ok && ae_obj_array_get_length(&arr0) == i + 1;
+      } else {
+         Ok = Ok && ae_obj_array_append_transfer(&arr0, &_pint) == i;
+      }
+   // Try reading pointer
+   //
+   // NOTE: we randomly change pInt2 prior to retrieving pointer from the array in order to check correctness
+      if (i % 3 != 0) {
+         RepObj(basicssint, pint2);
+         pint2->ival = 12345;
+      } else {
+         ae_smart_ptr_assign(&_pint2, NULL, false, false, 0, NULL, NULL);
+      }
+      ae_obj_array_get(&arr0, i, &_pint2);
+      if (i % 2 != 0) {
+         Ok = Ok && pint2 != NULL && pint2->ival == i;
+      } else {
+         Ok = Ok && pint2 == NULL;
+      }
+      if (!Ok) {
+         ae_frame_leave();
+         return Ok;
+      }
+   // Try changing pInt2 - changes should propagate to pInt
+      if (i % 2 != 0) {
+         pint2->ival = -i;
+         Ok = Ok && pint->ival == -i;
+      }
+   }
+   for (i = 0; i < n; i++) {
+      if (i % 2 != 0) {
+      // Read one more time to catch some errors that appear only after multiple operations with pointers
+         ae_obj_array_get(&arr0, i, &_pint);
+         Ok = Ok && pint != NULL && pint->ival == -i;
+      }
+   }
+   SetObj(ae_obj_array, &arr0);
+   Ok = Ok && ae_obj_array_get_length(&arr0) == 0;
+// Test 2: try parallel appends of sequentially increasing integers to ObjArray,
+// check that all integers are present in the result. Some multuthreading-related
+// bugs should be caught by this test.
+   n = 1000000;
+   testalglibbasicsunit_parallelappendobjarray(&arr1, 0, n, true);
+   ae_vector_set_length(&bflag, n);
+   for (i = 0; i < n; i++) {
+      bflag.xB[i] = false;
+   }
+   for (i = 0; i < n; i++) {
+      ae_obj_array_get(&arr1, i, &_pint);
+      if (pint == NULL || pint->ival < 0 || pint->ival >= n) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      Ok = Ok && !bflag.xB[pint->ival];
+      bflag.xB[pint->ival] = true;
+   }
+// Test 3: try concurrent appends combined with rewrites of existing elements.
+//
+// This test should fail on arrays with dynamic capacity because some of the
+// writes should happen during capacity increase and thus will be lost.
+   n = 1000000;
+   ae_vector_set_length(&idxmap, n);
+   for (i = 0; i < n; i++) {
+      idxmap.xZ[i] = -1;
+   }
+   ae_obj_array_fixed_capacity(&arr2, n);
+   Ok = Ok && ae_obj_array_get_length(&arr2) == 0;
+   testalglibbasicsunit_parallelappendmodifyobjarray(&arr2, 0, n, true, &idxmap, n, 117);
+   for (i = 0; i < n; i++) {
+      ae_obj_array_get(&arr2, i, &_pint);
+      if (pint == NULL) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      Ok = Ok && pint->ival == 117;
+   }
+// Test that arrays are successfully copied into shared pool and back
+//
+// During this test we check ability to correctly create a deep copy of
+// the ObjArray. In order to do so we spoil original instances of arrays
+// after the copying and check that spoiled values do not transfer to
+// copies.
+   RepObj(basicssintarr, pintarra);
+   ae_vector_set_length(&pintarra->arr, 1);
+   pintarra->arr.xZ[0] = 66;
+   ae_obj_array_append_transfer(&arr3, &_pintarra);
+   ae_shared_pool_set_seed(&pool3, &arr3, sizeof(arr3), (ae_init_op)ae_obj_array_init, (ae_copy_op)ae_obj_array_copy, (ae_free_op)ae_obj_array_free);
+   pintarra->arr.xZ[0] = -13;
+   for (i = 0; i <= 4; i++) {
+   // Retrieve element from the pool, check, spoil
+      ae_shared_pool_retrieve(&pool3, &_parr3);
+      Ok = Ok && parr3 != NULL;
+      if (!Ok) {
+         ae_frame_leave();
+         return Ok;
+      }
+      ae_obj_array_get(parr3, 0, &_pintarrb);
+      Ok = Ok && pintarrb->arr.cnt == 1 && pintarrb->arr.xZ[0] == 66;
+      if (!Ok) {
+         ae_frame_leave();
+         return Ok;
+      }
+      pintarrb->arr.xZ[0] = -13;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testalglibbasicsunit_testobjarray() {
+   bool Ok;
+   Ok = true;
+   Ok = Ok && testalglibbasicsunit_dotestobjarray();
+   if (!Ok || !silent) {
+      if (Ok) {
+         printf("OBJARRAY:                                OK\n");
+      } else {
+         printf("OBJARRAY:                                FAILED\n");
+      }
+   }
+   return Ok;
+}
+
 // TestPoolSum: summation with pool
 //
 // We perform summation of 500000 numbers (each of them is equal to 1) in the
@@ -88634,9 +88993,11 @@ bool testalglibbasics() {
    bool standardOk = testalglibbasicsunit_teststandardfunctions();
    bool serializationOk = testalglibbasicsunit_testserializationfunctions();
    bool sharedpoolOk = testalglibbasicsunit_testsharedpool();
+   bool pointersOk = testalglibbasicsunit_testpointers();
+   bool objarrayOk = testalglibbasicsunit_testobjarray();
    bool smpOk = testalglibbasicsunit_testsmp();
 // The final report.
-   bool Ok = complexOk && specialOk && swapOk && standardOk && serializationOk && sharedpoolOk && smpOk;
+   bool Ok = complexOk && specialOk && swapOk && standardOk && serializationOk && sharedpoolOk && pointersOk && objarrayOk && smpOk;
    if (!Ok || !silent) {
       printf("AlgLib Basics Test\n");
       printf("* Complex Functions:                      %s\n", complexOk ? "Ok" : "Failed");
@@ -88645,6 +89006,8 @@ bool testalglibbasics() {
       printf("* Standard Functions:                     %s\n", standardOk ? "Ok" : "Failed");
       printf("* Serialization Functions:                %s\n", serializationOk ? "Ok" : "Failed");
       printf("* Shared Pool Functions:                  %s\n", sharedpoolOk ? "Ok" : "Failed");
+      printf("* Pointers:                               %s\n", pointersOk ? "Ok" : "Failed");
+      printf("* Object Arrays:                          %s\n", objarrayOk ? "Ok" : "Failed");
       printf("* SMP:                                    %s\n", smpOk ? "Ok" : "Failed");
       printf("Test %s\n", Ok ? "Passed" : "Failed");
    }
@@ -88945,6 +89308,25 @@ int main(int argc, char **argv) {
       case AE_SKIP_TEST: printf("Testing Mode: just compiling\nDone in 0 seconds\n"); return EXIT_SUCCESS;
       default: printf("Testing Mode: unknown\n"); return EXIT_FAILURE;
    }
+// Allocation counter
+#ifdef AE_USE_ALLOC_COUNTER
+   printf("Allocation counter activated...\n");
+   _use_alloc_counter = true;
+   if (_alloc_counter != 0) {
+      printf("FAILURE: alloc_counter is non-zero on start!\n");
+      return 1;
+   }
+   {
+      void *p = aligned_malloc((size_t)1, (size_t)64);
+      if (_alloc_counter == 0)
+         printf(":::: WARNING: ALLOC_COUNTER IS INACTIVE!!! :::::\n");
+      aligned_free(p);
+      if (_alloc_counter != 0) {
+         printf("FAILURE: alloc_counter does not decrease!\n");
+         return 1;
+      }
+   }
+#endif
 // Now, we are ready to test!
    time(&time_0);
 #ifdef _ALGLIB_HAS_WORKSTEALING
@@ -88982,9 +89364,20 @@ int main(int argc, char **argv) {
 // Free structures
    free_mutex(&tests_mutex);
    free_mutex(&print_mutex);
-#ifdef AE_HPC
+#ifdef _ALGLIB_HAS_WORKSTEALING
    ae_free_disposed_items();
+#endif
+#ifdef AE_HPC
    ae_complete_finalization_before_exit();
+#endif
+// Test allocation counter
+#ifdef AE_USE_ALLOC_COUNTER
+   printf("Allocation counter checked... ");
+   if (_alloc_counter != 0) {
+      printf("FAILURE: alloc_counter is non-zero on end!\n");
+      return 1;
+   } else
+      printf("OK\n");
 #endif
 // Return the result.
    return global_failure_flag;

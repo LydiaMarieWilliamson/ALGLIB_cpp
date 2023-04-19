@@ -7118,12 +7118,7 @@ void sparsemv(sparsematrix *s, RVector *x, RVector *y) {
          }
          y->xR[i] = v;
          if (u > 0) {
-            lt = ri1 - u;
-            rt = ri1 - 1;
-            lt1 = i - u;
-            rt1 = i - 1;
-            v = x->xR[i];
-            ae_v_addd(&y->xR[lt1], 1, &s->vals.xR[lt], 1, rt1 - lt1 + 1, v);
+            raddvx(u, x->xR[i], &s->vals, ri1 - u, y, i - u);
          }
       }
       return;
@@ -7204,11 +7199,9 @@ void sparsemtv(sparsematrix *s, RVector *x, RVector *y) {
          u = s->uidx.xZ[i];
          if (d > 0) {
             lt = ri;
-            rt = ri + d - 1;
             lt1 = i - d;
-            rt1 = i - 1;
             v = x->xR[i];
-            ae_v_addd(&y->xR[lt1], 1, &s->vals.xR[lt], 1, rt1 - lt1 + 1, v);
+            raddvx(d, v, &s->vals, lt, y, lt1);
          }
          v = s->vals.xR[ri + d] * x->xR[i];
          if (u > 0) {
@@ -7363,12 +7356,7 @@ void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_
             }
             y->xR[i + iy] += alpha * v;
             if (u > 0) {
-               lt = ri1 - u;
-               rt = ri1 - 1;
-               lt1 = i - u + iy;
-               rt1 = i - 1 + iy;
-               v = alpha * x->xR[i + ix];
-               ae_v_addd(&y->xR[lt1], 1, &s->vals.xR[lt], 1, rt1 - lt1 + 1, v);
+               raddvx(u, alpha * x->xR[i + ix], &s->vals, ri1 - u, y, i - u + iy);
             }
          }
          return;
@@ -7405,12 +7393,7 @@ void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_
             d = s->didx.xZ[i];
             u = s->uidx.xZ[i];
             if (d > 0) {
-               lt = ri;
-               rt = ri + d - 1;
-               lt1 = i - d + iy;
-               rt1 = i - 1 + iy;
-               v = alpha * x->xR[i + ix];
-               ae_v_addd(&y->xR[lt1], 1, &s->vals.xR[lt], 1, rt1 - lt1 + 1, v);
+               raddvx(d, alpha * x->xR[i + ix], &s->vals, ri, y, i - d + iy);
             }
             v = alpha * s->vals.xR[ri + d] * x->xR[i + ix];
             if (u > 0) {
@@ -7746,7 +7729,6 @@ double sparsevsmv(sparsematrix *s, bool isupper, RVector *x) {
          result += v * s->vals.xR[ri + d] * v;
          if (d > 0 && !isupper) {
             lt = ri;
-            rt = ri + d - 1;
             lt1 = i - d;
             k = d - 1;
             v0 = x->xR[i];
@@ -7758,7 +7740,6 @@ double sparsevsmv(sparsematrix *s, bool isupper, RVector *x) {
          }
          if (u > 0 && isupper) {
             lt = ri1 - u;
-            rt = ri1 - 1;
             lt1 = i - u;
             k = u - 1;
             v0 = x->xR[i];
@@ -7864,7 +7845,6 @@ void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
          u = s->uidx.xZ[i];
          if (d > 0) {
             lt = ri;
-            rt = ri + d - 1;
             lt1 = i - d;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -7882,7 +7862,6 @@ void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
          }
          if (u > 0) {
             lt = ri1 - u;
-            rt = ri1 - 1;
             lt1 = i - u;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -7993,7 +7972,6 @@ void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
          u = s->uidx.xZ[i];
          if (d > 0) {
             lt = ri;
-            rt = ri + d - 1;
             lt1 = i - d;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -8011,7 +7989,6 @@ void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
          }
          if (u > 0) {
             lt = ri1 - u;
-            rt = ri1 - 1;
             lt1 = i - u;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -8134,7 +8111,6 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
          u = s->uidx.xZ[i];
          if (d > 0) {
             lt = ri;
-            rt = ri + d - 1;
             lt1 = i - d;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -8154,7 +8130,6 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
          }
          if (u > 0) {
             lt = ri1 - u;
-            rt = ri1 - 1;
             lt1 = i - u;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -8314,7 +8289,6 @@ void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b
          u = s->uidx.xZ[i];
          if (d > 0 && !isupper) {
             lt = ri;
-            rt = ri + d - 1;
             lt1 = i - d;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -8334,7 +8308,6 @@ void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b
          }
          if (u > 0 && isupper) {
             lt = ri1 - u;
-            rt = ri1 - 1;
             lt1 = i - u;
             rt1 = i - 1;
             for (j = lt1; j <= rt1; j++) {
@@ -15731,14 +15704,6 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
          ae_frame_leave();
          return result;
       }
-      if (zneeded == 2) {
-         ae_matrix_set_length(z, n, n);
-         for (i = 1; i <= n; i++) {
-            ae_v_move(z->xyR[i - 1], 1, &z1.xyR[i][1], 1, n);
-         }
-         ae_frame_leave();
-         return result;
-      }
       if (zneeded == 3) {
          ae_matrix_set_length(z, 1, n);
          ae_v_move(z->xyR[0], 1, &z1.xyR[1][1], 1, n);
@@ -19090,91 +19055,11 @@ void sluv2buffer_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === AMDORDERING Package ===
+// Depends on: (AlgLibInternal) ABLASF
 // Depends on: ABLAS, SPARSE
 namespace alglib_impl {
 static const ae_int_t amdordering_knsheadersize = 2;
 static const ae_int_t amdordering_llmentrysize = 6;
-
-// Initializes n-set by empty structure.
-//
-// IMPORTANT: this function need O(N) time for initialization. It is recommended
-//            to reduce its usage as much as possible, and use nsClear()
-//            where possible.
-//
-// Inputs:
-//     N           -   possible set size
-//
-// Outputs:
-//     SA          -   empty N-set
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nsinitemptyslow(ae_int_t n, amdnset *sa) {
-   sa->n = n;
-   sa->nstored = 0;
-   isetallocv(n, -999999999, &sa->locationof);
-   isetallocv(n, -999999999, &sa->items);
-}
-
-// Clears set
-//
-// Inputs:
-//     SA          -   set to be cleared
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nsclear(amdnset *sa) {
-   ae_int_t i;
-   ae_int_t ns;
-   ns = sa->nstored;
-   for (i = 0; i < ns; i++) {
-      sa->locationof.xZ[sa->items.xZ[i]] = -1;
-   }
-   sa->nstored = 0;
-}
-
-// Copies n-set to properly initialized target set. The target set has to  be
-// properly initialized, and it can be non-empty. If  it  is  non-empty,  its
-// contents is quickly erased before copying.
-//
-// The cost of this function is O(max(SrcSize,DstSize))
-//
-// Inputs:
-//     SSrc        -   source N-set
-//     SDst        -   destination N-set (has same size as SSrc)
-//
-// Outputs:
-//     SDst        -   copy of SSrc
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nscopy(amdnset *ssrc, amdnset *sdst) {
-   ae_int_t ns;
-   ae_int_t i;
-   ae_int_t k;
-   amdordering_nsclear(sdst);
-   ns = ssrc->nstored;
-   for (i = 0; i < ns; i++) {
-      k = ssrc->items.xZ[i];
-      sdst->items.xZ[i] = k;
-      sdst->locationof.xZ[k] = i;
-   }
-   sdst->nstored = ns;
-}
-
-// Add K-th element to the set. The element may already exist in the set.
-//
-// Inputs:
-//     SA          -   set
-//     K           -   element to add, 0 <= K < N.
-//
-// Outputs:
-//     SA          -   modified SA
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nsaddelement(amdnset *sa, ae_int_t k) {
-   ae_int_t ns;
-   if (sa->locationof.xZ[k] >= 0) {
-      return;
-   }
-   ns = sa->nstored;
-   sa->locationof.xZ[k] = ns;
-   sa->items.xZ[ns] = k;
-   sa->nstored = ns + 1;
-}
 
 // Add K-th set from the source kn-set
 //
@@ -19185,7 +19070,7 @@ static void amdordering_nsaddelement(amdnset *sa, ae_int_t k) {
 // Outputs:
 //     SA          -   modified SA
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nsaddkth(amdnset *sa, amdknset *src, ae_int_t k) {
+static void amdordering_nsaddkth(niset *sa, amdknset *src, ae_int_t k) {
    ae_int_t idxbegin;
    ae_int_t idxend;
    ae_int_t j;
@@ -19214,56 +19099,7 @@ static void amdordering_nsaddkth(amdnset *sa, amdknset *src, ae_int_t k) {
 // Outputs:
 //     SA          -   modified SA
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nssubtract1(amdnset *sa, amdnset *src) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t loc;
-   ae_int_t item;
-   ae_int_t ns;
-   ae_int_t ss;
-   ns = sa->nstored;
-   ss = src->nstored;
-   if (ss < ns) {
-      for (i = 0; i < ss; i++) {
-         j = src->items.xZ[i];
-         loc = sa->locationof.xZ[j];
-         if (loc >= 0) {
-            item = sa->items.xZ[ns - 1];
-            sa->items.xZ[loc] = item;
-            sa->locationof.xZ[item] = loc;
-            sa->locationof.xZ[j] = -1;
-            ns--;
-         }
-      }
-   } else {
-      i = 0;
-      while (i < ns) {
-         j = sa->items.xZ[i];
-         loc = src->locationof.xZ[j];
-         if (loc >= 0) {
-            item = sa->items.xZ[ns - 1];
-            sa->items.xZ[i] = item;
-            sa->locationof.xZ[item] = i;
-            sa->locationof.xZ[j] = -1;
-            ns--;
-         } else {
-            i++;
-         }
-      }
-   }
-   sa->nstored = ns;
-}
-
-// Subtracts K-th set from the source structure
-//
-// Inputs:
-//     SA          -   set
-//     Src, K      -   source kn-set and set index K
-//
-// Outputs:
-//     SA          -   modified SA
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nssubtractkth(amdnset *sa, amdknset *src, ae_int_t k) {
+static void amdordering_nssubtractkth(niset *sa, amdknset *src, ae_int_t k) {
    ae_int_t idxbegin;
    ae_int_t idxend;
    ae_int_t j;
@@ -19288,20 +19124,6 @@ static void amdordering_nssubtractkth(amdnset *sa, amdknset *src, ae_int_t k) {
    sa->nstored = ns;
 }
 
-// Counts set elements
-//
-// Inputs:
-//     SA          -   set
-//
-// Result:
-//     number of elements in SA
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static ae_int_t amdordering_nscount(amdnset *sa) {
-   ae_int_t result;
-   result = sa->nstored;
-   return result;
-}
-
 // Counts set elements not present in the K-th set of the source structure
 //
 // Inputs:
@@ -19311,7 +19133,7 @@ static ae_int_t amdordering_nscount(amdnset *sa) {
 // Result:
 //     number of elements in SA not present in Src[K]
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static ae_int_t amdordering_nscountnotkth(amdnset *sa, amdknset *src, ae_int_t k) {
+static ae_int_t amdordering_nscountnotkth(niset *sa, amdknset *src, ae_int_t k) {
    ae_int_t idxbegin;
    ae_int_t idxend;
    ae_int_t intersectcnt;
@@ -19339,7 +19161,7 @@ static ae_int_t amdordering_nscountnotkth(amdnset *sa, amdknset *src, ae_int_t k
 // Result:
 //     number of elements in SA also present in Src[K]
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static ae_int_t amdordering_nscountandkth(amdnset *sa, amdknset *src, ae_int_t k) {
+static ae_int_t amdordering_nscountandkth(niset *sa, amdknset *src, ae_int_t k) {
    ae_int_t idxbegin;
    ae_int_t idxend;
    ae_int_t result;
@@ -19355,81 +19177,6 @@ static ae_int_t amdordering_nscountandkth(amdnset *sa, amdknset *src, ae_int_t k
    return result;
 }
 #endif
-
-// Compare two sets, returns True for equal sets
-//
-// Inputs:
-//     S0          -   set 0
-//     S1          -   set 1, must have same parameter N as set 0
-//
-// Result:
-//     True, if sets are equal
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static bool amdordering_nsequal(amdnset *s0, amdnset *s1) {
-   ae_int_t i;
-   ae_int_t ns0;
-   ae_int_t ns1;
-   bool result;
-   result = false;
-   if (s0->n != s1->n) {
-      return result;
-   }
-   if (s0->nstored != s1->nstored) {
-      return result;
-   }
-   ns0 = s0->nstored;
-   ns1 = s1->nstored;
-   for (i = 0; i < ns0; i++) {
-      if (s1->locationof.xZ[s0->items.xZ[i]] < 0) {
-         return result;
-      }
-   }
-   for (i = 0; i < ns1; i++) {
-      if (s0->locationof.xZ[s1->items.xZ[i]] < 0) {
-         return result;
-      }
-   }
-   result = true;
-   return result;
-}
-
-// Prepares iteration over set
-//
-// Inputs:
-//     SA          -   set
-//
-// Outputs:
-//     SA          -   SA ready for repeated calls of nsEnumerate()
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_nsstartenumeration(amdnset *sa) {
-   sa->iteridx = 0;
-}
-
-// Iterates over the set. Subsequent calls return True and set J to  new  set
-// item until iteration stops and False is returned.
-//
-// Inputs:
-//     SA          -   n-set
-//
-// Outputs:
-//     J           -   if:
-//                     * Result == True - index of element in the set
-//                     * Result == False - not set
-// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static bool amdordering_nsenumerate(amdnset *sa, ae_int_t *i) {
-   ae_int_t k;
-   bool result;
-   *i = 0;
-   k = sa->iteridx;
-   if (k >= sa->nstored) {
-      result = false;
-      return result;
-   }
-   *i = sa->items.xZ[k];
-   sa->iteridx = k + 1;
-   result = true;
-   return result;
-}
 
 // Compresses internal storage, reclaiming previously dropped blocks. To be
 // used internally by kn-set modification functions.
@@ -19678,7 +19425,7 @@ static void amdordering_knsaddnewelement(amdknset *sa, ae_int_t i, ae_int_t k) {
 // Outputs:
 //     SA          -   I-th set except for elements in Src
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_knssubtract1(amdknset *sa, ae_int_t i, amdnset *src) {
+static void amdordering_knssubtract1(amdknset *sa, ae_int_t i, niset *src) {
    ae_int_t j;
    ae_int_t idxbegin;
    ae_int_t idxend;
@@ -19757,7 +19504,7 @@ static ae_int_t amdordering_knscountkth(amdknset *s0, ae_int_t k) {
 // Result:
 //     count
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static ae_int_t amdordering_knscountnot(amdknset *s0, ae_int_t i, amdnset *s1) {
+static ae_int_t amdordering_knscountnot(amdknset *s0, ae_int_t i, niset *s1) {
    ae_int_t idxbegin0;
    ae_int_t cnt0;
    ae_int_t j;
@@ -19940,13 +19687,13 @@ static void amdordering_mtxinit(ae_int_t n, amdllmatrix *a) {
 // Outputs:
 //     S           -   elements from J-th column are added to S
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static void amdordering_mtxaddcolumnto(amdllmatrix *a, ae_int_t j, amdnset *s) {
+static void amdordering_mtxaddcolumnto(amdllmatrix *a, ae_int_t j, niset *s) {
    ae_int_t n;
    ae_int_t eidx;
    n = a->n;
    eidx = a->vbegin.xZ[n + j];
    while (eidx >= 0) {
-      amdordering_nsaddelement(s, a->entries.xZ[eidx * amdordering_llmentrysize + 4]);
+      nisaddelement(s, a->entries.xZ[eidx * amdordering_llmentrysize + 4]);
       eidx = a->entries.xZ[eidx * amdordering_llmentrysize + 3];
    }
 }
@@ -20009,7 +19756,7 @@ static void amdordering_mtxinsertnewelement(amdllmatrix *a, ae_int_t i, ae_int_t
 // Result:
 //     element count
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-static ae_int_t amdordering_mtxcountcolumnnot(amdllmatrix *a, ae_int_t j, amdnset *s) {
+static ae_int_t amdordering_mtxcountcolumnnot(amdllmatrix *a, ae_int_t j, niset *s) {
    ae_int_t n;
    ae_int_t eidx;
    ae_int_t result;
@@ -20390,18 +20137,18 @@ static void amdordering_amdselectpivotelement(amdbuffer *buf, ae_int_t k, ae_int
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static void amdordering_amdcomputelp(amdbuffer *buf, ae_int_t p) {
    ae_int_t i;
-   amdordering_nsclear(&buf->setp);
+   nisclear(&buf->setp);
    amdordering_nsaddkth(&buf->setp, &buf->setsuper, p);
-   amdordering_nsclear(&buf->lp);
+   nisclear(&buf->lp);
    amdordering_nsaddkth(&buf->lp, &buf->seta, p);
    for (amdordering_knsstartenumeration(&buf->sete, p); amdordering_knsenumerate(&buf->sete, &i); ) {
       amdordering_mtxaddcolumnto(&buf->mtxl, i, &buf->lp);
    }
    amdordering_nssubtractkth(&buf->lp, &buf->setsuper, p);
-   amdordering_nscopy(&buf->lp, &buf->setrp);
-   amdordering_nssubtract1(&buf->setrp, &buf->setq);
+   niscopy(&buf->lp, &buf->setrp);
+   nissubtract1(&buf->setrp, &buf->setq);
    buf->lscnt = 0;
-   for (amdordering_nsstartenumeration(&buf->lp); amdordering_nsenumerate(&buf->lp, &i); ) {
+   for (nisstartenumeration(&buf->lp); nisenumerate(&buf->lp, &i); ) {
       ae_assert(!buf->iseliminated.xB[i], "AMD: integrity check 0740 failed");
       amdordering_mtxinsertnewelement(&buf->mtxl, i, p);
       if (buf->issupernode.xB[i]) {
@@ -20409,7 +20156,7 @@ static void amdordering_amdcomputelp(amdbuffer *buf, ae_int_t p) {
          buf->lscnt++;
       }
    }
-   amdordering_nsclear(&buf->ep);
+   nisclear(&buf->ep);
    amdordering_nsaddkth(&buf->ep, &buf->sete, p);
 }
 
@@ -20471,7 +20218,7 @@ static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t 
          }
       }
    }
-   amdordering_nsclear(&buf->setqsupercand);
+   nisclear(&buf->setqsupercand);
    for (lidx = 0; lidx < buf->lscnt; lidx++) {
       if (buf->setq.locationof.xZ[buf->ls.xZ[lidx]] < 0) {
          lpi = buf->ls.xZ[lidx];
@@ -20479,7 +20226,7 @@ static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t 
          amdordering_knssubtract1(&buf->seta, lpi, &buf->setp);
          amdordering_knssubtract1(&buf->sete, lpi, &buf->ep);
          amdordering_knsaddnewelement(&buf->sete, lpi, p);
-         cntq = amdordering_nscount(&buf->setq);
+         cntq = niscount(&buf->setq);
          cntsuperi = amdordering_knscountkth(&buf->setsuper, lpi);
          cntainoti = amdordering_knscountkth(&buf->seta, lpi);
          if (cntq > 0) {
@@ -20487,8 +20234,8 @@ static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t 
          } else {
             cntainotqi = cntainoti;
          }
-         cntlpnoti = amdordering_nscount(&buf->lp) - cntsuperi;
-         cntlpnotqi = amdordering_nscount(&buf->setrp) - cntsuperi;
+         cntlpnoti = niscount(&buf->lp) - cntsuperi;
+         cntlpnotqi = niscount(&buf->setrp) - cntsuperi;
          cc = 0;
          amdordering_knsdirectaccess(&buf->sete, lpi, &idxbegin, &idxend);
          for (jj = idxbegin; jj < idxend; jj++) {
@@ -20506,16 +20253,16 @@ static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t 
             }
             cc += e;
          }
-         bnd0 = n - k - amdordering_nscount(&buf->setp);
+         bnd0 = n - k - niscount(&buf->setp);
          bnd1 = amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) + cntlpnoti;
          bnd2 = cntq + cntainotqi + cntlpnotqi + cc;
          d = imin3(bnd0, bnd1, bnd2);
          amdordering_vtxupdateapproximatedegree(&buf->vertexdegrees, lpi, d);
          if (tau > 0 && d + cntsuperi > tau) {
-            amdordering_nsaddelement(&buf->setqsupercand, lpi);
+            nisaddelement(&buf->setqsupercand, lpi);
          }
          if (buf->checkexactdegrees) {
-            amdordering_nsclear(&buf->exactdegreetmp0);
+            nisclear(&buf->exactdegreetmp0);
             for (amdordering_knsstartenumeration(&buf->sete, lpi); amdordering_knsenumerate(&buf->sete, &j); ) {
                amdordering_mtxaddcolumnto(&buf->mtxl, j, &buf->exactdegreetmp0);
             }
@@ -20563,11 +20310,11 @@ static void amdordering_amddetectsupernodes(amdbuffer *buf) {
       if (buf->setq.locationof.xZ[buf->ls.xZ[i]] < 0) {
          lpi = buf->ls.xZ[i];
          hashi = (amdordering_knssumkth(&buf->seta, lpi) + amdordering_knssumkth(&buf->sete, lpi)) % n;
-         amdordering_nsaddelement(&buf->nonemptybuckets, hashi);
+         nisaddelement(&buf->nonemptybuckets, hashi);
          amdordering_knsaddnewelement(&buf->hashbuckets, hashi, lpi);
       }
    }
-   for (amdordering_nsstartenumeration(&buf->nonemptybuckets); amdordering_nsenumerate(&buf->nonemptybuckets, &hashi); ) {
+   for (nisstartenumeration(&buf->nonemptybuckets); nisenumerate(&buf->nonemptybuckets, &hashi); ) {
       if (amdordering_knscountkth(&buf->hashbuckets, hashi) >= 2) {
          cnt = 0;
          for (amdordering_knsstartenumeration(&buf->hashbuckets, hashi); amdordering_knsenumerate(&buf->hashbuckets, &i); ) {
@@ -20579,17 +20326,17 @@ static void amdordering_amddetectsupernodes(amdbuffer *buf) {
                if (buf->issupernode.xB[buf->sncandidates.xZ[i]] && buf->issupernode.xB[buf->sncandidates.xZ[j]]) {
                   lpi = buf->sncandidates.xZ[i];
                   lpj = buf->sncandidates.xZ[j];
-                  amdordering_nsclear(&buf->adji);
-                  amdordering_nsclear(&buf->adjj);
+                  nisclear(&buf->adji);
+                  nisclear(&buf->adjj);
                   amdordering_nsaddkth(&buf->adji, &buf->seta, lpi);
                   amdordering_nsaddkth(&buf->adjj, &buf->seta, lpj);
                   amdordering_nsaddkth(&buf->adji, &buf->sete, lpi);
                   amdordering_nsaddkth(&buf->adjj, &buf->sete, lpj);
-                  amdordering_nsaddelement(&buf->adji, lpi);
-                  amdordering_nsaddelement(&buf->adji, lpj);
-                  amdordering_nsaddelement(&buf->adjj, lpi);
-                  amdordering_nsaddelement(&buf->adjj, lpj);
-                  if (!amdordering_nsequal(&buf->adji, &buf->adjj)) {
+                  nisaddelement(&buf->adji, lpi);
+                  nisaddelement(&buf->adji, lpj);
+                  nisaddelement(&buf->adjj, lpi);
+                  nisaddelement(&buf->adjj, lpj);
+                  if (!nisequal(&buf->adji, &buf->adjj)) {
                      continue;
                   }
                   nj = amdordering_knscountkth(&buf->setsuper, lpj);
@@ -20609,7 +20356,7 @@ static void amdordering_amddetectsupernodes(amdbuffer *buf) {
       }
       amdordering_knsclearkthnoreclaim(&buf->hashbuckets, hashi);
    }
-   amdordering_nsclear(&buf->nonemptybuckets);
+   nisclear(&buf->nonemptybuckets);
 }
 
 // Assign quasidense status to proposed supervars,  perform all the necessary
@@ -20626,15 +20373,15 @@ static void amdordering_amddetectsupernodes(amdbuffer *buf) {
 //     Buf         -   variables belonging  to  supervariables  in  cand  are
 //                     added to SetQ. Supervariables are removed from all lists
 // ALGLIB Project: Copyright 15.11.2021 by Sergey Bochkanov
-static void amdordering_amdmovetoquasidense(amdbuffer *buf, amdnset *cand, ae_int_t p) {
+static void amdordering_amdmovetoquasidense(amdbuffer *buf, niset *cand, ae_int_t p) {
    ae_int_t i;
    ae_int_t j;
-   for (amdordering_nsstartenumeration(cand); amdordering_nsenumerate(cand, &j); ) {
+   for (nisstartenumeration(cand); nisenumerate(cand, &j); ) {
       ae_assert(j != p, "AMD: integrity check 9464 failed");
       ae_assert(buf->issupernode.xB[j], "AMD: integrity check 6284 failed");
       ae_assert(!buf->iseliminated.xB[j], "AMD: integrity check 3858 failed");
       for (amdordering_knsstartenumeration(&buf->setsuper, j); amdordering_knsenumerate(&buf->setsuper, &i); ) {
-         amdordering_nsaddelement(&buf->setq, i);
+         nisaddelement(&buf->setq, i);
       }
       amdordering_knsclearkthreclaim(&buf->seta, j);
       amdordering_knsclearkthreclaim(&buf->sete, j);
@@ -20661,6 +20408,20 @@ static void amdordering_amdmovetoquasidense(amdbuffer *buf, amdnset *cand, ae_in
 //                     algorithm. This array is ignored  (not  referenced  at
 //                     all) when AMDType == 0.
 //     N           -   problem size
+//     PromoteAbove-   columns with degrees higher than PromoteAbove*max(MEAN(Degree),1)
+//                     may be postponed. Ignored for AMDType != 1.
+//                     This parameter controls postponement of dense columns
+//                     (and algorithm ability to efficiently handle them):
+//                     * big PromoteAbove (N or more) effectively means that
+//                       no eligible columns are postponed. Better to combine
+//                       with your own heuristic to choose eligible columns,
+//                       otherwise algorithm will have hard time on problems
+//                       with dense columns in the eligible set.
+//                     * values between 2 and 10 are usually  a  good  choice
+//                       for manual control
+//                     * zero  value  means   that   appropriate   value   is
+//                       automatically chosen. Specific value may  change  in
+//                       future ALGLIB versions. Recommended.
 //     AMDType     -   ordering type:
 //                     * 0 for the classic AMD
 //                     * 1 for the improved AMD
@@ -20675,7 +20436,7 @@ static void amdordering_amdmovetoquasidense(amdbuffer *buf, amdnset *cand, ae_in
 //     N for AMDType == 0, 0 <= Result <= N for AMDType == 1
 //     0 is returned only when there are no columns that are both sparse enough and eligible.
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf) {
+ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n, double promoteabove, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -20690,6 +20451,7 @@ ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n,
    ae_int_t d;
    ae_int_t result;
    ae_assert(amdtype == 0 || amdtype == 1, "GenerateAMDPermutationX: unexpected ordering type");
+   ae_assert(amdtype == 0 || isfinite(promoteabove) && promoteabove >= 0.0, "GenerateAMDPermutationX: unexpected PromoteAbove - infinite or negative");
    setprealloc = 3;
    inithashbucketsize = 16;
    result = n;
@@ -20703,7 +20465,7 @@ ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n,
    }
    amdordering_knsinit(n, n, setprealloc, &buf->sete);
    amdordering_knsinit(n, n, inithashbucketsize, &buf->hashbuckets);
-   amdordering_nsinitemptyslow(n, &buf->nonemptybuckets);
+   nisinitemptyslow(n, &buf->nonemptybuckets);
    vectorsetlengthatleast(&buf->perm, n);
    vectorsetlengthatleast(&buf->invperm, n);
    vectorsetlengthatleast(&buf->columnswaps, n);
@@ -20717,15 +20479,15 @@ ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n,
    bsetallocv(n, false, &buf->iseliminated);
    isetallocv(n, -1, &buf->arrwe);
    allocv(n, &buf->ls);
-   amdordering_nsinitemptyslow(n, &buf->setp);
-   amdordering_nsinitemptyslow(n, &buf->lp);
-   amdordering_nsinitemptyslow(n, &buf->setrp);
-   amdordering_nsinitemptyslow(n, &buf->ep);
-   amdordering_nsinitemptyslow(n, &buf->exactdegreetmp0);
-   amdordering_nsinitemptyslow(n, &buf->adji);
-   amdordering_nsinitemptyslow(n, &buf->adjj);
-   amdordering_nsinitemptyslow(n, &buf->setq);
-   amdordering_nsinitemptyslow(n, &buf->setqsupercand);
+   nisinitemptyslow(n, &buf->setp);
+   nisinitemptyslow(n, &buf->lp);
+   nisinitemptyslow(n, &buf->setrp);
+   nisinitemptyslow(n, &buf->ep);
+   nisinitemptyslow(n, &buf->exactdegreetmp0);
+   nisinitemptyslow(n, &buf->adji);
+   nisinitemptyslow(n, &buf->adjj);
+   nisinitemptyslow(n, &buf->setq);
+   nisinitemptyslow(n, &buf->setqsupercand);
    tau = 0;
    if (amdtype == 1) {
       ae_assert(eligible->cnt >= n, "GenerateAMDPermutationX: length(Eligible) < N");
@@ -20735,23 +20497,24 @@ ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n,
          meand += d;
       }
       meand /= n;
-      tau = round(10 * meand) + 2;
+      tau = round((promoteabove > 0.0 ? promoteabove : 10.0) * rmax2(meand, 1.0));
+      tau = imax2(tau, 1);
       for (i = 0; i < n; i++) {
          if (!eligible->xB[i] || amdordering_vtxgetapprox(&buf->vertexdegrees, i) > tau) {
-            amdordering_nsaddelement(&buf->setqsupercand, i);
+            nisaddelement(&buf->setqsupercand, i);
          }
       }
       amdordering_amdmovetoquasidense(buf, &buf->setqsupercand, -1);
    }
    k = 0;
-   while (k < n - amdordering_nscount(&buf->setq)) {
+   while (k < n - niscount(&buf->setq)) {
       amdordering_amdselectpivotelement(buf, k, &p, &nodesize);
       amdordering_amdcomputelp(buf, p);
       amdordering_amdmasselimination(buf, p, k, tau);
       amdordering_amdmovetoquasidense(buf, &buf->setqsupercand, p);
       amdordering_amddetectsupernodes(buf);
-      ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, p) >= amdordering_nscount(&buf->lp), "AMD: integrity check 7956 failed");
-      ae_assert(amdordering_knscountkth(&buf->sete, p) > 2 || amdordering_nscount(&buf->setq) > 0 || amdordering_vtxgetapprox(&buf->vertexdegrees, p) == amdordering_nscount(&buf->lp), "AMD: integrity check 7295 failed");
+      ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, p) >= niscount(&buf->lp), "AMD: integrity check 7956 failed");
+      ae_assert(amdordering_knscountkth(&buf->sete, p) > 2 || niscount(&buf->setq) > 0 || amdordering_vtxgetapprox(&buf->vertexdegrees, p) == niscount(&buf->lp), "AMD: integrity check 7295 failed");
       for (amdordering_knsstartenumeration(&buf->sete, p); amdordering_knsenumerate(&buf->sete, &j); ) {
          amdordering_mtxclearcolumn(&buf->mtxl, j);
       }
@@ -20765,7 +20528,7 @@ ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n,
       amdordering_vtxremovevertex(&buf->vertexdegrees, p);
       k += nodesize;
    }
-   ae_assert(k + amdordering_nscount(&buf->setq) == n, "AMD: integrity check 6326 failed");
+   ae_assert(k + niscount(&buf->setq) == n, "AMD: integrity check 6326 failed");
    ae_assert(k > 0 || amdtype == 1, "AMD: integrity check 9463 failed");
    result = k;
    vectorsetlengthatleast(perm, n);
@@ -20795,31 +20558,9 @@ void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector 
    ae_int_t r;
    ae_frame_make(&_frame_block);
    NewVector(dummy, 0, DT_BOOL);
-   r = generateamdpermutationx(a, &dummy, n, perm, invperm, 0, buf);
+   r = generateamdpermutationx(a, &dummy, n, 0.0, perm, invperm, 0, buf);
    ae_assert(r == n, "GenerateAMDPermutation: integrity check failed, the matrix is only partially processed");
    ae_frame_leave();
-}
-
-void amdnset_init(void *_p, bool make_automatic) {
-   amdnset *p = (amdnset *)_p;
-   ae_vector_init(&p->items, 0, DT_INT, make_automatic);
-   ae_vector_init(&p->locationof, 0, DT_INT, make_automatic);
-}
-
-void amdnset_copy(void *_dst, const void *_src, bool make_automatic) {
-   amdnset *dst = (amdnset *)_dst;
-   const amdnset *src = (const amdnset *)_src;
-   dst->n = src->n;
-   dst->nstored = src->nstored;
-   ae_vector_copy(&dst->items, &src->items, make_automatic);
-   ae_vector_copy(&dst->locationof, &src->locationof, make_automatic);
-   dst->iteridx = src->iteridx;
-}
-
-void amdnset_free(void *_p, bool make_automatic) {
-   amdnset *p = (amdnset *)_p;
-   ae_vector_free(&p->items, make_automatic);
-   ae_vector_free(&p->locationof, make_automatic);
 }
 
 void amdknset_init(void *_p, bool make_automatic) {
@@ -20922,21 +20663,21 @@ void amdbuffer_init(void *_p, bool make_automatic) {
    amdknset_init(&p->sete, make_automatic);
    amdllmatrix_init(&p->mtxl, make_automatic);
    amdvertexset_init(&p->vertexdegrees, make_automatic);
-   amdnset_init(&p->setq, make_automatic);
+   niset_init(&p->setq, make_automatic);
    ae_vector_init(&p->perm, 0, DT_INT, make_automatic);
    ae_vector_init(&p->invperm, 0, DT_INT, make_automatic);
    ae_vector_init(&p->columnswaps, 0, DT_INT, make_automatic);
-   amdnset_init(&p->setp, make_automatic);
-   amdnset_init(&p->lp, make_automatic);
-   amdnset_init(&p->setrp, make_automatic);
-   amdnset_init(&p->ep, make_automatic);
-   amdnset_init(&p->adji, make_automatic);
-   amdnset_init(&p->adjj, make_automatic);
+   niset_init(&p->setp, make_automatic);
+   niset_init(&p->lp, make_automatic);
+   niset_init(&p->setrp, make_automatic);
+   niset_init(&p->ep, make_automatic);
+   niset_init(&p->adji, make_automatic);
+   niset_init(&p->adjj, make_automatic);
    ae_vector_init(&p->ls, 0, DT_INT, make_automatic);
-   amdnset_init(&p->setqsupercand, make_automatic);
-   amdnset_init(&p->exactdegreetmp0, make_automatic);
+   niset_init(&p->setqsupercand, make_automatic);
+   niset_init(&p->exactdegreetmp0, make_automatic);
    amdknset_init(&p->hashbuckets, make_automatic);
-   amdnset_init(&p->nonemptybuckets, make_automatic);
+   niset_init(&p->nonemptybuckets, make_automatic);
    ae_vector_init(&p->sncandidates, 0, DT_INT, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_INT, make_automatic);
    ae_vector_init(&p->arrwe, 0, DT_INT, make_automatic);
@@ -20955,22 +20696,22 @@ void amdbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    amdknset_copy(&dst->sete, &src->sete, make_automatic);
    amdllmatrix_copy(&dst->mtxl, &src->mtxl, make_automatic);
    amdvertexset_copy(&dst->vertexdegrees, &src->vertexdegrees, make_automatic);
-   amdnset_copy(&dst->setq, &src->setq, make_automatic);
+   niset_copy(&dst->setq, &src->setq, make_automatic);
    ae_vector_copy(&dst->perm, &src->perm, make_automatic);
    ae_vector_copy(&dst->invperm, &src->invperm, make_automatic);
    ae_vector_copy(&dst->columnswaps, &src->columnswaps, make_automatic);
-   amdnset_copy(&dst->setp, &src->setp, make_automatic);
-   amdnset_copy(&dst->lp, &src->lp, make_automatic);
-   amdnset_copy(&dst->setrp, &src->setrp, make_automatic);
-   amdnset_copy(&dst->ep, &src->ep, make_automatic);
-   amdnset_copy(&dst->adji, &src->adji, make_automatic);
-   amdnset_copy(&dst->adjj, &src->adjj, make_automatic);
+   niset_copy(&dst->setp, &src->setp, make_automatic);
+   niset_copy(&dst->lp, &src->lp, make_automatic);
+   niset_copy(&dst->setrp, &src->setrp, make_automatic);
+   niset_copy(&dst->ep, &src->ep, make_automatic);
+   niset_copy(&dst->adji, &src->adji, make_automatic);
+   niset_copy(&dst->adjj, &src->adjj, make_automatic);
    ae_vector_copy(&dst->ls, &src->ls, make_automatic);
    dst->lscnt = src->lscnt;
-   amdnset_copy(&dst->setqsupercand, &src->setqsupercand, make_automatic);
-   amdnset_copy(&dst->exactdegreetmp0, &src->exactdegreetmp0, make_automatic);
+   niset_copy(&dst->setqsupercand, &src->setqsupercand, make_automatic);
+   niset_copy(&dst->exactdegreetmp0, &src->exactdegreetmp0, make_automatic);
    amdknset_copy(&dst->hashbuckets, &src->hashbuckets, make_automatic);
-   amdnset_copy(&dst->nonemptybuckets, &src->nonemptybuckets, make_automatic);
+   niset_copy(&dst->nonemptybuckets, &src->nonemptybuckets, make_automatic);
    ae_vector_copy(&dst->sncandidates, &src->sncandidates, make_automatic);
    ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
    ae_vector_copy(&dst->arrwe, &src->arrwe, make_automatic);
@@ -20986,21 +20727,21 @@ void amdbuffer_free(void *_p, bool make_automatic) {
    amdknset_free(&p->sete, make_automatic);
    amdllmatrix_free(&p->mtxl, make_automatic);
    amdvertexset_free(&p->vertexdegrees, make_automatic);
-   amdnset_free(&p->setq, make_automatic);
+   niset_free(&p->setq, make_automatic);
    ae_vector_free(&p->perm, make_automatic);
    ae_vector_free(&p->invperm, make_automatic);
    ae_vector_free(&p->columnswaps, make_automatic);
-   amdnset_free(&p->setp, make_automatic);
-   amdnset_free(&p->lp, make_automatic);
-   amdnset_free(&p->setrp, make_automatic);
-   amdnset_free(&p->ep, make_automatic);
-   amdnset_free(&p->adji, make_automatic);
-   amdnset_free(&p->adjj, make_automatic);
+   niset_free(&p->setp, make_automatic);
+   niset_free(&p->lp, make_automatic);
+   niset_free(&p->setrp, make_automatic);
+   niset_free(&p->ep, make_automatic);
+   niset_free(&p->adji, make_automatic);
+   niset_free(&p->adjj, make_automatic);
    ae_vector_free(&p->ls, make_automatic);
-   amdnset_free(&p->setqsupercand, make_automatic);
-   amdnset_free(&p->exactdegreetmp0, make_automatic);
+   niset_free(&p->setqsupercand, make_automatic);
+   niset_free(&p->exactdegreetmp0, make_automatic);
    amdknset_free(&p->hashbuckets, make_automatic);
-   amdnset_free(&p->nonemptybuckets, make_automatic);
+   niset_free(&p->nonemptybuckets, make_automatic);
    ae_vector_free(&p->sncandidates, make_automatic);
    ae_vector_free(&p->tmp0, make_automatic);
    ae_vector_free(&p->arrwe, make_automatic);
@@ -21011,6 +20752,11 @@ void amdbuffer_free(void *_p, bool make_automatic) {
 // === SPCHOL Package ===
 // Depends on: AMDORDERING
 namespace alglib_impl {
+static const ae_int_t spchol_updatesheadersize = 2;
+static const ae_int_t spchol_groupheadersize = 2;
+static const ae_int_t spchol_batchheadersize = 2;
+static const ae_int_t spchol_sequenceentrysize = 3;
+
 // The recommended width of the SIMD-friendly buffer.
 // Informational function, useful for debugging.
 static ae_int_t spchol_spsymmgetmaxsimd() {
@@ -21576,6 +21322,186 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
    return result;
 }
 
+// Generic supernode update kernel
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static void spchol_updatesupernodegeneric(spcholanalysis *analysis, ae_int_t sidx, ae_int_t cols0, ae_int_t cols1, ae_int_t offss, ZVector *raw2smap, ae_int_t ladjidx, RVector *diagd) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t uidx;
+   ae_int_t colu0;
+   ae_int_t colu1;
+   ae_int_t urbase;
+   ae_int_t urlast;
+   ae_int_t urank;
+   ae_int_t uwidth;
+   ae_int_t uheight;
+   ae_int_t urowstride;
+   ae_int_t trowstride;
+   ae_int_t targetrow;
+   ae_int_t targetcol;
+   ae_int_t offsu;
+   ae_int_t offsd;
+   ae_int_t offs0;
+   ae_int_t offsj;
+   ae_int_t offsk;
+   double v;
+   ae_int_t wrkrow;
+   ae_frame_make(&_frame_block);
+   NewVector(u2smap, 0, DT_INT);
+   uidx = analysis->ladj.idx.xZ[ladjidx];
+   offsd = analysis->supercolrange.xZ[uidx];
+   offsu = analysis->rowoffsets.xZ[uidx];
+   colu0 = analysis->supercolrange.xZ[uidx];
+   colu1 = analysis->supercolrange.xZ[uidx + 1];
+   urbase = analysis->superrowridx.xZ[uidx];
+   urlast = analysis->superrowridx.xZ[uidx + 1];
+   urank = colu1 - colu0;
+   trowstride = analysis->rowstrides.xZ[sidx];
+   urowstride = analysis->rowstrides.xZ[uidx];
+   wrkrow = analysis->ladj.urow0.xZ[ladjidx];
+   uwidth = analysis->ladj.uwidth.xZ[ladjidx];
+   uheight = urlast - wrkrow;
+// Skip leading uRank+WrkRow rows of U because they are not used.
+   offsu += (colu1 - colu0 + (wrkrow - urbase)) * urowstride;
+// Handle general update, rerefence code
+   nipoolretrieve(&analysis->nintegerpool, &u2smap);
+   vectorsetlengthatleast(&u2smap, uheight);
+   for (i = 0; i < uheight; i++) {
+      u2smap.xZ[i] = raw2smap->xZ[analysis->superrowidx.xZ[wrkrow + i]];
+   }
+   if (analysis->unitd) {
+   // Unit D, vanilla Cholesky
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + u2smap.xZ[k] * trowstride;
+         for (j = 0; j < uwidth; j++) {
+            targetcol = u2smap.xZ[j];
+            offsj = offsu + j * urowstride;
+            offsk = offsu + k * urowstride;
+            offs0 = targetrow + targetcol;
+            v = analysis->outputstorage.xR[offs0];
+            for (i = 0; i < urank; i++) {
+               v -= analysis->outputstorage.xR[offsj + i] * analysis->outputstorage.xR[offsk + i];
+            }
+            analysis->outputstorage.xR[offs0] = v;
+         }
+      }
+   } else {
+   // Non-unit D, LDLT decomposition
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + u2smap.xZ[k] * trowstride;
+         for (j = 0; j < uwidth; j++) {
+            targetcol = u2smap.xZ[j];
+            offsj = offsu + j * urowstride;
+            offsk = offsu + k * urowstride;
+            offs0 = targetrow + targetcol;
+            v = analysis->outputstorage.xR[offs0];
+            for (i = 0; i < urank; i++) {
+               v -= analysis->outputstorage.xR[offsj + i] * diagd->xR[offsd + i] * analysis->outputstorage.xR[offsk + i];
+            }
+            analysis->outputstorage.xR[offs0] = v;
+         }
+      }
+   }
+   nipoolrecycle(&analysis->nintegerpool, &u2smap);
+   ae_frame_leave();
+}
+
+// Update target supernode with data from its children. This operation  is  a
+// supernodal equivalent of the column update by  all  preceding  cols  in  a
+// left-looking Cholesky.
+//
+// This function applies LAdjIdx1-LAdjIdx0 updates, from LAdjidx0 to LAdjIdx1-1
+// from child columns. Each update has the following form:
+//
+//     S = S - scatter(U*D*Uc')
+//
+// where
+// * S is an tHeight*tWidth rectangular target matrix that is:
+//   * stored with tStride >= tWidth in RowStorage[OffsS:OffsS+tHeight*tStride-1]
+//   * lower trapezoidal i.e. its leading tWidth*tWidth  submatrix  is  lower
+//     triangular. One may update either entire  tWidth*tWidth  submatrix  or
+//     just its lower part, because upper triangle is not referenced anyway.
+//   * the height of S is not given because it is not actually needed
+// * U is an uHeight*uRank rectangular update matrix tht is:
+//   * stored with row stride uStride >= uRank in RowStorage[OffsU:OffsU+uHeight*uStride-1].
+// * Uc is the leading uWidth*uRank submatrix of U
+// * D is uRank*uRank diagonal matrix that is:
+//   * stored in DiagD[OffsD:OffsD+uRank-1]
+//   * unit, when Analysis.UnitD == True. In this case it can be ignored, although
+//     DiagD still contains 1's in all of its entries
+// * uHeight <= tHeight, uWidth <= tWidth, so scatter operation is needed to update
+//   S with smaller update.
+// * scatter() is an operation  that  extends  smaller  uHeight*uWidth update
+//   matrix U*Uc' into larger tHeight*tWidth target matrix by adding zero rows
+//   and columns into U*Uc':
+//   * I-th row of update modifies Raw2SMap[SuperRowIdx[URBase+I]]-th row  of
+//     the matrix S
+//   * J-th column of update modifies Raw2SMap[SuperRowIdx[URBase+J]]-th  col
+//     of the matrix S
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static void spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, ae_int_t cols0, ae_int_t cols1, ae_int_t offss, ZVector *raw2smap, ae_int_t ladjidx0, ae_int_t ladjidx1, RVector *diagd) {
+   ae_int_t i;
+   ae_int_t uidx;
+   ae_int_t colu0;
+   ae_int_t colu1;
+   ae_int_t urbase;
+   ae_int_t urlast;
+   ae_int_t urank;
+   ae_int_t uwidth;
+   ae_int_t uheight;
+   ae_int_t urowstride;
+   ae_int_t twidth;
+   ae_int_t theight;
+   ae_int_t trowstride;
+   ae_int_t offsu;
+   ae_int_t wrkrow;
+   ae_int_t ladjidx;
+   twidth = cols1 - cols0;
+   theight = twidth + (analysis->superrowridx.xZ[sidx + 1] - analysis->superrowridx.xZ[sidx]);
+   trowstride = analysis->rowstrides.xZ[sidx];
+   for (ladjidx = ladjidx0; ladjidx < ladjidx1; ladjidx++) {
+      uidx = analysis->ladj.idx.xZ[ladjidx];
+      offsu = analysis->rowoffsets.xZ[uidx];
+      colu0 = analysis->supercolrange.xZ[uidx];
+      colu1 = analysis->supercolrange.xZ[uidx + 1];
+      urbase = analysis->superrowridx.xZ[uidx];
+      urlast = analysis->superrowridx.xZ[uidx + 1];
+      urank = colu1 - colu0;
+      urowstride = analysis->rowstrides.xZ[uidx];
+      wrkrow = analysis->ladj.urow0.xZ[ladjidx];
+      uwidth = analysis->ladj.uwidth.xZ[ladjidx];
+      uheight = urlast - wrkrow;
+   // Skip leading uRank+WrkRow rows of U because they are not used.
+      offsu += (urank + (wrkrow - urbase)) * urowstride;
+   // Handle special cases
+      if (trowstride == 4) {
+      // Target is stride-4 column, try several kernels that may work with tWidth == 3 and tWidth == 4
+         if (uwidth == 4 && twidth == 4 && urank == 4 && urowstride == 4) {
+            if (spchol_updatekernel4444(&analysis->outputstorage, offss, theight, offsu, uheight, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, wrkrow)) {
+               continue;
+            }
+         }
+         if (spchol_updatekernelabc4(&analysis->outputstorage, offss, twidth, offsu, uheight, urank, urowstride, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, wrkrow)) {
+            continue;
+         }
+      }
+      if (urank == 1 && urowstride == 1) {
+         if (spchol_updatekernelrank1(&analysis->outputstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, wrkrow)) {
+            continue;
+         }
+      }
+      if (urank == 2 && urowstride == 2) {
+         if (spchol_updatekernelrank2(&analysis->outputstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, wrkrow)) {
+            continue;
+         }
+      }
+   // Handle general update with no specialized kernel
+      spchol_updatesupernodegeneric(analysis, sidx, cols0, cols1, offss, raw2smap, ladjidx, diagd);
+   }
+}
+
 // Factorizes target supernode, returns True on success, False on failure.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
@@ -21690,6 +21616,205 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
    }
    result = true;
    return result;
+}
+
+// This function processes updates batch (a set of precomputed update
+// sequences that has to be applied sequentially) stored in Analysis.BlkStruct
+//
+// Inputs:
+//     Analysis    -   prior  analysis  performed on some sparse matrix, with
+//                     matrix being stored in Analysis.
+//     BlkOffs     -   block offset relative to the beginning of BlkStruct[],
+//                     beginning of the batch data
+//
+// Outputs:
+//     Analysis    -   partial supernode update is applied
+//     FailureFlag -   on the failure is set to True, ignored on success.
+//                     Such design is thread-safe.
+// ALGLIB Routine: Copyright 09.07.2022 by Sergey Bochkanov
+static void spchol_spsymmprocessupdatesbatch(spcholanalysis *analysis, ae_int_t blkoffs, bool *failureflag) {
+   ae_frame _frame_block;
+   ae_int_t seqidx;
+   ae_int_t sequencescnt;
+   ae_int_t sidx;
+   ae_int_t cols0;
+   ae_int_t cols1;
+   ae_int_t supernodesize;
+   ae_int_t offss;
+   ae_int_t i;
+   ae_int_t k;
+   ae_int_t k0;
+   ae_int_t k1;
+   ae_int_t i0;
+   ae_int_t i1;
+   ae_frame_make(&_frame_block);
+   NewVector(raw2smap, 0, DT_INT);
+   nipoolretrieve(&analysis->nintegerpool, &raw2smap);
+   sequencescnt = analysis->blkstruct.xZ[blkoffs + 1];
+   blkoffs += spchol_batchheadersize;
+   for (seqidx = 0; seqidx < sequencescnt; seqidx++) {
+      sidx = analysis->blkstruct.xZ[blkoffs];
+      i0 = analysis->blkstruct.xZ[blkoffs + 1];
+      i1 = analysis->blkstruct.xZ[blkoffs + 2];
+      cols0 = analysis->supercolrange.xZ[sidx];
+      cols1 = analysis->supercolrange.xZ[sidx + 1];
+      supernodesize = cols1 - cols0;
+      offss = analysis->rowoffsets.xZ[sidx];
+   // Prepare mapping of raw (range 0...N-1) indexes into internal (range 0...SupernodeSize+OffdiagSize-1) ones
+      for (i = cols0; i < cols1; i++) {
+         raw2smap.xZ[i] = i - cols0;
+      }
+      k0 = analysis->superrowridx.xZ[sidx];
+      k1 = analysis->superrowridx.xZ[sidx + 1] - 1;
+      for (k = k0; k <= k1; k++) {
+         raw2smap.xZ[analysis->superrowidx.xZ[k]] = supernodesize + (k - k0);
+      }
+   // Update current supernode with remaining updates.
+      spchol_updatesupernode(analysis, sidx, cols0, cols1, offss, &raw2smap, i0, i1, &analysis->diagd);
+   // Factorize current supernode if last update was applied
+      if (i1 == analysis->ladj.rowend.xZ[sidx] && !spchol_factorizesupernode(analysis, sidx)) {
+         nipoolrecycle(&analysis->nintegerpool, &raw2smap);
+         *failureflag = true;
+         ae_frame_leave();
+         return;
+      }
+   // Next sequence
+      blkoffs += spchol_sequenceentrysize;
+   }
+   nipoolrecycle(&analysis->nintegerpool, &raw2smap);
+   ae_frame_leave();
+}
+
+// This function processes updates group (a set of precomputed update batches
+// that can be applied concurrently) stored in Analysis.BlkStruct
+//
+// Inputs:
+//     Analysis    -   prior  analysis  performed on some sparse matrix, with
+//                     matrix being stored in Analysis.
+//     BlkOffs     -   block offset relative to the beginning of BlkStruct[],
+//                     beginning of the group data
+//
+// Outputs:
+//     Analysis    -   partial supernode update is applied
+//     FailureFlag -   on the failure is set to True, ignored on success.
+//                     Such design is thread-safe.
+// ALGLIB Routine: Copyright 09.07.2022 by Sergey Bochkanov
+static void spchol_spsymmprocessupdatesgroup(spcholanalysis *analysis, ae_int_t blkoffs, bool *failureflag) {
+   ae_int_t bidx;
+   ae_int_t batchescnt;
+   batchescnt = analysis->blkstruct.xZ[blkoffs + 1];
+   blkoffs += spchol_groupheadersize;
+// One batch, sequential processing
+   if (batchescnt == 1) {
+      spchol_spsymmprocessupdatesbatch(analysis, blkoffs, failureflag);
+      return;
+   }
+// Parallel processing (more than one batch in the group means that we decided
+// to parallelize computations during the scheduling stage)
+   for (bidx = 0; bidx < batchescnt; bidx++) {
+      spchol_spsymmprocessupdatesbatch(analysis, blkoffs, failureflag);
+      blkoffs += analysis->blkstruct.xZ[blkoffs];
+   }
+}
+
+// Recursive factorization of the supernodal  block  (a set of interdependent
+// supernodes) stored at BlkStruct[] at offset BlkOffs.
+//
+// Due to interdependencies, block supernodes can NOT be  factorized  in  the
+// parallel manner. However, it is still possible to perform  parallel column
+// updates (this part is handled by parallel DC  tree  associated  with  each
+// block).
+//
+// Inputs:
+//     Analysis    -   prior  analysis  performed on some sparse matrix, with
+//                     matrix being stored in Analysis.
+//     CurLAdjRowBegin-array[NSuper], pointers to unprocessed column  updates
+//                     stored in LAdj structure. Initially it is  a  copy  of
+//                     LAdj.RowBegin[], but every time  we  apply  update  to
+//                     a column, we advance its CurLAdjRowBegin[] entry.
+//                     This array is shared between all concurrently  running
+//                     worker threads.
+//     BlkOffs     -   block offset relative to the beginning of BlkStruct[]
+//
+// Outputs:
+//     Analysis    -   contains factorization results
+//     FailureFlag -   on the failure is set to True, ignored on success.
+//                     Such design is thread-safe.
+//
+// The function returns True  when  factorization  resulted  in nondegenerate
+// matrix. False is returned when factorization fails (Cholesky factorization
+// of indefinite matrix) or LDLT factorization has exactly zero  elements  at
+// the diagonal.
+// ALGLIB Routine: Copyright 09.07.2022 by Sergey Bochkanov
+static void spchol_spsymmfactorizeblockrec(spcholanalysis *analysis, ZVector *curladjrowbegin, ae_int_t blkoffs, bool isrootcall, bool *failureflag) {
+   ae_int_t bs;
+   ae_int_t cc;
+   ae_int_t curoffs;
+   ae_int_t childrenlistoffs;
+   ae_int_t gidx;
+   ae_int_t groupscnt;
+   ae_int_t i;
+   ae_assert(analysis->tasktype == 0, "SPCholFactorize: Analysis type does not match current task");
+// Parallelism was tried if: isrootcall && analysis->useparallelism
+// Analyze block information
+   curoffs = blkoffs;
+   bs = analysis->blkstruct.xZ[curoffs];
+   curoffs += 1 + bs;
+   cc = analysis->blkstruct.xZ[curoffs];
+   childrenlistoffs = curoffs + 2;
+   curoffs += 2 + cc;
+// Process children.
+// The very fact that we created more than one children node means that parallel processing is needed.
+   if (cc > 0) {
+      for (i = 0; i < cc; i++) {
+         spchol_spsymmfactorizeblockrec(analysis, curladjrowbegin, analysis->blkstruct.xZ[childrenlistoffs + i], false, failureflag);
+      }
+   }
+// Apply precomputed update-and-factorize sequence stored in the UPDATES section of the block
+   groupscnt = analysis->blkstruct.xZ[curoffs + 1];
+   curoffs += spchol_updatesheadersize;
+   for (gidx = 0; gidx < groupscnt; gidx++) {
+      spchol_spsymmprocessupdatesgroup(analysis, curoffs, failureflag);
+      curoffs += analysis->blkstruct.xZ[curoffs];
+   }
+}
+
+// Print blocked elimination tree to trace log.
+// ALGLIB Routine: Copyright 09.07.2022 by Sergey Bochkanov
+static void spchol_printblockedeliminationtreerec(spcholanalysis *analysis, ae_int_t blkoffs, ae_int_t depth) {
+   ae_int_t curoffs;
+   ae_int_t bs;
+   ae_int_t cc;
+   ae_int_t i;
+   ae_int_t supernodeslistoffs;
+   ae_int_t childrenlistoffs;
+   double selfcost;
+   double avgsnode;
+   ae_int_t bidx;
+   ae_int_t sidx;
+   ae_int_t cols0;
+   ae_int_t cols1;
+   curoffs = blkoffs;
+   bs = analysis->blkstruct.xZ[curoffs];
+   supernodeslistoffs = curoffs + 1;
+   curoffs += 1 + bs;
+   cc = analysis->blkstruct.xZ[curoffs];
+   childrenlistoffs = curoffs + 2;
+   curoffs += 2 + cc;
+// Print blocked elimination tree node
+   selfcost = 0.0;
+   avgsnode = 0.0;
+   for (bidx = 0; bidx < bs; bidx++) {
+      sidx = analysis->blkstruct.xZ[supernodeslistoffs + bidx];
+      cols0 = analysis->supercolrange.xZ[sidx];
+      cols1 = analysis->supercolrange.xZ[sidx + 1];
+      avgsnode += (double)(cols1 - cols0) / bs;
+      selfcost += analysis->ladj.nflop.xR[sidx];
+   }
+// Print children.
+   for (i = 0; i < cc; i++) {
+      spchol_printblockedeliminationtreerec(analysis, analysis->blkstruct.xZ[childrenlistoffs + i], depth + 1);
+   }
 }
 
 // Solve a linear system: propagating the computed supernode.
@@ -22190,6 +22315,7 @@ static ae_int_t spchol_alignpositioninarray(ae_int_t offs) {
 //                     * Analysis.SuperRowRIdx
 //                     * Analysis.SuperRowIdx
 //                     * Analysis.ParentSupernode
+//                     * Analysis.ChildSupernodesRIdx, Analysis.ChildSupernodesIdx
 //                     * Analysis.OutRowCounts
 //                     other fields are ignored and not changed.
 //     Node2Supernode- array[N] that maps node indexes to supernode indexes
@@ -22314,6 +22440,19 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
          analysis->parentsupernode.xZ[sidx] = nodeidx;
       }
    }
+   allocv(nsuper + 2, &analysis->childsupernodesridx);
+   allocv(nsuper + 1, &analysis->childsupernodesidx);
+   spchol_fromparenttochildren(&analysis->parentsupernode, nsuper, &analysis->childsupernodesridx, &analysis->childsupernodesidx, ttmp0);
+   i = analysis->childsupernodesridx.xZ[nsuper];
+   for (sidx = 0; sidx < nsuper; sidx++) {
+      j = analysis->parentsupernode.xZ[sidx];
+      if (j < 0) {
+         analysis->childsupernodesidx.xZ[i] = sidx;
+         i++;
+      }
+   }
+   ae_assert(i == nsuper, "SPSymmAnalyze: integrity check 4dr5 failed");
+   analysis->childsupernodesridx.xZ[nsuper + 1] = i;
 // Allocate supernodal storage
    vectorsetlengthatleast(&analysis->rowoffsets, analysis->nsuper + 1);
    vectorsetlengthatleast(&analysis->rowstrides, analysis->nsuper);
@@ -22360,12 +22499,11 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
 //                     preallocated place.
 //
 // Outputs:
-//     Analysis    -   following fields are initialized:
-//                     * Analysis.LAdjPlus
-//                     * Analysis.LAdjPlusR
+//     Analysis    -   Analysis.LAdj is initialized
 //     Node2Supernode- array[N] that maps node indexes to supernode indexes
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, sparsematrix *rawa, ZVector *node2supernode, ae_int_t n, ZVector *ttmp0, ZVector *ttmp1, BVector *tflagarray) {
+   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t rowidx;
@@ -22375,50 +22513,559 @@ static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, spars
    ae_int_t rfirst;
    ae_int_t rlast;
    ae_int_t sidx;
+   ae_int_t ladjcnt;
+   double uflop;
+   double sflop;
+   ae_int_t wrkrow;
+   ae_int_t offdiagrow;
+   ae_int_t lastrow;
+   ae_int_t theight;
+   ae_int_t twidth;
+   ae_frame_make(&_frame_block);
    ae_assert(ttmp0->cnt > n, "AnalyzeSupernodalDependencies: input buffer tTmp0 is too short");
    ae_assert(ttmp1->cnt > n, "AnalyzeSupernodalDependencies: input buffer tTmp1 is too short");
    ae_assert(tflagarray->cnt > n, "AnalyzeSupernodalDependencies: input buffer tTmp0 is too short");
    ae_assert(sparseiscrs(rawa), "AnalyzeSupernodalDependencies: RawA must be CRS matrix");
-// Determine LAdjPlus - supernodes feeding updates to the SIdx-th one.
+// Determine LAdj - supernodes feeding updates to the SIdx-th one.
 //
 // Without supernodes we have: K-th row of L (also denoted as ladj+(K))
 // includes original nonzeros from A (also denoted as ladj(K)) as well
 // as all elements on paths in elimination tree from ladj(K) to K.
 //
 // With supernodes: same principle applied.
-   isetallocv(analysis->nsuper + 1, 0, &analysis->ladjplusr);
+   isetallocv(analysis->nsuper, 0, &analysis->ladj.rowbegin);
+   isetallocv(analysis->nsuper, 0, &analysis->ladj.rowend);
+   rsetallocv(analysis->nsuper, 0.0, &analysis->ladj.nflop);
    bsetv(n, true, tflagarray);
-   analysis->ladjplusr.xZ[0] = 0;
+   icopyv(analysis->nsuper, &analysis->superrowridx, ttmp0);
+   ladjcnt = 0;
    for (sidx = 0; sidx < analysis->nsuper; sidx++) {
-   // Generate list of nodes feeding updates to SIdx-th one
-      ivectorgrowto(&analysis->ladjplus, analysis->ladjplusr.xZ[sidx] + analysis->nsuper);
-      rfirst = analysis->ladjplusr.xZ[sidx];
+   // Generate ordered list of nodes feeding updates to SIdx-th one
+      igrowv(ladjcnt + analysis->nsuper, &analysis->ladj.idx);
+      igrowv(ladjcnt + analysis->nsuper, &analysis->ladj.urow0);
+      igrowv(ladjcnt + analysis->nsuper, &analysis->ladj.uwidth);
+      rgrowv(ladjcnt + analysis->nsuper, &analysis->ladj.uflop);
+      rfirst = ladjcnt;
       rlast = rfirst;
+      analysis->ladj.rowbegin.xZ[sidx] = rfirst;
       for (rowidx = analysis->supercolrange.xZ[sidx]; rowidx < analysis->supercolrange.xZ[sidx + 1]; rowidx++) {
          i = analysis->invsuperperm.xZ[rowidx];
          j0 = rawa->ridx.xZ[i];
          j1 = rawa->uidx.xZ[i] - 1;
          for (jj = j0; jj <= j1; jj++) {
             j = node2supernode->xZ[analysis->superperm.xZ[rawa->idx.xZ[jj]]];
-            if (j < sidx && tflagarray->xB[j]) {
-               analysis->ladjplus.xZ[rlast] = j;
+         // add supernode and its parents up the chain
+            while (j >= 0 && j < sidx && tflagarray->xB[j]) {
+               analysis->ladj.idx.xZ[rlast] = j;
                tflagarray->xB[j] = false;
                rlast++;
                j = analysis->parentsupernode.xZ[j];
-               while (j >= 0 && j < sidx && tflagarray->xB[j]) {
-                  analysis->ladjplus.xZ[rlast] = j;
-                  tflagarray->xB[j] = false;
-                  rlast++;
-                  j = analysis->parentsupernode.xZ[j];
-               }
             }
          }
       }
+      tagsortmiddlei(&analysis->ladj.idx, rlast - rfirst, rfirst);
+   // Compute update-related information
+      sflop = 0.0;
+      twidth = analysis->supercolrange.xZ[sidx + 1] - analysis->supercolrange.xZ[sidx];
+      theight = twidth + (analysis->superrowridx.xZ[sidx + 1] - analysis->superrowridx.xZ[sidx]);
       for (i = rfirst; i < rlast; i++) {
-         tflagarray->xB[analysis->ladjplus.xZ[i]] = true;
+         j = analysis->ladj.idx.xZ[i];
+         wrkrow = ttmp0->xZ[j];
+         offdiagrow = wrkrow;
+         lastrow = analysis->superrowridx.xZ[j + 1];
+         while (offdiagrow < lastrow && analysis->superrowidx.xZ[offdiagrow] < analysis->supercolrange.xZ[sidx + 1]) {
+            offdiagrow++;
+         }
+         uflop = (offdiagrow - wrkrow) * (lastrow - wrkrow) * (analysis->supercolrange.xZ[j + 1] - analysis->supercolrange.xZ[j]);
+         analysis->ladj.urow0.xZ[i] = wrkrow;
+         analysis->ladj.uwidth.xZ[i] = offdiagrow - wrkrow;
+         analysis->ladj.uflop.xR[i] = uflop;
+         sflop += uflop;
+         ttmp0->xZ[j] = offdiagrow;
       }
-      analysis->ladjplusr.xZ[sidx + 1] = rlast;
+      for (i = 0; i < twidth; i++) {
+         sflop += (theight - i) * (twidth - i);
+      }
+      analysis->ladj.nflop.xR[sidx] = sflop;
+      j = analysis->parentsupernode.xZ[sidx];
+   // Finalize
+      for (i = rfirst; i < rlast; i++) {
+         tflagarray->xB[analysis->ladj.idx.xZ[i]] = true;
+      }
+      analysis->ladj.rowend.xZ[sidx] = rlast;
+      ladjcnt = rlast;
    }
+   rcopyallocv(analysis->nsuper, &analysis->ladj.nflop, &analysis->ladj.sflop);
+   for (sidx = 0; sidx < analysis->nsuper; sidx++) {
+      j = analysis->parentsupernode.xZ[sidx];
+      if (j >= 0) {
+         analysis->ladj.sflop.xR[j] += analysis->ladj.sflop.xR[sidx];
+      }
+   }
+   ae_frame_leave();
+}
+
+// This function appends a set of updates for a block of supernodes stored in
+// the BlkStruct[] array.
+//
+// Inputs:
+//     Analysis    -   analysis object with completely initialized supernodal
+//                     structure, including LAdj
+//     RowBegin    -   on entry contains A COPY of LAdj.RowBegin[] array.
+//                     Modified during scheduling, so it is important to
+//                     provide a copy.
+//     IsFactorized-   array[NSuper], on entry must be set to False.
+//     NFLOP       -   on entry contains A COPY of LAdj.NFLOP[] array.
+//                     Modified during scheduling, so it is important to
+//                     provide a copy.
+//     BlkStruct   -   array[Offs] or larger, elements up to Offs contain
+//                     previous blocks
+//     BlockItemsOffs- offset in BlkStruct[] where block items are stored
+//                     (items must be sorted by ascending)
+//     BlockSize   -   number of supernodes in the block
+//     Depth       -   zero on the topmost call
+//     Offs        -   points to the end of BlkStruct[]
+//     GroupsCreated-  must be set to zero on entry
+//     TotalFLOPs  -   contains already accumulated FLOP count
+//     SequentialFLOPs-contains already accumulated FLOP count
+//
+// Outputs:
+//     BlkStruct   -   elements from the former Offs (including) to the new
+//                     Offs (not including) contain update information. The
+//                     array can be reallocated to store new data.
+//     Offs        -   positioned past the end of the block structure
+//     GroupsCreated-  increased by count of newly created update groups
+//     TotalFLOPs  -   updated with total FLOP count
+//     SequentialFLOPs-updated with sequential FLOP count - ones that can't
+//                     be parallelized; the rest can be and will be parallelized.
+// ALGLIB Project: Copyright 05.07.2022 by Sergey Bochkanov
+static void spchol_scheduleupdatesforablockrec(spcholanalysis *analysis, ZVector *rowbegin, BVector *isfactorized, RVector *nflop, ZVector *blkstruct, ae_int_t blockitemsoffs, ae_int_t blocksize, ae_int_t depth, ae_int_t *offs, ae_int_t *groupscreated, double *totalflops, double *sequentialflops) {
+   const ae_int_t smallupdate = 128;
+   const double raw2sthreshold = 0.01;
+   ae_int_t i;
+   ae_int_t k;
+   ae_int_t kmid;
+   ae_int_t sidx;
+   ae_int_t batchesheaderoffs;
+   ae_int_t groupsheaderoffs;
+   ae_int_t updatesissued;
+   ae_int_t batchesissued;
+   bool isbasecase;
+   double residualcost;
+   double leftcost;
+   double updcost;
+   double raw2scost;
+   double batchcost;
+   double minbatchcost;
+   ae_int_t repsupernodesupdated;
+// Initial evaluation of the block - should we divide it into two
+// smaller subblocks A and B and schedule parallel update A-to-B
+// or process it as single factorization?
+   residualcost = 0.0;
+   for (k = 0; k < blocksize; k++) {
+      sidx = blkstruct->xZ[blockitemsoffs + k];
+      residualcost += nflop->xR[sidx];
+   }
+   kmid = blocksize / 2;
+   leftcost = 0.0;
+   for (k = 0; k < kmid; k++) {
+      sidx = blkstruct->xZ[blockitemsoffs + k];
+      leftcost += nflop->xR[sidx];
+   }
+   while (kmid < blocksize && leftcost < 0.05 * residualcost) {
+      sidx = blkstruct->xZ[blockitemsoffs + kmid];
+      leftcost += nflop->xR[sidx];
+      kmid++;
+   }
+   raw2scost = 0.0;
+   for (k = kmid; k < blocksize; k++) {
+      sidx = blkstruct->xZ[blockitemsoffs + k];
+      raw2scost += analysis->superrowridx.xZ[sidx + 1] - analysis->superrowridx.xZ[sidx];
+   }
+   repsupernodesupdated = 0;
+   updcost = 0.0;
+   for (k = kmid; k < blocksize; k++) {
+      sidx = blkstruct->xZ[blockitemsoffs + k];
+      i = rowbegin->xZ[sidx];
+      while (true) {
+         if (i == analysis->ladj.rowend.xZ[sidx] || analysis->ladj.idx.xZ[i] >= blkstruct->xZ[blockitemsoffs + kmid]) {
+            break;
+         }
+         updcost += analysis->ladj.uflop.xR[i];
+         i++;
+      }
+      if (i != rowbegin->xZ[sidx]) {
+         repsupernodesupdated++;
+      }
+   }
+// Basecase
+   isbasecase = false;
+   if (!analysis->debugblocksupernodal) {
+      if (!isbasecase && blocksize < smallupdate) {
+         isbasecase = true;
+      }
+      if (!isbasecase && kmid == blocksize) {
+         isbasecase = true;
+      }
+      if (!isbasecase && residualcost < spawnlevel()) {
+         isbasecase = true;
+      }
+      if (!isbasecase && updcost < spawnlevel()) {
+         isbasecase = true;
+      }
+      if (!isbasecase && raw2scost > raw2sthreshold * updcost) {
+         isbasecase = true;
+      }
+   }
+   if (analysis->debugblocksupernodal) {
+      isbasecase = isbasecase || blocksize <= 1 || kmid == blocksize || randombool();
+   }
+   if (isbasecase) {
+   // Schedule sequential updates for the entire block
+      groupsheaderoffs = *offs;
+      igrowv(groupsheaderoffs + spchol_groupheadersize, blkstruct);
+      blkstruct->xZ[groupsheaderoffs] = -1;
+      blkstruct->xZ[groupsheaderoffs + 1] = 1;
+      *offs = groupsheaderoffs + spchol_groupheadersize;
+      batchesheaderoffs = *offs;
+      igrowv(batchesheaderoffs + spchol_batchheadersize + blocksize * spchol_sequenceentrysize, blkstruct);
+      blkstruct->xZ[batchesheaderoffs] = -1;
+      blkstruct->xZ[batchesheaderoffs + 1] = -1;
+      *offs = batchesheaderoffs + spchol_batchheadersize;
+      updatesissued = 0;
+      for (k = 0; k < blocksize; k++) {
+         sidx = blkstruct->xZ[blockitemsoffs + k];
+         if (isfactorized->xB[sidx]) {
+            continue;
+         }
+         blkstruct->xZ[*offs] = sidx;
+         blkstruct->xZ[*offs + 1] = rowbegin->xZ[sidx];
+         blkstruct->xZ[*offs + 2] = analysis->ladj.rowend.xZ[sidx];
+         rowbegin->xZ[sidx] = analysis->ladj.rowend.xZ[sidx];
+         nflop->xR[sidx] = 0.0;
+         isfactorized->xB[sidx] = true;
+         updatesissued++;
+         *offs += spchol_sequenceentrysize;
+      }
+      blkstruct->xZ[batchesheaderoffs] = *offs - batchesheaderoffs;
+      blkstruct->xZ[batchesheaderoffs + 1] = updatesissued;
+      blkstruct->xZ[groupsheaderoffs] = *offs - groupsheaderoffs;
+      ++*groupscreated;
+      *totalflops += residualcost;
+      *sequentialflops += residualcost;
+      return;
+   }
+   spchol_scheduleupdatesforablockrec(analysis, rowbegin, isfactorized, nflop, blkstruct, blockitemsoffs, kmid, depth + 1, offs, groupscreated, totalflops, sequentialflops);
+   groupsheaderoffs = *offs;
+   igrowv(groupsheaderoffs + spchol_groupheadersize, blkstruct);
+   blkstruct->xZ[groupsheaderoffs] = -1;
+   blkstruct->xZ[groupsheaderoffs + 1] = -1;
+   *offs = groupsheaderoffs + spchol_groupheadersize;
+   batchesissued = 0;
+   minbatchcost = rmax2(1.01 * updcost / maxconcurrency(), spawnlevel());
+   if (analysis->debugblocksupernodal) {
+      minbatchcost = randomreal() * updcost;
+   }
+   k = kmid;
+   while (k < blocksize) {
+      batchcost = 0.0;
+      updatesissued = 0;
+      batchesheaderoffs = *offs;
+      igrowv(*offs + spchol_batchheadersize + (blocksize - kmid) * spchol_sequenceentrysize, blkstruct);
+      blkstruct->xZ[batchesheaderoffs] = -1;
+      blkstruct->xZ[batchesheaderoffs + 1] = -1;
+      *offs = batchesheaderoffs + spchol_batchheadersize;
+      while (k < blocksize && (updatesissued == 0 || batchcost < minbatchcost)) {
+         sidx = blkstruct->xZ[blockitemsoffs + k];
+         if (isfactorized->xB[sidx]) {
+            k++;
+            continue;
+         }
+         i = rowbegin->xZ[sidx];
+         blkstruct->xZ[*offs] = sidx;
+         blkstruct->xZ[*offs + 1] = i;
+         while (true) {
+            if (i == analysis->ladj.rowend.xZ[sidx] || analysis->ladj.idx.xZ[i] >= blkstruct->xZ[blockitemsoffs + kmid]) {
+               break;
+            }
+            nflop->xR[sidx] -= analysis->ladj.uflop.xR[i];
+            *totalflops += analysis->ladj.uflop.xR[i];
+            batchcost += analysis->ladj.uflop.xR[i];
+            i++;
+         }
+         rowbegin->xZ[sidx] = i;
+         blkstruct->xZ[*offs + 2] = i;
+         isfactorized->xB[sidx] = rowbegin->xZ[sidx] == analysis->ladj.rowend.xZ[sidx];
+         if (isfactorized->xB[sidx]) {
+            *totalflops += nflop->xR[sidx];
+            batchcost += nflop->xR[sidx];
+            nflop->xR[sidx] = 0.0;
+         }
+         *offs += spchol_sequenceentrysize;
+         updatesissued++;
+         k++;
+      }
+      blkstruct->xZ[batchesheaderoffs] = *offs - batchesheaderoffs;
+      blkstruct->xZ[batchesheaderoffs + 1] = updatesissued;
+      batchesissued++;
+   }
+   blkstruct->xZ[groupsheaderoffs] = *offs - groupsheaderoffs;
+   blkstruct->xZ[groupsheaderoffs + 1] = batchesissued;
+   ++*groupscreated;
+   spchol_scheduleupdatesforablockrec(analysis, rowbegin, isfactorized, nflop, blkstruct, blockitemsoffs + kmid, blocksize - kmid, depth + 1, offs, groupscreated, totalflops, sequentialflops);
+}
+
+// This function appends batch of supernodes (heads)  and  their  descendants
+// to the BlkStruct[] array.
+//
+// Inputs:
+//     Analysis    -   analysis object with completely initialized supernodal
+//                     structure, including LAdj
+//     HeadsStack  -   array[NSuper] which is used as a stack. NHeads elements
+//                     starting from position StackBase store supernode indexes,
+//                     elements above them can be used and overwritten by this
+//                     function
+//     BlkStruct   -   array[Offs] or larger, elements up to Offs contain
+//                     previous blocks
+//     Offs        -   points to the end of BlkStruct[]
+//     TotalFLOPs  -   contains already accumulated FLOP count
+//     SequentialFLOPs-contains already accumulated FLOP count
+//
+// Outputs:
+//     BlkStruct   -   elements from the former Offs (including) to the new
+//                     Offs (not including) contain supernodal blocks. The
+//                     array can be reallocated to store new data.
+//     Offs        -   positioned past the end of the block structure
+//     TotalFLOPs  -   updated with total FLOP count
+//     SequentialFLOPs-updated with sequential FLOP count - ones that can't
+//                     be parallelized; the rest can be and will be parallelized.
+// ALGLIB Project: Copyright 05.07.2022 by Sergey Bochkanov
+static void spchol_processbatchofheadsrec(spcholanalysis *analysis, ZVector *headsstack, ae_int_t stackbase, ae_int_t nheads, ZVector *blkstruct, ae_int_t *offs, double *totalflops, double *sequentialflops) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t blocksize;
+   ae_int_t childrenbase;
+   ae_int_t cidx;
+   ae_int_t j0;
+   ae_int_t j1;
+   ae_int_t groupscreated;
+   ae_int_t cndbigsubproblems;
+   double bigsubproblemsize;
+   ae_int_t blockitemslistoffs;
+   ae_int_t childrenlistoffs;
+   ae_int_t nchildren;
+   ae_int_t updatesheaderoffs;
+   double tmpsequentialflops;
+   double sequentialblockflops;
+   double sequentialchildrenflops;
+   ae_frame_make(&_frame_block);
+   NewVector(isfactorized, 0, DT_BOOL);
+   NewVector(rowbegin, 0, DT_INT);
+   NewVector(nflop, 0, DT_REAL);
+   igrowv(*offs + 1 + analysis->nsuper + 2, blkstruct);
+// Perform breadth-first traversal of children of supernodes stored in HeadsStack[],
+// extending the list by the newly traversed nodes. When we decide that it is feasible
+// to spawn parallel subproblems we add them to HeadsStack[] starting from offset ChildrenBase.
+   blocksize = nheads;
+   childrenbase = analysis->nsuper;
+   i = stackbase;
+   while (i < stackbase + blocksize) {
+      j0 = analysis->childsupernodesridx.xZ[headsstack->xZ[i]];
+      j1 = analysis->childsupernodesridx.xZ[headsstack->xZ[i] + 1] - 1;
+   // Quick processing for a supernode with only one child: add to the block
+      if (j0 == j1) {
+         headsstack->xZ[stackbase + blocksize] = analysis->childsupernodesidx.xZ[j0];
+         blocksize++;
+         i++;
+         continue;
+      }
+   // More than one child.
+   // Count big subproblems.
+   // When debug mode is activated, we randomly decide on subproblem size
+      cndbigsubproblems = 0;
+      bigsubproblemsize = spawnlevel();
+      if (analysis->debugblocksupernodal && randombool()) {
+         bigsubproblemsize = -1.0;
+      }
+      for (j = analysis->childsupernodesridx.xZ[headsstack->xZ[i]]; j < analysis->childsupernodesridx.xZ[headsstack->xZ[i] + 1]; j++) {
+         if (analysis->ladj.sflop.xR[analysis->childsupernodesidx.xZ[j]] >= bigsubproblemsize) {
+            cndbigsubproblems++;
+         }
+      }
+   // Analyze child nodes
+      for (j = j0; j <= j1; j++) {
+         if (cndbigsubproblems >= 2 && analysis->ladj.sflop.xR[analysis->childsupernodesidx.xZ[j]] >= bigsubproblemsize) {
+         // Supernode has more than one child that is big enough to parallelize computations.
+         // Move big childs to a separate list.
+            childrenbase--;
+            headsstack->xZ[childrenbase] = analysis->childsupernodesidx.xZ[j];
+         } else {
+         // Either child is too small or we have only one big child (i.e. we follow elimination tree trunk).
+         // Sequential processing, add supernode to the block.
+            headsstack->xZ[stackbase + blocksize] = analysis->childsupernodesidx.xZ[j];
+            blocksize++;
+         }
+      }
+      i++;
+   }
+   ae_assert(stackbase + blocksize <= childrenbase, "SPSymm: integrity check 4fb6 failed");
+   ae_assert(childrenbase <= analysis->nsuper, "SPSymm: integrity check 4fb7 failed");
+// Output SUPERNODES list.
+   blkstruct->xZ[*offs] = blocksize;
+   blockitemslistoffs = *offs + 1;
+   for (i = 0; i < blocksize; i++) {
+      blkstruct->xZ[blockitemslistoffs + i] = headsstack->xZ[stackbase + i];
+   }
+   tagsortmiddlei(blkstruct, blocksize, blockitemslistoffs);
+   *offs = blockitemslistoffs + blocksize;
+// Output CHILDREN list, temporarily store children supernode indexes instead of their offsets in BlkStruct[]
+   nchildren = analysis->nsuper - childrenbase;
+   childrenlistoffs = *offs + 2;
+   blkstruct->xZ[*offs] = nchildren;
+   blkstruct->xZ[*offs + 1] = 0;
+   for (i = 0; i < nchildren; i++) {
+      blkstruct->xZ[childrenlistoffs + i] = headsstack->xZ[childrenbase + i];
+   }
+   *offs += 2 + nchildren;
+// Output UPDATES part
+   nbpoolretrieve(&analysis->nbooleanpool, &isfactorized);
+   nipoolretrieve(&analysis->nintegerpool, &rowbegin);
+   nrpoolretrieve(&analysis->nrealpool, &nflop);
+   bsetv(analysis->nsuper, false, &isfactorized);
+   icopyv(analysis->nsuper, &analysis->ladj.rowbegin, &rowbegin);
+   rcopyv(analysis->nsuper, &analysis->ladj.nflop, &nflop);
+   groupscreated = 0;
+   updatesheaderoffs = *offs;
+   igrowv(updatesheaderoffs + spchol_updatesheadersize, blkstruct);
+   *offs = updatesheaderoffs + spchol_updatesheadersize;
+   sequentialblockflops = 0.0;
+   spchol_scheduleupdatesforablockrec(analysis, &rowbegin, &isfactorized, &nflop, blkstruct, blockitemslistoffs, blocksize, 0, offs, &groupscreated, totalflops, &sequentialblockflops);
+   blkstruct->xZ[updatesheaderoffs] = *offs - updatesheaderoffs;
+   blkstruct->xZ[updatesheaderoffs + 1] = groupscreated;
+   nbpoolrecycle(&analysis->nbooleanpool, &isfactorized);
+   nipoolrecycle(&analysis->nintegerpool, &rowbegin);
+   nrpoolrecycle(&analysis->nrealpool, &nflop);
+// Recursively process children, replace supernode indexes by their offsets in BlkStruct[]
+   sequentialchildrenflops = 0.0;
+   for (i = 0; i < nchildren; i++) {
+      cidx = blkstruct->xZ[childrenlistoffs + i];
+      blkstruct->xZ[childrenlistoffs + i] = *offs;
+      headsstack->xZ[stackbase + blocksize] = cidx;
+      tmpsequentialflops = 0.0;
+      spchol_processbatchofheadsrec(analysis, headsstack, stackbase + blocksize, 1, blkstruct, offs, totalflops, &tmpsequentialflops);
+      sequentialchildrenflops = rmax2(sequentialchildrenflops, tmpsequentialflops);
+   }
+// Compute final sequential FLOPs
+   *sequentialflops = sequentialblockflops + sequentialchildrenflops;
+   ae_frame_leave();
+}
+
+// This function creates block-tree structure from the supernodal elimination
+// tree.
+//
+// Inputs:
+//     Analysis    -   analysis object with completely initialized supernodal
+//                     structure, including LAdj
+//
+// Outputs:
+//     Analysis    -   Analysis.BlkStruct is initialized
+//                     Analysis.UseParallelism is set
+// ALGLIB Project: Copyright 05.07.2022 by Sergey Bochkanov
+static void spchol_createblockstructure(spcholanalysis *analysis) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t nheads;
+   ae_int_t nrootbatches;
+   ae_int_t nunprocessedheads;
+   ae_int_t offs;
+   ae_int_t childrenoffs;
+   double minrootbatchcost;
+   double smallcasecost;
+   double curcost;
+   double totalflops;
+   double sequentialflops;
+   double tmpsequentialflops;
+   ae_frame_make(&_frame_block);
+   NewVector(heads, 0, DT_INT);
+   NewVector(rootbatchsizes, 0, DT_INT);
+   NewVector(costs, 0, DT_REAL);
+   offs = 0;
+// Retrieve temporary arrays from the pool
+   nipoolretrieve(&analysis->nintegerpool, &heads);
+   nipoolretrieve(&analysis->nintegerpool, &rootbatchsizes);
+   nrpoolretrieve(&analysis->nrealpool, &costs);
+// Generate list of elimination forest heads, sort them by cost decrease
+   nheads = 0;
+   for (i = analysis->childsupernodesridx.xZ[analysis->nsuper]; i < analysis->childsupernodesridx.xZ[analysis->nsuper + 1]; i++) {
+      heads.xZ[nheads] = analysis->childsupernodesidx.xZ[i];
+      costs.xR[nheads] = analysis->ladj.sflop.xR[heads.xZ[nheads]];
+      nheads++;
+   }
+   ae_assert(nheads >= 1, "SPChol: integrity check 4t6d failed");
+   rmulv(nheads, -1.0, &costs);
+   tagsortmiddleir(&heads, &costs, nheads);
+   rmulv(nheads, -1.0, &costs);
+// Determine root batches count and their sizes.
+   minrootbatchcost = spawnlevel();
+   smallcasecost = 16 * 16 * 16;
+   nrootbatches = 0;
+   i = nheads - 1;
+   curcost = 0.0;
+   isetv(analysis->nsuper, 0, &rootbatchsizes);
+   while (i >= 0) {
+      while (i >= 0) {
+      // Aggregate heads until we aggregate all small heads AND total cost is greater than the spawn theshold.
+      // When the debug mode is active, we randomly stop aggregating.
+         if (rootbatchsizes.xZ[nrootbatches] != 0) {
+            if ((!analysis->debugblocksupernodal && curcost > minrootbatchcost) && costs.xR[i] > smallcasecost) {
+               break;
+            }
+            if (analysis->debugblocksupernodal && randombool()) {
+               break;
+            }
+         }
+         rootbatchsizes.xZ[nrootbatches]++;
+         curcost += costs.xR[i];
+         i--;
+      }
+      nrootbatches++;
+      curcost = 0.0;
+   }
+// Output empty supernodes list
+   igrowv(offs + 1, &analysis->blkstruct);
+   analysis->blkstruct.xZ[offs] = 0;
+   offs++;
+// Allocate place for CHILDREN
+   igrowv(offs + 2 + nrootbatches, &analysis->blkstruct);
+   analysis->blkstruct.xZ[offs] = nrootbatches;
+   analysis->blkstruct.xZ[offs + 1] = 0;
+   childrenoffs = offs + 2;
+   offs = childrenoffs + nrootbatches;
+// Output empty UPDATES
+   igrowv(offs + spchol_updatesheadersize, &analysis->blkstruct);
+   analysis->blkstruct.xZ[offs] = 2;
+   analysis->blkstruct.xZ[offs + 1] = 0;
+   offs += spchol_updatesheadersize;
+// For each batch of heads generate its child block
+   totalflops = 0.0;
+   sequentialflops = 0.0;
+   nunprocessedheads = nheads;
+   for (i = 0; i < nrootbatches; i++) {
+      tmpsequentialflops = 0.0;
+      analysis->blkstruct.xZ[childrenoffs + i] = offs;
+      spchol_processbatchofheadsrec(analysis, &heads, nunprocessedheads - rootbatchsizes.xZ[i], rootbatchsizes.xZ[i], &analysis->blkstruct, &offs, &totalflops, &tmpsequentialflops);
+      sequentialflops = rmax2(sequentialflops, tmpsequentialflops);
+      nunprocessedheads -= rootbatchsizes.xZ[i];
+   }
+   ae_assert(nunprocessedheads == 0, "SPSymm: integrity check 2ff5 failed");
+// Decide on parallelism support
+   analysis->useparallelism = totalflops > smpactivationlevel() && totalflops > (sequentialflops + 1.0) * minspeedup();
+// Recycle temporary arrays
+   nipoolrecycle(&analysis->nintegerpool, &heads);
+   nipoolrecycle(&analysis->nintegerpool, &rootbatchsizes);
+   nrpoolrecycle(&analysis->nrealpool, &costs);
+   ae_frame_leave();
 }
 
 // This function loads matrix into the supernodal storage.
@@ -22951,153 +23598,6 @@ static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsemat
    }
 }
 
-// Update target supernode with data from one of its children. This operation
-// is a supernodal equivalent  of  the  column  update  in  the  left-looking
-// Cholesky.
-//
-// The generic update has the following form:
-//
-//     S = S - scatter(U*D*Uc')
-//
-// where
-// * S is an tHeight*tWidth rectangular target matrix that is:
-//   * stored with tStride >= tWidth in RowStorage[OffsS:OffsS+tHeight*tStride-1]
-//   * lower trapezoidal i.e. its leading tWidth*tWidth  submatrix  is  lower
-//     triangular. One may update either entire  tWidth*tWidth  submatrix  or
-//     just its lower part, because upper triangle is not referenced anyway.
-//   * the height of S is not given because it is not actually needed
-// * U is an uHeight*uRank rectangular update matrix tht is:
-//   * stored with row stride uStride >= uRank in RowStorage[OffsU:OffsU+uHeight*uStride-1].
-// * Uc is the leading uWidth*uRank submatrix of U
-// * D is uRank*uRank diagonal matrix that is:
-//   * stored in DiagD[OffsD:OffsD+uRank-1]
-//   * unit, when Analysis.UnitD == True. In this case it can be ignored, although
-//     DiagD still contains 1's in all of its entries
-// * uHeight <= tHeight, uWidth <= tWidth, so scatter operation is needed to update
-//   S with smaller update.
-// * scatter() is an operation  that  extends  smaller  uHeight*uWidth update
-//   matrix U*Uc' into larger tHeight*tWidth target matrix by adding zero rows
-//   and columns into U*Uc':
-//   * I-th row of update modifies Raw2SMap[SuperRowIdx[URBase+I]]-th row  of
-//     the matrix S
-//   * J-th column of update modifies Raw2SMap[SuperRowIdx[URBase+J]]-th  col
-//     of the matrix S
-// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, ae_int_t cols0, ae_int_t cols1, ae_int_t offss, ZVector *raw2smap, ae_int_t uidx, ae_int_t wrkrow, RVector *diagd, ae_int_t offsd) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t colu0;
-   ae_int_t colu1;
-   ae_int_t urbase;
-   ae_int_t urlast;
-   ae_int_t urank;
-   ae_int_t uwidth;
-   ae_int_t uheight;
-   ae_int_t urowstride;
-   ae_int_t twidth;
-   ae_int_t theight;
-   ae_int_t trowstride;
-   ae_int_t targetrow;
-   ae_int_t targetcol;
-   ae_int_t offsu;
-   ae_int_t offdiagrow;
-   ae_int_t lastrow;
-   ae_int_t offs0;
-   ae_int_t offsj;
-   ae_int_t offsk;
-   double v;
-   ae_int_t result;
-   twidth = cols1 - cols0;
-   theight = twidth + (analysis->superrowridx.xZ[sidx + 1] - analysis->superrowridx.xZ[sidx]);
-   offsu = analysis->rowoffsets.xZ[uidx];
-   colu0 = analysis->supercolrange.xZ[uidx];
-   colu1 = analysis->supercolrange.xZ[uidx + 1];
-   urbase = analysis->superrowridx.xZ[uidx];
-   urlast = analysis->superrowridx.xZ[uidx + 1];
-   urank = colu1 - colu0;
-   trowstride = analysis->rowstrides.xZ[sidx];
-   urowstride = analysis->rowstrides.xZ[uidx];
-// Skip leading uRank+WrkRow rows of U because they are not used.
-   offsu += (colu1 - colu0 + wrkrow) * urowstride;
-// Analyze range of rows in supernode LAdjPlus[II] and determine two subranges:
-// * one with indexes stored at SuperRowIdx[WrkRow:OffdiagRow);
-//   these indexes are the ones that intersect with range of rows/columns [ColS0,ColS1)
-//   occupied by diagonal block of the supernode SIdx
-// * one with indexes stored at SuperRowIdx[OffdiagRow:LastRow);
-//   these indexes are ones that intersect with range of rows occupied by
-//   offdiagonal block of the supernode SIdx
-   offdiagrow = wrkrow;
-   lastrow = urlast - urbase;
-   while (offdiagrow < lastrow && analysis->superrowidx.xZ[offdiagrow + urbase] < cols1) {
-      offdiagrow++;
-   }
-   uwidth = offdiagrow - wrkrow;
-   uheight = lastrow - wrkrow;
-   result = offdiagrow;
-// Handle special cases
-   if (trowstride == 4) {
-   // Target is stride-4 column, try several kernels that may work with tWidth == 3 and tWidth == 4
-      if (uwidth == 4 && twidth == 4 && urank == 4 && urowstride == 4) {
-         if (spchol_updatekernel4444(&analysis->outputstorage, offss, theight, offsu, uheight, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
-            return result;
-         }
-      }
-      if (spchol_updatekernelabc4(&analysis->outputstorage, offss, twidth, offsu, uheight, urank, urowstride, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
-         return result;
-      }
-   }
-   if (urank == 1 && urowstride == 1) {
-      if (spchol_updatekernelrank1(&analysis->outputstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
-         return result;
-      }
-   }
-   if (urank == 2 && urowstride == 2) {
-      if (spchol_updatekernelrank2(&analysis->outputstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
-         return result;
-      }
-   }
-// Handle general update, rerefence code
-   vectorsetlengthatleast(&analysis->u2smap, uheight);
-   for (i = 0; i < uheight; i++) {
-      analysis->u2smap.xZ[i] = raw2smap->xZ[analysis->superrowidx.xZ[urbase + wrkrow + i]];
-   }
-   if (analysis->unitd) {
-   // Unit D, vanilla Cholesky
-      for (k = 0; k < uheight; k++) {
-         targetrow = offss + analysis->u2smap.xZ[k] * trowstride;
-         for (j = 0; j < uwidth; j++) {
-            targetcol = analysis->u2smap.xZ[j];
-            offsj = offsu + j * urowstride;
-            offsk = offsu + k * urowstride;
-            offs0 = targetrow + targetcol;
-            v = analysis->outputstorage.xR[offs0];
-            for (i = 0; i < urank; i++) {
-               v -= analysis->outputstorage.xR[offsj + i] * analysis->outputstorage.xR[offsk + i];
-            }
-            analysis->outputstorage.xR[offs0] = v;
-         }
-      }
-   } else {
-   // Non-unit D, LDLT decomposition
-      for (k = 0; k < uheight; k++) {
-         targetrow = offss + analysis->u2smap.xZ[k] * trowstride;
-         for (j = 0; j < uwidth; j++) {
-            targetcol = analysis->u2smap.xZ[j];
-            offsj = offsu + j * urowstride;
-            offsk = offsu + k * urowstride;
-            offs0 = targetrow + targetcol;
-            v = analysis->outputstorage.xR[offs0];
-            for (i = 0; i < urank; i++) {
-               v -= analysis->outputstorage.xR[offsj + i] * diagd->xR[offsd + i] * analysis->outputstorage.xR[offsk + i];
-            }
-            analysis->outputstorage.xR[offs0] = v;
-         }
-      }
-   }
-   return result;
-}
-
 // Dense Cholesky driver for internal integrity checks
 // ALGLIB Routine: Copyright 22.08.2021 by Sergey Bochkanov
 static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper) {
@@ -23257,15 +23757,33 @@ ae_int_t spsymmgetmaxfastkernel() {
 //                       max(Priorities[])+1  internal  AMD  rounds   will   be
 //                       performed, so avoid specifying too large values here.
 //                       Ideally, 0 <= Priorities[I] < 5.
+//     PromoteAbove-   columns with degrees higher than PromoteAbove*max(MEAN(Degree),1)
+//                     may be promoted to the next priority group. Ignored  for
+//                     PermType != 3 and PermType != -3.
+//                     This parameter can be used to make priorities  a  hard
+//                     requirement, a non-binding  suggestion,  or  something
+//                     in-between:
+//                     * big PromoteAbove (N or more) effectively means that
+//                       priorities are hard
+//                     * values between 2 and 10 are usually a good choice  for
+//                       soft priorities
+//                     * zero value means that appropriate  value  for  a  soft
+//                       priority (between 2 and 5) is automatically chosen.
+//                       Specific value may change in future ALGLIB versions.
 //     FactType    -   factorization type:
 //                     * 0 for traditional Cholesky
 //                     * 1 for LDLT decomposition with strictly diagonal D
 //     PermType    -   permutation type:
-//                     *-3 for debug improved AMD (a sequence of decreasing
-//                         tail sizes is generated, ~logN in total, even if
-//                         ordering can be done with just one round of AMD).
-//                         This ordering is used to test correctness of
-//                         multiple AMD rounds.
+//                     *-3 for debug improved AMD which debugs AMD itself and
+//                         parallel block supernodal code:
+//                         * AMD is debugged by generating a sequence of decreasing
+//                           tail sizes, ~logN in total, even if ordering can be
+//                           done with just one round of AMD. This ordering is
+//                           used to test correctness of multiple AMD rounds.
+//                         * parallel block supernodal code is debugged by
+//                           partitioning problems into smallest possible chunks,
+//                           ignoring thresholds set by SMPActivationLevel()
+//                           and SpawnLevel().
 //                     *-2 for column count ordering (NOT RECOMMENDED!)
 //                     *-1 for absence of permutation
 //                     * 0 for best permutation available
@@ -23297,7 +23815,7 @@ ae_int_t spsymmgetmaxfastkernel() {
 // i.e. has diagonal element which is exactly zero. In  such  case  False  is
 // returned.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis) {
+bool spsymmanalyze(sparsematrix *a, ZVector *priorities, double promoteabove, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis) {
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
@@ -23316,6 +23834,7 @@ bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_i
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SPSymmAnalyze: non-square A");
    ae_assert(facttype == 0 || facttype == 1, "SPSymmAnalyze: unexpected FactType");
    ae_assert(permtype == 0 || permtype == 1 || permtype == 2 || permtype == 3 || permtype == -1 || permtype == -2 || permtype == -3, "SPSymmAnalyze: unexpected PermType");
+   ae_assert(permtype != 3 && permtype != -3 || isfinite(promoteabove) && promoteabove >= 0.0, "SPSymmAnalyze: unexpected PromoteAbove - infinite or negative");
    result = true;
    n = sparsegetnrows(a);
    if (permtype == -3 || permtype == 3) {
@@ -23325,11 +23844,13 @@ bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_i
    if (permtype == 0) {
       isetallocv(n, 0, &analysis->curpriorities);
       permtype = 3;
+      promoteabove = 0.0;
    }
    analysis->tasktype = 0;
    analysis->n = n;
    analysis->unitd = facttype == 0;
    analysis->permtype = permtype;
+   analysis->debugblocksupernodal = permtype == -3;
    analysis->istopologicalordering = permtype == -1 || permtype == 1;
    analysis->applypermutationtooutput = permtype == -1;
    analysis->modtype = 0;
@@ -23337,6 +23858,7 @@ bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_i
    analysis->modparam1 = 0.0;
    analysis->modparam2 = 0.0;
    analysis->modparam3 = 0.0;
+   analysis->useparallelism = false;
 // Allocate temporaries
    vectorsetlengthatleast(&analysis->tmpparent, n + 1);
    vectorsetlengthatleast(&analysis->tmp0, n + 1);
@@ -23345,6 +23867,9 @@ bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_i
    vectorsetlengthatleast(&analysis->tmp3, n + 1);
    vectorsetlengthatleast(&analysis->tmp4, n + 1);
    vectorsetlengthatleast(&analysis->flagarray, n + 1);
+   nbpoolinit(&analysis->nbooleanpool, n);
+   nipoolinit(&analysis->nintegerpool, n);
+   nrpoolinit(&analysis->nrealpool, n);
 // Initial integrity check - diagonal MUST be symbolically nonzero
    for (i = 0; i < n; i++) {
       if (a->didx.xZ[i] == a->uidx.xZ[i]) {
@@ -23421,7 +23946,7 @@ bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_i
                   eligiblecnt++;
                }
             }
-            newrange0 = range0 + generateamdpermutationx(&analysis->tmpa, &analysis->eligible, range1 - range0, &analysis->tmpperm, &analysis->invtmpperm, 1, &analysis->amdtmp);
+            newrange0 = range0 + generateamdpermutationx(&analysis->tmpa, &analysis->eligible, range1 - range0, promoteabove, &analysis->tmpperm, &analysis->invtmpperm, 1, &analysis->amdtmp);
             if (permtype == -3) {
             // Special debug ordering in order to test correctness of multiple AMD rounds
                newrange0 = imin2(newrange0, range0 + m / 2 + 1);
@@ -23522,6 +24047,8 @@ bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_i
    // Having fully initialized supernodal structure, analyze dependencies
       spchol_analyzesupernodaldependencies(analysis, &analysis->tmpa, &analysis->node2supernode, n, &analysis->tmp0, &analysis->tmp1, &analysis->flagarray);
    }
+// Prepare block structure
+   spchol_createblockstructure(analysis);
 // Save information for integrity checks
    icopyallocv(n + 1, &analysis->tmpat.ridx, &analysis->referenceridx);
 // Load matrix into the supernodal storage
@@ -23685,55 +24212,23 @@ void spsymmreloaddiagonal(spcholanalysis *analysis, RVector *d) {
 // the diagonal.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 bool spsymmfactorize(spcholanalysis *analysis) {
-   ae_int_t i;
-   ae_int_t k;
-   ae_int_t ii;
+   ae_frame _frame_block;
    ae_int_t n;
-   ae_int_t cols0;
-   ae_int_t cols1;
-   ae_int_t offss;
-   ae_int_t blocksize;
-   ae_int_t sidx;
-   ae_int_t uidx;
    bool result;
+   ae_frame_make(&_frame_block);
+   bool b;
    ae_assert(analysis->tasktype == 0, "SPCholFactorize: Analysis type does not match current task");
-   result = true;
    n = analysis->n;
-// Prepare structures:
-// * WrkRows[] store pointers to beginnings of the offdiagonal supernode row ranges;
-//   at the beginning of the work WrkRows[] == 0, but as we advance from the column
-//   range [0,A) to [A,B), to [B,C) and so on, we advance WrkRows[] in order to
-//   quickly skip parts that are less than A, less than B, less than C and so on.
-   vectorsetlengthatleast(&analysis->raw2smap, n);
+// Allocate temporaries
    vectorsetlengthatleast(&analysis->tmp0, n + 1);
-   bsetallocv(n, false, &analysis->flagarray);
-   isetallocv(analysis->nsuper, 0, &analysis->wrkrows);
    rsetallocv(n, 0.0, &analysis->diagd);
    rcopyallocv(analysis->rowoffsets.xZ[analysis->nsuper], &analysis->inputstorage, &analysis->outputstorage);
-// Now we can run actual supernodal Cholesky
-   for (sidx = 0; sidx < analysis->nsuper; sidx++) {
-      cols0 = analysis->supercolrange.xZ[sidx];
-      cols1 = analysis->supercolrange.xZ[sidx + 1];
-      blocksize = cols1 - cols0;
-      offss = analysis->rowoffsets.xZ[sidx];
-   // Prepare mapping of raw (range 0...N-1) indexes into internal (range 0...BlockSize+OffdiagSize-1) ones
-      for (i = cols0; i < cols1; i++) {
-         analysis->raw2smap.xZ[i] = i - cols0;
-      }
-      for (k = analysis->superrowridx.xZ[sidx]; k < analysis->superrowridx.xZ[sidx + 1]; k++) {
-         analysis->raw2smap.xZ[analysis->superrowidx.xZ[k]] = blocksize + (k - analysis->superrowridx.xZ[sidx]);
-      }
-   // Update current supernode with nonzeros from the current row
-      for (ii = analysis->ladjplusr.xZ[sidx]; ii < analysis->ladjplusr.xZ[sidx + 1]; ii++) {
-         uidx = analysis->ladjplus.xZ[ii];
-         analysis->wrkrows.xZ[uidx] = spchol_updatesupernode(analysis, sidx, cols0, cols1, offss, &analysis->raw2smap, uidx, analysis->wrkrows.xZ[uidx], &analysis->diagd, analysis->supercolrange.xZ[uidx]);
-      }
-   // Factorize current supernode
-      if (!spchol_factorizesupernode(analysis, sidx)) {
-         result = false;
-         return result;
-      }
-   }
+   icopyallocv(analysis->nsuper, &analysis->ladj.rowbegin, &analysis->currowbegin);
+// Perform recursive processing
+   b = false;
+   spchol_spsymmfactorizeblockrec(analysis, &analysis->currowbegin, 0, true, &b);
+   result = !b;
+   ae_frame_leave();
    return result;
 }
 
@@ -23783,7 +24278,6 @@ void spsymmsolve(spcholanalysis *analysis, RVector *b) {
    ae_int_t j;
    ae_int_t k;
    double v;
-   ae_int_t simdwidth;
    ae_int_t baseoffs;
    ae_int_t cols0;
    ae_int_t cols1;
@@ -23793,19 +24287,17 @@ void spsymmsolve(spcholanalysis *analysis, RVector *b) {
    ae_int_t blocksize;
    ae_int_t rbase;
    ae_int_t offdiagsize;
+   double x0;
+   double x1;
+   double x2;
+   double x3;
    n = analysis->n;
-   simdwidth = spchol_spsymmgetmaxsimd();
    rsetallocv(n, 0.0, &analysis->tmpx);
 // Handle left-hand side permutation, convert data to internal SIMD-friendly format
-   rsetallocv(n * simdwidth, 0.0, &analysis->simdbuf);
    for (i = 0; i < n; i++) {
-      analysis->simdbuf.xR[i * simdwidth] = b->xR[analysis->inveffectiveperm.xZ[i]];
+      analysis->tmpx.xR[i] = b->xR[analysis->inveffectiveperm.xZ[i]];
    }
 // Solve for L*tmp_x == rhs.
-//
-// The RHS (original and temporary updates) is stored in the SIMD-friendly SIMDBuf which
-// stores RHS as unevaluated sum of SIMDWidth numbers (this format allows easy updates
-// with SIMD intrinsics), the result is written into TmpX (traditional contiguous storage).
    for (sidx = 0; sidx < analysis->nsuper; sidx++) {
       cols0 = analysis->supercolrange.xZ[sidx];
       cols1 = analysis->supercolrange.xZ[sidx + 1];
@@ -23814,27 +24306,123 @@ void spsymmsolve(spcholanalysis *analysis, RVector *b) {
       sstride = analysis->rowstrides.xZ[sidx];
       rbase = analysis->superrowridx.xZ[sidx];
       offdiagsize = analysis->superrowridx.xZ[sidx + 1] - rbase;
-   // Solve for variables in the supernode
-      for (i = cols0; i < cols1; i++) {
-         baseoffs = offss + (i - cols0) * sstride + (-cols0);
-         v = 0.0;
-         for (j = 0; j < simdwidth; j++) {
-            v += analysis->simdbuf.xR[i * simdwidth + j];
+   // Solve for variables in the supernode,
+   // fetch vars to locals (when supernode is small enough)
+      ae_assert(blocksize <= 4, "SPSymm: integrity check 4228 failed");
+      if (blocksize == 1) {
+      // One column, fetch to X0
+         ae_assert(sstride == 1, "SPSymm: integrity check 4620 failed");
+         x0 = analysis->tmpx.xR[cols0] / analysis->outputstorage.xR[offss];
+         analysis->tmpx.xR[cols0] = x0;
+      } else {
+         if (blocksize == 2) {
+         // Two columns, fetch to X0 and X1
+            ae_assert(sstride == 2, "SPSymm: integrity check 5730 failed");
+            for (i = cols0; i < cols1; i++) {
+               baseoffs = offss + (i - cols0) * sstride + (-cols0);
+               v = analysis->tmpx.xR[i];
+               for (j = cols0; j < i; j++) {
+                  v -= analysis->outputstorage.xR[baseoffs + j] * analysis->tmpx.xR[j];
+               }
+               analysis->tmpx.xR[i] = v / analysis->outputstorage.xR[baseoffs + i];
+            }
+            x0 = analysis->tmpx.xR[cols0];
+            x1 = analysis->tmpx.xR[cols0 + 1];
+         } else {
+            if (blocksize == 3) {
+            // Three columns, fetch to X0, X1 and X2
+               ae_assert(sstride == 4, "SPSymm: integrity check 7446 failed");
+               for (i = cols0; i < cols1; i++) {
+                  baseoffs = offss + (i - cols0) * sstride + (-cols0);
+                  v = analysis->tmpx.xR[i];
+                  for (j = cols0; j < i; j++) {
+                     v -= analysis->outputstorage.xR[baseoffs + j] * analysis->tmpx.xR[j];
+                  }
+                  analysis->tmpx.xR[i] = v / analysis->outputstorage.xR[baseoffs + i];
+               }
+               x0 = analysis->tmpx.xR[cols0];
+               x1 = analysis->tmpx.xR[cols0 + 1];
+               x2 = analysis->tmpx.xR[cols0 + 2];
+            } else {
+               if (blocksize == 4) {
+               // Four columns, fetch to X0, X1, X2, X3
+                  ae_assert(sstride == 4, "SPSymm: integrity check 9252 failed");
+                  for (i = cols0; i < cols1; i++) {
+                     baseoffs = offss + (i - cols0) * sstride + (-cols0);
+                     v = analysis->tmpx.xR[i];
+                     for (j = cols0; j < i; j++) {
+                        v -= analysis->outputstorage.xR[baseoffs + j] * analysis->tmpx.xR[j];
+                     }
+                     analysis->tmpx.xR[i] = v / analysis->outputstorage.xR[baseoffs + i];
+                  }
+                  x0 = analysis->tmpx.xR[cols0];
+                  x1 = analysis->tmpx.xR[cols0 + 1];
+                  x2 = analysis->tmpx.xR[cols0 + 2];
+                  x3 = analysis->tmpx.xR[cols0 + 3];
+               } else {
+               // Generic case
+                  for (i = cols0; i < cols1; i++) {
+                     baseoffs = offss + (i - cols0) * sstride + (-cols0);
+                     v = analysis->tmpx.xR[i];
+                     for (j = cols0; j < i; j++) {
+                        v -= analysis->outputstorage.xR[baseoffs + j] * analysis->tmpx.xR[j];
+                     }
+                     analysis->tmpx.xR[i] = v / analysis->outputstorage.xR[baseoffs + i];
+                  }
+               }
+            }
          }
-         for (j = cols0; j < i; j++) {
-            v -= analysis->outputstorage.xR[baseoffs + j] * analysis->tmpx.xR[j];
-         }
-         analysis->tmpx.xR[i] = v / analysis->outputstorage.xR[baseoffs + i];
       }
    // Propagate update to other variables
-      for (k = 0; k < offdiagsize; k++) {
-         i = analysis->superrowidx.xZ[rbase + k];
-         baseoffs = offss + (k + blocksize) * sstride;
-         v = analysis->simdbuf.xR[i * simdwidth];
-         for (j = 0; j < blocksize; j++) {
-            v -= analysis->outputstorage.xR[baseoffs + j] * analysis->tmpx.xR[cols0 + j];
+      if (blocksize == 1) {
+      // Special case: single column
+         baseoffs = offss + 1;
+         for (k = 0; k < offdiagsize; k++) {
+            i = analysis->superrowidx.xZ[rbase + k];
+            analysis->tmpx.xR[i] -= analysis->outputstorage.xR[baseoffs] * x0;
+            baseoffs++;
          }
-         analysis->simdbuf.xR[i * simdwidth] = v;
+      } else {
+         if (blocksize == 2) {
+         // Two columns
+            baseoffs = offss + 4;
+            for (k = 0; k < offdiagsize; k++) {
+               i = analysis->superrowidx.xZ[rbase + k];
+               analysis->tmpx.xR[i] -= analysis->outputstorage.xR[baseoffs] * x0 + analysis->outputstorage.xR[baseoffs + 1] * x1;
+               baseoffs += 2;
+            }
+         } else {
+            if (blocksize == 3) {
+            // Three columns
+               baseoffs = offss + 12;
+               for (k = 0; k < offdiagsize; k++) {
+                  i = analysis->superrowidx.xZ[rbase + k];
+                  analysis->tmpx.xR[i] -= analysis->outputstorage.xR[baseoffs] * x0 + analysis->outputstorage.xR[baseoffs + 1] * x1 + analysis->outputstorage.xR[baseoffs + 2] * x2;
+                  baseoffs += 4;
+               }
+            } else {
+               if (blocksize == 4) {
+               // Four columns
+                  baseoffs = offss + 16;
+                  for (k = 0; k < offdiagsize; k++) {
+                     i = analysis->superrowidx.xZ[rbase + k];
+                     analysis->tmpx.xR[i] -= analysis->outputstorage.xR[baseoffs] * x0 + analysis->outputstorage.xR[baseoffs + 1] * x1 + analysis->outputstorage.xR[baseoffs + 2] * x2 + analysis->outputstorage.xR[baseoffs + 3] * x3;
+                     baseoffs += 4;
+                  }
+               } else {
+               // Generic propagate
+                  for (k = 0; k < offdiagsize; k++) {
+                     i = analysis->superrowidx.xZ[rbase + k];
+                     baseoffs = offss + (k + blocksize) * sstride;
+                     v = analysis->tmpx.xR[i];
+                     for (j = 0; j < blocksize; j++) {
+                        v -= analysis->outputstorage.xR[baseoffs + j] * analysis->tmpx.xR[cols0 + j];
+                     }
+                     analysis->tmpx.xR[i] = v;
+                  }
+               }
+            }
+         }
       }
    }
 // Solve for D*tmp_x == rhs.
@@ -23856,11 +24444,77 @@ void spsymmsolve(spcholanalysis *analysis, RVector *b) {
       rbase = analysis->superrowridx.xZ[sidx];
       offdiagsize = analysis->superrowridx.xZ[sidx + 1] - rbase;
    // Subtract already computed variables
-      for (k = 0; k < offdiagsize; k++) {
-         baseoffs = offss + (k + blocksize) * sstride;
-         v = analysis->tmpx.xR[analysis->superrowidx.xZ[rbase + k]];
-         for (j = 0; j < blocksize; j++) {
-            analysis->tmpx.xR[cols0 + j] -= analysis->outputstorage.xR[baseoffs + j] * v;
+      if (blocksize == 1) {
+      // Single column, use value fetched in X0
+         x0 = analysis->tmpx.xR[cols0];
+         baseoffs = offss + 1;
+         for (k = 0; k < offdiagsize; k++) {
+            x0 -= analysis->outputstorage.xR[baseoffs] * analysis->tmpx.xR[analysis->superrowidx.xZ[rbase + k]];
+            baseoffs++;
+         }
+         analysis->tmpx.xR[cols0] = x0;
+      } else {
+         if (blocksize == 2) {
+         // Two columns, use values fetched in X0, X1
+            x0 = analysis->tmpx.xR[cols0];
+            x1 = analysis->tmpx.xR[cols0 + 1];
+            baseoffs = offss + 4;
+            for (k = 0; k < offdiagsize; k++) {
+               v = analysis->tmpx.xR[analysis->superrowidx.xZ[rbase + k]];
+               x0 -= analysis->outputstorage.xR[baseoffs] * v;
+               x1 -= analysis->outputstorage.xR[baseoffs + 1] * v;
+               baseoffs += 2;
+            }
+            analysis->tmpx.xR[cols0] = x0;
+            analysis->tmpx.xR[cols0 + 1] = x1;
+         } else {
+            if (blocksize == 3) {
+            // Three columns, use values fetched in X0, X1, X2
+               x0 = analysis->tmpx.xR[cols0];
+               x1 = analysis->tmpx.xR[cols0 + 1];
+               x2 = analysis->tmpx.xR[cols0 + 2];
+               baseoffs = offss + 12;
+               for (k = 0; k < offdiagsize; k++) {
+                  v = analysis->tmpx.xR[analysis->superrowidx.xZ[rbase + k]];
+                  x0 -= analysis->outputstorage.xR[baseoffs] * v;
+                  x1 -= analysis->outputstorage.xR[baseoffs + 1] * v;
+                  x2 -= analysis->outputstorage.xR[baseoffs + 2] * v;
+                  baseoffs += 4;
+               }
+               analysis->tmpx.xR[cols0] = x0;
+               analysis->tmpx.xR[cols0 + 1] = x1;
+               analysis->tmpx.xR[cols0 + 2] = x2;
+            } else {
+               if (blocksize == 4) {
+               // Four columns, use values fetched in X0, X1, X2, X3
+                  x0 = analysis->tmpx.xR[cols0];
+                  x1 = analysis->tmpx.xR[cols0 + 1];
+                  x2 = analysis->tmpx.xR[cols0 + 2];
+                  x3 = analysis->tmpx.xR[cols0 + 3];
+                  baseoffs = offss + 16;
+                  for (k = 0; k < offdiagsize; k++) {
+                     v = analysis->tmpx.xR[analysis->superrowidx.xZ[rbase + k]];
+                     x0 -= analysis->outputstorage.xR[baseoffs] * v;
+                     x1 -= analysis->outputstorage.xR[baseoffs + 1] * v;
+                     x2 -= analysis->outputstorage.xR[baseoffs + 2] * v;
+                     x3 -= analysis->outputstorage.xR[baseoffs + 3] * v;
+                     baseoffs += 4;
+                  }
+                  analysis->tmpx.xR[cols0] = x0;
+                  analysis->tmpx.xR[cols0 + 1] = x1;
+                  analysis->tmpx.xR[cols0 + 2] = x2;
+                  analysis->tmpx.xR[cols0 + 3] = x3;
+               } else {
+               // Generic case
+                  for (k = 0; k < offdiagsize; k++) {
+                     baseoffs = offss + (k + blocksize) * sstride;
+                     v = analysis->tmpx.xR[analysis->superrowidx.xZ[rbase + k]];
+                     for (j = 0; j < blocksize; j++) {
+                        analysis->tmpx.xR[cols0 + j] -= analysis->outputstorage.xR[baseoffs + j] * v;
+                     }
+                  }
+               }
+            }
          }
       }
    // Solve for variables in the supernode
@@ -23950,41 +24604,82 @@ void spsymmdiagerr(spcholanalysis *analysis, double *sumsq, double *errsq) {
    }
 }
 
+void spcholadj_init(void *_p, bool make_automatic) {
+   spcholadj *p = (spcholadj *)_p;
+   ae_vector_init(&p->rowbegin, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->rowend, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->idx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->urow0, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->uwidth, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->uflop, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->nflop, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->sflop, 0, DT_REAL, make_automatic);
+}
+
+void spcholadj_copy(void *_dst, const void *_src, bool make_automatic) {
+   spcholadj *dst = (spcholadj *)_dst;
+   const spcholadj *src = (const spcholadj *)_src;
+   ae_vector_copy(&dst->rowbegin, &src->rowbegin, make_automatic);
+   ae_vector_copy(&dst->rowend, &src->rowend, make_automatic);
+   ae_vector_copy(&dst->idx, &src->idx, make_automatic);
+   ae_vector_copy(&dst->urow0, &src->urow0, make_automatic);
+   ae_vector_copy(&dst->uwidth, &src->uwidth, make_automatic);
+   ae_vector_copy(&dst->uflop, &src->uflop, make_automatic);
+   ae_vector_copy(&dst->nflop, &src->nflop, make_automatic);
+   ae_vector_copy(&dst->sflop, &src->sflop, make_automatic);
+}
+
+void spcholadj_free(void *_p, bool make_automatic) {
+   spcholadj *p = (spcholadj *)_p;
+   ae_vector_free(&p->rowbegin, make_automatic);
+   ae_vector_free(&p->rowend, make_automatic);
+   ae_vector_free(&p->idx, make_automatic);
+   ae_vector_free(&p->urow0, make_automatic);
+   ae_vector_free(&p->uwidth, make_automatic);
+   ae_vector_free(&p->uflop, make_automatic);
+   ae_vector_free(&p->nflop, make_automatic);
+   ae_vector_free(&p->sflop, make_automatic);
+}
+
 void spcholanalysis_init(void *_p, bool make_automatic) {
    spcholanalysis *p = (spcholanalysis *)_p;
    ae_vector_init(&p->referenceridx, 0, DT_INT, make_automatic);
    ae_vector_init(&p->parentsupernode, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->childsupernodesridx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->childsupernodesidx, 0, DT_INT, make_automatic);
    ae_vector_init(&p->supercolrange, 0, DT_INT, make_automatic);
    ae_vector_init(&p->superrowridx, 0, DT_INT, make_automatic);
    ae_vector_init(&p->superrowidx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->blkstruct, 0, DT_INT, make_automatic);
    ae_vector_init(&p->fillinperm, 0, DT_INT, make_automatic);
    ae_vector_init(&p->invfillinperm, 0, DT_INT, make_automatic);
    ae_vector_init(&p->superperm, 0, DT_INT, make_automatic);
    ae_vector_init(&p->invsuperperm, 0, DT_INT, make_automatic);
    ae_vector_init(&p->effectiveperm, 0, DT_INT, make_automatic);
    ae_vector_init(&p->inveffectiveperm, 0, DT_INT, make_automatic);
-   ae_vector_init(&p->ladjplusr, 0, DT_INT, make_automatic);
-   ae_vector_init(&p->ladjplus, 0, DT_INT, make_automatic);
+   spcholadj_init(&p->ladj, make_automatic);
    ae_vector_init(&p->outrowcounts, 0, DT_INT, make_automatic);
    ae_vector_init(&p->inputstorage, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->outputstorage, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->rowstrides, 0, DT_INT, make_automatic);
    ae_vector_init(&p->rowoffsets, 0, DT_INT, make_automatic);
    ae_vector_init(&p->diagd, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->wrkrows, 0, DT_INT, make_automatic);
+   nbpool_init(&p->nbooleanpool, make_automatic);
+   nipool_init(&p->nintegerpool, make_automatic);
+   nrpool_init(&p->nrealpool, make_automatic);
+   ae_vector_init(&p->currowbegin, 0, DT_INT, make_automatic);
    ae_vector_init(&p->flagarray, 0, DT_BOOL, make_automatic);
    ae_vector_init(&p->eligible, 0, DT_BOOL, make_automatic);
    ae_vector_init(&p->curpriorities, 0, DT_INT, make_automatic);
    ae_vector_init(&p->tmpparent, 0, DT_INT, make_automatic);
    ae_vector_init(&p->node2supernode, 0, DT_INT, make_automatic);
-   ae_vector_init(&p->u2smap, 0, DT_INT, make_automatic);
-   ae_vector_init(&p->raw2smap, 0, DT_INT, make_automatic);
    amdbuffer_init(&p->amdtmp, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_INT, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_INT, make_automatic);
    ae_vector_init(&p->tmp2, 0, DT_INT, make_automatic);
    ae_vector_init(&p->tmp3, 0, DT_INT, make_automatic);
    ae_vector_init(&p->tmp4, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->raw2smap, 0, DT_INT, make_automatic);
    sparsematrix_init(&p->tmpa, make_automatic);
    sparsematrix_init(&p->tmpat, make_automatic);
    sparsematrix_init(&p->tmpa2, make_automatic);
@@ -24010,12 +24705,17 @@ void spcholanalysis_copy(void *_dst, const void *_src, bool make_automatic) {
    dst->modparam1 = src->modparam1;
    dst->modparam2 = src->modparam2;
    dst->modparam3 = src->modparam3;
+   dst->debugblocksupernodal = src->debugblocksupernodal;
    ae_vector_copy(&dst->referenceridx, &src->referenceridx, make_automatic);
    dst->nsuper = src->nsuper;
    ae_vector_copy(&dst->parentsupernode, &src->parentsupernode, make_automatic);
+   ae_vector_copy(&dst->childsupernodesridx, &src->childsupernodesridx, make_automatic);
+   ae_vector_copy(&dst->childsupernodesidx, &src->childsupernodesidx, make_automatic);
    ae_vector_copy(&dst->supercolrange, &src->supercolrange, make_automatic);
    ae_vector_copy(&dst->superrowridx, &src->superrowridx, make_automatic);
    ae_vector_copy(&dst->superrowidx, &src->superrowidx, make_automatic);
+   ae_vector_copy(&dst->blkstruct, &src->blkstruct, make_automatic);
+   dst->useparallelism = src->useparallelism;
    ae_vector_copy(&dst->fillinperm, &src->fillinperm, make_automatic);
    ae_vector_copy(&dst->invfillinperm, &src->invfillinperm, make_automatic);
    ae_vector_copy(&dst->superperm, &src->superperm, make_automatic);
@@ -24024,28 +24724,29 @@ void spcholanalysis_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->inveffectiveperm, &src->inveffectiveperm, make_automatic);
    dst->istopologicalordering = src->istopologicalordering;
    dst->applypermutationtooutput = src->applypermutationtooutput;
-   ae_vector_copy(&dst->ladjplusr, &src->ladjplusr, make_automatic);
-   ae_vector_copy(&dst->ladjplus, &src->ladjplus, make_automatic);
+   spcholadj_copy(&dst->ladj, &src->ladj, make_automatic);
    ae_vector_copy(&dst->outrowcounts, &src->outrowcounts, make_automatic);
    ae_vector_copy(&dst->inputstorage, &src->inputstorage, make_automatic);
    ae_vector_copy(&dst->outputstorage, &src->outputstorage, make_automatic);
    ae_vector_copy(&dst->rowstrides, &src->rowstrides, make_automatic);
    ae_vector_copy(&dst->rowoffsets, &src->rowoffsets, make_automatic);
    ae_vector_copy(&dst->diagd, &src->diagd, make_automatic);
-   ae_vector_copy(&dst->wrkrows, &src->wrkrows, make_automatic);
+   nbpool_copy(&dst->nbooleanpool, &src->nbooleanpool, make_automatic);
+   nipool_copy(&dst->nintegerpool, &src->nintegerpool, make_automatic);
+   nrpool_copy(&dst->nrealpool, &src->nrealpool, make_automatic);
+   ae_vector_copy(&dst->currowbegin, &src->currowbegin, make_automatic);
    ae_vector_copy(&dst->flagarray, &src->flagarray, make_automatic);
    ae_vector_copy(&dst->eligible, &src->eligible, make_automatic);
    ae_vector_copy(&dst->curpriorities, &src->curpriorities, make_automatic);
    ae_vector_copy(&dst->tmpparent, &src->tmpparent, make_automatic);
    ae_vector_copy(&dst->node2supernode, &src->node2supernode, make_automatic);
-   ae_vector_copy(&dst->u2smap, &src->u2smap, make_automatic);
-   ae_vector_copy(&dst->raw2smap, &src->raw2smap, make_automatic);
    amdbuffer_copy(&dst->amdtmp, &src->amdtmp, make_automatic);
    ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
    ae_vector_copy(&dst->tmp1, &src->tmp1, make_automatic);
    ae_vector_copy(&dst->tmp2, &src->tmp2, make_automatic);
    ae_vector_copy(&dst->tmp3, &src->tmp3, make_automatic);
    ae_vector_copy(&dst->tmp4, &src->tmp4, make_automatic);
+   ae_vector_copy(&dst->raw2smap, &src->raw2smap, make_automatic);
    sparsematrix_copy(&dst->tmpa, &src->tmpa, make_automatic);
    sparsematrix_copy(&dst->tmpat, &src->tmpat, make_automatic);
    sparsematrix_copy(&dst->tmpa2, &src->tmpa2, make_automatic);
@@ -24063,37 +24764,41 @@ void spcholanalysis_free(void *_p, bool make_automatic) {
    spcholanalysis *p = (spcholanalysis *)_p;
    ae_vector_free(&p->referenceridx, make_automatic);
    ae_vector_free(&p->parentsupernode, make_automatic);
+   ae_vector_free(&p->childsupernodesridx, make_automatic);
+   ae_vector_free(&p->childsupernodesidx, make_automatic);
    ae_vector_free(&p->supercolrange, make_automatic);
    ae_vector_free(&p->superrowridx, make_automatic);
    ae_vector_free(&p->superrowidx, make_automatic);
+   ae_vector_free(&p->blkstruct, make_automatic);
    ae_vector_free(&p->fillinperm, make_automatic);
    ae_vector_free(&p->invfillinperm, make_automatic);
    ae_vector_free(&p->superperm, make_automatic);
    ae_vector_free(&p->invsuperperm, make_automatic);
    ae_vector_free(&p->effectiveperm, make_automatic);
    ae_vector_free(&p->inveffectiveperm, make_automatic);
-   ae_vector_free(&p->ladjplusr, make_automatic);
-   ae_vector_free(&p->ladjplus, make_automatic);
+   spcholadj_free(&p->ladj, make_automatic);
    ae_vector_free(&p->outrowcounts, make_automatic);
    ae_vector_free(&p->inputstorage, make_automatic);
    ae_vector_free(&p->outputstorage, make_automatic);
    ae_vector_free(&p->rowstrides, make_automatic);
    ae_vector_free(&p->rowoffsets, make_automatic);
    ae_vector_free(&p->diagd, make_automatic);
-   ae_vector_free(&p->wrkrows, make_automatic);
+   nbpool_free(&p->nbooleanpool, make_automatic);
+   nipool_free(&p->nintegerpool, make_automatic);
+   nrpool_free(&p->nrealpool, make_automatic);
+   ae_vector_free(&p->currowbegin, make_automatic);
    ae_vector_free(&p->flagarray, make_automatic);
    ae_vector_free(&p->eligible, make_automatic);
    ae_vector_free(&p->curpriorities, make_automatic);
    ae_vector_free(&p->tmpparent, make_automatic);
    ae_vector_free(&p->node2supernode, make_automatic);
-   ae_vector_free(&p->u2smap, make_automatic);
-   ae_vector_free(&p->raw2smap, make_automatic);
    amdbuffer_free(&p->amdtmp, make_automatic);
    ae_vector_free(&p->tmp0, make_automatic);
    ae_vector_free(&p->tmp1, make_automatic);
    ae_vector_free(&p->tmp2, make_automatic);
    ae_vector_free(&p->tmp3, make_automatic);
    ae_vector_free(&p->tmp4, make_automatic);
+   ae_vector_free(&p->raw2smap, make_automatic);
    sparsematrix_free(&p->tmpa, make_automatic);
    sparsematrix_free(&p->tmpat, make_automatic);
    sparsematrix_free(&p->tmpa2, make_automatic);
@@ -25388,7 +26093,7 @@ bool sparsecholesky(sparsematrix *a, bool isupper) {
    permtype = -1;
 // Easy case - CRS matrix in lower triangle, no conversion or transposition is needed
    if (sparseiscrs(a) && !isupper) {
-      result = spsymmanalyze(a, &priorities, facttype, permtype, &analysis.analysis);
+      result = spsymmanalyze(a, &priorities, 0.0, facttype, permtype, &analysis.analysis);
       if (!result) {
          ae_frame_leave();
          return result;
@@ -25409,7 +26114,7 @@ bool sparsecholesky(sparsematrix *a, bool isupper) {
    } else {
       sparsecopytocrsbuf(a, &analysis.wrka);
    }
-   result = spsymmanalyze(&analysis.wrka, &priorities, facttype, permtype, &analysis.analysis);
+   result = spsymmanalyze(&analysis.wrka, &priorities, 0.0, facttype, permtype, &analysis.analysis);
    if (!result) {
       ae_frame_leave();
       return result;
@@ -25498,7 +26203,7 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
    permtype = 0;
 // Easy case - CRS matrix in lower triangle, no conversion or transposition is needed
    if (sparseiscrs(a) && !isupper) {
-      result = spsymmanalyze(a, &priorities, facttype, permtype, &analysis.analysis);
+      result = spsymmanalyze(a, &priorities, 0.0, facttype, permtype, &analysis.analysis);
       if (!result) {
          ae_frame_leave();
          return result;
@@ -25519,7 +26224,7 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
    } else {
       sparsecopytocrsbuf(a, &analysis.wrka);
    }
-   result = spsymmanalyze(&analysis.wrka, &priorities, facttype, permtype, &analysis.analysis);
+   result = spsymmanalyze(&analysis.wrka, &priorities, 0.0, facttype, permtype, &analysis.analysis);
    if (!result) {
       ae_frame_leave();
       return result;
@@ -25626,9 +26331,9 @@ bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_
       sparsecopytocrs(a, &analysis->crsa);
       if (isupper) {
          sparsecopytransposecrsbuf(&analysis->crsa, &analysis->crsat);
-         result = spsymmanalyze(&analysis->crsat, &priorities, facttype, permtype, &analysis->analysis);
+         result = spsymmanalyze(&analysis->crsat, &priorities, 0.0, facttype, permtype, &analysis->analysis);
       } else {
-         result = spsymmanalyze(&analysis->crsa, &priorities, facttype, permtype, &analysis->analysis);
+         result = spsymmanalyze(&analysis->crsa, &priorities, 0.0, facttype, permtype, &analysis->analysis);
       }
    } else {
    // The matrix is stored in CRS format. However we may need to
@@ -25636,9 +26341,9 @@ bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_
    // by SPSymmAnalyze).
       if (isupper) {
          sparsecopytransposecrsbuf(a, &analysis->crsat);
-         result = spsymmanalyze(&analysis->crsat, &priorities, facttype, permtype, &analysis->analysis);
+         result = spsymmanalyze(&analysis->crsat, &priorities, 0.0, facttype, permtype, &analysis->analysis);
       } else {
-         result = spsymmanalyze(a, &priorities, facttype, permtype, &analysis->analysis);
+         result = spsymmanalyze(a, &priorities, 0.0, facttype, permtype, &analysis->analysis);
       }
    }
    ae_frame_leave();

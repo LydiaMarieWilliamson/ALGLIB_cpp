@@ -545,6 +545,16 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 		―	Added a new macro:
 			RepObj(Type, P) P = (Type *)ae_malloc(sizeof *P), memset(P, 0, sizeof *P), Type##_init(P, false), ae_smart_ptr_assign(&amp;_##P, P, true, true, sizeof *P, Type##_copy, Type##_free)
 			Use P as a temporary before assigning its value to _P.
+	∙	TestC.cpp: Update the main and alglibbasics testing units.
+42	Update AlgLibInternal.{cpp,h} to 3.20.0.
+	∙	Follow-up revisions made to AlgLibInternal.{cpp,h} from 3.20.0:
+		―	Remove {b,i,r}case2 functions: they are just the C-conditional expression.
+		―	Convert sboolarray ⇒ BVector, sintegerarray ⇒ ZVector
+		―	Redefine and replace sboolarray_{init,copy,free} by BVector_{init,copy,free}.
+		―	Redefine and replace sintegerarray_{init,copy,free} by ZVector_{init,copy,free}.
+	∙	TestC.cpp: Update the tsort testing unit.
+42	Update LinAlg.{cpp,h} to 3.20.0.
+	Update of the call of spsymmanalyze(), from LinAlg.*, in Optimization.cpp.
 </pre>
 </p>
 <p>
@@ -718,6 +728,9 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 42	7692 1.0x 11766 0.9x 11632 1.0x 9518 1.0x 1680482344 (642a2028) 78 // Partial inclusion of updates in 3.20.0 staged. TestC minbc error corrected.
 42	7634 1.0x 11629 1.0x 11769 1.0x 7742 1.0x 1680735245 (642dfc0d) 79 // Upgrade of Ap.{cpp,h} to 3.20.0.
 42	7519 1.0x 11365 1.0x 11769 1.0x 9690 1.0x 1680990464 (6431e100) 76 // Upgrade of AlgLibInternal.{cpp,h} to 3.20.0.
+42	7519 1.0x 12049 1.0x 11115 1.0x 9539 1.0x 1681933586 (64404512) 75 // Upgrade of TestC.cpp (alglibbasics, main) for Ap.{cpp,h} to 3.20.0.
+42	7692 1.0x 11906 0.9x 11498 1.0x 9373 1.0x 1681935896 (64404e18) 79 // Upgrade of TestC.cpp (tsort) for AlgLibInternal.{cpp,h} to 3.20.0.
+42	7752 1.0x 11629 1.0x 11909 1.0x 9761 1.0x 1681937187 (64405323) 76 // Upgrade of LinAlg.{cpp,h} to 3.20.0.
 </pre>
 </p>
 <p>
@@ -771,19 +784,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7519
+* RGEMM-SEQ-16   (MFLOPS)   7752
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  11365
+* RGEMM-SEQ-32   (MFLOPS)  11629
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11769
+* RGEMM-SEQ-64   (MFLOPS)  11909
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9690
+* RGEMM-SEQ-1024 (MFLOPS)   9761
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1680990464 (6431e100)
+Seed: 1681937187 (64405323)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian

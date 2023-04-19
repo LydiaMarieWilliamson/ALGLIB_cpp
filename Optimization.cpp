@@ -15750,7 +15750,7 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
 // Perform factorization analysis using sparsity pattern (but not numerical values)
    factldlt = 1;
    permpriorityamd = 3;
-   if (!spsymmanalyze(&s->rawsystem, &s->priorities, factldlt, permpriorityamd, &s->analysis)) {
+   if (!spsymmanalyze(&s->rawsystem, &s->priorities, 0.0, factldlt, permpriorityamd, &s->analysis)) {
       ae_assert(false, "ReducedSystemInit: critical integrity check failed, symbolically degenerate KKT system encountered");
    }
 }

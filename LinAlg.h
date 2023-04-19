@@ -545,19 +545,9 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
 } // end of namespace alglib_impl
 
 // === AMDORDERING Package ===
+// Depends on: (AlgLibInternal) ABLASF
 // Depends on: ABLAS, SPARSE
 namespace alglib_impl {
-struct amdnset {
-   ae_int_t n;
-   ae_int_t nstored;
-   ae_vector items;
-   ae_vector locationof;
-   ae_int_t iteridx;
-};
-void amdnset_init(void *_p, bool make_automatic);
-void amdnset_copy(void *_dst, const void *_src, bool make_automatic);
-void amdnset_free(void *_p, bool make_automatic);
-
 struct amdknset {
    ae_int_t k;
    ae_int_t n;
@@ -610,22 +600,22 @@ struct amdbuffer {
    amdknset sete;
    amdllmatrix mtxl;
    amdvertexset vertexdegrees;
-   amdnset setq;
+   niset setq;
    ae_vector perm;
    ae_vector invperm;
    ae_vector columnswaps;
-   amdnset setp;
-   amdnset lp;
-   amdnset setrp;
-   amdnset ep;
-   amdnset adji;
-   amdnset adjj;
+   niset setp;
+   niset lp;
+   niset setrp;
+   niset ep;
+   niset adji;
+   niset adjj;
    ae_vector ls;
    ae_int_t lscnt;
-   amdnset setqsupercand;
-   amdnset exactdegreetmp0;
+   niset setqsupercand;
+   niset exactdegreetmp0;
    amdknset hashbuckets;
-   amdnset nonemptybuckets;
+   niset nonemptybuckets;
    ae_vector sncandidates;
    ae_vector tmp0;
    ae_vector arrwe;
@@ -635,13 +625,27 @@ void amdbuffer_init(void *_p, bool make_automatic);
 void amdbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void amdbuffer_free(void *_p, bool make_automatic);
 
-ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf);
+ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n, double promoteabove, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf);
 void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, amdbuffer *buf);
 } // end of namespace alglib_impl
 
 // === SPCHOL Package ===
 // Depends on: AMDORDERING
 namespace alglib_impl {
+struct spcholadj {
+   ae_vector rowbegin;
+   ae_vector rowend;
+   ae_vector idx;
+   ae_vector urow0;
+   ae_vector uwidth;
+   ae_vector uflop;
+   ae_vector nflop;
+   ae_vector sflop;
+};
+void spcholadj_init(void *_p, bool make_automatic);
+void spcholadj_copy(void *_dst, const void *_src, bool make_automatic);
+void spcholadj_free(void *_p, bool make_automatic);
+
 struct spcholanalysis {
    ae_int_t tasktype;
    ae_int_t n;
@@ -652,12 +656,17 @@ struct spcholanalysis {
    double modparam1;
    double modparam2;
    double modparam3;
+   bool debugblocksupernodal;
    ae_vector referenceridx;
    ae_int_t nsuper;
    ae_vector parentsupernode;
+   ae_vector childsupernodesridx;
+   ae_vector childsupernodesidx;
    ae_vector supercolrange;
    ae_vector superrowridx;
    ae_vector superrowidx;
+   ae_vector blkstruct;
+   bool useparallelism;
    ae_vector fillinperm;
    ae_vector invfillinperm;
    ae_vector superperm;
@@ -666,28 +675,29 @@ struct spcholanalysis {
    ae_vector inveffectiveperm;
    bool istopologicalordering;
    bool applypermutationtooutput;
-   ae_vector ladjplusr;
-   ae_vector ladjplus;
+   spcholadj ladj;
    ae_vector outrowcounts;
    ae_vector inputstorage;
    ae_vector outputstorage;
    ae_vector rowstrides;
    ae_vector rowoffsets;
    ae_vector diagd;
-   ae_vector wrkrows;
+   nbpool nbooleanpool;
+   nipool nintegerpool;
+   nrpool nrealpool;
+   ae_vector currowbegin;
    ae_vector flagarray;
    ae_vector eligible;
    ae_vector curpriorities;
    ae_vector tmpparent;
    ae_vector node2supernode;
-   ae_vector u2smap;
-   ae_vector raw2smap;
    amdbuffer amdtmp;
    ae_vector tmp0;
    ae_vector tmp1;
    ae_vector tmp2;
    ae_vector tmp3;
    ae_vector tmp4;
+   ae_vector raw2smap;
    sparsematrix tmpa;
    sparsematrix tmpat;
    sparsematrix tmpa2;
@@ -705,7 +715,7 @@ void spcholanalysis_copy(void *_dst, const void *_src, bool make_automatic);
 void spcholanalysis_free(void *_p, bool make_automatic);
 
 ae_int_t spsymmgetmaxfastkernel();
-bool spsymmanalyze(sparsematrix *a, ZVector *priorities, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis);
+bool spsymmanalyze(sparsematrix *a, ZVector *priorities, double promoteabove, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis);
 void spsymmsetmodificationstrategy(spcholanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3);
 void spsymmreload(spcholanalysis *analysis, sparsematrix *a);
 void spsymmreloaddiagonal(spcholanalysis *analysis, RVector *d);
