@@ -1403,5 +1403,194 @@ bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t s
    }
    return true;
 }
+
+// Fast kernel for biharmonic panel with NY == 1
+//
+// Inputs:
+//     D0, D1, D2      -   evaluation point minus (Panel.C0,Panel.C1,Panel.C2)
+//
+// Outputs:
+//     F               -   model value
+//     InvPowRPPlus1   -   1/(R^(P+1))
+// ALGLIB: Copyright 26.08.2022 by Sergey Bochkanov
+bool avx2_rbfv3farfields_bhpaneleval1fastkernel16(double d0, double d1, double d2, double *pnma, double *pnmb, double *pmmcdiag, double *ynma, double *tblrmodmn, double *f, double *invpowrpplus1) {
+   ae_int_t n;
+   double r, r2, r01, invr;
+   double sintheta, costheta;
+   complex expiphi, expiphi2, expiphi3, expiphi4;
+   ae_int_t jj;
+   bool result;
+   *f = 0.0;
+   *invpowrpplus1 = 0.0;
+   result = true;
+// Convert to spherical polar coordinates.
+//
+// NOTE: we make sure that R is non-zero by adding extremely small perturbation
+   r2 = d0 * d0 + d1 * d1 + d2 * d2 + minrealnumber;
+   r = sqrt(r2);
+   r01 = sqrt(d0 * d0 + d1 * d1 + minrealnumber);
+   costheta = d2 / r;
+   sintheta = r01 / r;
+   expiphi = complex_from_d(d0 / r01, d1 / r01);
+   invr = 1.0 / r;
+// prepare precomputed quantities
+   double powsintheta2 = sintheta * sintheta;
+   double powsintheta3 = powsintheta2 * sintheta;
+   double powsintheta4 = powsintheta2 * powsintheta2;
+   expiphi2 = complex_from_d(expiphi.x * expiphi.x - expiphi.y * expiphi.y, 2.0 * expiphi.x * expiphi.y);
+   expiphi3 = complex_from_d(expiphi2.x * expiphi.x - expiphi2.y * expiphi.y, expiphi2.x * expiphi.y + expiphi.x * expiphi2.y);
+   expiphi4 = complex_from_d(expiphi2.x * expiphi2.x - expiphi2.y * expiphi2.y, 2.0 * expiphi2.x * expiphi2.y);
+// Compute far field expansion for a cluster of basis functions f=r
+//
+// NOTE: the original paper by Beatson et al. uses f=r as the basis function,
+//       whilst ALGLIB uses f=-r due to conditional positive definiteness requirement.
+//       We will perform conversion later.
+   __m256d v_costheta = _mm256_set1_pd(costheta);
+   __m256d v_r2 = _mm256_set1_pd(r2);
+   __m256d v_f = _mm256_setzero_pd();
+   __m256d v_invr = _mm256_set1_pd(invr);
+   __m256d v_powsinthetaj = _mm256_set_pd(powsintheta3, powsintheta2, sintheta, 1.0);
+   __m256d v_powsintheta4 = _mm256_set1_pd(powsintheta4);
+   __m256d v_expijphix = _mm256_set_pd(expiphi3.x, expiphi2.x, expiphi.x, 1.0);
+   __m256d v_expijphiy = _mm256_set_pd(expiphi3.y, expiphi2.y, expiphi.y, 0.0);
+   __m256d v_expi4phix = _mm256_set1_pd(expiphi4.x);
+   __m256d v_expi4phiy = _mm256_set1_pd(expiphi4.y);
+   *f = 0.0;
+   for (jj = 0; jj < 4; jj++) {
+      __m256d pnm_cur = _mm256_setzero_pd(), pnm_prev = _mm256_setzero_pd(), pnm_new;
+      __m256d v_powrminusj1 = _mm256_set1_pd(invr);
+      for (n = 0; n < jj * 4; n++)
+         v_powrminusj1 = _mm256_mul_pd(v_powrminusj1, v_invr);
+      for (n = jj * 4; n < 16; n++) {
+         ae_int_t j0 = jj * 4;
+         pnm_new = _mm256_mul_pd(v_powsinthetaj, _mm256_load_pd(pmmcdiag + n * 16 + j0));
+         pnm_new = _mm256_add_pd(pnm_new, _mm256_mul_pd(v_costheta, _mm256_mul_pd(pnm_cur, _mm256_load_pd(pnma + n * 16 + j0))));
+         pnm_new = _mm256_add_pd(pnm_new, _mm256_mul_pd(pnm_prev, _mm256_load_pd(pnmb + n * 16 + j0)));
+         pnm_prev = pnm_cur;
+         pnm_cur = pnm_new;
+         __m256d v_tmp = _mm256_mul_pd(pnm_cur, _mm256_load_pd(ynma + n * 16 + j0));
+         __m256d v_sphericalx = _mm256_mul_pd(v_tmp, v_expijphix);
+         __m256d v_sphericaly = _mm256_mul_pd(v_tmp, v_expijphiy);
+         __m256d v_summnx = _mm256_add_pd(_mm256_mul_pd(v_r2, _mm256_load_pd(tblrmodmn + n * 64 + j0 + 32)), _mm256_load_pd(tblrmodmn + n * 64 + j0));
+         __m256d v_summny = _mm256_add_pd(_mm256_mul_pd(v_r2, _mm256_load_pd(tblrmodmn + n * 64 + j0 + 48)), _mm256_load_pd(tblrmodmn + n * 64 + j0 + 16));
+         __m256d v_z = _mm256_sub_pd(_mm256_mul_pd(v_sphericalx, v_summnx), _mm256_mul_pd(v_sphericaly, v_summny));
+         v_f = _mm256_add_pd(v_f, _mm256_mul_pd(v_powrminusj1, v_z));
+         v_powrminusj1 = _mm256_mul_pd(v_powrminusj1, v_invr);
+      }
+      __m256d v_expijphix_new = _mm256_sub_pd(_mm256_mul_pd(v_expijphix, v_expi4phix), _mm256_mul_pd(v_expijphiy, v_expi4phiy));
+      __m256d v_expijphiy_new = _mm256_add_pd(_mm256_mul_pd(v_expijphix, v_expi4phiy), _mm256_mul_pd(v_expijphiy, v_expi4phix));
+      v_powsinthetaj = _mm256_mul_pd(v_powsinthetaj, v_powsintheta4);
+      v_expijphix = v_expijphix_new;
+      v_expijphiy = v_expijphiy_new;
+   }
+   double ttt[4];
+   _mm256_storeu_pd(ttt, v_f);
+   for (int k = 0; k < 4; k++)
+      *f += ttt[k];
+   double r4 = r2 * r2;
+   double r8 = r4 * r4;
+   double r16 = r8 * r8;
+   *invpowrpplus1 = 1.0 / r16;
+   return result;
+}
+
+// Fast kernel for biharmonic panel with general NY
+//
+// Inputs:
+//     D0, D1, D2      -   evaluation point minus (Panel.C0,Panel.C1,Panel.C2)
+//
+// Outputs:
+//     F               -   array[NY], model value
+//     InvPowRPPlus1   -   1/(R^(P+1))
+// ALGLIB: Copyright 26.08.2022 by Sergey Bochkanov
+bool avx2_rbfv3farfields_bhpanelevalfastkernel16(double d0, double d1, double d2, ae_int_t ny, double *pnma, double *pnmb, double *pmmcdiag, double *ynma, double *tblrmodmn, double *f, double *invpowrpplus1) {
+   ae_int_t n;
+   double r, r2, r01, invr;
+   double sintheta, costheta;
+   complex expiphi, expiphi2, expiphi3, expiphi4;
+   ae_int_t jj;
+// Precomputed buffer which is enough for NY up to 16
+   __m256d v_f[16];
+   if (ny > 16)
+      return false;
+   for (int k = 0; k < ny; k++) {
+      v_f[k] = _mm256_setzero_pd();
+      f[k] = 0.0;
+   }
+// Convert to spherical polar coordinates.
+//
+// NOTE: we make sure that R is non-zero by adding extremely small perturbation
+   r2 = d0 * d0 + d1 * d1 + d2 * d2 + minrealnumber;
+   r = sqrt(r2);
+   r01 = sqrt(d0 * d0 + d1 * d1 + minrealnumber);
+   costheta = d2 / r;
+   sintheta = r01 / r;
+   expiphi = complex_from_d(d0 / r01, d1 / r01);
+   invr = 1.0 / r;
+// prepare precomputed quantities
+   double powsintheta2 = sintheta * sintheta;
+   double powsintheta3 = powsintheta2 * sintheta;
+   double powsintheta4 = powsintheta2 * powsintheta2;
+   expiphi2 = complex_from_d(expiphi.x * expiphi.x - expiphi.y * expiphi.y, 2.0 * expiphi.x * expiphi.y);
+   expiphi3 = complex_from_d(expiphi2.x * expiphi.x - expiphi2.y * expiphi.y, expiphi2.x * expiphi.y + expiphi.x * expiphi2.y);
+   expiphi4 = complex_from_d(expiphi2.x * expiphi2.x - expiphi2.y * expiphi2.y, 2.0 * expiphi2.x * expiphi2.y);
+// Compute far field expansion for a cluster of basis functions f=r
+//
+// NOTE: the original paper by Beatson et al. uses f=r as the basis function,
+//       whilst ALGLIB uses f=-r due to conditional positive definiteness requirement.
+//       We will perform conversion later.
+   __m256d v_costheta = _mm256_set1_pd(costheta);
+   __m256d v_r2 = _mm256_set1_pd(r2);
+   __m256d v_invr = _mm256_set1_pd(invr);
+   __m256d v_powsinthetaj = _mm256_set_pd(powsintheta3, powsintheta2, sintheta, 1.0);
+   __m256d v_powsintheta4 = _mm256_set1_pd(powsintheta4);
+   __m256d v_expijphix = _mm256_set_pd(expiphi3.x, expiphi2.x, expiphi.x, 1.0);
+   __m256d v_expijphiy = _mm256_set_pd(expiphi3.y, expiphi2.y, expiphi.y, 0.0);
+   __m256d v_expi4phix = _mm256_set1_pd(expiphi4.x);
+   __m256d v_expi4phiy = _mm256_set1_pd(expiphi4.y);
+   *f = 0.0;
+   for (jj = 0; jj < 4; jj++) {
+      __m256d pnm_cur = _mm256_setzero_pd(), pnm_prev = _mm256_setzero_pd(), pnm_new;
+      __m256d v_powrminusj1 = _mm256_set1_pd(invr);
+      for (n = 0; n < jj * 4; n++)
+         v_powrminusj1 = _mm256_mul_pd(v_powrminusj1, v_invr);
+      for (n = jj * 4; n < 16; n++) {
+         ae_int_t j0 = jj * 4;
+         pnm_new = _mm256_mul_pd(v_powsinthetaj, _mm256_load_pd(pmmcdiag + n * 16 + j0));
+         pnm_new = _mm256_add_pd(pnm_new, _mm256_mul_pd(v_costheta, _mm256_mul_pd(pnm_cur, _mm256_load_pd(pnma + n * 16 + j0))));
+         pnm_new = _mm256_add_pd(pnm_new, _mm256_mul_pd(pnm_prev, _mm256_load_pd(pnmb + n * 16 + j0)));
+         pnm_prev = pnm_cur;
+         pnm_cur = pnm_new;
+         __m256d v_tmp = _mm256_mul_pd(pnm_cur, _mm256_load_pd(ynma + n * 16 + j0));
+         __m256d v_sphericalx = _mm256_mul_pd(v_tmp, v_expijphix);
+         __m256d v_sphericaly = _mm256_mul_pd(v_tmp, v_expijphiy);
+         double *p_rmodmn = tblrmodmn + n * 64 + j0;
+         for (int k = 0; k < ny; k++) {
+            __m256d v_summnx = _mm256_add_pd(_mm256_mul_pd(v_r2, _mm256_load_pd(p_rmodmn + 32)), _mm256_load_pd(p_rmodmn));
+            __m256d v_summny = _mm256_add_pd(_mm256_mul_pd(v_r2, _mm256_load_pd(p_rmodmn + 48)), _mm256_load_pd(p_rmodmn + 16));
+            __m256d v_z = _mm256_sub_pd(_mm256_mul_pd(v_sphericalx, v_summnx), _mm256_mul_pd(v_sphericaly, v_summny));
+            v_f[k] = _mm256_add_pd(v_f[k], _mm256_mul_pd(v_powrminusj1, v_z));
+            p_rmodmn += 1024;
+         }
+         v_powrminusj1 = _mm256_mul_pd(v_powrminusj1, v_invr);
+      }
+      __m256d v_expijphix_new = _mm256_sub_pd(_mm256_mul_pd(v_expijphix, v_expi4phix), _mm256_mul_pd(v_expijphiy, v_expi4phiy));
+      __m256d v_expijphiy_new = _mm256_add_pd(_mm256_mul_pd(v_expijphix, v_expi4phiy), _mm256_mul_pd(v_expijphiy, v_expi4phix));
+      v_powsinthetaj = _mm256_mul_pd(v_powsinthetaj, v_powsintheta4);
+      v_expijphix = v_expijphix_new;
+      v_expijphiy = v_expijphiy_new;
+   }
+   for (int t = 0; t < ny; t++) {
+      double ttt[4];
+      _mm256_storeu_pd(ttt, v_f[t]);
+      for (int k = 0; k < 4; k++)
+         f[t] += ttt[k];
+   }
+   double r4 = r2 * r2;
+   double r8 = r4 * r4;
+   double r16 = r8 * r8;
+   *invpowrpplus1 = 1.0 / r16;
+   return true;
+}
 #endif // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS
 } // end of namespace alglib_impl

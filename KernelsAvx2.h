@@ -38,6 +38,8 @@ void avx2_ablasf_dotblkh(const double *src_a, const double *src_b, ae_int_t roun
 void avx2_ablasf_daxpby(ae_int_t n, double alpha, const double *src, double beta, double *dst);
 bool avx2_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase);
 bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase);
+bool avx2_rbfv3farfields_bhpaneleval1fastkernel16(double d0, double d1, double d2, double *pnma, double *pnmb, double *pmmcdiag, double *ynma, double *tblrmodmn, double *f, double *invpowrpplus1);
+bool avx2_rbfv3farfields_bhpanelevalfastkernel16(double d0, double d1, double d2, ae_int_t ny, double *pnma, double *pnmb, double *pmmcdiag, double *ynma, double *tblrmodmn, double *f, double *invpowrpplus1);
 #endif // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS
 } // end of namespace alglib_impl
 

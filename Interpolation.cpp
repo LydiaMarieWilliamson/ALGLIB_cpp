@@ -12,6 +12,9 @@
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
 #define InAlgLib
+// Must be defined before we include anything depending on any kernel headers.
+#define _ALGLIB_IMPL_DEFINES
+#define _ALGLIB_INTEGRITY_CHECKS_ONCE
 #include "Interpolation.h"
 
 // === RATINT Package ===
@@ -17463,6 +17466,862 @@ void rbfv1report_free(void *_p, bool make_automatic) {
 // === RBFV3FARFIELDS Package ===
 // Depends on: (AlgLibInternal) SCODES, TSORT
 namespace alglib_impl {
+// Initialize precomputed table for a biharmonic evaluator
+// ALGLIB: Copyright 26.08.2022 by Sergey Bochkanov
+void biharmonicevaluatorinit(biharmonicevaluator *eval, ae_int_t maxp) {
+   ae_int_t i;
+   ae_int_t n;
+   ae_int_t m;
+   complex cplxi;
+   complex cplxminusi;
+   ae_assert(maxp >= 2, "BiharmonicEvaluatorInit: MaxP < 2");
+   eval->maxp = maxp;
+// Precompute some often used values
+//
+// NOTE: we use SetLength() instead of rAllocV() in order to enforce strict length
+//       of the precomputed tables which results in better bounds checking during
+//       the running time.
+   eval->precomputedcount = 2 * maxp + 3;
+   ae_vector_set_length(&eval->tpowminus1, eval->precomputedcount);
+   ae_vector_set_length(&eval->tpowminusi, eval->precomputedcount);
+   ae_vector_set_length(&eval->tpowi, eval->precomputedcount);
+   cplxi = complex_from_d(0.0, +1.0);
+   cplxminusi = complex_from_d(0.0, -1.0);
+   eval->tpowminus1.xR[0] = 1.0;
+   eval->tpowminusi.xC[0] = complex_from_i(1);
+   eval->tpowi.xC[0] = complex_from_i(1);
+   for (i = 1; i < eval->precomputedcount; i++) {
+      eval->tpowminus1.xR[i] = eval->tpowminus1.xR[i - 1] * -1.0;
+      eval->tpowminusi.xC[i] = ae_c_mul(eval->tpowminusi.xC[i - 1], cplxminusi);
+      eval->tpowi.xC[i] = ae_c_mul(eval->tpowi.xC[i - 1], cplxi);
+   }
+   ae_vector_set_length(&eval->tfactorial, eval->precomputedcount);
+   ae_vector_set_length(&eval->tsqrtfactorial, eval->precomputedcount);
+   eval->tfactorial.xR[0] = 1.0;
+   for (i = 1; i < eval->precomputedcount; i++) {
+      eval->tfactorial.xR[i] = i * eval->tfactorial.xR[i - 1];
+   }
+   for (i = 0; i < eval->precomputedcount; i++) {
+      eval->tsqrtfactorial.xR[i] = sqrt(eval->tfactorial.xR[i]);
+   }
+   ae_vector_set_length(&eval->tdoublefactorial, eval->precomputedcount);
+   ae_assert(eval->precomputedcount >= 2, "BiharmonicEvaluatorInit: integrity check 8446 failed");
+   eval->tdoublefactorial.xR[0] = 1.0;
+   eval->tdoublefactorial.xR[1] = 1.0;
+   for (i = 2; i < eval->precomputedcount; i++) {
+      eval->tdoublefactorial.xR[i] = i * eval->tdoublefactorial.xR[i - 2];
+   }
+// Precompute coefficients for the associated Legendre recurrence relation
+//
+//   P[n+1,m] = P[n,m]*CosTheta*(2*n-1)/(N-M) - P[n-1,m]*(N+M-1)/(N-M)  (for n>m)
+//            = P[n,m]*CosTheta*PnmA[n+1,m] + P[n-1,m]*PnmB[n+1,m]      (for n>m)
+   rsetallocv((maxp + 1) * (maxp + 1), 0.0, &eval->pnma);
+   rsetallocv((maxp + 1) * (maxp + 1), 0.0, &eval->pnmb);
+   for (n = 0; n <= maxp; n++) {
+      for (m = 0; m < n; m++) {
+         eval->pnma.xR[n * (maxp + 1) + m] = (double)(2 * n - 1) / (n - m);
+         eval->pnmb.xR[n * (maxp + 1) + m] = -(double)(n + m - 1) / (n - m);
+      }
+   }
+// Precompute coefficient used during computation of initial values of the
+// associated Legendre recurrence
+   rsetallocv(maxp + 1, 0.0, &eval->pmmc);
+   rsetallocv((maxp + 1) * (maxp + 1), 0.0, &eval->pmmcdiag);
+   for (m = 0; m <= maxp; m++) {
+      eval->pmmc.xR[m] = eval->tpowminus1.xR[m] * eval->tdoublefactorial.xR[imax2(2 * m - 1, 0)];
+      eval->pmmcdiag.xR[m * (maxp + 1) + m] = eval->pmmc.xR[m];
+   }
+// Precompute coefficient YnmA used during computation of the spherical harmonic Ynm
+   rsetallocv((maxp + 1) * (maxp + 1), 0.0, &eval->ynma);
+   for (n = 0; n <= maxp; n++) {
+      for (m = 0; m <= n; m++) {
+         eval->ynma.xR[n * (maxp + 1) + m] = eval->tpowminus1.xR[m] * eval->tsqrtfactorial.xR[n - m] / eval->tsqrtfactorial.xR[n + m];
+      }
+   }
+// Precompute coefficient InmA used during computation of the inner function Inm
+   csetallocv((maxp + 1) * (maxp + 1), complex_from_d(0.0), &eval->inma);
+   for (n = 0; n <= maxp; n++) {
+      for (m = 0; m <= n; m++) {
+         eval->inma.xC[n * (maxp + 1) + m] = ae_c_mul_d(eval->tpowminusi.xC[m], eval->tpowminus1.xR[n] / (eval->tsqrtfactorial.xR[n + m] * eval->tsqrtfactorial.xR[n - m]));
+      }
+   }
+// Precompute coefficients MnmA and NnmA used during computation of expansion functions Mnm and Nnm
+   rsetallocv(maxp + 1, 0.0, &eval->mnma);
+   rsetallocv(maxp + 1, 0.0, &eval->nnma);
+   for (n = 0; n <= maxp; n++) {
+      eval->nnma.xR[n] = -eval->tpowminus1.xR[n] / (2 * n - 1);
+      if (n < maxp - 1) {
+         eval->mnma.xR[n] = eval->tpowminus1.xR[n] / (2 * n + 3);
+      }
+   }
+}
+
+// Build a panel with biharmonic far field expansions. The  function  assumes
+// that we work with 3D data. Lower dimensional data can be zero-padded. Data
+// with higher dimensionality is NOT supported by biharmonic code.
+//
+// IMPORTANT: this function computes far field expansion,  but  it  does  NOT
+//            compute error bounds. By default, far field distance is set  to
+//            some extremely big number.
+//            You should explicitly set desired far  field  tolerance  (which
+//            leads to automatic computation of the UseAtDistance  field)  by
+//            calling bhPanelSetPrec().
+//
+// Inputs:
+//     Panel           -   panel to be initialized. Previously allocated
+//                         memory is reused as much as possible.
+//     XW              -   array[?,3+NY]:
+//                         * 3 first columns are X,Y,Z coordinates
+//                         * subsequent NY columns are basis function coefficients
+//     XIdx0, XIdx1    -   defines row range [XIdx0,XIdx1) of XW to process,
+//                         XIdx1-XIdx0 rows are processed, the rest is ignored
+//     NY              -   NY >= 1, output values count
+//     Eval            -   precomputed table
+// ALGLIB: Copyright 26.08.2022 by Sergey Bochkanov
+void bhpanelinit(biharmonicpanel *panel, RMatrix *xw, ae_int_t xidx0, ae_int_t xidx1, ae_int_t ny, biharmonicevaluator *eval) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t d;
+   ae_int_t n;
+   ae_int_t offs;
+   ae_int_t doffs;
+   double x0;
+   double x1;
+   double x2;
+   double r;
+   double r2;
+   double r01;
+   double v;
+   double v0;
+   double v1;
+   double v2;
+   double vnij;
+   double vmij;
+   double costheta;
+   double sintheta;
+   double powsinthetaj;
+   double pnmprev;
+   double pnm;
+   double pnmnew;
+   complex inma;
+   complex expiminusphi;
+   complex expiminusjphi;
+   complex sphericaly;
+   complex innernm;
+   complex nnm;
+   complex mnm;
+   complex fmult;
+   ae_int_t stride2;
+   ae_assert(xidx1 - xidx0 >= 1, "bhPanelInit: XIdx1 <= XIdx0");
+// Allocate space
+   panel->ny = ny;
+   panel->p = eval->maxp;
+   panel->stride = eval->maxp + 1;
+   panel->sizeinner = eval->maxp + 1;
+   panel->sizen = eval->maxp + 1;
+   panel->sizem = eval->maxp - 1;
+   panel->useatdistance = 0.001 * sqrt(maxrealnumber);
+   csetallocv(ny * panel->stride * panel->stride, complex_from_d(0.0), &panel->tbln);
+   csetallocv(ny * panel->stride * panel->stride, complex_from_d(0.0), &panel->tblm);
+   csetallocv(ny * panel->stride * panel->stride, complex_from_d(0.0), &panel->tblmodn);
+   csetallocv(ny * panel->stride * panel->stride, complex_from_d(0.0), &panel->tblmodm);
+   rsetallocv(ny * 4 * panel->stride * panel->stride, 0.0, &panel->tblrmodmn);
+   stride2 = panel->stride * panel->stride;
+// Compute center, SubAbs and RMax
+   panel->maxsumabs = 0.0;
+   panel->c0 = 0.0;
+   panel->c1 = 0.0;
+   panel->c2 = 0.0;
+   for (k = xidx0; k < xidx1; k++) {
+      panel->c0 += xw->xyR[k][0];
+      panel->c1 += xw->xyR[k][1];
+      panel->c2 += xw->xyR[k][2];
+   }
+   panel->c0 /= xidx1 - xidx0;
+   panel->c1 /= xidx1 - xidx0;
+   panel->c2 /= xidx1 - xidx0;
+   panel->rmax = machineepsilon;
+   for (k = xidx0; k < xidx1; k++) {
+      v0 = xw->xyR[k][0] - panel->c0;
+      v1 = xw->xyR[k][1] - panel->c1;
+      v2 = xw->xyR[k][2] - panel->c2;
+      panel->rmax = rmax2(panel->rmax, sqrt(v0 * v0 + v1 * v1 + v2 * v2));
+   }
+   for (d = 0; d < ny; d++) {
+      v = 0.0;
+      for (k = xidx0; k < xidx1; k++) {
+         v += fabs(xw->xyR[k][3 + d]);
+      }
+      panel->maxsumabs = rmax2(panel->maxsumabs, v);
+   }
+// Precompute powers of RMax up to MaxP+1
+   allocv(eval->maxp + 2, &panel->tblpowrmax);
+   panel->tblpowrmax.xR[0] = 1.0;
+   for (i = 1; i <= eval->maxp + 1; i++) {
+      panel->tblpowrmax.xR[i] = panel->tblpowrmax.xR[i - 1] * panel->rmax;
+   }
+// Fill tables N and M
+   allocv(panel->sizeinner, &panel->tpowr);
+   for (k = xidx0; k < xidx1; k++) {
+   // Prepare table of spherical harmonics for point K (to be used later to compute
+   // inner functions I_nm and expansion functions N_nm and M_nm).
+      x0 = xw->xyR[k][0] - panel->c0;
+      x1 = xw->xyR[k][1] - panel->c1;
+      x2 = xw->xyR[k][2] - panel->c2;
+      r2 = x0 * x0 + x1 * x1 + x2 * x2 + minrealnumber;
+      r = sqrt(r2);
+      r01 = sqrt(x0 * x0 + x1 * x1 + minrealnumber);
+      costheta = x2 / r;
+      sintheta = r01 / r;
+      expiminusphi = complex_from_d(x0 / r01, -x1 / r01);
+      panel->tpowr.xR[0] = 1.0;
+      for (i = 1; i < panel->sizeinner; i++) {
+         panel->tpowr.xR[i] = panel->tpowr.xR[i - 1] * r;
+      }
+   // Compute table of associated Legrengre polynomials, with
+   //
+   //     P_nm(N=I,M=-J,X)
+   //
+   // being an associated Legendre polynomial, as defined in "Numerical
+   // recipes in C" and Wikipedia.
+   //
+   // It is important that the section 3 of 'Fast evaluation of polyharmonic
+   // splines in three dimensions' by R.K. Beatson, M.J.D. Powell and A.M. Tan
+   // uses different formulation of P_nm. We will account for the difference
+   // during the computation of the spherical harmonics.
+      powsinthetaj = 1.0;
+      expiminusjphi = complex_from_d(1.0);
+      for (j = 0; j < panel->stride; j++) {
+      // Prepare recursion for associated Legendre polynomials
+         pnmprev = 0.0;
+         pnm = powsinthetaj * eval->pmmc.xR[j];
+      // Perform recursion on N
+         for (n = j; n < panel->stride; n++) {
+            offs = n * panel->stride + j;
+         // Compute table of associated Legrengre polynomials with
+         //
+         //     P_nm(N=I,M=-J,X)
+         //
+         // being an associated Legendre polynomial, as defined in "Numerical
+         // recipes in C" and Wikipedia.
+         //
+         // It is important that the section 3 of 'Fast evaluation of polyharmonic
+         // splines in three dimensions' by R.K. Beatson, M.J.D. Powell and A.M. Tan
+         // uses different formulation of P_nm. We will account for the difference
+         // during the computation of the spherical harmonics.
+            if (n > j) {
+            // Recursion on N
+               pnmnew = pnm * costheta * eval->pnma.xR[offs] + pnmprev * eval->pnmb.xR[offs];
+               pnmprev = pnm;
+               pnm = pnmnew;
+            }
+         // Compute table of spherical harmonics Y_nm(N=I,M=-J) with
+         //
+         //     Y_nm(N,M) = E_m*sqrt((n-m)!/(n+m)!)*P_nm(cos(theta))*exp(i*m*phi)
+         //     E_m = m > 0 ? pow(-1,m) : 1
+         //     (because we always compute Y_nm for m <= 0, E_m is always 1)
+         //
+         // being a spherical harmonic, as defined in the equation (18) of 'Fast evaluation of polyharmonic
+         // splines in three dimensions' by R.K. Beatson, M.J.D. Powell and A.M. Tan.
+         //
+         // Here P_nm is an associated Legendre polynomial as defined by Beatson et al. However, Pnm variable
+         // stores values of associated Legendre polynomials as defined by Wikipedia. Below we perform conversion
+         // between one format and another one:
+         //
+         //     P_nm(Beatson)  = P_nm(Wiki)*(-1)^(-m)*(n+m)!/(n-m)!
+         //     Y_nm(n=N,m=-J) = E_m*sqrt((n-m)!/(n+m)!)*P_nm(Beatson)*exp(i*m*phi)
+         //                    = E_m*sqrt((n-m)!/(n+m)!)*P_nm(Wiki)*(-1)^(-m)*(n+m)!/(n-m)!*exp(i*m*phi)
+         //                    = [E_m*(-1)^(-m)*sqrt((n+m)!/(n-m)!)*P_nm(Wiki)]*exp(i*m*phi)
+         //                    = A_ynm*P_nm(Wiki)*exp(i*m*phi)
+            v = pnm * eval->ynma.xR[offs];
+            sphericaly = complex_from_d(v * expiminusjphi.x, v * expiminusjphi.y);
+         // Compute inner functions table where
+         //
+         //     InnerNM = I_nm(n=I,m=-J),
+         //
+         // with
+         //
+         //     I_nm(n,m) = pow(i,|m|)*pow(-1,n)*pow(r,n)/sqrt((n-m)!(n+m)!)*Y_nm(theta,phi)
+         //               = I_ynm*r^n*Y_nm(theta,phi)
+         //
+         // being an inner function, as defined in equation (20) of 'Fast evaluation of polyharmonic splines in three dimensions'
+         // by R.K. Beatson, M.J.D. Powell and A.M. Tan 1.
+            v = panel->tpowr.xR[n];
+            inma = eval->inma.xC[offs];
+            innernm = complex_from_d(v * (inma.x * sphericaly.x - inma.y * sphericaly.y), v * (inma.x * sphericaly.y + inma.y * sphericaly.x));
+         // Update expansion functions N_nm and M_nm with harmonics coming from the point #K
+         //
+         // NOTE: precomputed coefficient MnmA[] takes care of the fact that we require
+         //       Mnm for n,m > P-2 to be zero. It is exactly zero at the corresponding positions,
+         //       so we may proceed without conditional operators.
+            for (d = 0; d < ny; d++) {
+               doffs = offs + d * stride2;
+               vnij = xw->xyR[k][3 + d] * eval->nnma.xR[n];
+               nnm = panel->tbln.xC[doffs];
+               panel->tbln.xC[doffs] = complex_from_d(nnm.x + vnij * innernm.x, nnm.y + vnij * innernm.y);
+               vmij = xw->xyR[k][3 + d] * panel->tpowr.xR[2] * eval->mnma.xR[n];
+               mnm = panel->tblm.xC[doffs];
+               panel->tblm.xC[doffs] = complex_from_d(mnm.x + vmij * innernm.x, mnm.y + vmij * innernm.y);
+            }
+         }
+      // Prepare for the next iteration
+         powsinthetaj *= sintheta;
+         v0 = expiminusjphi.x * expiminusphi.x - expiminusjphi.y * expiminusphi.y;
+         v1 = expiminusjphi.x * expiminusphi.y + expiminusjphi.y * expiminusphi.x;
+         expiminusjphi = complex_from_d(v0, v1);
+      }
+   }
+// Compute modified N_nm and M_nm by multiplying original values by sqrt((n-m)!(n+m)!)*i^(-m),
+// with additional multiplication by 2 for J != 0
+//
+// This scaling factor is a part of the outer function O_nm which is computed during the model
+// evaluation, and it does NOT depends on the trial point X. So, merging it with N_nm/M_nm
+// saves us a lot of computational effort.
+   for (i = 0; i <= panel->p; i++) {
+      for (j = 0; j <= i; j++) {
+         v = eval->tsqrtfactorial.xR[i + j] * eval->tsqrtfactorial.xR[i - j];
+         if (j != 0) {
+            v *= 2.0;
+         }
+         fmult = eval->tpowi.xC[j];
+         fmult.x *= v;
+         fmult.y *= v;
+         if (i < panel->sizen) {
+            for (d = 0; d < ny; d++) {
+               nnm = panel->tbln.xC[d * stride2 + i * panel->stride + j];
+               panel->tblmodn.xC[d * stride2 + i * panel->stride + j] = complex_from_d(nnm.x * fmult.x - nnm.y * fmult.y, nnm.x * fmult.y + nnm.y * fmult.x);
+            }
+         }
+         if (i < panel->sizem) {
+            for (d = 0; d < ny; d++) {
+               mnm = panel->tblm.xC[d * stride2 + i * panel->stride + j];
+               panel->tblmodm.xC[d * stride2 + i * panel->stride + j] = complex_from_d(mnm.x * fmult.x - mnm.y * fmult.y, mnm.x * fmult.y + mnm.y * fmult.x);
+            }
+         }
+      }
+   }
+// Convert tblModN and tblModN into packed storage
+   offs = 0;
+   doffs = 0;
+   for (i = 0; i < (panel->p + 1) * ny; i++) {
+      for (j = 0; j <= panel->p; j++) {
+         panel->tblrmodmn.xR[doffs + j] = panel->tblmodm.xC[offs + j].x;
+      }
+      doffs += panel->stride;
+      for (j = 0; j <= panel->p; j++) {
+         panel->tblrmodmn.xR[doffs + j] = panel->tblmodm.xC[offs + j].y;
+      }
+      doffs += panel->stride;
+      for (j = 0; j <= panel->p; j++) {
+         panel->tblrmodmn.xR[doffs + j] = panel->tblmodn.xC[offs + j].x;
+      }
+      doffs += panel->stride;
+      for (j = 0; j <= panel->p; j++) {
+         panel->tblrmodmn.xR[doffs + j] = panel->tblmodn.xC[offs + j].y;
+      }
+      doffs += panel->stride;
+      offs += panel->stride;
+   }
+// Default UseAtDistance, means that far field is not used
+   panel->useatdistance = 1.0E50 + 1000000.0 * panel->rmax;
+}
+
+// This function sets far field distance depending on desired accuracy.
+//
+// Inputs:
+//     Panel           -   panel with valid far field expansion
+//     Tol             -   desired tolerance
+// ALGLIB: Copyright 20.11.2022 by Sergey Bochkanov
+void bhpanelsetprec(biharmonicpanel *panel, double tol) {
+   double errbnd;
+   double rcand;
+   ae_assert(isfinite(tol) && tol > 0.0, "bhPanelSetPrec: Tol <= 0 or infinite");
+   rcand = panel->rmax;
+   do {
+      rcand = 1.05 * rcand + machineepsilon;
+      errbnd = panel->maxsumabs * rcand * (2.0 / (2 * panel->p + 1)) * pow(panel->rmax / rcand, panel->p + 1) / (1.0 - panel->rmax / rcand);
+   } while (errbnd >= tol);
+   panel->useatdistance = rcand;
+}
+
+// Far field expansions for RBF's.
+
+// Fast kernel for biharmonic panel with NY == 1
+// Inputs:
+//     D0, D1, D2      -   evaluation point minus (Panel.C0,Panel.C1,Panel.C2)
+// Outputs:
+//     F               -   model value
+//     InvPowRPPlus1   -   1/(R^(P+1))
+// ALGLIB: Copyright 26.08.2022 by Sergey Bochkanov
+static bool rbfv3farfields_bhpaneleval1fastkernel(double d0, double d1, double d2, ae_int_t panelp, RVector *pnma, RVector *pnmb, RVector *pmmcdiag, RVector *ynma, RVector *tblrmodmn, double *f, double *invpowrpplus1) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Only panelp == 15 is supported
+   if (panelp == 15) {
+   // Try fast kernels.
+   // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+      KerFunAvx2(rbfv3farfields_bhpaneleval1fastkernel16(d0, d1, d2, pnma->xR, pnmb->xR, pmmcdiag->xR, ynma->xR, tblrmodmn->xR, f, invpowrpplus1))
+   }
+#else
+   *f = 0.0;
+   *invpowrpplus1 = 0.0;
+#endif
+// No fast kernels, no generic C implementation.
+   return false;
+}
+
+// Fast kernel for biharmonic panel with general NY
+// Inputs:
+//     D0, D1, D2      -   evaluation point minus (Panel.C0,Panel.C1,Panel.C2)
+// Outputs:
+//     F               -   model value
+//     InvPowRPPlus1   -   1/(R^(P+1))
+// ALGLIB: Copyright 26.08.2022 by Sergey Bochkanov
+static bool rbfv3farfields_bhpanelevalfastkernel(double d0, double d1, double d2, ae_int_t ny, ae_int_t panelp, RVector *pnma, RVector *pnmb, RVector *pmmcdiag, RVector *ynma, RVector *tblrmodmn, RVector *f, double *invpowrpplus1) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Only panelp == 15 is supported
+   if (panelp == 15) {
+   // Try fast kernels.
+   // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+      KerFunAvx2(rbfv3farfields_bhpanelevalfastkernel16(d0, d1, d2, ny, pnma->xR, pnmb->xR, pmmcdiag->xR, ynma->xR, tblrmodmn->xR, f->xR, invpowrpplus1))
+   }
+#else
+   *invpowrpplus1 = 0.0;
+#endif
+// No fast kernels, no generic C implementation.
+   return false;
+}
+
+// Tries evaluating model using the far field expansion stored in the panel,
+// special case for NY == 1
+//
+// Inputs:
+//     Panel           -   panel
+//     Eval            -   precomputed table
+//     X0, X1, X2      -   evaluation point
+//     NeedErrBnd      -   whether error bound is needed or not
+//
+// Outputs:
+//     F               -   model value
+//     ErrBnd          -   upper bound on the far field expansion error, if
+//                         requested. Zero otherwise.
+// ALGLIB: Copyright 26.08.2022 by Sergey Bochkanov
+void bhpaneleval1(biharmonicpanel *panel, biharmonicevaluator *eval, double x0, double x1, double x2, double *f, bool neederrbnd, double *errbnd) {
+   ae_int_t j;
+   ae_int_t n;
+   complex vsummn;
+   double v;
+   double r;
+   double r2;
+   double r01;
+   double v0;
+   double v1;
+   double invr;
+   double invpowrmplus1;
+   double invpowrnplus1;
+   double invpowrpplus1;
+   double pnmnew;
+   double pnm;
+   double pnmprev;
+   double sintheta;
+   double powsinthetaj;
+   double costheta;
+   complex expiphi;
+   complex expijphi;
+   complex sphericaly;
+   ae_int_t offs;
+   *f = 0.0;
+   *errbnd = 0.0;
+   ae_assert(panel->ny == 1, "RBF3EVAL1: NY > 1");
+// Center evaluation point
+   x0 -= panel->c0;
+   x1 -= panel->c1;
+   x2 -= panel->c2;
+   r2 = x0 * x0 + x1 * x1 + x2 * x2 + minrealnumber;
+   r = sqrt(r2);
+// Try to use fast kernel.
+// If fast kernel returns False, use reference implementation below.
+   if (!rbfv3farfields_bhpaneleval1fastkernel(x0, x1, x2, panel->p, &eval->pnma, &eval->pnmb, &eval->pmmcdiag, &eval->ynma, &panel->tblrmodmn, f, &invpowrpplus1)) {
+   // No fast kernel.
+   //
+   // Convert to spherical polar coordinates.
+   //
+   // NOTE: we make sure that R is non-zero by adding extremely small perturbation
+      r01 = sqrt(x0 * x0 + x1 * x1 + minrealnumber);
+      costheta = x2 / r;
+      sintheta = r01 / r;
+      expiphi = complex_from_d(x0 / r01, x1 / r01);
+   // Compute far field expansion for a cluster of basis functions f == r
+   //
+   // NOTE: the original paper by Beatson et al. uses f == r as the basis function,
+   //       whilst ALGLIB uses f == -r due to conditional positive definiteness requirement.
+   //       We will perform conversion later.
+      powsinthetaj = 1.0;
+      *f = 0.0;
+      invr = 1.0 / r;
+      invpowrmplus1 = invr;
+      expijphi = complex_from_d(1.0);
+      for (j = 0; j <= panel->p; j++) {
+         invpowrnplus1 = invpowrmplus1;
+      // Prepare recursion for associated Legendre polynomials
+         pnmprev = 0.0;
+         pnm = powsinthetaj * eval->pmmc.xR[j];
+      //
+         for (n = j; n <= panel->p; n++) {
+            offs = n * panel->stride + j;
+         // Compute table of associated Legrengre polynomials with
+         //
+         //     P_nm(N=I,M=-J,X)
+         //
+         // being an associated Legendre polynomial, as defined in "Numerical
+         // recipes in C" and Wikipedia.
+         //
+         // It is important that the section 3 of 'Fast evaluation of polyharmonic
+         // splines in three dimensions' by R.K. Beatson, M.J.D. Powell and A.M. Tan
+         // uses different formulation of P_nm. We will account for the difference
+         // during the computation of the spherical harmonics.
+            if (n > j) {
+            // Recursion on N
+               pnmnew = pnm * costheta * eval->pnma.xR[offs] + pnmprev * eval->pnmb.xR[offs];
+               pnmprev = pnm;
+               pnm = pnmnew;
+            }
+         // Compute table of spherical harmonics where
+         //
+         //     funcSphericalY[I*N+J] = Y_nm(N=I,M=-J),
+         //
+         // with
+         //
+         //     Y_nm(N,M) = E_m*sqrt((n-m)!/(n+m)!)*P_nm(cos(theta))*exp(i*m*phi)
+         //     E_m = m > 0 ? pow(-1,m) : 1
+         //     (because we always compute Y_nm for m <= 0, E_m is always 1)
+         //
+         // being a spherical harmonic, as defined in the equation (18) of 'Fast evaluation of polyharmonic
+         // splines in three dimensions' by R.K. Beatson, M.J.D. Powell and A.M. Tan.
+         //
+         // Here P_nm is an associated Legendre polynomial as defined by Beatson et al. However, the Pnm
+         // variable stores values of associated Legendre polynomials as defined by Wikipedia. Below we perform conversion
+         // between one format and another one:
+         //
+         //     P_nm(Beatson) = P_nm(Wiki)*(-1)^(-m)*(n+m)!/(n-m)!
+         //     Y_nm(N,M)     = E_m*sqrt((n-m)!/(n+m)!)*P_nm(Beatson)*exp(i*m*phi)
+         //                   = E_m*sqrt((n-m)!/(n+m)!)*P_nm(Wiki)*(-1)^(-m)*(n+m)!/(n-m)!*exp(i*m*phi)
+         //                   = [E_m*(-1)^(-m)*sqrt((n+m)!/(n-m)!)*P_nm(Wiki)]*exp(i*m*phi)
+         //                   = YnmA[n,m]*P_nm(Wiki)*exp(i*m*phi)
+            v = pnm * eval->ynma.xR[offs];
+            sphericaly = complex_from_d(v * expijphi.x, v * expijphi.y);
+         // Compute outer function for n = N, m = 1..N
+         // Update result with O_mn*(M_mn + R^2*N_mn).
+         //
+         // The most straighforward implementation of the loop below should look like as follows:
+         //
+         //     O_nm  = [sqrt((n-m)!(n+m)!)*i^m]*Y_nm/R^(n+1)
+         //     RES  += 2*RealPart[(R^2*N_nm+M_nm)*O_nm]
+         //
+         // However, we may save a lot of computational effort by moving [sqrt((n-m)!(n+m)!)*i^m]
+         // multiplier to the left part of the product, i.e. by merging it with N_nm and M_nm
+         // and producing MODIFIED expansions NMod and MMod. Because computing this multiplier
+         // involves three lookups into precomputed tables and one complex product, it may
+         // save us a lot of time.
+            vsummn = complex_from_d(r2 * panel->tblmodn.xC[offs].x + panel->tblmodm.xC[offs].x, r2 * panel->tblmodn.xC[offs].y + panel->tblmodm.xC[offs].y);
+            *f += invpowrnplus1 * (vsummn.x * sphericaly.x - vsummn.y * sphericaly.y);
+            invpowrnplus1 *= invr;
+         }
+      // Prepare for the next iteration
+         powsinthetaj *= sintheta;
+         invpowrmplus1 *= invr;
+         v0 = expijphi.x * expiphi.x - expijphi.y * expiphi.y;
+         v1 = expijphi.x * expiphi.y + expijphi.y * expiphi.x;
+         expijphi = complex_from_d(v0, v1);
+      }
+      invpowrpplus1 = r * invpowrmplus1;
+   }
+// Convert from f == r to f == -r
+   *f = -*f;
+// Compute error bound
+   *errbnd = 0.0;
+   if (neederrbnd) {
+      *errbnd = panel->maxsumabs * r2 * 2.0 * panel->tblpowrmax.xR[panel->p + 1] * invpowrpplus1 / ((2 * panel->p + 1) * (r - panel->rmax));
+      *errbnd += 100.0 * machineepsilon * (panel->maxsumabs * r + fabs(*f));
+   }
+}
+
+// Tries evaluating model using the far field expansion stored in the panel,
+// general case for NY >= 1
+//
+// Inputs:
+//     Panel           -   panel
+//     Eval            -   precomputed table
+//     X0, X1, X2      -   evaluation point
+//     NeedErrBnd      -   whether error bound is needed or not
+//
+// Outputs:
+//     F               -   model value
+//     ErrBnd          -   upper bound on the far field expansion error, if
+//                         requested. Zero otherwise.
+// ALGLIB: Copyright 10.11.2022 by Sergey Bochkanov
+void bhpaneleval(biharmonicpanel *panel, biharmonicevaluator *eval, double x0, double x1, double x2, RVector *f, bool neederrbnd, double *errbnd) {
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t n;
+   ae_int_t ny;
+   ae_int_t stride2;
+   complex vsummn;
+   double v;
+   double r;
+   double r2;
+   double r01;
+   double v0;
+   double v1;
+   double invr;
+   double invpowrmplus1;
+   double invpowrnplus1;
+   double pnmnew;
+   double pnm;
+   double pnmprev;
+   double sintheta;
+   double powsinthetaj;
+   double invpowrpplus1;
+   double costheta;
+   complex expiphi;
+   complex expijphi;
+   complex sphericaly;
+   ae_int_t offs;
+   ae_int_t offsk;
+   double af;
+   *errbnd = 0.0;
+   ny = panel->ny;
+   vectorsetlengthatleast(f, ny);
+// Center and convert to spherical polar coordinates.
+//
+// NOTE: we make sure that R is non-zero by adding extremely small perturbation
+   x0 -= panel->c0;
+   x1 -= panel->c1;
+   x2 -= panel->c2;
+   r2 = x0 * x0 + x1 * x1 + x2 * x2 + minrealnumber;
+   r = sqrt(r2);
+   r01 = sqrt(x0 * x0 + x1 * x1 + minrealnumber);
+   costheta = x2 / r;
+   sintheta = r01 / r;
+   expiphi = complex_from_d(x0 / r01, x1 / r01);
+// Try to use fast kernel.
+// If fast kernel returns False, use reference implementation below.
+   if (!rbfv3farfields_bhpanelevalfastkernel(x0, x1, x2, ny, panel->p, &eval->pnma, &eval->pnmb, &eval->pmmcdiag, &eval->ynma, &panel->tblrmodmn, f, &invpowrpplus1)) {
+   // No fast kernel.
+   //
+   // Compute far field expansion for a cluster of basis functions f == r
+   //
+   // NOTE: the original paper by Beatson et al. uses f == r as the basis function,
+   //       whilst ALGLIB uses f == -r due to conditional positive definiteness requirement.
+   //       We will perform conversion later.
+      powsinthetaj = 1.0;
+      for (k = 0; k < ny; k++) {
+         f->xR[k] = 0.0;
+      }
+      invr = 1.0 / r;
+      invpowrmplus1 = invr;
+      expijphi = complex_from_d(1.0);
+      stride2 = panel->stride * panel->stride;
+      for (j = 0; j <= panel->p; j++) {
+         invpowrnplus1 = invpowrmplus1;
+      // Prepare recursion for associated Legendre polynomials
+         pnmprev = 0.0;
+         pnm = powsinthetaj * eval->pmmc.xR[j];
+      //
+         for (n = j; n <= panel->p; n++) {
+            offs = n * panel->stride + j;
+         // Compute table of associated Legrengre polynomials with
+         //
+         //     P_nm(N=I,M=-J,X)
+         //
+         // being an associated Legendre polynomial, as defined in "Numerical
+         // recipes in C" and Wikipedia.
+         //
+         // It is important that the section 3 of 'Fast evaluation of polyharmonic
+         // splines in three dimensions' by R.K. Beatson, M.J.D. Powell and A.M. Tan
+         // uses different formulation of P_nm. We will account for the difference
+         // during the computation of the spherical harmonics.
+            if (n > j) {
+            // Recursion on N
+               pnmnew = pnm * costheta * eval->pnma.xR[offs] + pnmprev * eval->pnmb.xR[offs];
+               pnmprev = pnm;
+               pnm = pnmnew;
+            }
+         // Compute table of spherical harmonics where
+         //
+         //     funcSphericalY[I*N+J] = Y_nm(N=I,M=-J),
+         //
+         // with
+         //
+         //     Y_nm(N,M) = E_m*sqrt((n-m)!/(n+m)!)*P_nm(cos(theta))*exp(i*m*phi)
+         //     E_m = m > 0 ? pow(-1,m) : 1
+         //     (because we always compute Y_nm for m <= 0, E_m is always 1)
+         //
+         // being a spherical harmonic, as defined in the equation (18) of 'Fast evaluation of polyharmonic
+         // splines in three dimensions' by R.K. Beatson, M.J.D. Powell and A.M. Tan.
+         //
+         // Here P_nm is an associated Legendre polynomial as defined by Beatson et al. However, the Pnm
+         // variable stores values of associated Legendre polynomials as defined by Wikipedia. Below we perform conversion
+         // between one format and another one:
+         //
+         //     P_nm(Beatson) = P_nm(Wiki)*(-1)^(-m)*(n+m)!/(n-m)!
+         //     Y_nm(N,M)     = E_m*sqrt((n-m)!/(n+m)!)*P_nm(Beatson)*exp(i*m*phi)
+         //                   = E_m*sqrt((n-m)!/(n+m)!)*P_nm(Wiki)*(-1)^(-m)*(n+m)!/(n-m)!*exp(i*m*phi)
+         //                   = [E_m*(-1)^(-m)*sqrt((n+m)!/(n-m)!)*P_nm(Wiki)]*exp(i*m*phi)
+         //                   = YnmA[n,m]*P_nm(Wiki)*exp(i*m*phi)
+            v = pnm * eval->ynma.xR[offs];
+            sphericaly = complex_from_d(v * expijphi.x, v * expijphi.y);
+         // Compute outer function for n = N, m = 1..N
+         // Update result with O_mn*(M_mn + R^2*N_mn).
+         //
+         // The most straighforward implementation of the loop below should look like as follows:
+         //
+         //     O_nm  = [sqrt((n-m)!(n+m)!)*i^m]*Y_nm/R^(n+1)
+         //     RES  += 2*RealPart[(R^2*N_nm+M_nm)*O_nm]
+         //
+         // However, we may save a lot of computational effort by moving [sqrt((n-m)!(n+m)!)*i^m]
+         // multiplier to the left part of the product, i.e. by merging it with N_nm and M_nm
+         // and producing MODIFIED expansions NMod and MMod. Because computing this multiplier
+         // involves three lookups into precomputed tables and one complex product, it may
+         // save us a lot of time.
+            offsk = offs;
+            for (k = 0; k < ny; k++) {
+               vsummn = complex_from_d(r2 * panel->tblmodn.xC[offsk].x + panel->tblmodm.xC[offsk].x, r2 * panel->tblmodn.xC[offsk].y + panel->tblmodm.xC[offsk].y);
+               f->xR[k] += invpowrnplus1 * (vsummn.x * sphericaly.x - vsummn.y * sphericaly.y);
+               offsk += stride2;
+            }
+            invpowrnplus1 *= invr;
+         }
+      // Prepare for the next iteration
+         powsinthetaj *= sintheta;
+         invpowrmplus1 *= invr;
+         v0 = expijphi.x * expiphi.x - expijphi.y * expiphi.y;
+         v1 = expijphi.x * expiphi.y + expijphi.y * expiphi.x;
+         expijphi = complex_from_d(v0, v1);
+      }
+      invpowrpplus1 = r * invpowrmplus1;
+   }
+// Convert from f == r to f == -r
+   for (k = 0; k < ny; k++) {
+      f->xR[k] = -f->xR[k];
+   }
+// Compute error bound, if needed
+   *errbnd = 0.0;
+   if (neederrbnd) {
+      af = 0.0;
+      for (k = 0; k < ny; k++) {
+         af = rmax2(af, fabs(f->xR[k]));
+      }
+      *errbnd = panel->maxsumabs * r2 * 2.0 * panel->tblpowrmax.xR[panel->p + 1] * invpowrpplus1 / ((2 * panel->p + 1) * (r - panel->rmax));
+      *errbnd += 100.0 * machineepsilon * (panel->maxsumabs * r + af);
+   }
+}
+
+void biharmonicevaluator_init(void *_p, bool make_automatic) {
+   biharmonicevaluator *p = (biharmonicevaluator *)_p;
+   ae_vector_init(&p->tdoublefactorial, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tfactorial, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tsqrtfactorial, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tpowminus1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tpowi, 0, DT_COMPLEX, make_automatic);
+   ae_vector_init(&p->tpowminusi, 0, DT_COMPLEX, make_automatic);
+   ae_vector_init(&p->ynma, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->pnma, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->pnmb, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->pmmc, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->pmmcdiag, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->mnma, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->nnma, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->inma, 0, DT_COMPLEX, make_automatic);
+}
+
+void biharmonicevaluator_copy(void *_dst, const void *_src, bool make_automatic) {
+   biharmonicevaluator *dst = (biharmonicevaluator *)_dst;
+   const biharmonicevaluator *src = (const biharmonicevaluator *)_src;
+   dst->maxp = src->maxp;
+   dst->precomputedcount = src->precomputedcount;
+   ae_vector_copy(&dst->tdoublefactorial, &src->tdoublefactorial, make_automatic);
+   ae_vector_copy(&dst->tfactorial, &src->tfactorial, make_automatic);
+   ae_vector_copy(&dst->tsqrtfactorial, &src->tsqrtfactorial, make_automatic);
+   ae_vector_copy(&dst->tpowminus1, &src->tpowminus1, make_automatic);
+   ae_vector_copy(&dst->tpowi, &src->tpowi, make_automatic);
+   ae_vector_copy(&dst->tpowminusi, &src->tpowminusi, make_automatic);
+   ae_vector_copy(&dst->ynma, &src->ynma, make_automatic);
+   ae_vector_copy(&dst->pnma, &src->pnma, make_automatic);
+   ae_vector_copy(&dst->pnmb, &src->pnmb, make_automatic);
+   ae_vector_copy(&dst->pmmc, &src->pmmc, make_automatic);
+   ae_vector_copy(&dst->pmmcdiag, &src->pmmcdiag, make_automatic);
+   ae_vector_copy(&dst->mnma, &src->mnma, make_automatic);
+   ae_vector_copy(&dst->nnma, &src->nnma, make_automatic);
+   ae_vector_copy(&dst->inma, &src->inma, make_automatic);
+}
+
+void biharmonicevaluator_free(void *_p, bool make_automatic) {
+   biharmonicevaluator *p = (biharmonicevaluator *)_p;
+   ae_vector_free(&p->tdoublefactorial, make_automatic);
+   ae_vector_free(&p->tfactorial, make_automatic);
+   ae_vector_free(&p->tsqrtfactorial, make_automatic);
+   ae_vector_free(&p->tpowminus1, make_automatic);
+   ae_vector_free(&p->tpowi, make_automatic);
+   ae_vector_free(&p->tpowminusi, make_automatic);
+   ae_vector_free(&p->ynma, make_automatic);
+   ae_vector_free(&p->pnma, make_automatic);
+   ae_vector_free(&p->pnmb, make_automatic);
+   ae_vector_free(&p->pmmc, make_automatic);
+   ae_vector_free(&p->pmmcdiag, make_automatic);
+   ae_vector_free(&p->mnma, make_automatic);
+   ae_vector_free(&p->nnma, make_automatic);
+   ae_vector_free(&p->inma, make_automatic);
+}
+
+void biharmonicpanel_init(void *_p, bool make_automatic) {
+   biharmonicpanel *p = (biharmonicpanel *)_p;
+   ae_vector_init(&p->tbln, 0, DT_COMPLEX, make_automatic);
+   ae_vector_init(&p->tblm, 0, DT_COMPLEX, make_automatic);
+   ae_vector_init(&p->tblmodn, 0, DT_COMPLEX, make_automatic);
+   ae_vector_init(&p->tblmodm, 0, DT_COMPLEX, make_automatic);
+   ae_vector_init(&p->tblpowrmax, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tblrmodmn, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->funcsphericaly, 0, DT_COMPLEX, make_automatic);
+   ae_vector_init(&p->tpowr, 0, DT_REAL, make_automatic);
+}
+
+void biharmonicpanel_copy(void *_dst, const void *_src, bool make_automatic) {
+   biharmonicpanel *dst = (biharmonicpanel *)_dst;
+   const biharmonicpanel *src = (const biharmonicpanel *)_src;
+   dst->c0 = src->c0;
+   dst->c1 = src->c1;
+   dst->c2 = src->c2;
+   dst->rmax = src->rmax;
+   dst->useatdistance = src->useatdistance;
+   dst->ny = src->ny;
+   dst->p = src->p;
+   dst->sizen = src->sizen;
+   dst->sizem = src->sizem;
+   dst->stride = src->stride;
+   dst->sizeinner = src->sizeinner;
+   ae_vector_copy(&dst->tbln, &src->tbln, make_automatic);
+   ae_vector_copy(&dst->tblm, &src->tblm, make_automatic);
+   ae_vector_copy(&dst->tblmodn, &src->tblmodn, make_automatic);
+   ae_vector_copy(&dst->tblmodm, &src->tblmodm, make_automatic);
+   ae_vector_copy(&dst->tblpowrmax, &src->tblpowrmax, make_automatic);
+   ae_vector_copy(&dst->tblrmodmn, &src->tblrmodmn, make_automatic);
+   dst->maxsumabs = src->maxsumabs;
+   ae_vector_copy(&dst->funcsphericaly, &src->funcsphericaly, make_automatic);
+   ae_vector_copy(&dst->tpowr, &src->tpowr, make_automatic);
+}
+
+void biharmonicpanel_free(void *_p, bool make_automatic) {
+   biharmonicpanel *p = (biharmonicpanel *)_p;
+   ae_vector_free(&p->tbln, make_automatic);
+   ae_vector_free(&p->tblm, make_automatic);
+   ae_vector_free(&p->tblmodn, make_automatic);
+   ae_vector_free(&p->tblmodm, make_automatic);
+   ae_vector_free(&p->tblpowrmax, make_automatic);
+   ae_vector_free(&p->tblrmodmn, make_automatic);
+   ae_vector_free(&p->funcsphericaly, make_automatic);
+   ae_vector_free(&p->tpowr, make_automatic);
+}
 } // end of namespace alglib_impl
 
 // === RBFV3 Package ===
@@ -17471,6 +18330,12 @@ namespace alglib_impl {
 // Depends on: (Solvers) ITERATIVESPARSE
 // Depends on: RBFV3FARFIELDS
 namespace alglib_impl {
+static const ae_int_t rbfv3_defaultmaxpanelsize = 128;
+static const ae_int_t rbfv3_minfarfieldsize = 256;
+static const ae_int_t rbfv3_biharmonicseriesmax = 15;
+static const ae_int_t rbfv3_farfieldnone = -1;
+static const ae_int_t rbfv3_farfieldbiharmonic = 1;
+
 // Reallocates calcBuf if necessary, reuses previously allocated space if
 // possible.
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
@@ -17514,6 +18379,7 @@ void rbfv3create(ae_int_t nx, ae_int_t ny, ae_int_t bf, double bfp, rbfv3model *
    rbfv3_allocatecalcbuffer(s, &s->calcbuf);
 // Debug counters
    s->dbgregqrusedforddm = false;
+   s->dbgworstfirstdecay = 0.0;
 }
 
 // This function creates buffer  structure  which  can  be  used  to  perform
@@ -17688,9 +18554,675 @@ static void rbfv3_modelmatrixinit(RMatrix *xx, ae_int_t n, ae_int_t nx, ae_int_t
    ae_frame_leave();
 }
 
+// Get maximum panel size for a fast evaluator
+// ALGLIB: Copyright 27.08.2022 by Sergey Bochkanov
+ae_int_t rbf3getmaxpanelsize() {
+   ae_int_t result;
+   result = rbfv3_defaultmaxpanelsize;
+   return result;
+}
+
+// Recursive subroutine that recomputes far field radii according  to  user-
+// specified accuracy requirements.
+//
+// It should be called only for properly initialized models with coefficients
+// being loaded into them.
+static void rbfv3_fastevaluatorpushtolrec(rbf3fastevaluator *eval, ae_int_t treenodeidx, ae_int_t dbglevel, double maxcomputeerr) {
+   const bool userelaxederrorestimates = true;
+   ae_frame _frame_block;
+   double childerr;
+   bool farfieldreconfigured;
+   ae_frame_make(&_frame_block);
+   RefObj(rbf3panel, panel);
+   ae_obj_array_get(&eval->panels, treenodeidx, &_panel);
+// Reconfigure far field expansion, if present
+   if (panel->farfieldexpansion != rbfv3_farfieldnone) {
+      farfieldreconfigured = false;
+   // Far field expansions for a biharmonic kernel
+      if (panel->farfieldexpansion == rbfv3_farfieldbiharmonic) {
+         bhpanelsetprec(&panel->bhexpansion, maxcomputeerr);
+         panel->farfielddistance = panel->bhexpansion.useatdistance;
+         farfieldreconfigured = true;
+      }
+   // Check that far field was recognized and processed
+      ae_assert(farfieldreconfigured, "RBF3: unexpected far field at PushTolRec()");
+   }
+// Non-leaf panel with two children
+   if (panel->paneltype == 1) {
+   // Propagate relaxed error bounds to children. Instead of requiring it to be
+   // MaxComputeErr/2 for each of the subpanels (the sum is MaxComputeErr, which
+   // guarantees that the error bound is satisfied) we use larger value: MaxComputeErr/sqrt(2).
+   //
+   // The idea is that individual panel errors are uncorrelated, so we can achieve
+   // better results by using relaxed error tolerances, but still having total
+   // sum - on average - within prescribed bounds. Because error estimates are
+   // overly cautious, it usually works fine.
+      childerr = userelaxederrorestimates ? maxcomputeerr / 1.41 : maxcomputeerr / 2.0;
+      rbfv3_fastevaluatorpushtolrec(eval, panel->childa, dbglevel + 1, childerr);
+      rbfv3_fastevaluatorpushtolrec(eval, panel->childb, dbglevel + 1, childerr);
+      ae_frame_leave();
+      return;
+   }
+   ae_frame_leave();
+}
+
+// Sets fast evaluator tolerance, reconfiguring far field  radii  all  along
+// the evaluation tree. Assumes that coefficients were loaded  with  one  of
+// FastEvaluatorLoadCoeffs()/FastEvaluatorLoadCoeffs1() calls.
+//
+// Inputs:
+//     Eval            -   fast evaluator with loaded coefficients
+//     MaxComputeErr   -   non-negative value which controls accuracy of the
+//                         model evaluation:
+//                         * == 0 means that we try to perform exact evaluation
+//                                (subject to rounding errors) and do not try
+//                                to utilize far field expansions
+//                         * > 0  means that far field expansions are used when
+//                                we can save some time. Maximum absolute error
+//                                of the model will be at most MaxComputeErr.
+static void rbfv3_fastevaluatorpushtol(rbf3fastevaluator *eval, double maxcomputeerr) {
+   ae_assert(isfinite(maxcomputeerr), "FastEvaluatorPushTol: MaxComputeErr is not finite");
+   ae_assert(maxcomputeerr >= 0.0, "FastEvaluatorPushTol: MaxComputeErr < 0");
+   ae_assert(eval->isloaded, "FastEvaluatorPushTol: coefficients are not loaded");
+   rbfv3_fastevaluatorpushtolrec(eval, 0, 0, maxcomputeerr);
+}
+
+// Allocate temporaries in the evaluator buffer
+static void rbfv3_evalbufferinit(rbf3evaluatorbuffer *buf, ae_int_t nx, ae_int_t maxpanelsize) {
+   allocv(maxpanelsize, &buf->funcbuf);
+   allocv(maxpanelsize, &buf->wrkbuf);
+   allocv(maxpanelsize, &buf->df1);
+   allocv(maxpanelsize, &buf->df2);
+   allocm(nx, maxpanelsize, &buf->deltabuf);
+   allocv(maxpanelsize, &buf->mindist2);
+   allocv(maxpanelsize, &buf->coeffbuf);
+   allocv(nx, &buf->x);
+}
+
+// Recursive function for the fast evaluator
+static ae_int_t rbfv3_fastevaluatorinitrec(rbf3fastevaluator *eval, RMatrix *xx, ZVector *ptidx, RVector *coordbuf, ae_int_t idx0, ae_int_t idx1, nrpool *nxpool) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   double v;
+   ae_int_t idxmid;
+   ae_int_t subsetlength;
+   ae_int_t subset0;
+   ae_int_t subset1;
+   ae_int_t largestdim;
+   ae_int_t result;
+   ae_frame_make(&_frame_block);
+   RefObj(rbf3panel, panel);
+   NewVector(boxmin, 0, DT_REAL);
+   NewVector(boxmax, 0, DT_REAL);
+   ae_assert(idx1 > idx0, "FastEvaluatorInitRec: Idx1 <= Idx0");
+   subsetlength = idx1 - idx0;
+// Add panel to the array, prepare to return its index
+   RepObj(rbf3panel, panel);
+   result = ae_obj_array_append_transfer(&eval->panels, &_panel);
+// Prepare panel fields that are always set:
+// * panel center and radius
+// * default far field state (not present)
+   rsetallocv(eval->nx, 0.0, &panel->clustercenter);
+   for (i = idx0; i < idx1; i++) {
+      for (j = 0; j < eval->nx; j++) {
+         panel->clustercenter.xR[j] += xx->xyR[ptidx->xZ[i]][j];
+      }
+   }
+   for (j = 0; j < eval->nx; j++) {
+      panel->clustercenter.xR[j] /= subsetlength;
+   }
+   if (eval->nx <= 4 && eval->nx > 0) {
+      panel->c0 = panel->clustercenter.xR[0];
+   }
+   if (eval->nx <= 4 && eval->nx > 1) {
+      panel->c1 = panel->clustercenter.xR[1];
+   }
+   if (eval->nx <= 4 && eval->nx > 2) {
+      panel->c2 = panel->clustercenter.xR[2];
+   }
+   if (eval->nx <= 4 && eval->nx > 3) {
+      panel->c3 = panel->clustercenter.xR[3];
+   }
+   panel->clusterrad = 1.0E-50;
+   for (i = idx0; i < idx1; i++) {
+      v = 0.0;
+      for (j = 0; j < eval->nx; j++) {
+         v += sqr(panel->clustercenter.xR[j] - xx->xyR[ptidx->xZ[i]][j]);
+      }
+      panel->clusterrad = rmax2(panel->clusterrad, v);
+   }
+   panel->clusterrad = sqrt(panel->clusterrad);
+   panel->farfieldexpansion = rbfv3_farfieldnone;
+   panel->farfielddistance = 0.0;
+   panel->idx0 = idx0;
+   panel->idx1 = idx1;
+// Handle leaf panel (small enough)
+   if (subsetlength <= eval->maxpanelsize) {
+      panel->paneltype = 0;
+      allocv(subsetlength, &panel->ptidx);
+      allocm(eval->nx, subsetlength, &panel->xt);
+      for (i = idx0; i < idx1; i++) {
+         panel->ptidx.xZ[i - idx0] = ptidx->xZ[i];
+         for (j = 0; j < eval->nx; j++) {
+            v = xx->xyR[ptidx->xZ[i]][j];
+            panel->xt.xyR[j][i - idx0] = v;
+            eval->permx.xyR[i][j] = v;
+         }
+      }
+      rsetallocm(eval->ny, subsetlength, 0.0, &panel->wt);
+      rbfv3_evalbufferinit(&panel->tgtbuf, eval->nx, eval->maxpanelsize);
+      ae_frame_leave();
+      return result;
+   }
+// Prepare temporaries
+   nrpoolretrieve(nxpool, &boxmin);
+   nrpoolretrieve(nxpool, &boxmax);
+// Prepare to split large panel:
+// * compute bounding box and its largest dimension
+// * sort points by largest dimension of the bounding box
+// * split in two
+   rcopyrv(eval->nx, xx, ptidx->xZ[idx0], &boxmin);
+   rcopyrv(eval->nx, xx, ptidx->xZ[idx0], &boxmax);
+   for (i = idx0 + 1; i < idx1; i++) {
+      for (j = 0; j < eval->nx; j++) {
+         boxmin.xR[j] = rmin2(boxmin.xR[j], xx->xyR[ptidx->xZ[i]][j]);
+         boxmax.xR[j] = rmax2(boxmax.xR[j], xx->xyR[ptidx->xZ[i]][j]);
+      }
+   }
+   largestdim = 0;
+   for (j = 1; j < eval->nx; j++) {
+      if (boxmax.xR[j] - boxmin.xR[j] > boxmax.xR[largestdim] - boxmin.xR[largestdim]) {
+         largestdim = j;
+      }
+   }
+   for (i = idx0; i < idx1; i++) {
+      coordbuf->xR[i] = xx->xyR[ptidx->xZ[i]][largestdim];
+   }
+   tagsortmiddleri(coordbuf, ptidx, subsetlength, idx0);
+   ae_assert(subsetlength > eval->maxpanelsize, "RBF3: integrity check 2955 failed");
+   subset0 = tiledsplit(subsetlength, subsetlength > rbfv3_minfarfieldsize ? rbfv3_minfarfieldsize : eval->maxpanelsize), subset1 = subsetlength - subset0;
+   idxmid = idx0 + subset0;
+// Return temporaries back to nxPool and perform recursive processing
+   nrpoolrecycle(nxpool, &boxmin);
+   nrpoolrecycle(nxpool, &boxmax);
+   panel->paneltype = 1;
+   panel->childa = rbfv3_fastevaluatorinitrec(eval, xx, ptidx, coordbuf, idx0, idxmid, nxpool);
+   panel->childb = rbfv3_fastevaluatorinitrec(eval, xx, ptidx, coordbuf, idxmid, idx1, nxpool);
+   ae_frame_leave();
+   return result;
+}
+
+// Initialize fast model evaluator using current dataset and default  (zero)
+// coefficients.
+//
+// The coefficients can be loaded later  with  RBF3FastEvaluatorLoadCoeffs()
+// or RBF3FastEvaluatorLoadCoeffs1().
+static void rbfv3_fastevaluatorinit(rbf3fastevaluator *eval, RMatrix *x, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t maxpanelsize, ae_int_t bftype, double bfparam) {
+   ae_frame _frame_block;
+   ae_int_t rootidx;
+   ae_int_t i;
+   ae_frame_make(&_frame_block);
+   DupMatrix(x);
+   NewVector(coordbuf, 0, DT_REAL);
+   NewObj(nrpool, nxpool);
+   NewObj(rbf3evaluatorbuffer, bufseed);
+// Prepare the evaluator and temporaries
+   eval->n = n;
+   eval->nx = nx;
+   eval->ny = ny;
+   eval->maxpanelsize = maxpanelsize;
+   eval->functype = bftype;
+   eval->funcparam = bfparam;
+   SetObj(ae_obj_array, &eval->panels);
+   rsetallocm(n, 3 + ny, 0.0, &eval->tmpx3w);
+   rsetallocm(ny, n, 0.0, &eval->wstoredorig);
+   allocm(n, nx, &eval->permx);
+   rbfv3_evalbufferinit(&bufseed, eval->nx, eval->maxpanelsize);
+   ae_shared_pool_set_seed(&eval->bufferpool, &bufseed, sizeof(bufseed), rbf3evaluatorbuffer_init, rbf3evaluatorbuffer_copy, rbf3evaluatorbuffer_free);
+   eval->isloaded = false;
+// Perform recursive subdivision, generate panels
+   allocv(n, &eval->origptidx);
+   for (i = 0; i < n; i++) {
+      eval->origptidx.xZ[i] = i;
+   }
+   allocv(n, &coordbuf);
+   nrpoolinit(&nxpool, nx);
+   rootidx = rbfv3_fastevaluatorinitrec(eval, x, &eval->origptidx, &coordbuf, 0, n, &nxpool);
+   ae_assert(rootidx == 0, "FastEvaluatorInit: integrity check for RootIdx failed");
+   ae_frame_leave();
+}
+
+// Recursive subroutine that loads coefficients into the fast evaluator. The
+// coefficients are expected to be in Eval.WStoredOrig[NY,N]
+//
+// Depending  on  the  settings  specified  during evaluator creation (basis
+// function type and parameter), far field expansion can be  built  for  the
+// model.
+static void rbfv3_fastevaluatorloadcoeffsrec(rbf3fastevaluator *eval, ae_int_t treenodeidx) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t npts;
+   ae_frame_make(&_frame_block);
+   RefObj(rbf3panel, panel);
+   ae_obj_array_get(&eval->panels, treenodeidx, &_panel);
+   npts = panel->idx1 - panel->idx0;
+// Create far field expansion, if possible
+   panel->farfieldexpansion = rbfv3_farfieldnone;
+   if (eval->functype == 1 && npts >= rbfv3_minfarfieldsize && eval->funcparam == 0.0 && eval->nx <= 3) {
+   // Use far field expansions for a biharmonic kernel
+      for (i = panel->idx0; i < panel->idx1; i++) {
+         for (j = 0; j < eval->nx; j++) {
+            eval->tmpx3w.xyR[i][j] = eval->permx.xyR[i][j];
+         }
+         for (j = 0; j < eval->ny; j++) {
+            eval->tmpx3w.xyR[i][3 + j] = eval->wstoredorig.xyR[j][eval->origptidx.xZ[i]];
+         }
+      }
+      bhpanelinit(&panel->bhexpansion, &eval->tmpx3w, panel->idx0, panel->idx1, eval->ny, &eval->bheval);
+      panel->farfieldexpansion = rbfv3_farfieldbiharmonic;
+      panel->farfielddistance = panel->bhexpansion.useatdistance;
+   }
+// Non-leaf panel with two children
+   if (panel->paneltype == 1) {
+   // Load coefficients into child panels.
+      rbfv3_fastevaluatorloadcoeffsrec(eval, panel->childa);
+      rbfv3_fastevaluatorloadcoeffsrec(eval, panel->childb);
+      ae_frame_leave();
+      return;
+   }
+// Leaf panel
+   ae_assert(panel->paneltype == 0, "RBF3: integrity check 4594 failed");
+   for (i = 0; i < eval->ny; i++) {
+      for (j = 0; j < npts; j++) {
+         panel->wt.xyR[i][j] = eval->wstoredorig.xyR[i][panel->ptidx.xZ[j]];
+      }
+   }
+   ae_frame_leave();
+}
+
+// Loads coefficients into fast evaluator built with NY == 1.
+//
+// Depending  on  the  settings  specified  during evaluator creation (basis
+// function type and parameter), far field expansion can be  built  for  the
+// model.
+//
+// Inputs:
+//     Eval            -   fast evaluator to load coefficients to
+//     W               -   coeffs vector
+static void rbfv3_fastevaluatorloadcoeffs1(rbf3fastevaluator *eval, RVector *w) {
+   ae_assert(eval->ny == 1, "FastEvaluatorLoadCoeffs1: Eval.NY != 1");
+   ae_assert(ae_obj_array_get_length(&eval->panels) > 0, "FastEvaluatorLoadCoeffs1: Length(Panels) == 0");
+// Prepare problem-specific evaluator, if any
+   if (eval->functype == 1 && eval->funcparam == 0.0 && eval->nx <= 3) {
+      biharmonicevaluatorinit(&eval->bheval, rbfv3_biharmonicseriesmax);
+   }
+// Recursively load coefficients into panels
+   rcopyvr(eval->n, w, &eval->wstoredorig, 0);
+   rbfv3_fastevaluatorloadcoeffsrec(eval, 0);
+// Done
+   eval->isloaded = true;
+}
+
+// Loads coefficients into fast evaluator (works with any NY >= 1)
+//
+// Depending  on  the  settings  specified  during evaluator creation (basis
+// function type and parameter), far field expansion can be  built  for  the
+// model.
+//
+// Inputs:
+//     Eval            -   fast evaluator to load coefficients to
+//     W               -   coeffs vector, array[NY,N]
+static void rbfv3_fastevaluatorloadcoeffs(rbf3fastevaluator *eval, RMatrix *w) {
+   ae_assert(eval->ny <= w->rows, "FastEvaluatorLoadCoeffs: Eval.NY > Rows(W)");
+   ae_assert(ae_obj_array_get_length(&eval->panels) > 0, "FastEvaluatorLoadCoeffs: Length(Panels) == 0");
+// Prepare problem-specific evaluator, if any
+   if (eval->functype == 1 && eval->funcparam == 0.0 && eval->nx <= 3) {
+      biharmonicevaluatorinit(&eval->bheval, rbfv3_biharmonicseriesmax);
+   }
+// Recursively load coefficients into panels
+   rmatrixcopy(eval->ny, eval->n, w, 0, 0, &eval->wstoredorig, 0, 0);
+   rbfv3_fastevaluatorloadcoeffsrec(eval, 0);
+// Done
+   eval->isloaded = true;
+}
+
+// Updates Y[] with result of panel-to-panel interaction using straightforward
+// O(PANELSIZE^2) computation formula.
+static void rbfv3_fastevaluatorcomputepanel2panel(rbf3fastevaluator *eval, rbf3panel *dstpanel, rbf3panel *srcpanel, rbf3evaluatorbuffer *buf, RVector *y) {
+   ae_int_t ndstpts;
+   ae_int_t i0;
+   ae_int_t k;
+   double distance0;
+   ae_int_t srcsize;
+   ae_assert(eval->ny == 1, "RBF3Panel2Panel: ny > 1");
+   ae_assert(dstpanel->paneltype == 0 && dstpanel->idx1 - dstpanel->idx0 <= eval->maxpanelsize, "RBF3: integrity check 2735 failed");
+   ae_assert(srcpanel->paneltype == 0 && srcpanel->idx1 - srcpanel->idx0 <= eval->maxpanelsize, "RBF3: integrity check 2736 failed");
+   ndstpts = dstpanel->idx1 - dstpanel->idx0;
+   srcsize = srcpanel->idx1 - srcpanel->idx0;
+   distance0 = 1.0E-50;
+   if (eval->functype == 1) {
+      distance0 += sqr(eval->funcparam);
+   }
+   ae_assert(eval->functype == 1 || eval->functype == 2, "RBF3: integrity check 9132 failed");
+   for (i0 = 0; i0 < ndstpts; i0++) {
+      rsetv(srcsize, distance0, &buf->funcbuf);
+      for (k = 0; k < eval->nx; k++) {
+         rsetv(srcsize, dstpanel->xt.xyR[k][i0], &buf->wrkbuf);
+         raddrv(srcsize, -1.0, &srcpanel->xt, k, &buf->wrkbuf);
+         rmuladdv(srcsize, &buf->wrkbuf, &buf->wrkbuf, &buf->funcbuf);
+      }
+      if (eval->functype == 1) {
+      // f == -sqrt(r^2+alpha^2), including f == -r as a special case
+         rsqrtv(srcsize, &buf->funcbuf);
+         rmulv(srcsize, -1.0, &buf->funcbuf);
+      }
+      if (eval->functype == 2) {
+      // f == r^2*ln(r)
+      //
+      // NOTE: FuncBuf[] is always positive due to small correction added,
+      //       thus we have no need to handle ln(0) as a special case.
+         for (k = 0; k < srcsize; k++) {
+            buf->funcbuf.xR[k] *= 0.5 * log(buf->funcbuf.xR[k]);
+         }
+      }
+      y->xR[dstpanel->ptidx.xZ[i0]] += rdotvr(srcsize, &buf->funcbuf, &srcpanel->wt, 0);
+   }
+}
+
+// Recursive evaluation function that recursively evaluates all source panels.
+//
+// The plan is for each target panel to evaluate all source panels that may
+// contribute to model values at target points. This function evaluates all
+// sources, given some target.
+//
+// This function has to be called with SourceTreeNode == 0.
+static void rbfv3_fastevaluatorcomputeallrecurseonsources(rbf3fastevaluator *eval, rbf3panel *dstpanel, rbf3evaluatorbuffer *buf, ae_int_t sourcetreenode, RVector *y) {
+   ae_frame _frame_block;
+   ae_int_t i0;
+   ae_int_t k;
+   double v;
+   double vv;
+   double dstpaneldistance;
+   bool farfieldprocessed;
+   double c0;
+   double c1;
+   double c2;
+   ae_int_t ndstpts;
+   ae_frame_make(&_frame_block);
+   RefObj(rbf3panel, srcpanel);
+   ndstpts = dstpanel->idx1 - dstpanel->idx0;
+   ae_obj_array_get(&eval->panels, sourcetreenode, &_srcpanel);
+// Analyze possibility of applying far field expansion
+   if (srcpanel->farfieldexpansion != rbfv3_farfieldnone) {
+      dstpaneldistance = 0.0;
+      for (k = 0; k < eval->nx; k++) {
+         dstpaneldistance += sqr(dstpanel->clustercenter.xR[k] - srcpanel->clustercenter.xR[k]);
+      }
+      dstpaneldistance = sqrt(dstpaneldistance);
+      dstpaneldistance -= dstpanel->clusterrad;
+      if (dstpaneldistance > srcpanel->farfielddistance) {
+         farfieldprocessed = false;
+         c0 = 0.0;
+         c1 = 0.0;
+         c2 = 0.0;
+         if (srcpanel->farfieldexpansion == rbfv3_farfieldbiharmonic) {
+            for (i0 = 0; i0 < ndstpts; i0++) {
+               if (eval->nx >= 1) {
+                  c0 = dstpanel->xt.xyR[0][i0];
+               }
+               if (eval->nx >= 2) {
+                  c1 = dstpanel->xt.xyR[1][i0];
+               }
+               if (eval->nx >= 3) {
+                  c2 = dstpanel->xt.xyR[2][i0];
+               }
+               bhpaneleval1(&srcpanel->bhexpansion, &eval->bheval, c0, c1, c2, &v, false, &vv);
+               y->xR[dstpanel->ptidx.xZ[i0]] += v;
+            }
+            farfieldprocessed = true;
+         }
+         ae_assert(farfieldprocessed, "RBF3: integrity check 4832 failed");
+         ae_frame_leave();
+         return;
+      }
+   }
+// Far field expansion is not present, or we are too close to the expansion center.
+// Try recursive processing or handle leaf panel.
+   if (srcpanel->paneltype == 1) {
+      rbfv3_fastevaluatorcomputeallrecurseonsources(eval, dstpanel, buf, srcpanel->childa, y);
+      rbfv3_fastevaluatorcomputeallrecurseonsources(eval, dstpanel, buf, srcpanel->childb, y);
+   } else {
+      rbfv3_fastevaluatorcomputepanel2panel(eval, dstpanel, srcpanel, buf, y);
+   }
+   ae_frame_leave();
+}
+
+// Recursive evaluation function that recursively evaluates all target panels.
+//
+// The plan is for each target panel to evaluate all source panels that may
+// contribute to model values at target points. This function evaluates all
+// targets, and it passes control to another function that evaluates all
+// sources.
+//
+// This function has to be called with TargetTreeNode == 0.
+// It can parallelize its computations.
+static void rbfv3_fastevaluatorcomputeallrecurseontargets(rbf3fastevaluator *eval, ae_int_t targettreenode, RVector *y) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   RefObj(rbf3panel, dstpanel);
+// Do we need parallel execution?
+// Checked only at the root.
+// Parallelism was tried if: targettreenode == 0 && (double)eval->n * eval->n > smpactivationlevel() && ae_obj_array_get_length(&eval->panels) > 1
+// Evaluate destination panel
+   ae_obj_array_get(&eval->panels, targettreenode, &_dstpanel);
+   if (dstpanel->paneltype == 1) {
+      rbfv3_fastevaluatorcomputeallrecurseontargets(eval, dstpanel->childa, y);
+      rbfv3_fastevaluatorcomputeallrecurseontargets(eval, dstpanel->childb, y);
+      ae_frame_leave();
+      return;
+   }
+   ae_assert(dstpanel->paneltype == 0, "RBF3: integrity check 2735 failed");
+// Recurse on sources.
+// Use evaluator buffer stored in target panel for temporaries.
+   rbfv3_fastevaluatorcomputeallrecurseonsources(eval, dstpanel, &dstpanel->tgtbuf, 0, y);
+   ae_frame_leave();
+}
+
+// Performs batch evaluation at each node (assuming NY == 1).
+static void rbfv3_fastevaluatorcomputeall(rbf3fastevaluator *eval, RVector *y) {
+   ae_assert(eval->ny == 1, "FastEvaluatorComputeAll: Eval.NY != 1");
+   rsetallocv(eval->n, 0.0, y);
+   rbfv3_fastevaluatorcomputeallrecurseontargets(eval, 0, y);
+}
+
+// Recursion on source panels for batch evaluation
+//
+// NOTE: this function is thread-safe, the same Eval object can be  used  by
+//       multiple threads calling ComputeBatch() concurrently. Although  for
+//       technical reasons Eval is accepted as non-const parameter,  thread-
+//       safety is guaranteed.
+//
+// Inputs:
+//     Eval        -   evaluator
+//     X           -   array[N,NX], dataset
+//     TgtIdx      -   target row index
+//     SourceTreeNode- index of the current panel in the tree; must be zero.
+//     UseFarFields-   use far fields to accelerate computations - or use
+//                     slow but exact formulae
+//
+// Outputs:
+//     Y           -   array[NY,N], column TgtIdx is updated
+static void rbfv3_fastevaluatorcomputebatchrecurseonsources(rbf3fastevaluator *eval, RMatrix *x, ae_int_t tgtidx, ae_int_t sourcetreenode, bool usefarfields, rbf3evaluatorbuffer *buf, RMatrix *y) {
+   ae_frame _frame_block;
+   ae_int_t srcsize;
+   ae_int_t k;
+   ae_int_t d;
+   double distance0;
+   double paneldistance;
+   bool farfieldprocessed;
+   double c0;
+   double c1;
+   double c2;
+   double v;
+   double vv;
+   ae_frame_make(&_frame_block);
+   RefObj(rbf3panel, srcpanel);
+   ae_obj_array_get(&eval->panels, sourcetreenode, &_srcpanel);
+// Analyze possibility of applying far field expansion
+   if (srcpanel->farfieldexpansion != rbfv3_farfieldnone && usefarfields) {
+      paneldistance = 0.0;
+      for (k = 0; k < eval->nx; k++) {
+         paneldistance += sqr(x->xyR[tgtidx][k] - srcpanel->clustercenter.xR[k]);
+      }
+      paneldistance = sqrt(paneldistance);
+      if (paneldistance > srcpanel->farfielddistance) {
+         farfieldprocessed = false;
+         c0 = 0.0;
+         c1 = 0.0;
+         c2 = 0.0;
+         if (srcpanel->farfieldexpansion == rbfv3_farfieldbiharmonic) {
+            if (eval->nx >= 1) {
+               c0 = x->xyR[tgtidx][0];
+            }
+            if (eval->nx >= 2) {
+               c1 = x->xyR[tgtidx][1];
+            }
+            if (eval->nx >= 3) {
+               c2 = x->xyR[tgtidx][2];
+            }
+            if (eval->ny == 1) {
+               bhpaneleval1(&srcpanel->bhexpansion, &eval->bheval, c0, c1, c2, &v, false, &vv);
+               y->xyR[0][tgtidx] += v;
+            } else {
+               bhpaneleval(&srcpanel->bhexpansion, &eval->bheval, c0, c1, c2, &buf->y, false, &vv);
+               for (k = 0; k < eval->ny; k++) {
+                  y->xyR[k][tgtidx] += buf->y.xR[k];
+               }
+            }
+            farfieldprocessed = true;
+         }
+         ae_assert(farfieldprocessed, "RBF3: integrity check 4832 failed");
+         ae_frame_leave();
+         return;
+      }
+   }
+// Perform recursive processing if needed
+   if (srcpanel->paneltype == 1) {
+      rbfv3_fastevaluatorcomputebatchrecurseonsources(eval, x, tgtidx, srcpanel->childa, usefarfields, buf, y);
+      rbfv3_fastevaluatorcomputebatchrecurseonsources(eval, x, tgtidx, srcpanel->childb, usefarfields, buf, y);
+      ae_frame_leave();
+      return;
+   }
+   ae_assert(srcpanel->paneltype == 0 && srcpanel->idx1 - srcpanel->idx0 <= eval->maxpanelsize, "RBF3: integrity check 2735 failed");
+// Obtain evaluation buffer and process panel.
+// Recycle the buffer later.
+   ae_assert(eval->functype == 1 || eval->functype == 2, "RBF3: integrity check 1132 failed");
+   srcsize = srcpanel->idx1 - srcpanel->idx0;
+   distance0 = 1.0E-50;
+   if (eval->functype == 1) {
+      distance0 += sqr(eval->funcparam);
+   }
+   rsetv(srcsize, distance0, &buf->funcbuf);
+   for (k = 0; k < eval->nx; k++) {
+      rsetv(srcsize, x->xyR[tgtidx][k], &buf->wrkbuf);
+      raddrv(srcsize, -1.0, &srcpanel->xt, k, &buf->wrkbuf);
+      rmuladdv(srcsize, &buf->wrkbuf, &buf->wrkbuf, &buf->funcbuf);
+   }
+   if (eval->functype == 1) {
+   // f == -sqrt(r^2+alpha^2), including f == -r as a special case
+      rsqrtv(srcsize, &buf->funcbuf);
+      rmulv(srcsize, -1.0, &buf->funcbuf);
+   }
+   if (eval->functype == 2) {
+   // f == r^2*ln(r)
+   //
+   // NOTE: FuncBuf[] is always positive due to small correction added,
+   //       thus we have no need to handle ln(0) as a special case.
+      for (k = 0; k < srcsize; k++) {
+         buf->funcbuf.xR[k] *= 0.5 * log(buf->funcbuf.xR[k]);
+      }
+   }
+   for (d = 0; d < eval->ny; d++) {
+      y->xyR[d][tgtidx] += rdotvr(srcsize, &buf->funcbuf, &srcpanel->wt, d);
+   }
+   ae_frame_leave();
+}
+
+// Recursion on targets for batch evaluation, splits interval into smaller
+// ones.
+//
+// NOTE: this function is thread-safe, the same Eval object can be  used  by
+//       multiple threads calling ComputeBatch() concurrently. Although  for
+//       technical reasons Eval is accepted as non-const parameter,  thread-
+//       safety is guaranteed.
+//
+// Inputs:
+//     Eval        -   evaluator
+//     X           -   array[N,NX], dataset
+//     Idx0,Idx1   -   target range
+//     IsRootCall  -   must be True
+//     UseFarFields-   use far fields to accelerate computations - or use
+//                     slow but exact formulae
+//
+// Outputs:
+//     Y           -   array[NY,N], computed values
+static void rbfv3_fastevaluatorcomputebatchrecurseontargets(rbf3fastevaluator *eval, RMatrix *x, ae_int_t idx0, ae_int_t idx1, bool isrootcall, bool usefarfields, RMatrix *y) {
+   const ae_int_t maxcomputebatchsize = 128;
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t size0;
+   ae_int_t size1;
+   ae_frame_make(&_frame_block);
+   RefObj(rbf3evaluatorbuffer, buf);
+// Do we need parallel execution?
+// Checked only at the root.
+// Parallelism was tried if: isrootcall && idx1 - idx0 > maxcomputebatchsize && (double)eval->n * (idx1 - idx0) > smpactivationlevel()
+// Split targets
+   if (idx1 - idx0 > maxcomputebatchsize) {
+      size0 = tiledsplit(idx1 - idx0, maxcomputebatchsize), size1 = idx1 - idx0 - size0;
+      rbfv3_fastevaluatorcomputebatchrecurseontargets(eval, x, idx0, idx0 + size0, false, usefarfields, y);
+      rbfv3_fastevaluatorcomputebatchrecurseontargets(eval, x, idx0 + size0, idx1, false, usefarfields, y);
+      ae_frame_leave();
+      return;
+   }
+// Run recursion on sources
+   ae_shared_pool_retrieve(&eval->bufferpool, &_buf);
+   for (i = idx0; i < idx1; i++) {
+      rbfv3_fastevaluatorcomputebatchrecurseonsources(eval, x, i, 0, usefarfields, buf, y);
+   }
+   ae_shared_pool_recycle(&eval->bufferpool, &_buf);
+   ae_frame_leave();
+}
+
+// Performs batch evaluation at user-specified points which does not have to
+// coincide with nodes. Assumes NY == 1.
+//
+// NOTE: this function is thread-safe, the same Eval object can be  used  by
+//       multiple threads calling ComputeBatch() concurrently. Although  for
+//       technical reasons Eval is accepted as non-const parameter,  thread-
+//       safety is guaranteed.
+//
+// Inputs:
+//     Eval        -   evaluator
+//     X           -   array[N,NX], dataset
+//     N           -   rows count
+//     UseFarFields-   use far fields to accelerate computations - or use
+//                     slow but exact formulae
+//
+// Outputs:
+//     Y           -   array[NY,N], computed values.
+//                     The array is reallocated if needed.
+static void rbfv3_fastevaluatorcomputebatch(rbf3fastevaluator *eval, RMatrix *x, ae_int_t n, bool usefarfields, RMatrix *y) {
+   rsetallocm(eval->ny, n, 0.0, y);
+   rbfv3_fastevaluatorcomputebatchrecurseontargets(eval, x, 0, n, true, usefarfields, y);
+}
+
 // Creates fast evaluation structures after initialization of the model
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
 static void rbfv3_createfastevaluator(rbfv3model *model) {
+   const double defaultfastevaltol = 0.001;
    ae_frame _frame_block;
    ae_int_t offs;
    ae_int_t ontheflystorage;
@@ -17702,16 +19234,27 @@ static void rbfv3_createfastevaluator(rbfv3model *model) {
    ae_int_t curlen;
    ae_frame_make(&_frame_block);
    NewMatrix(xx, 0, 0, DT_REAL);
-// Setup model matrix structure
-   ontheflystorage = 1;
+   NewMatrix(ct, 0, 0, DT_REAL);
+// Extract dataset into separate matrix
    allocm(model->nc, model->nx, &xx);
+   allocm(model->ny, model->nc, &ct);
    offs = 0;
    for (i = 0; i < model->nc; i++) {
       for (j = 0; j < model->nx; j++) {
          xx.xyR[i][j] = model->cw.xR[offs + j];
       }
-      offs += model->nx + model->ny;
+      offs += model->nx;
+      for (j = 0; j < model->ny; j++) {
+         ct.xyR[j][i] = model->cw.xR[offs + j];
+      }
+      offs += model->ny;
    }
+// Prepare fast evaluator
+   rbfv3_fastevaluatorinit(&model->fasteval, &xx, model->nc, model->nx, model->ny, rbfv3_defaultmaxpanelsize, model->bftype, model->bfparam);
+   rbfv3_fastevaluatorloadcoeffs(&model->fasteval, &ct);
+   rbfv3_fastevaluatorpushtol(&model->fasteval, defaultfastevaltol);
+// Setup model matrix structure
+   ontheflystorage = 1;
    rbfv3_modelmatrixinit(&xx, model->nc, model->nx, model->bftype, model->bfparam, ontheflystorage, &model->evaluator);
 // Store model coefficients in the efficient chunked format (chunk size is aligned with that
 // of the Model.Evaluator).
@@ -18347,7 +19890,7 @@ static void rbfv3_computeacbfpreconditionerbasecase(acbfbuilder *builder, acbfbu
       }
    }
 // Add local correction grid: select more distant neighbors
-   while (currentrad > 0.0 && currentrad < builder->roughdatasetdiameter) {
+   while (ncorrection > 0 && currentrad > 0.0 && currentrad < builder->roughdatasetdiameter) {
    // Select neighbors within CurrentRad*Builder.CorrectorGrowth
       if (expansionscount == 0) {
       // First expansion, use simplified kd-tree #1
@@ -19013,111 +20556,6 @@ static void rbfv3_computerowchunk(rbf3evaluator *evaluator, RVector *x, rbf3eval
    ae_assert(false, "RBFV3: unexpected FuncType in ComputeRowChunk()");
 }
 
-// Recursive subroutine for parallel divide-and-conquer computation of matrix-
-// vector product with coefficients vector. Works only for on-the-fly models
-// with StorageType == 1
-// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
-static void rbfv3_modelmatrixcomputeproductrec(rbf3evaluator *modelmatrix, RVector *c, ZVector *rowidx, RVector *r, ae_int_t idx0, ae_int_t idx1, bool toplevelcall) {
-   ae_frame _frame_block;
-   ae_int_t s0;
-   ae_int_t s1;
-   ae_int_t i;
-   ae_int_t colidx;
-   ae_int_t curchunk;
-   ae_int_t srcidx;
-   double distance0;
-   ae_frame_make(&_frame_block);
-   RefObj(rbf3evaluatorbuffer, buf);
-   ae_assert(modelmatrix->storagetype == 1, "ModelMatrixComputeProductRec: unexpected StorageType");
-// Parallelism was tried if: toplevelcall && (double)modelmatrix->n * (idx1 - idx0) > smpactivationlevel() && idx1 - idx0 > modelmatrix->chunksize
-// Perform recursive subdivision on the destination indexes until we fit into the chunk size
-   if (idx1 - idx0 > modelmatrix->chunksize) {
-      s0 = tiledsplit(idx1 - idx0, modelmatrix->chunksize), s1 = idx1 - idx0 - s0;
-      rbfv3_modelmatrixcomputeproductrec(modelmatrix, c, rowidx, r, idx0, idx0 + s0, false);
-      rbfv3_modelmatrixcomputeproductrec(modelmatrix, c, rowidx, r, idx0 + s0, idx1, false);
-      ae_frame_leave();
-      return;
-   }
-// Now split column indexes
-   ae_assert(modelmatrix->functype == 1 || modelmatrix->functype == 2, "ModelMatrixComputeProductRec: unexpected FuncType");
-   ae_shared_pool_retrieve(&modelmatrix->bufferpool, &_buf);
-   rsetallocv(modelmatrix->nx, 0.0, &buf->x);
-   rsetallocv(modelmatrix->chunksize, 0.0, &buf->coeffbuf);
-   rsetallocv(modelmatrix->chunksize, 0.0, &buf->funcbuf);
-   rsetallocv(modelmatrix->chunksize, 0.0, &buf->wrkbuf);
-   colidx = 0;
-   srcidx = 0;
-   distance0 = 1.0E-50;
-   if (modelmatrix->functype == 1) {
-   // Kernels that add squared parameter to the squared distance
-      distance0 = sqr(modelmatrix->funcparam);
-   }
-   while (colidx < modelmatrix->n) {
-   // Handle basecase with size at most ChunkSize*ChunkSize
-      curchunk = imin2(modelmatrix->chunksize, modelmatrix->n - colidx);
-      rcopyvx(curchunk, c, colidx, &buf->coeffbuf, 0);
-      for (i = idx0; i < idx1; i++) {
-         rcopyrv(modelmatrix->nx, &modelmatrix->x, rowidx->xZ[i], &buf->x);
-         rbfv3_computerowchunk(modelmatrix, &buf->x, buf, curchunk, srcidx, distance0, 0);
-         r->xR[i] += rdotv(curchunk, &buf->funcbuf, &buf->coeffbuf);
-      }
-      colidx += curchunk;
-      srcidx += modelmatrix->nx;
-   }
-   ae_shared_pool_recycle(&modelmatrix->bufferpool, &_buf);
-   ae_frame_leave();
-}
-
-// Computes product of the model matrix with vector C, writes result to R.
-//
-// NOTE: this function is thread safe and can be used with the same model matrix
-//       from different threads
-//
-// NOTE: If R is longer than M, it is not reallocated and additional elements
-//       are not modified.
-// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
-static void rbfv3_modelmatrixcomputeproduct(rbf3evaluator *modelmatrix, RVector *c, RVector *r) {
-   ae_assert(modelmatrix->storagetype == 0 || modelmatrix->storagetype == 1, "ModelMatrixComputeProduct: unexpected StorageType");
-   allocv(modelmatrix->n, r);
-   if (modelmatrix->storagetype == 0) {
-      rmatrixgemv(modelmatrix->n, modelmatrix->n, 1.0, &modelmatrix->f, 0, 0, 0, c, 0, 0.0, r, 0);
-      return;
-   }
-   if (modelmatrix->storagetype == 1) {
-      rsetv(modelmatrix->n, 0.0, r);
-      rbfv3_modelmatrixcomputeproductrec(modelmatrix, c, &modelmatrix->entireset, r, 0, modelmatrix->n, true);
-      return;
-   }
-   ae_assert(false, "ModelMatrixComputeProduct: integrity check failed");
-}
-
-// Computes product of the subset of the model matrix (only rows with indexes
-// from Idx[]) with vector C, writes result to R.
-//
-// NOTE: this function is thread safe and can be used with the same model matrix
-//       from different threads
-//
-// NOTE: If R is longer than M, it is not reallocated and additional elements
-//       are not modified.
-// ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
-static void rbfv3_modelmatrixcomputeproductatnodes(rbf3evaluator *modelmatrix, RVector *c, ZVector *idx, ae_int_t m, RVector *r) {
-   ae_int_t i;
-   ae_assert(modelmatrix->storagetype == 0 || modelmatrix->storagetype == 1, "ModelMatrixComputeProductAtNodes: unexpected StorageType");
-   allocv(m, r);
-   if (modelmatrix->storagetype == 0) {
-      for (i = 0; i < m; i++) {
-         r->xR[i] = rdotvr(modelmatrix->n, c, &modelmatrix->f, idx->xZ[i]);
-      }
-      return;
-   }
-   if (modelmatrix->storagetype == 1) {
-      rsetv(m, 0.0, r);
-      rbfv3_modelmatrixcomputeproductrec(modelmatrix, c, idx, r, 0, m, true);
-      return;
-   }
-   ae_assert(false, "ModelMatrixComputeProductAtNodes: integrity check failed");
-}
-
 // Basecase initialization routine for DDM solver.
 //
 //
@@ -19195,7 +20633,7 @@ static void rbfv3_ddmsolverinitbasecase(rbf3ddmsolver *solver, RMatrix *x, ae_in
    }
    for (i = tgt0; i < tgt1; i++) {
       rcopyrv(nx, x, tgtidx->xZ[i], &x0);
-      nc = kdtreetsqueryknn(&solver->kdt, &buf->kdtbuf, &x0, nneighbors, true);
+      nc = kdtreetsqueryknn(&solver->kdt, &buf->kdtbuf, &x0, nneighbors + 1, true);
       kdtreetsqueryresultstags(&solver->kdt, &buf->kdtbuf, &neighbors);
       for (k = 0; k < nc; k++) {
          nk = neighbors.xZ[k];
@@ -19422,6 +20860,8 @@ static void rbfv3_ddmsolverinit(RMatrix *x, double rescaledby, ae_int_t n, ae_in
    ae_int_t i;
    ae_int_t j;
    double correctorgridseparation;
+   double reg;
+   ae_int_t nsys;
    ae_frame_make(&_frame_block);
    NewVector(idx, 0, DT_INT);
    NewObj(rbf3ddmbuffer, bufferseed);
@@ -19470,7 +20910,8 @@ static void rbfv3_ddmsolverinit(RMatrix *x, double rescaledby, ae_int_t n, ae_in
    rbfv3_selectglobalnodes(x, n, nx, &idummy, 0, ncorrector, &solver->corrnodes, &solver->ncorrector, &correctorgridseparation);
    ncorrector = solver->ncorrector;
    ae_assert(ncorrector > 0, "RBFV3: NCorrector == 0");
-   rsetallocm(ncorrector + nx + 1, ncorrector + nx + 1, 0.0, &corrsys);
+   nsys = ncorrector + nx + 1;
+   rsetallocm(2 * nsys, nsys, 0.0, &corrsys);
    allocm(ncorrector, nx, &solver->corrx);
    for (i = 0; i < ncorrector; i++) {
       rcopyrr(nx, x, solver->corrnodes.xZ[i], &solver->corrx, i);
@@ -19508,9 +20949,17 @@ static void rbfv3_ddmsolverinit(RMatrix *x, double rescaledby, ae_int_t n, ae_in
    for (j = 0; j < ncorrector; j++) {
       corrsys.xyR[j][j] += solver->lambdav;
    }
-   rmatrixqr(&corrsys, ncorrector + nx + 1, ncorrector + nx + 1, &corrtau);
-   rmatrixqrunpackq(&corrsys, ncorrector + nx + 1, ncorrector + nx + 1, &corrtau, ncorrector + nx + 1, &solver->corrq);
-   rmatrixqrunpackr(&corrsys, ncorrector + nx + 1, ncorrector + nx + 1, &solver->corrr);
+   reg = 1.0;
+   for (i = 0; i < nsys; i++) {
+      reg = rmax2(reg, rmaxabsr(nsys, &corrsys, i));
+   }
+   reg *= sqrt(machineepsilon);
+   for (j = 0; j < nsys; j++) {
+      corrsys.xyR[nsys + j][j] = reg;
+   }
+   rmatrixqr(&corrsys, 2 * nsys, nsys, &corrtau);
+   rmatrixqrunpackq(&corrsys, 2 * nsys, nsys, &corrtau, nsys, &solver->corrq);
+   rmatrixqrunpackr(&corrsys, 2 * nsys, nsys, &solver->corrr);
    ae_frame_leave();
 }
 
@@ -19620,7 +21069,7 @@ static void rbfv3_ddmsolverrunrec(rbf3ddmsolver *solver, RMatrix *res, ae_int_t 
 //     C           -   rows 0..N-1  contain spline coefficients
 //                     rows N..N+NX are filled by zeros
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
-static void rbfv3_ddmsolverrun(rbf3ddmsolver *solver, RMatrix *res, ae_int_t n, ae_int_t nx, ae_int_t ny, sparsematrix *sp, rbf3evaluator *bfmatrix, RMatrix *upd) {
+static void rbfv3_ddmsolverrun(rbf3ddmsolver *solver, RMatrix *res, ae_int_t n, ae_int_t nx, ae_int_t ny, sparsematrix *sp, rbf3evaluator *bfmatrix, rbf3fastevaluator *fasteval, double fastevaltol, RMatrix *upd) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -19631,6 +21080,7 @@ static void rbfv3_ddmsolverrun(rbf3ddmsolver *solver, RMatrix *res, ae_int_t n, 
    NewVector(x0, 0, DT_REAL);
    NewVector(x1, 0, DT_REAL);
    NewVector(refrhs1, 0, DT_REAL);
+   NewMatrix(corrpred, 0, 0, DT_REAL);
    NewMatrix(updt, 0, 0, DT_REAL);
    rsetallocm(ny, n + nx + 1, 0.0, &updt);
    rsetallocm(n + nx + 1, ny, 0.0, &c);
@@ -19661,11 +21111,14 @@ static void rbfv3_ddmsolverrun(rbf3ddmsolver *solver, RMatrix *res, ae_int_t n, 
    allocv(n + nx + 1, &x1);
    for (j = 0; j < ny; j++) {
    // Prepare right-hand side for the QR solver
+      rsetallocm(1, solver->ncorrector + nx + 1, 0.0, &corrpred);
       rsetallocv(solver->ncorrector + nx + 1, 0.0, &refrhs1);
       rcopyrv(n + nx + 1, &updt, j, &x1);
-      rbfv3_modelmatrixcomputeproductatnodes(bfmatrix, &x1, &solver->corrnodes, solver->ncorrector, &refrhs1);
+      rbfv3_fastevaluatorloadcoeffs1(fasteval, &x1);
+      rbfv3_fastevaluatorpushtol(fasteval, fastevaltol);
+      rbfv3_fastevaluatorcomputebatch(fasteval, &solver->corrx, solver->ncorrector, true, &corrpred);
       for (i = 0; i < solver->ncorrector; i++) {
-         refrhs1.xR[i] = res->xyR[solver->corrnodes.xZ[i]][j] - refrhs1.xR[i];
+         refrhs1.xR[i] = res->xyR[solver->corrnodes.xZ[i]][j] - corrpred.xyR[0][i];
          for (k = 0; k < nx; k++) {
             refrhs1.xR[i] -= solver->corrx.xyR[i][k] * x1.xR[n + k];
          }
@@ -19689,10 +21142,10 @@ static void rbfv3_ddmsolverrun(rbf3ddmsolver *solver, RMatrix *res, ae_int_t n, 
 
 // This function is a specialized version of DDMSolverRun() for NY == 1.
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
-static void rbfv3_ddmsolverrun1(rbf3ddmsolver *solver, RVector *res, ae_int_t n, ae_int_t nx, sparsematrix *sp, rbf3evaluator *bfmatrix, RVector *upd) {
+static void rbfv3_ddmsolverrun1(rbf3ddmsolver *solver, RVector *res, ae_int_t n, ae_int_t nx, sparsematrix *sp, rbf3evaluator *bfmatrix, rbf3fastevaluator *fasteval, double fastevaltol, RVector *upd) {
    allocm(n, 1, &solver->tmpres1);
    rcopyvc(n, res, &solver->tmpres1, 0);
-   rbfv3_ddmsolverrun(solver, &solver->tmpres1, n, nx, 1, sp, bfmatrix, &solver->tmpupd1);
+   rbfv3_ddmsolverrun(solver, &solver->tmpres1, n, nx, 1, sp, bfmatrix, fasteval, fastevaltol, &solver->tmpupd1);
    allocv(n + nx + 1, upd);
    rcopycv(n + nx + 1, &solver->tmpupd1, 0, upd);
 }
@@ -19714,6 +21167,17 @@ static void rbfv3_ddmsolverrun1(rbf3ddmsolver *solver, RVector *res, ae_int_t n,
 //                 * 1 for linear term (STRONGLY RECOMMENDED)
 //                 * 2 for constant term (may break convergence guarantees for thin plate splines)
 //                 * 3 for zero term (may break convergence guarantees for all types of splines)
+//     RBFProfile- RBF profile to use:
+//                 *  0 for the 'standard' profile
+//                 * -1 for the 'debug' profile intended to test all possible code branches even
+//                      on small-scale problems. The idea is to choose very small batch sizes and
+//                      threshold values, such that small problems with N = 100..200 can test all
+//                      nested levels of the algorithm.
+//     TOL     -   desired relative accuracy:
+//                 * should between 1E-3 and 1E-6
+//                 * values higher than 1E-3 usually make no sense (bad accuracy, no performance benefits)
+//                 * values below 1E-6 may result in algorithm taking too much time,
+//                   so we silently override them to 0.000001
 //     S       -   RBF model, already initialized by RBFCreate() call.
 //     progress10000- variable used for progress reports, it is regularly set
 //                 to the current progress multiplied by 10000, in order to
@@ -19743,11 +21207,11 @@ static void rbfv3_ddmsolverrun1(rbf3ddmsolver *solver, RVector *res, ae_int_t n,
 // NOTE:  failure  to  build  model will leave current state of the structure
 // unchanged.
 // ALGLIB: Copyright 12.12.2021 by Sergey Bochkanov
-void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, ae_int_t bftype, double bfparamraw, double lambdavraw, ae_int_t aterm, rbfv3model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv3report *rep) {
+void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, ae_int_t bftype, double bfparamraw, double lambdavraw, ae_int_t aterm, ae_int_t rbfprofile, double tol, rbfv3model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv3report *rep) {
    const double epsred = 0.999999;
-   const ae_int_t maxddmits = 50;
+   const ae_int_t maxddmits = 25;
    ae_frame _frame_block;
-   double tol;
+   double fastevaltol;
    ae_int_t n;
    ae_int_t nx;
    ae_int_t ny;
@@ -19757,23 +21221,27 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
    double mergetol;
    ae_int_t matrixformat;
    ae_int_t acbfbatch;
-   ae_int_t nglobal;
-   ae_int_t nlocal;
-   ae_int_t ncorrection;
-   ae_int_t nbatch;
-   ae_int_t nneighbors;
-   ae_int_t ncoarse;
+   ae_int_t acbfglobal;
+   ae_int_t acbflocal;
+   ae_int_t acbfcorrection;
+   ae_int_t ddmbatch;
+   ae_int_t ddmneighbors;
+   ae_int_t ddmcoarse;
+   ae_int_t maxpanelsize;
    ae_int_t ortbasissize;
    double resnrm;
    double res0nrm;
    ae_int_t iteridx;
    ae_int_t yidx;
    double orterr;
+   double l1nrm;
+   double linfnrm;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double v;
    double vv;
+   double debugdamping;
    ae_frame_make(&_frame_block);
    SetObj(rbfv3report, rep);
    NewMatrix(xscaled, 0, 0, DT_REAL);
@@ -19781,6 +21249,7 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
    NewMatrix(xcoarse, 0, 0, DT_REAL);
    NewMatrix(x1t, 0, 0, DT_REAL);
    NewObj(rbf3evaluator, bfmatrix);
+   NewObj(rbf3fastevaluator, fasteval);
    NewVector(b, 0, DT_REAL);
    NewVector(x0, 0, DT_REAL);
    NewVector(x1, 0, DT_REAL);
@@ -19805,11 +21274,12 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
    NewVector(refrhs1, 0, DT_REAL);
    NewVector(refsol1, 0, DT_REAL);
    mergetol = 1000.0 * machineepsilon;
-   tol = 0.000001;
+   ae_assert(isfinite(tol), "RBFV3Build: incorrect TOL");
    ae_assert(s->nx > 0, "RBFV3Build: incorrect NX");
    ae_assert(s->ny > 0, "RBFV3Build: incorrect NY");
    ae_assert(bftype == 1 || bftype == 2 || bftype == 3, "RBFV3Build: incorrect BFType");
-   ae_assert(aterm == 1 || aterm == 2 || aterm == 3, "RBFV3Build: incorrect BFType");
+   ae_assert(aterm == 1 || aterm == 2 || aterm == 3, "RBFV3Build: incorrect ATerm");
+   ae_assert(rbfprofile == -2 || rbfprofile == -1 || rbfprofile == 0, "RBFV3Build: incorrect RBFProfile");
    for (j = 0; j < s->nx; j++) {
       ae_assert(scaleraw->xR[j] > 0.0, "RBFV2BuildHierarchical: incorrect ScaleVec");
    }
@@ -19821,6 +21291,8 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
    rep->maxerror = 0.0;
    rep->rmserror = 0.0;
    rep->iterationscount = 0;
+   s->dbgregqrusedforddm = false;
+   s->dbgworstfirstdecay = 0.0;
 // Quick exit when we have no points
    if (nraw == 0) {
       rbfv3_zerofill(s, nx, ny);
@@ -19838,6 +21310,37 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
       }
       x1t.xyR[nx][i] = 1.0;
    }
+// Set algorithm parameters according to the current profile
+   ae_assert(rbfprofile == -2 || rbfprofile == -1 || rbfprofile == 0, "RBFV3Build: incorrect RBFProfile");
+   tol = rmax2(tol, 0.000001);
+   acbfglobal = 0;
+   acbflocal = imax2(iround(pow(5.0, nx)), 25);
+   acbfcorrection = iround(pow(5.0, nx));
+   acbfbatch = 32;
+   ddmneighbors = 0;
+   ddmbatch = imin2(1000, n);
+   ddmcoarse = imin3(iround(0.1 * n + 10.0), 2048, n);
+   maxpanelsize = rbfv3_defaultmaxpanelsize;
+   debugdamping = 0.0;
+   if (rbfprofile == -1 || rbfprofile == -2) {
+   // Decrease batch sizes and corrector efficiency.
+   // Add debug damping which produces suboptimal ACBF basis.
+      acbfbatch = 16;
+      ddmneighbors = 3;
+      ddmbatch = 16;
+      ddmcoarse = imin3(iround(0.05 * n + 2.0), 512, n);
+      maxpanelsize = 16;
+      if (rbfprofile == -2) {
+         debugdamping = 0.000001;
+      }
+   }
+// Prepare fast evaluator
+//
+// NOTE: we set fast evaluation tolerance to TOL. Actually, it is better to have it somewhat below
+//       TOL, e.g. TOL/10 or TOL/100. However, we rely on the fact that fast evaluator error estimate
+//       is inherently pessimistic, i.e. actual evaluation accuracy is better than that.
+   fastevaltol = tol;
+   rbfv3_fastevaluatorinit(&fasteval, &xscaled, n, nx, 1, maxpanelsize, bftype, bfparamscaled);
 // Compute design matrix
    matrixformat = 1;
    rbfv3_modelmatrixinit(&xscaled, n, nx, bftype, bfparamscaled, matrixformat, &bfmatrix);
@@ -19860,27 +21363,10 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
       }
    }
 // Build preconditioner
-   nglobal = 0;
-   nlocal = imax2(iround(pow(5.5, nx)), 25);
-   ncorrection = iround(pow(5.0, nx));
-   acbfbatch = 32;
-   rbfv3_computeacbfpreconditioner(&xscaled, n, nx, bftype, bfparamscaled, aterm, acbfbatch, nglobal, nlocal, ncorrection, 5, 2, lambdavwrk, &sp);
+   rbfv3_computeacbfpreconditioner(&xscaled, n, nx, bftype, bfparamscaled, aterm, acbfbatch, acbfglobal, acbflocal, acbfcorrection, 5, 2, lambdavwrk + debugdamping, &sp);
 // DDM
    rsetallocm(n + nx + 1, ny, 0.0, &c2);
-   nneighbors = iround(pow(5.0, nx));
-   if (nx == 1) {
-      nbatch = imin2(100, n);
-   } else {
-      if (nx == 2) {
-         nbatch = imin2(100, n);
-      } else {
-         nbatch = imin3(iround(pow(10.0, nx)), 1000, n);
-      }
-   }
-   ncoarse = iround(rmax2(4.0, pow(3.0, nx)) * ((double)n / nbatch + 1));
-   ncoarse = imax2(ncoarse, iround(pow(4.0, nx)));
-   ncoarse = imin2(ncoarse, n);
-   rbfv3_ddmsolverinit(&xscaled, rescaledby, n, nx, &bfmatrix, bftype, bfparamscaled, lambdavwrk, aterm, &sp, nneighbors, nbatch, ncoarse, &ddmsolver);
+   rbfv3_ddmsolverinit(&xscaled, rescaledby, n, nx, &bfmatrix, bftype, bfparamscaled, lambdavwrk, aterm, &sp, ddmneighbors, ddmbatch, ddmcoarse, &ddmsolver);
 // Use preconditioned GMRES
    rep->rmserror = 0.0;
    rep->maxerror = 0.0;
@@ -19889,6 +21375,7 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
       rsetallocv(n + nx + 1, 0.0, &y0);
       rsetallocv(n + nx + 1, 0.0, &y1);
       rcopycv(n, &yscaled, yidx, &y0);
+      res0nrm = sqrt(rdotv2(n, &y0));
       fblsgmrescreate(&y0, n, imin2(maxddmits, n), &gmressolver);
       gmressolver.epsres = tol;
       gmressolver.epsred = epsred;
@@ -19896,33 +21383,38 @@ void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, 
       while (fblsgmresiteration(&gmressolver)) {
          allocv(n + nx + 1, &y0);
          allocv(n + nx + 1, &y1);
-         rbfv3_ddmsolverrun1(&ddmsolver, &gmressolver.x, n, nx, &sp, &bfmatrix, &y0);
-         rbfv3_modelmatrixcomputeproduct(&bfmatrix, &y0, &y1);
+         rbfv3_ddmsolverrun1(&ddmsolver, &gmressolver.x, n, nx, &sp, &bfmatrix, &fasteval, fastevaltol, &y0);
+         rbfv3_fastevaluatorloadcoeffs1(&fasteval, &y0);
+         rbfv3_fastevaluatorpushtol(&fasteval, fastevaltol * res0nrm);
+         rbfv3_fastevaluatorcomputeall(&fasteval, &y1);
          rgemvx(n, nx + 1, 1.0, &x1t, 0, 0, 1, &y0, n, 1.0, &y1, 0);
          for (i = 0; i < n; i++) {
             y1.xR[i] += lambdavwrk * y0.xR[i];
          }
          rcopyv(n, &y1, &gmressolver.ax);
          rep->iterationscount++;
+         if (iteridx == 1) {
+            s->dbgworstfirstdecay = rmax2(gmressolver.reprelres, s->dbgworstfirstdecay);
+         }
          iteridx++;
       }
-      rbfv3_ddmsolverrun1(&ddmsolver, &gmressolver.xs, n, nx, &sp, &bfmatrix, &x1);
+      rbfv3_ddmsolverrun1(&ddmsolver, &gmressolver.xs, n, nx, &sp, &bfmatrix, &fasteval, fastevaltol, &x1);
+      ae_assert(isfinite(rdotv2(n + nx + 1, &x1)), "RBF3: integrity check 4359 failed");
       rcopyvc(n + nx + 1, &x1, &c2, yidx);
    // Compute predictions and errors
    //
    // NOTE: because dataset preprocessing may reorder and merge points we have
    //       to use raw-to-work mapping in order to be able to compute correct
    //       error metrics.
-      rbfv3_modelmatrixcomputeproduct(&bfmatrix, &x1, &y1);
+      rbfv3_fastevaluatorloadcoeffs1(&fasteval, &x1);
+      rbfv3_fastevaluatorpushtol(&fasteval, fastevaltol * res0nrm);
+      rbfv3_fastevaluatorcomputeall(&fasteval, &y1);
       rgemvx(n, nx + 1, 1.0, &x1t, 0, 0, 1, &x1, n, 1.0, &y1, 0);
       resnrm = 0.0;
-      res0nrm = 0.0;
       for (i = 0; i < n; i++) {
          resnrm += sqr(yscaled.xyR[i][yidx] - y1.xR[i] - lambdavwrk * x1.xR[i]);
-         res0nrm += sqr(yscaled.xyR[i][yidx]);
       }
       resnrm = sqrt(resnrm);
-      res0nrm = sqrt(res0nrm);
       for (i = 0; i < nraw; i++) {
          v = yraw->xyR[i][yidx] - y1.xR[raw2wrkmap.xZ[i]];
          rep->maxerror = rmax2(rep->maxerror, fabs(v));
@@ -20032,6 +21524,141 @@ void rbfv3tscalcbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y)
       srcidx += nx;
       widx += ny;
    }
+}
+
+// This function performs fast calculation  using  far  field  expansion  (if
+// supported for a current model, and if model size justifies utilization  of
+// far fields), using currently stored fast evaluation tolerance.
+//
+// If no far field is present, straightforward O(N) evaluation is performed.
+//
+// This function allows to use same RBF model object  in  different  threads,
+// assuming  that  different   threads  use  different  instances  of  buffer
+// structure.
+//
+// Inputs:
+//     S       -   RBF model, may be shared between different threads
+//     Buf     -   buffer object created for this particular instance of  RBF
+//                 model with rbfcreatecalcbuffer().
+//     X       -   coordinates, array[NX].
+//                 X may have more than NX elements, in this case only
+//                 leading NX will be used.
+//     Y       -   possibly preallocated array
+//
+// Outputs:
+//     Y       -   function value, array[NY]. Y is not reallocated when it
+//                 is larger than NY.
+// ALGLIB: Copyright 01.11.2022 by Sergey Bochkanov
+void rbfv3tsfastcalcbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y) {
+   ae_int_t nx;
+   ae_int_t ny;
+   ae_int_t i;
+   ae_int_t j;
+   ae_assert(x->cnt >= s->nx, "RBFV3TsCalcBuf: Length(X) < NX");
+   ae_assert(isfinitevector(x, s->nx), "RBFV3TsCalcBuf: X contains infinite or NaN values");
+   nx = s->nx;
+   ny = s->ny;
+// Handle linear term
+   vectorsetlengthatleast(y, ny);
+   for (i = 0; i < ny; i++) {
+      y->xR[i] = s->v.xyR[i][nx];
+      for (j = 0; j < nx; j++) {
+         y->xR[i] += s->v.xyR[i][j] * x->xR[j];
+      }
+   }
+   if (s->nc == 0) {
+      return;
+   }
+// Handle RBF term
+   allocm(1, nx, &buf->x2d);
+   for (j = 0; j < nx; j++) {
+      buf->x2d.xyR[0][j] = x->xR[j] / s->s.xR[j];
+   }
+   rbfv3_fastevaluatorcomputebatch(&s->fasteval, &buf->x2d, 1, true, &buf->y2d);
+   for (i = 0; i < ny; i++) {
+      y->xR[i] += buf->y2d.xyR[i][0];
+   }
+}
+
+// Changes fast evaluator tolerance.
+//
+// The  original  fast  evaluator  provides too conservative error estimates,
+// even when relaxed tolerances are used.  Thus,  far  field  expansions  are
+// often ignored when it is pretty safe  to use them and  save  computational
+// time.
+//
+// This function does the following:
+// * pushes 'raw' tolerance specified by user to the fast evaluator
+// * samples about 100 randomly selected points, computes  true  average  and
+//   maximum errors of the fast evaluator on these points.
+//   Usually these errors are 1000x-10000x less than ones allowed by user.
+// * adjusts 'raw' tolerance, producing so called 'working' tolerance in order
+//   to bring maximum error closer to limits, improving performance due to
+//   looser tolerances
+//
+// The running time of this function is O(N). It is not thread-safe.
+// ALGLIB: Copyright 01.11.2022 by Sergey Bochkanov
+void rbf3pushfastevaltol(rbfv3model *s, double tol) {
+   ae_frame _frame_block;
+   ae_int_t seed0;
+   ae_int_t seed1;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t nsampled;
+   double avgrawerror;
+   double maxrawerror;
+   double tolgrowth;
+   double maxtolgrowth;
+   ae_frame_make(&_frame_block);
+   NewObj(hqrndstate, rs);
+   NewVector(x, 0, DT_REAL);
+   NewVector(ya, 0, DT_REAL);
+   NewVector(yb, 0, DT_REAL);
+   NewObj(rbfv3calcbuffer, buf);
+   ae_assert(tol > 0.0, "RBF3PushFastEvalTol: TOL <= 0");
+   if (s->nc == 0) {
+      ae_frame_leave();
+      return;
+   }
+   rbfv3createcalcbuffer(s, &buf);
+// Choose seeds for RNG that produces indexes of points being sampled
+   nsampled = 100;
+   maxtolgrowth = 1000000.0;
+   seed0 = 47623;
+   seed1 = 83645264;
+// Push 'raw' tolerance, sample random points and compute errors
+   rbfv3_fastevaluatorpushtol(&s->fasteval, tol);
+   avgrawerror = 0.0;
+   maxrawerror = 0.0;
+   allocv(s->nx, &x);
+   hqrndseed(seed0, seed1, &rs);
+   for (i = 0; i < nsampled; i++) {
+   // Sample point
+      k = hqrnduniformi(&rs, s->nc);
+      for (j = 0; j < s->nx; j++) {
+         x.xR[j] = s->cw.xR[(s->nx + s->ny) * k + j];
+      }
+   // Compute reference value, fast value, compare
+      rbfv3tscalcbuf(s, &buf, &x, &ya);
+      rbfv3tsfastcalcbuf(s, &buf, &x, &yb);
+      for (j = 0; j < s->ny; j++) {
+         avgrawerror += fabs(ya.xR[j] - yb.xR[j]);
+         maxrawerror = rmax2(maxrawerror, fabs(ya.xR[j] - yb.xR[j]));
+      }
+   }
+   avgrawerror /= nsampled * s->ny;
+// Compute proposed growth for the target tolerance.
+//
+// NOTE: a heuristic formula is used which works well in practice.
+   tolgrowth = tol / rmax2(avgrawerror * 25.0 + tol / maxtolgrowth, maxrawerror * 5.0 + tol / maxtolgrowth);
+   if (tolgrowth < 1.0) {
+      ae_frame_leave();
+      return;
+   }
+// Adjust tolerance
+   rbfv3_fastevaluatorpushtol(&s->fasteval, tol * tolgrowth);
+   ae_frame_leave();
 }
 
 // This function calculates values of the RBF model at the given point.
@@ -20729,12 +22356,15 @@ void rbfv3unserialize(ae_serializer *s, rbfv3model *model) {
 void rbf3evaluatorbuffer_init(void *_p, bool make_automatic) {
    rbf3evaluatorbuffer *p = (rbf3evaluatorbuffer *)_p;
    ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->y, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->coeffbuf, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->funcbuf, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->wrkbuf, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->mindist2, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->df1, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->df2, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x2, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->y2, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->deltabuf, 0, 0, DT_REAL, make_automatic);
 }
 
@@ -20742,25 +22372,115 @@ void rbf3evaluatorbuffer_copy(void *_dst, const void *_src, bool make_automatic)
    rbf3evaluatorbuffer *dst = (rbf3evaluatorbuffer *)_dst;
    const rbf3evaluatorbuffer *src = (const rbf3evaluatorbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
+   ae_vector_copy(&dst->y, &src->y, make_automatic);
    ae_vector_copy(&dst->coeffbuf, &src->coeffbuf, make_automatic);
    ae_vector_copy(&dst->funcbuf, &src->funcbuf, make_automatic);
    ae_vector_copy(&dst->wrkbuf, &src->wrkbuf, make_automatic);
    ae_vector_copy(&dst->mindist2, &src->mindist2, make_automatic);
    ae_vector_copy(&dst->df1, &src->df1, make_automatic);
    ae_vector_copy(&dst->df2, &src->df2, make_automatic);
+   ae_vector_copy(&dst->x2, &src->x2, make_automatic);
+   ae_vector_copy(&dst->y2, &src->y2, make_automatic);
    ae_matrix_copy(&dst->deltabuf, &src->deltabuf, make_automatic);
 }
 
 void rbf3evaluatorbuffer_free(void *_p, bool make_automatic) {
    rbf3evaluatorbuffer *p = (rbf3evaluatorbuffer *)_p;
    ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->y, make_automatic);
    ae_vector_free(&p->coeffbuf, make_automatic);
    ae_vector_free(&p->funcbuf, make_automatic);
    ae_vector_free(&p->wrkbuf, make_automatic);
    ae_vector_free(&p->mindist2, make_automatic);
    ae_vector_free(&p->df1, make_automatic);
    ae_vector_free(&p->df2, make_automatic);
+   ae_vector_free(&p->x2, make_automatic);
+   ae_vector_free(&p->y2, make_automatic);
    ae_matrix_free(&p->deltabuf, make_automatic);
+}
+
+void rbf3panel_init(void *_p, bool make_automatic) {
+   rbf3panel *p = (rbf3panel *)_p;
+   ae_vector_init(&p->clustercenter, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->ptidx, 0, DT_INT, make_automatic);
+   ae_matrix_init(&p->xt, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->wt, 0, 0, DT_REAL, make_automatic);
+   biharmonicpanel_init(&p->bhexpansion, make_automatic);
+   rbf3evaluatorbuffer_init(&p->tgtbuf, make_automatic);
+}
+
+void rbf3panel_copy(void *_dst, const void *_src, bool make_automatic) {
+   rbf3panel *dst = (rbf3panel *)_dst;
+   const rbf3panel *src = (const rbf3panel *)_src;
+   dst->paneltype = src->paneltype;
+   dst->clusterrad = src->clusterrad;
+   ae_vector_copy(&dst->clustercenter, &src->clustercenter, make_automatic);
+   dst->c0 = src->c0;
+   dst->c1 = src->c1;
+   dst->c2 = src->c2;
+   dst->c3 = src->c3;
+   dst->farfieldexpansion = src->farfieldexpansion;
+   dst->farfielddistance = src->farfielddistance;
+   dst->idx0 = src->idx0;
+   dst->idx1 = src->idx1;
+   dst->childa = src->childa;
+   dst->childb = src->childb;
+   ae_vector_copy(&dst->ptidx, &src->ptidx, make_automatic);
+   ae_matrix_copy(&dst->xt, &src->xt, make_automatic);
+   ae_matrix_copy(&dst->wt, &src->wt, make_automatic);
+   biharmonicpanel_copy(&dst->bhexpansion, &src->bhexpansion, make_automatic);
+   rbf3evaluatorbuffer_copy(&dst->tgtbuf, &src->tgtbuf, make_automatic);
+}
+
+void rbf3panel_free(void *_p, bool make_automatic) {
+   rbf3panel *p = (rbf3panel *)_p;
+   ae_vector_free(&p->clustercenter, make_automatic);
+   ae_vector_free(&p->ptidx, make_automatic);
+   ae_matrix_free(&p->xt, make_automatic);
+   ae_matrix_free(&p->wt, make_automatic);
+   biharmonicpanel_free(&p->bhexpansion, make_automatic);
+   rbf3evaluatorbuffer_free(&p->tgtbuf, make_automatic);
+}
+
+void rbf3fastevaluator_init(void *_p, bool make_automatic) {
+   rbf3fastevaluator *p = (rbf3fastevaluator *)_p;
+   ae_matrix_init(&p->permx, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->origptidx, 0, DT_INT, make_automatic);
+   ae_matrix_init(&p->wstoredorig, 0, 0, DT_REAL, make_automatic);
+   ae_obj_array_init(&p->panels, make_automatic);
+   biharmonicevaluator_init(&p->bheval, make_automatic);
+   ae_shared_pool_init(&p->bufferpool, make_automatic);
+   ae_matrix_init(&p->tmpx3w, 0, 0, DT_REAL, make_automatic);
+}
+
+void rbf3fastevaluator_copy(void *_dst, const void *_src, bool make_automatic) {
+   rbf3fastevaluator *dst = (rbf3fastevaluator *)_dst;
+   const rbf3fastevaluator *src = (const rbf3fastevaluator *)_src;
+   dst->n = src->n;
+   dst->nx = src->nx;
+   dst->ny = src->ny;
+   dst->maxpanelsize = src->maxpanelsize;
+   dst->functype = src->functype;
+   dst->funcparam = src->funcparam;
+   ae_matrix_copy(&dst->permx, &src->permx, make_automatic);
+   ae_vector_copy(&dst->origptidx, &src->origptidx, make_automatic);
+   ae_matrix_copy(&dst->wstoredorig, &src->wstoredorig, make_automatic);
+   dst->isloaded = src->isloaded;
+   ae_obj_array_copy(&dst->panels, &src->panels, make_automatic);
+   biharmonicevaluator_copy(&dst->bheval, &src->bheval, make_automatic);
+   ae_shared_pool_copy(&dst->bufferpool, &src->bufferpool, make_automatic);
+   ae_matrix_copy(&dst->tmpx3w, &src->tmpx3w, make_automatic);
+}
+
+void rbf3fastevaluator_free(void *_p, bool make_automatic) {
+   rbf3fastevaluator *p = (rbf3fastevaluator *)_p;
+   ae_matrix_free(&p->permx, make_automatic);
+   ae_vector_free(&p->origptidx, make_automatic);
+   ae_matrix_free(&p->wstoredorig, make_automatic);
+   ae_obj_array_free(&p->panels, make_automatic);
+   biharmonicevaluator_free(&p->bheval, make_automatic);
+   ae_shared_pool_free(&p->bufferpool, make_automatic);
+   ae_matrix_free(&p->tmpx3w, make_automatic);
 }
 
 void rbf3evaluator_init(void *_p, bool make_automatic) {
@@ -20806,6 +22526,8 @@ void rbfv3calcbuffer_init(void *_p, bool make_automatic) {
    rbf3evaluatorbuffer_init(&p->evalbuf, make_automatic);
    ae_vector_init(&p->x123, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->y123, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->x2d, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->y2d, 0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->xg, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->yg, 0, DT_REAL, make_automatic);
 }
@@ -20817,6 +22539,8 @@ void rbfv3calcbuffer_copy(void *_dst, const void *_src, bool make_automatic) {
    rbf3evaluatorbuffer_copy(&dst->evalbuf, &src->evalbuf, make_automatic);
    ae_vector_copy(&dst->x123, &src->x123, make_automatic);
    ae_vector_copy(&dst->y123, &src->y123, make_automatic);
+   ae_matrix_copy(&dst->x2d, &src->x2d, make_automatic);
+   ae_matrix_copy(&dst->y2d, &src->y2d, make_automatic);
    ae_vector_copy(&dst->xg, &src->xg, make_automatic);
    ae_vector_copy(&dst->yg, &src->yg, make_automatic);
 }
@@ -20827,6 +22551,8 @@ void rbfv3calcbuffer_free(void *_p, bool make_automatic) {
    rbf3evaluatorbuffer_free(&p->evalbuf, make_automatic);
    ae_vector_free(&p->x123, make_automatic);
    ae_vector_free(&p->y123, make_automatic);
+   ae_matrix_free(&p->x2d, make_automatic);
+   ae_matrix_free(&p->y2d, make_automatic);
    ae_vector_free(&p->xg, make_automatic);
    ae_vector_free(&p->yg, make_automatic);
 }
@@ -21123,6 +22849,7 @@ void rbfv3model_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->cw, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->pointindexes, 0, DT_INT, make_automatic);
    rbf3evaluator_init(&p->evaluator, make_automatic);
+   rbf3fastevaluator_init(&p->fasteval, make_automatic);
    ae_matrix_init(&p->wchunked, 0, 0, DT_REAL, make_automatic);
    rbfv3calcbuffer_init(&p->calcbuf, make_automatic);
 }
@@ -21140,9 +22867,11 @@ void rbfv3model_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->pointindexes, &src->pointindexes, make_automatic);
    dst->nc = src->nc;
    rbf3evaluator_copy(&dst->evaluator, &src->evaluator, make_automatic);
+   rbf3fastevaluator_copy(&dst->fasteval, &src->fasteval, make_automatic);
    ae_matrix_copy(&dst->wchunked, &src->wchunked, make_automatic);
    rbfv3calcbuffer_copy(&dst->calcbuf, &src->calcbuf, make_automatic);
    dst->dbgregqrusedforddm = src->dbgregqrusedforddm;
+   dst->dbgworstfirstdecay = src->dbgworstfirstdecay;
 }
 
 void rbfv3model_free(void *_p, bool make_automatic) {
@@ -21152,6 +22881,7 @@ void rbfv3model_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->cw, make_automatic);
    ae_vector_free(&p->pointindexes, make_automatic);
    rbf3evaluator_free(&p->evaluator, make_automatic);
+   rbf3fastevaluator_free(&p->fasteval, make_automatic);
    ae_matrix_free(&p->wchunked, make_automatic);
    rbfv3calcbuffer_free(&p->calcbuf, make_automatic);
 }
@@ -21176,6 +22906,96 @@ void rbfv3report_free(void *_p, bool make_automatic) {
 // Depends on: SPLINE1D
 namespace alglib_impl {
 static const double spline2d_cholreg = 1.0E-12;
+
+// Adjust evaluation interval: if we are inside missing cell, but very  close
+// to the nonmissing one, move to its boundaries.
+//
+// This function is used to avoid situation when evaluation at the nodes adjacent
+// to missing cells fails due to rounding errors that move us away  from  the
+// feasible cell.
+//
+// Returns True if X/Y, DX/DY, IX/IY were successfully  repositioned  to  the
+// nearest nonmissing cell (or were feasible from the very beginning).  False
+// is returned if we are deep in the missing cell.
+// ALGLIB: Copyright 26.06.2022 by Sergey Bochkanov
+static bool spline2d_adjustevaluationinterval(spline2dinterpolant *s, double *x, double *t, double *dt, ae_int_t *ix, double *y, double *u, double *du, ae_int_t *iy) {
+   double tol;
+   bool tryleftbndx;
+   bool tryrightbndx;
+   bool trycenterx;
+   bool tryleftbndy;
+   bool tryrightbndy;
+   bool trycentery;
+   bool result;
+// Quick exit - no missing cells, or we are at non-missing cell
+   result = !s->hasmissingcells || !s->ismissingcell.xB[(s->n - 1) * *iy + *ix];
+   if (result) {
+      return result;
+   }
+// Missing cell, but maybe we are really close to some non-missing cell?
+   tol = 1000.0 * machineepsilon;
+   tryleftbndx = *t < tol && *ix > 0;
+   tryrightbndx = *t > 1.0 - tol && *ix + 1 < s->n - 1;
+   trycenterx = true;
+   tryleftbndy = *u < tol && *iy > 0;
+   tryrightbndy = *u > 1.0 - tol && *iy + 1 < s->m - 1;
+   trycentery = true;
+   if (!result && tryleftbndx && tryleftbndy && !s->ismissingcell.xB[(s->n - 1) * (*iy - 1) + (*ix - 1)]) {
+      --*ix;
+      --*iy;
+      *x = s->x.xR[*ix + 1];
+      *y = s->y.xR[*iy + 1];
+      result = true;
+   }
+   if (!result && tryleftbndx && trycentery && !s->ismissingcell.xB[(s->n - 1) * *iy + (*ix - 1)]) {
+      --*ix;
+      *x = s->x.xR[*ix + 1];
+      result = true;
+   }
+   if (!result && tryleftbndx && tryrightbndy && !s->ismissingcell.xB[(s->n - 1) * (*iy + 1) + (*ix - 1)]) {
+      --*ix;
+      ++*iy;
+      *x = s->x.xR[*ix + 1];
+      *y = s->y.xR[*iy];
+      result = true;
+   }
+   if (!result && trycenterx && tryleftbndy && !s->ismissingcell.xB[(s->n - 1) * (*iy - 1) + *ix]) {
+      --*iy;
+      *y = s->y.xR[*iy + 1];
+      result = true;
+   }
+   if (!result && trycenterx && tryrightbndy && !s->ismissingcell.xB[(s->n - 1) * (*iy + 1) + *ix]) {
+      ++*iy;
+      *y = s->y.xR[*iy];
+      result = true;
+   }
+   if (!result && tryrightbndx && tryleftbndy && !s->ismissingcell.xB[(s->n - 1) * (*iy - 1) + (*ix + 1)]) {
+      ++*ix;
+      --*iy;
+      *x = s->x.xR[*ix];
+      *y = s->y.xR[*iy + 1];
+      result = true;
+   }
+   if (!result && tryrightbndx && trycentery && !s->ismissingcell.xB[(s->n - 1) * *iy + (*ix + 1)]) {
+      ++*ix;
+      *x = s->x.xR[*ix];
+      result = true;
+   }
+   if (!result && tryrightbndx && tryrightbndy && !s->ismissingcell.xB[(s->n - 1) * (*iy + 1) + (*ix + 1)]) {
+      ++*ix;
+      ++*iy;
+      *x = s->x.xR[*ix];
+      *y = s->y.xR[*iy];
+      result = true;
+   }
+   if (result) {
+      *dt = 1.0 / (s->x.xR[*ix + 1] - s->x.xR[*ix]);
+      *t = (*x - s->x.xR[*ix]) * *dt;
+      *du = 1.0 / (s->y.xR[*iy + 1] - s->y.xR[*iy]);
+      *u = (*y - s->y.xR[*iy]) * *du;
+   }
+   return result;
+}
 
 // This subroutine calculates the value of the bilinear or bicubic spline  at
 // the given point X.
@@ -21256,6 +23076,11 @@ double spline2dcalc(spline2dinterpolant *c, double x, double y) {
    du = 1.0 / (c->y.xR[l + 1] - c->y.xR[l]);
    u = (y - c->y.xR[l]) * du;
    iy = l;
+// Handle possible missing cells
+   if (c->hasmissingcells && !spline2d_adjustevaluationinterval(c, &x, &t, &dt, &ix, &y, &u, &du, &iy)) {
+      result = NAN;
+      return result;
+   }
 // Bilinear interpolation
    if (c->stype == -1) {
       y1 = c->f.xR[c->n * iy + ix];
@@ -21385,6 +23210,11 @@ void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f) {
    du = 1.0 / (c->y.xR[l + 1] - c->y.xR[l]);
    u = (y - c->y.xR[l]) * du;
    iy = l;
+// Handle possible missing cells
+   if (c->hasmissingcells && !spline2d_adjustevaluationinterval(c, &x, &t, &dt, &ix, &y, &u, &du, &iy)) {
+      rsetv(c->d, NAN, f);
+      return;
+   }
 // Bilinear interpolation
    if (c->stype == -1) {
       for (i = 0; i < c->d; i++) {
@@ -21540,6 +23370,11 @@ double spline2dcalcvi(spline2dinterpolant *c, double x, double y, ae_int_t i) {
    du = 1.0 / (c->y.xR[l + 1] - c->y.xR[l]);
    u = (y - c->y.xR[l]) * du;
    iy = l;
+// Handle possible missing cells
+   if (c->hasmissingcells && !spline2d_adjustevaluationinterval(c, &x, &t, &dt, &ix, &y, &u, &du, &iy)) {
+      result = NAN;
+      return result;
+   }
 // Bilinear interpolation
    if (c->stype == -1) {
       y1 = c->f.xR[c->d * (c->n * iy + ix) + i];
@@ -21694,6 +23529,14 @@ void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double 
    u = (y - c->y.xR[l]) / (c->y.xR[l + 1] - c->y.xR[l]);
    du = 1.0 / (c->y.xR[l + 1] - c->y.xR[l]);
    iy = l;
+// Handle possible missing cells
+   if (c->hasmissingcells && !spline2d_adjustevaluationinterval(c, &x, &t, &dt, &ix, &y, &u, &du, &iy)) {
+      *f = NAN;
+      *fx = NAN;
+      *fy = NAN;
+      *fxy = NAN;
+      return;
+   }
 // Bilinear interpolation
    if (c->stype == -1) {
       y1 = c->f.xR[c->n * iy + ix];
@@ -21885,6 +23728,14 @@ void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, doub
    u = (y - c->y.xR[l]) / (c->y.xR[l + 1] - c->y.xR[l]);
    du = 1.0 / (c->y.xR[l + 1] - c->y.xR[l]);
    iy = l;
+// Handle possible missing cells
+   if (c->hasmissingcells && !spline2d_adjustevaluationinterval(c, &x, &t, &dt, &ix, &y, &u, &du, &iy)) {
+      *f = NAN;
+      *fx = NAN;
+      *fy = NAN;
+      *fxy = NAN;
+      return;
+   }
 // Bilinear interpolation
    if (c->stype == -1) {
       y1 = c->f.xR[d * (c->n * iy + ix) + i];
@@ -21991,6 +23842,7 @@ void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc) {
    cc->m = c->m;
    cc->d = c->d;
    cc->stype = c->stype;
+   cc->hasmissingcells = c->hasmissingcells;
    tblsize = -1;
    if (c->stype == -3) {
       tblsize = 4 * c->n * c->m * c->d;
@@ -22005,6 +23857,10 @@ void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc) {
    ae_v_move(cc->x.xR, 1, c->x.xR, 1, cc->n);
    ae_v_move(cc->y.xR, 1, c->y.xR, 1, cc->m);
    ae_v_move(cc->f.xR, 1, c->f.xR, 1, tblsize);
+   if (c->hasmissingcells) {
+      bcopyallocv(c->n * c->m, &c->ismissingnode, &cc->ismissingnode);
+      bcopyallocv((c->n - 1) * (c->m - 1), &c->ismissingcell, &cc->ismissingcell);
+   }
 }
 
 // Bicubic spline resampling
@@ -22151,6 +24007,7 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
    c->m = m;
    c->d = d;
    c->stype = -1;
+   c->hasmissingcells = false;
    ae_vector_set_length(&c->x, c->n);
    ae_vector_set_length(&c->y, c->m);
    ae_vector_set_length(&c->f, k);
@@ -22262,6 +24119,315 @@ static void spline2d_bicubiccalcderivatives(RMatrix *a, RVector *x, RVector *y, 
    ae_frame_leave();
 }
 
+// This subroutine builds bilinear vector-valued  spline,  with  some  spline
+// cells being missing due to missing nodes.
+//
+// When the node (i,j) is missing, it means that: a) we don't  have  function
+// value at this point (elements of F[] are ignored), and  b)  we  don't need
+// spline value at cells adjacent to the node (i,j), i.e. up to 4 spline cells
+// will be dropped. An attempt to compute spline value at  the  missing  cell
+// will return NAN.
+//
+// It is important to  understand  that  this  subroutine  does  NOT  support
+// interpolation on scattered grids. It allows us to drop some nodes, but  at
+// the cost of making a "hole in the spline" around this point. If  you  want
+// function  that   can   "fill  the  gap",  use  RBF  or  another  scattered
+// interpolation method.
+//
+// The  intended  usage  for  this  subroutine  are  regularly  sampled,  but
+// non-rectangular datasets.
+//
+// Inputs:
+//     X   -   spline abscissas, array[0..N-1]
+//     Y   -   spline ordinates, array[0..M-1]
+//     F   -   function values, array[0..M*N*D-1]:
+//             * first D elements store D values at (X[0],Y[0])
+//             * next D elements store D values at (X[1],Y[0])
+//             * general form - D function values at (X[i],Y[j]) are stored
+//               at F[D*(J*N+I)...D*(J*N+I)+D-1].
+//             * missing values are ignored
+//     Missing array[M*N], Missing[J*N+I] == True means that corresponding entries
+//             of F[] are missing nodes.
+//     M,N -   grid size, M >= 2, N >= 2
+//     D   -   vector dimension, D >= 1
+//
+// Outputs:
+//     C   -   spline interpolant
+// ALGLIB Project: Copyright 27.06.2022 by Sergey Bochkanov
+// API: void spline2dbuildbilinearmissing(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const boolean_1d_array &missing, const ae_int_t d, spline2dinterpolant &c);
+void spline2dbuildbilinearmissing(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, BVector *missing, ae_int_t d, spline2dinterpolant *c) {
+   ae_frame _frame_block;
+   double t;
+   bool tb;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t i0;
+   ae_frame_make(&_frame_block);
+   DupVector(f);
+   SetObj(spline2dinterpolant, c);
+   ae_assert(n >= 2, "Spline2DBuildBilinearMissing: N is less then 2");
+   ae_assert(m >= 2, "Spline2DBuildBilinearMissing: M is less then 2");
+   ae_assert(d >= 1, "Spline2DBuildBilinearMissing: invalid argument D (D < 1)");
+   ae_assert(x->cnt >= n && y->cnt >= m, "Spline2DBuildBilinearMissing: length of X or Y is too short (Length(X/Y) < N/M)");
+   ae_assert(isfinitevector(x, n) && isfinitevector(y, m), "Spline2DBuildBilinearMissing: X or Y contains NaN or Infinite value");
+   k = n * m * d;
+   ae_assert(f->cnt >= k, "Spline2DBuildBilinearMissing: length of F is too short (Length(F) < N*M*D)");
+   ae_assert(missing->cnt >= n * m, "Spline2DBuildBilinearMissing: Missing[] is shorter than M*N");
+   for (i = 0; i < k; i++) {
+      if (!missing->xB[i / d] && !isfinite(f->xR[i])) {
+         ae_assert(false, "Spline2DBuildBilinearMissing: F[] contains NAN or INF in its non-missing entries");
+      }
+   }
+// Fill interpolant.
+//
+// NOTE: we make sure that missing entries of F[] are filled by zeros.
+   c->n = n;
+   c->m = m;
+   c->d = d;
+   c->stype = -1;
+   c->hasmissingcells = true;
+   ae_vector_set_length(&c->x, c->n);
+   ae_vector_set_length(&c->y, c->m);
+   rsetallocv(k, 0.0, &c->f);
+   for (i = 0; i < c->n; i++) {
+      c->x.xR[i] = x->xR[i];
+   }
+   for (i = 0; i < c->m; i++) {
+      c->y.xR[i] = y->xR[i];
+   }
+   for (i = 0; i < k; i++) {
+      if (!missing->xB[i / d]) {
+         c->f.xR[i] = f->xR[i];
+      }
+   }
+   bcopyallocv(c->n * c->m, missing, &c->ismissingnode);
+// Sort points
+   for (j = 0; j < c->n; j++) {
+      k = j;
+      for (i = j + 1; i < c->n; i++) {
+         if (c->x.xR[i] < c->x.xR[k]) {
+            k = i;
+         }
+      }
+      if (k != j) {
+         for (i = 0; i < c->m; i++) {
+            for (i0 = 0; i0 < c->d; i0++) {
+               t = c->f.xR[c->d * (i * c->n + j) + i0];
+               c->f.xR[c->d * (i * c->n + j) + i0] = c->f.xR[c->d * (i * c->n + k) + i0];
+               c->f.xR[c->d * (i * c->n + k) + i0] = t;
+            }
+            tb = c->ismissingnode.xB[i * c->n + j];
+            c->ismissingnode.xB[i * c->n + j] = c->ismissingnode.xB[i * c->n + k];
+            c->ismissingnode.xB[i * c->n + k] = tb;
+         }
+         t = c->x.xR[j];
+         c->x.xR[j] = c->x.xR[k];
+         c->x.xR[k] = t;
+      }
+   }
+   for (i = 0; i < c->m; i++) {
+      k = i;
+      for (j = i + 1; j < c->m; j++) {
+         if (c->y.xR[j] < c->y.xR[k]) {
+            k = j;
+         }
+      }
+      if (k != i) {
+         for (j = 0; j < c->n; j++) {
+            for (i0 = 0; i0 < c->d; i0++) {
+               t = c->f.xR[c->d * (i * c->n + j) + i0];
+               c->f.xR[c->d * (i * c->n + j) + i0] = c->f.xR[c->d * (k * c->n + j) + i0];
+               c->f.xR[c->d * (k * c->n + j) + i0] = t;
+            }
+            tb = c->ismissingnode.xB[i * c->n + j];
+            c->ismissingnode.xB[i * c->n + j] = c->ismissingnode.xB[k * c->n + j];
+            c->ismissingnode.xB[k * c->n + j] = tb;
+         }
+         t = c->y.xR[i];
+         c->y.xR[i] = c->y.xR[k];
+         c->y.xR[k] = t;
+      }
+   }
+// 1. Determine cells that are not missing. A cell is non-missing if it has four non-missing
+//    nodes at its corners.
+// 2. Normalize IsMissingNode[] array - all isolated points that are not part of some non-missing
+//    cell are marked as missing too
+   bsetallocv((c->m - 1) * (c->n - 1), true, &c->ismissingcell);
+   for (i = 0; i < c->m - 1; i++) {
+      for (j = 0; j < c->n - 1; j++) {
+         if (!c->ismissingnode.xB[i * c->n + j] && !c->ismissingnode.xB[(i + 1) * c->n + j] && !c->ismissingnode.xB[i * c->n + (j + 1)] && !c->ismissingnode.xB[(i + 1) * c->n + (j + 1)]) {
+            c->ismissingcell.xB[i * (c->n - 1) + j] = false;
+         }
+      }
+   }
+   bsetv(c->m * c->n, true, &c->ismissingnode);
+   for (i = 0; i < c->m - 1; i++) {
+      for (j = 0; j < c->n - 1; j++) {
+         if (!c->ismissingcell.xB[i * (c->n - 1) + j]) {
+            c->ismissingnode.xB[i * c->n + j] = false;
+            c->ismissingnode.xB[(i + 1) * c->n + j] = false;
+            c->ismissingnode.xB[i * c->n + (j + 1)] = false;
+            c->ismissingnode.xB[(i + 1) * c->n + (j + 1)] = false;
+         }
+      }
+   }
+   ae_frame_leave();
+}
+
+// Internal subroutine.
+// Scans array IsMissing[] for segment containing non-missing values.
+//
+// On the first call I1 == I2 == -1.
+// Ater return from subsequent call either
+// * 0 <= I1 < I2 < N, B[I1:I2] is non-missing; result is True
+// * I1 == I2 == N; result is False
+static bool spline2d_scanfornonmissingsegment(BVector *ismissing, ae_int_t n, ae_int_t *i1, ae_int_t *i2) {
+   ae_int_t i;
+   bool result;
+   ae_assert(n >= 2, "ScanForNonmissingSegment: internal error (N < 2)");
+   ae_assert(*i1 <= *i2, "ScanForNonmissingSegment: internal error (I1 > I2)");
+   result = false;
+// Initial call: prepare and pass
+   if (*i1 < 0 || *i2 < 0) {
+      *i1 = -1;
+      *i2 = -1;
+   }
+// Scan for the next segment
+   if (*i1 < n && *i2 < n) {
+   // scan for the segment's start
+      i = *i2 + 1;
+      *i1 = n;
+      *i2 = n;
+      result = false;
+      while (true) {
+         if (i >= n) {
+            return result;
+         }
+         if (!ismissing->xB[i]) {
+            *i1 = i;
+            break;
+         }
+         i++;
+      }
+   // Scan for segment's end
+      while (true) {
+         if (i >= n) {
+            *i2 = n - 1;
+            break;
+         }
+         if (ismissing->xB[i]) {
+            *i2 = i - 1;
+            break;
+         }
+         i++;
+      }
+      ae_assert(*i2 > *i1, "ScanForFiniteSegment: internal error (segment is too short)");
+      result = true;
+   }
+   return result;
+}
+
+// Internal subroutine.
+//
+// Calculation of the first derivatives and the cross-derivative  subject  to
+// a missing values map in IsMissingNode[].
+//
+// The missing values map should be normalized, i.e. any isolated point  that
+// is not part of some non-missing cell should be marked as missing too.
+static void spline2d_bicubiccalcderivativesmissing(RMatrix *a, BVector *ismissingnode, RVector *x, RVector *y, ae_int_t m, ae_int_t n, RMatrix *dx, RMatrix *dy, RMatrix *dxy) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k1;
+   ae_int_t k2;
+   double s;
+   double ds;
+   double d2s;
+   ae_frame_make(&_frame_block);
+   SetMatrix(dx);
+   SetMatrix(dy);
+   SetMatrix(dxy);
+   NewVector(xt, 0, DT_REAL);
+   NewVector(ft, 0, DT_REAL);
+   NewVector(t, 0, DT_REAL);
+   NewVector(b, 0, DT_BOOL);
+   NewObj(spline1dinterpolant, c);
+   ae_assert(m >= 2, "BicubicCalcDerivativesMissing: internal error (M < 2)");
+   ae_assert(n >= 2, "BicubicCalcDerivativesMissing: internal error (N < 2)");
+// Allocate DX/DY/DXY and make initial fill by zeros
+   rsetallocm(m, n, 0.0, dx);
+   rsetallocm(m, n, 0.0, dy);
+   rsetallocm(m, n, 0.0, dxy);
+// dF/dX
+   allocv(n, &b);
+   ae_vector_set_length(&xt, n);
+   ae_vector_set_length(&ft, n);
+   ae_vector_set_length(&t, n);
+   for (i = 0; i < m; i++) {
+      k1 = -1;
+      k2 = -1;
+      rcopyrv(n, a, i, &t);
+      for (j = 0; j < n; j++) {
+         b.xB[j] = ismissingnode->xB[i * n + j];
+      }
+      while (spline2d_scanfornonmissingsegment(&b, n, &k1, &k2)) {
+         ae_v_move(xt.xR, 1, &x->xR[k1], 1, k2 - k1 + 1);
+         ae_v_move(ft.xR, 1, &t.xR[k1], 1, k2 - k1 + 1);
+         spline1dbuildcubic(&xt, &ft, k2 - k1 + 1, 0, 0.0, 0, 0.0, &c);
+         for (j = 0; j <= k2 - k1; j++) {
+            spline1ddiff(&c, x->xR[k1 + j], &s, &ds, &d2s);
+            dx->xyR[i][k1 + j] = ds;
+         }
+      }
+   }
+// dF/dY
+   allocv(m, &b);
+   ae_vector_set_length(&xt, m);
+   ae_vector_set_length(&ft, m);
+   ae_vector_set_length(&t, m);
+   for (j = 0; j < n; j++) {
+      k1 = -1;
+      k2 = -1;
+      ae_v_move(t.xR, 1, &a->xyR[0][j], a->stride, m);
+      for (i = 0; i < m; i++) {
+         b.xB[i] = ismissingnode->xB[i * n + j];
+      }
+      while (spline2d_scanfornonmissingsegment(&b, m, &k1, &k2)) {
+         ae_v_move(xt.xR, 1, &y->xR[k1], 1, k2 - k1 + 1);
+         ae_v_move(ft.xR, 1, &t.xR[k1], 1, k2 - k1 + 1);
+         spline1dbuildcubic(&xt, &ft, k2 - k1 + 1, 0, 0.0, 0, 0.0, &c);
+         for (i = 0; i <= k2 - k1; i++) {
+            spline1ddiff(&c, y->xR[k1 + i], &s, &ds, &d2s);
+            dy->xyR[k1 + i][j] = ds;
+         }
+      }
+   }
+// d2F/dXdY
+   allocv(n, &b);
+   ae_vector_set_length(&xt, n);
+   ae_vector_set_length(&ft, n);
+   ae_vector_set_length(&t, n);
+   for (i = 0; i < m; i++) {
+      k1 = -1;
+      k2 = -1;
+      ae_v_move(t.xR, 1, dy->xyR[i], 1, n);
+      for (j = 0; j < n; j++) {
+         b.xB[j] = ismissingnode->xB[i * n + j];
+      }
+      while (spline2d_scanfornonmissingsegment(&b, n, &k1, &k2)) {
+         ae_v_move(xt.xR, 1, &x->xR[k1], 1, k2 - k1 + 1);
+         ae_v_move(ft.xR, 1, &t.xR[k1], 1, k2 - k1 + 1);
+         spline1dbuildcubic(&xt, &ft, k2 - k1 + 1, 0, 0.0, 0, 0.0, &c);
+         for (j = 0; j <= k2 - k1; j++) {
+            spline1ddiff(&c, x->xR[k1 + j], &s, &ds, &d2s);
+            dxy->xyR[i][k1 + j] = ds;
+         }
+      }
+   }
+   ae_frame_leave();
+}
+
 // This subroutine builds bicubic vector-valued spline.
 //
 // Inputs:
@@ -22313,6 +24479,7 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
    c->n = n;
    c->m = m;
    c->stype = -3;
+   c->hasmissingcells = false;
    k *= 4;
    ae_vector_set_length(&c->x, c->n);
    ae_vector_set_length(&c->y, c->m);
@@ -22377,6 +24544,191 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
    ae_frame_leave();
 }
 
+// This  subroutine builds bicubic vector-valued  spline,  with  some  spline
+// cells being missing due to missing nodes.
+//
+// When the node (i,j) is missing, it means that: a) we don't  have  function
+// value at this point (elements of F[] are ignored), and  b)  we  don't need
+// spline value at cells adjacent to the node (i,j), i.e. up to 4 spline cells
+// will be dropped. An attempt to compute spline value at  the  missing  cell
+// will return NAN.
+//
+// It is important to  understand  that  this  subroutine  does  NOT  support
+// interpolation on scattered grids. It allows us to drop some nodes, but  at
+// the cost of making a "hole in the spline" around this point. If  you  want
+// function  that   can   "fill  the  gap",  use  RBF  or  another  scattered
+// interpolation method.
+//
+// The  intended  usage  for  this  subroutine  are  regularly  sampled,  but
+// non-rectangular datasets.
+//
+// Inputs:
+//     X   -   spline abscissas, array[0..N-1]
+//     Y   -   spline ordinates, array[0..M-1]
+//     F   -   function values, array[0..M*N*D-1]:
+//             * first D elements store D values at (X[0],Y[0])
+//             * next D elements store D values at (X[1],Y[0])
+//             * general form - D function values at (X[i],Y[j]) are stored
+//               at F[D*(J*N+I)...D*(J*N+I)+D-1].
+//             * missing values are ignored
+//     Missing array[M*N], Missing[J*N+I] == True means that corresponding entries
+//             of F[] are missing nodes.
+//     M,N -   grid size, M >= 2, N >= 2
+//     D   -   vector dimension, D >= 1
+//
+// Outputs:
+//     C   -   spline interpolant
+// ALGLIB Project: Copyright 27.06.2022 by Sergey Bochkanov
+// API: void spline2dbuildbicubicmissing(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const boolean_1d_array &missing, const ae_int_t d, spline2dinterpolant &c);
+void spline2dbuildbicubicmissing(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, BVector *missing, ae_int_t d, spline2dinterpolant *c) {
+   ae_frame _frame_block;
+   double t;
+   bool tb;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t di;
+   ae_int_t i0;
+   ae_frame_make(&_frame_block);
+   DupVector(f);
+   SetObj(spline2dinterpolant, c);
+   NewMatrix(tf, 0, 0, DT_REAL);
+   NewMatrix(dx, 0, 0, DT_REAL);
+   NewMatrix(dy, 0, 0, DT_REAL);
+   NewMatrix(dxy, 0, 0, DT_REAL);
+   ae_assert(n >= 2, "Spline2DBuildBicubicMissing: N is less than 2");
+   ae_assert(m >= 2, "Spline2DBuildBicubicMissing: M is less than 2");
+   ae_assert(d >= 1, "Spline2DBuildBicubicMissing: invalid argument D (D < 1)");
+   ae_assert(x->cnt >= n && y->cnt >= m, "Spline2DBuildBicubicMissing: length of X or Y is too short (Length(X/Y) < N/M)");
+   ae_assert(isfinitevector(x, n) && isfinitevector(y, m), "Spline2DBuildBicubicMissing: X or Y contains NaN or Infinite value");
+   k = n * m * d;
+   ae_assert(f->cnt >= k, "Spline2DBuildBicubicMissing: length of F is too short (Length(F) < N*M*D)");
+   ae_assert(missing->cnt >= n * m, "Spline2DBuildBicubicMissing: Missing[] is shorter than M*N");
+   for (i = 0; i < k; i++) {
+      if (!missing->xB[i / d] && !isfinite(f->xR[i])) {
+         ae_assert(false, "Spline2DBuildBicubicMissing: F[] contains NAN or INF in its non-missing entries");
+      }
+   }
+// Fill interpolant:
+//  F[0]...F[N*M*D-1]:
+//      f(i,j) table. f(0,0), f(0, 1), f(0,2) and so on...
+//  F[N*M*D]...F[2*N*M*D-1]:
+//      df(i,j)/dx table.
+//  F[2*N*M*D]...F[3*N*M*D-1]:
+//      df(i,j)/dy table.
+//  F[3*N*M*D]...F[4*N*M*D-1]:
+//      d2f(i,j)/dxdy table.
+   c->d = d;
+   c->n = n;
+   c->m = m;
+   c->stype = -3;
+   c->hasmissingcells = true;
+   ae_vector_set_length(&c->x, c->n);
+   ae_vector_set_length(&c->y, c->m);
+   rsetallocv(4 * k, 0.0, &c->f);
+   bcopyallocv(c->n * c->m, missing, &c->ismissingnode);
+   ae_matrix_set_length(&tf, c->m, c->n);
+   for (i = 0; i < c->n; i++) {
+      c->x.xR[i] = x->xR[i];
+   }
+   for (i = 0; i < c->m; i++) {
+      c->y.xR[i] = y->xR[i];
+   }
+   for (i = 0; i < k; i++) {
+      if (!missing->xB[i / d]) {
+         c->f.xR[i] = f->xR[i];
+      }
+   }
+// Sort points
+   for (j = 0; j < c->n; j++) {
+      k = j;
+      for (i = j + 1; i < c->n; i++) {
+         if (c->x.xR[i] < c->x.xR[k]) {
+            k = i;
+         }
+      }
+      if (k != j) {
+         for (i = 0; i < c->m; i++) {
+            for (i0 = 0; i0 < c->d; i0++) {
+               t = c->f.xR[c->d * (i * c->n + j) + i0];
+               c->f.xR[c->d * (i * c->n + j) + i0] = c->f.xR[c->d * (i * c->n + k) + i0];
+               c->f.xR[c->d * (i * c->n + k) + i0] = t;
+            }
+            tb = c->ismissingnode.xB[i * c->n + j];
+            c->ismissingnode.xB[i * c->n + j] = c->ismissingnode.xB[i * c->n + k];
+            c->ismissingnode.xB[i * c->n + k] = tb;
+         }
+         t = c->x.xR[j];
+         c->x.xR[j] = c->x.xR[k];
+         c->x.xR[k] = t;
+      }
+   }
+   for (i = 0; i < c->m; i++) {
+      k = i;
+      for (j = i + 1; j < c->m; j++) {
+         if (c->y.xR[j] < c->y.xR[k]) {
+            k = j;
+         }
+      }
+      if (k != i) {
+         for (j = 0; j < c->n; j++) {
+            for (i0 = 0; i0 < c->d; i0++) {
+               t = c->f.xR[c->d * (i * c->n + j) + i0];
+               c->f.xR[c->d * (i * c->n + j) + i0] = c->f.xR[c->d * (k * c->n + j) + i0];
+               c->f.xR[c->d * (k * c->n + j) + i0] = t;
+            }
+            tb = c->ismissingnode.xB[i * c->n + j];
+            c->ismissingnode.xB[i * c->n + j] = c->ismissingnode.xB[k * c->n + j];
+            c->ismissingnode.xB[k * c->n + j] = tb;
+         }
+         t = c->y.xR[i];
+         c->y.xR[i] = c->y.xR[k];
+         c->y.xR[k] = t;
+      }
+   }
+// 1. Determine cells that are not missing. A cell is non-missing if it has four non-missing
+//    nodes at its corners.
+// 2. Normalize IsMissingNode[] array - all isolated points that are not part of some non-missing
+//    cell are marked as missing too
+   bsetallocv((c->m - 1) * (c->n - 1), true, &c->ismissingcell);
+   for (i = 0; i < c->m - 1; i++) {
+      for (j = 0; j < c->n - 1; j++) {
+         if (!c->ismissingnode.xB[i * c->n + j] && !c->ismissingnode.xB[(i + 1) * c->n + j] && !c->ismissingnode.xB[i * c->n + (j + 1)] && !c->ismissingnode.xB[(i + 1) * c->n + (j + 1)]) {
+            c->ismissingcell.xB[i * (c->n - 1) + j] = false;
+         }
+      }
+   }
+   bsetv(c->m * c->n, true, &c->ismissingnode);
+   for (i = 0; i < c->m - 1; i++) {
+      for (j = 0; j < c->n - 1; j++) {
+         if (!c->ismissingcell.xB[i * (c->n - 1) + j]) {
+            c->ismissingnode.xB[i * c->n + j] = false;
+            c->ismissingnode.xB[(i + 1) * c->n + j] = false;
+            c->ismissingnode.xB[i * c->n + (j + 1)] = false;
+            c->ismissingnode.xB[(i + 1) * c->n + (j + 1)] = false;
+         }
+      }
+   }
+   for (di = 0; di < c->d; di++) {
+      for (i = 0; i < c->m; i++) {
+         for (j = 0; j < c->n; j++) {
+            tf.xyR[i][j] = c->f.xR[c->d * (i * c->n + j) + di];
+         }
+      }
+      spline2d_bicubiccalcderivativesmissing(&tf, &c->ismissingnode, &c->x, &c->y, c->m, c->n, &dx, &dy, &dxy);
+      for (i = 0; i < c->m; i++) {
+         for (j = 0; j < c->n; j++) {
+            k = c->d * (i * c->n + j) + di;
+            c->f.xR[k] = tf.xyR[i][j];
+            c->f.xR[c->n * c->m * c->d + k] = dx.xyR[i][j];
+            c->f.xR[2 * c->n * c->m * c->d + k] = dy.xyR[i][j];
+            c->f.xR[3 * c->n * c->m * c->d + k] = dxy.xyR[i][j];
+         }
+      }
+   }
+   ae_frame_leave();
+}
+
 // This subroutine was deprecated in ALGLIB 3.6.0
 //
 // We recommend you to switch  to  Spline2DBuildBilinearV(),  which  is  more
@@ -22399,6 +24751,7 @@ void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_in
    c->m = m;
    c->d = 1;
    c->stype = -1;
+   c->hasmissingcells = false;
    ae_vector_set_length(&c->x, c->n);
    ae_vector_set_length(&c->y, c->m);
    ae_vector_set_length(&c->f, c->n * c->m);
@@ -22483,6 +24836,7 @@ void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int
    c->n = n;
    c->m = m;
    c->stype = -3;
+   c->hasmissingcells = false;
    sfx = c->n * c->m;
    sfy = 2 * c->n * c->m;
    sfxy = 3 * c->n * c->m;
@@ -22549,6 +24903,7 @@ void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int
 // API: void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const double bx, const double ay, const double by);
 void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay, double by) {
    ae_frame _frame_block;
+   bool missingv;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -22557,6 +24912,7 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
    NewVector(y, 0, DT_REAL);
    NewVector(f, 0, DT_REAL);
    NewVector(v, 0, DT_REAL);
+   NewVector(missing, 0, DT_BOOL);
    ae_assert(c->stype == -3 || c->stype == -1, "Spline2DLinTransXY: incorrect C (incorrect parameter C.SType)");
    ae_assert(isfinite(ax), "Spline2DLinTransXY: AX is infinite or NaN");
    ae_assert(isfinite(bx), "Spline2DLinTransXY: BX is infinite or NaN");
@@ -22579,14 +24935,17 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
       }
    }
 // Handle different combinations of AX/AY
+   bsetallocv(c->n * c->m, false, &missing);
    if (ax == 0.0 && ay != 0.0) {
       for (i = 0; i < c->m; i++) {
          spline2dcalcvbuf(c, bx, y.xR[i], &v);
          y.xR[i] = (y.xR[i] - by) / ay;
+         missingv = !isfinite(v.xR[0]);
          for (j = 0; j < c->n; j++) {
             for (k = 0; k < c->d; k++) {
                f.xR[c->d * (i * c->n + j) + k] = v.xR[k];
             }
+            missing.xB[i * c->n + j] = missingv;
          }
       }
    }
@@ -22594,10 +24953,12 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
       for (j = 0; j < c->n; j++) {
          spline2dcalcvbuf(c, x.xR[j], by, &v);
          x.xR[j] = (x.xR[j] - bx) / ax;
+         missingv = !isfinite(v.xR[0]);
          for (i = 0; i < c->m; i++) {
             for (k = 0; k < c->d; k++) {
                f.xR[c->d * (i * c->n + j) + k] = v.xR[k];
             }
+            missing.xB[i * c->n + j] = missingv;
          }
       }
    }
@@ -22607,6 +24968,9 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
       }
       for (i = 0; i < c->m; i++) {
          y.xR[i] = (y.xR[i] - by) / ay;
+      }
+      if (c->hasmissingcells) {
+         bcopyv(c->n * c->m, &c->ismissingnode, &missing);
       }
    }
    if (ax == 0.0 && ay == 0.0) {
@@ -22618,13 +24982,23 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
             }
          }
       }
+      bsetv(c->n * c->m, !isfinite(v.xR[0]), &missing);
    }
 // Rebuild spline
-   if (c->stype == -3) {
-      spline2dbuildbicubicv(&x, c->n, &y, c->m, &f, c->d, c);
-   }
-   if (c->stype == -1) {
-      spline2dbuildbilinearv(&x, c->n, &y, c->m, &f, c->d, c);
+   if (!c->hasmissingcells) {
+      if (c->stype == -3) {
+         spline2dbuildbicubicv(&x, c->n, &y, c->m, &f, c->d, c);
+      }
+      if (c->stype == -1) {
+         spline2dbuildbilinearv(&x, c->n, &y, c->m, &f, c->d, c);
+      }
+   } else {
+      if (c->stype == -3) {
+         spline2dbuildbicubicmissing(&x, c->n, &y, c->m, &f, &missing, c->d, c);
+      }
+      if (c->stype == -1) {
+         spline2dbuildbilinearmissing(&x, c->n, &y, c->m, &f, &missing, c->d, c);
+      }
    }
    ae_frame_leave();
 }
@@ -22647,24 +25021,59 @@ void spline2dlintransf(spline2dinterpolant *c, double a, double b) {
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
    NewVector(f, 0, DT_REAL);
+   NewVector(missing, 0, DT_BOOL);
    ae_assert(c->stype == -3 || c->stype == -1, "Spline2DLinTransF: incorrect C (incorrect parameter C.SType)");
-   ae_vector_set_length(&x, c->n);
-   ae_vector_set_length(&y, c->m);
-   ae_vector_set_length(&f, c->m * c->n * c->d);
-   for (j = 0; j < c->n; j++) {
-      x.xR[j] = c->x.xR[j];
-   }
-   for (i = 0; i < c->m; i++) {
-      y.xR[i] = c->y.xR[i];
-   }
-   for (i = 0; i < c->m * c->n * c->d; i++) {
-      f.xR[i] = a * c->f.xR[i] + b;
-   }
-   if (c->stype == -3) {
-      spline2dbuildbicubicv(&x, c->n, &y, c->m, &f, c->d, c);
-   }
    if (c->stype == -1) {
-      spline2dbuildbilinearv(&x, c->n, &y, c->m, &f, c->d, c);
+   // Bilinear spline
+      if (!c->hasmissingcells) {
+      // Quick code for a spline without missing cells
+         for (i = 0; i < c->m * c->n * c->d; i++) {
+            c->f.xR[i] = a * c->f.xR[i] + b;
+         }
+      } else {
+      // Slower code for missing cells
+         for (i = 0; i < c->m * c->n * c->d; i++) {
+            if (!c->ismissingnode.xB[i / c->d]) {
+               c->f.xR[i] = a * c->f.xR[i] + b;
+            }
+         }
+      }
+   } else {
+   // Bicubic spline
+      if (!c->hasmissingcells) {
+      // Quick code for a spline without missing cells
+         ae_vector_set_length(&x, c->n);
+         ae_vector_set_length(&y, c->m);
+         ae_vector_set_length(&f, c->m * c->n * c->d);
+         for (j = 0; j < c->n; j++) {
+            x.xR[j] = c->x.xR[j];
+         }
+         for (i = 0; i < c->m; i++) {
+            y.xR[i] = c->y.xR[i];
+         }
+         for (i = 0; i < c->m * c->n * c->d; i++) {
+            f.xR[i] = a * c->f.xR[i] + b;
+         }
+         spline2dbuildbicubicv(&x, c->n, &y, c->m, &f, c->d, c);
+      } else {
+      // Slower code for missing cells
+         ae_vector_set_length(&x, c->n);
+         ae_vector_set_length(&y, c->m);
+         rsetallocv(c->m * c->n * c->d, 0.0, &f);
+         for (j = 0; j < c->n; j++) {
+            x.xR[j] = c->x.xR[j];
+         }
+         for (i = 0; i < c->m; i++) {
+            y.xR[i] = c->y.xR[i];
+         }
+         for (i = 0; i < c->m * c->n * c->d; i++) {
+            if (!c->ismissingnode.xB[i / c->d]) {
+               f.xR[i] = a * c->f.xR[i] + b;
+            }
+         }
+         bcopyallocv(c->m * c->n, &c->ismissingnode, &missing);
+         spline2dbuildbicubicmissing(&x, c->n, &y, c->m, &f, &missing, c->d, c);
+      }
    }
    ae_frame_leave();
 }
@@ -22678,7 +25087,7 @@ void spline2dlintransf(spline2dinterpolant *c, double a, double b) {
 //     M, N-   grid size (x-axis and y-axis)
 //     D   -   number of components
 //     Tbl -   coefficients table, unpacked format,
-//             D - components: [0..(N-1)*(M-1)*D-1, 0..19].
+//             D - components: [0..(N-1)*(M-1)*D-1, 0..20].
 //             For T = 0..D-1 (component index), I = 0...N-2 (x index),
 //             J = 0..M-2 (y index):
 //                 K = T + I*D + J*D*(N-1)
@@ -22698,6 +25107,8 @@ void spline2dlintransf(spline2dinterpolant *c, double a, double b) {
 //                 Tbl[K,9] = C11
 //                 ...
 //                 Tbl[K,19] = C33
+//                 Tbl[K,20] = 1 if the cell is present, 0 if the cell is missing.
+//                             In the latter case Tbl[4..19] are exactly zero.
 //             On each grid square spline is equals to:
 //                 S(x) = SUM(c[i,j]*(t^i)*(u^j), i = 0..3, j = 0..3)
 //                 t = x-x[j]
@@ -22733,7 +25144,7 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
    *n = c->n;
    *m = c->m;
    *d = c->d;
-   ae_matrix_set_length(tbl, (*n - 1) * (*m - 1) * *d, 20);
+   rsetallocm((*n - 1) * (*m - 1) * *d, 21, 0.0, tbl);
    sfx = *n * *m * *d;
    sfy = 2 * *n * *m * *d;
    sfxy = 3 * *n * *m * *d;
@@ -22741,13 +25152,19 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
       for (j = 0; j < *n - 1; j++) {
          for (k = 0; k < *d; k++) {
             p = *d * (i * (*n - 1) + j) + k;
+         // Set up cell dimensions (always present)
             tbl->xyR[p][0] = c->x.xR[j];
             tbl->xyR[p][1] = c->x.xR[j + 1];
             tbl->xyR[p][2] = c->y.xR[i];
             tbl->xyR[p][3] = c->y.xR[i + 1];
             dt = 1.0 / (tbl->xyR[p][1] - tbl->xyR[p][0]);
             du = 1.0 / (tbl->xyR[p][3] - tbl->xyR[p][2]);
-         // Bilinear interpolation
+         // Skip cell if it is missing
+            if (c->hasmissingcells && c->ismissingcell.xB[i * (c->n - 1) + j]) {
+               continue;
+            }
+            tbl->xyR[p][20] = 1.0;
+         // Bilinear interpolation: output coefficients
             if (c->stype == -1) {
                for (k0 = 4; k0 <= 19; k0++) {
                   tbl->xyR[p][k0] = 0.0;
@@ -22761,7 +25178,7 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
                tbl->xyR[p][5] = y4 - y1;
                tbl->xyR[p][9] = y3 - y2 - y4 + y1;
             }
-         // Bicubic interpolation
+         // Bicubic interpolation: output coefficients
             if (c->stype == -3) {
                s1 = *d * (*n * i + j) + k;
                s2 = *d * (*n * i + (j + 1)) + k;
@@ -24464,6 +26881,7 @@ static void spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalexy, 
    buf->localmodel.m = tilesize1;
    buf->localmodel.n = tilesize0;
    buf->localmodel.stype = -3;
+   buf->localmodel.hasmissingcells = false;
    vectorsetlengthatleast(&buf->localmodel.x, tilesize0);
    vectorsetlengthatleast(&buf->localmodel.y, tilesize1);
    vectorsetlengthatleast(&buf->localmodel.f, tilesize0 * tilesize1 * d * 4);
@@ -25384,6 +27802,7 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
    s->n = kx;
    s->m = ky;
    s->stype = -3;
+   s->hasmissingcells = false;
    sfx = s->n * s->m * d;
    sfy = 2 * s->n * s->m * d;
    sfxy = 3 * s->n * s->m * d;
@@ -25547,16 +27966,32 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
 // Serializer: allocation
 // ALGLIB: Copyright 28.02.2018 by Sergey Bochkanov
 void spline2dalloc(ae_serializer *s, spline2dinterpolant *spline) {
-// Header
-   ae_serializer_alloc_entry(s);
-// Data
-   ae_serializer_alloc_entry(s);
-   ae_serializer_alloc_entry(s);
-   ae_serializer_alloc_entry(s);
-   ae_serializer_alloc_entry(s);
-   allocrealarray(s, &spline->x, -1);
-   allocrealarray(s, &spline->y, -1);
-   allocrealarray(s, &spline->f, -1);
+// Which spline 2D format to use - V1 (no missing nodes) or V2 (missing nodes)?
+   if (!spline->hasmissingcells) {
+   // V1 format
+      ae_serializer_alloc_entry(s);
+   // Data
+      ae_serializer_alloc_entry(s);
+      ae_serializer_alloc_entry(s);
+      ae_serializer_alloc_entry(s);
+      ae_serializer_alloc_entry(s);
+      allocrealarray(s, &spline->x, -1);
+      allocrealarray(s, &spline->y, -1);
+      allocrealarray(s, &spline->f, -1);
+   } else {
+   // V2 format
+      ae_serializer_alloc_entry(s);
+   // Data
+      ae_serializer_alloc_entry(s);
+      ae_serializer_alloc_entry(s);
+      ae_serializer_alloc_entry(s);
+      ae_serializer_alloc_entry(s);
+      allocrealarray(s, &spline->x, -1);
+      allocrealarray(s, &spline->y, -1);
+      allocrealarray(s, &spline->f, -1);
+      allocbooleanarray(s, &spline->ismissingnode, -1);
+      allocbooleanarray(s, &spline->ismissingcell, -1);
+   }
 }
 
 // Serializer: serialization
@@ -25574,16 +28009,32 @@ void spline2dalloc(ae_serializer *s, spline2dinterpolant *spline) {
 // API: void spline2dserialize(spline2dinterpolant &obj, std::string &s_out);
 // API: void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out);
 void spline2dserialize(ae_serializer *s, spline2dinterpolant *spline) {
-// Header
-   ae_serializer_serialize_int(s, getspline2dserializationcode());
-// Data
-   ae_serializer_serialize_int(s, spline->stype);
-   ae_serializer_serialize_int(s, spline->n);
-   ae_serializer_serialize_int(s, spline->m);
-   ae_serializer_serialize_int(s, spline->d);
-   serializerealarray(s, &spline->x, -1);
-   serializerealarray(s, &spline->y, -1);
-   serializerealarray(s, &spline->f, -1);
+// Which spline 2D format to use - V1 (no missing nodes) or V2 (missing nodes)?
+   if (!spline->hasmissingcells) {
+   // V1 format
+      ae_serializer_serialize_int(s, getspline2dserializationcode());
+   // Data
+      ae_serializer_serialize_int(s, spline->stype);
+      ae_serializer_serialize_int(s, spline->n);
+      ae_serializer_serialize_int(s, spline->m);
+      ae_serializer_serialize_int(s, spline->d);
+      serializerealarray(s, &spline->x, -1);
+      serializerealarray(s, &spline->y, -1);
+      serializerealarray(s, &spline->f, -1);
+   } else {
+   // V2 format
+      ae_serializer_serialize_int(s, getspline2dwithmissingnodesserializationcode());
+   // Data
+      ae_serializer_serialize_int(s, spline->stype);
+      ae_serializer_serialize_int(s, spline->n);
+      ae_serializer_serialize_int(s, spline->m);
+      ae_serializer_serialize_int(s, spline->d);
+      serializerealarray(s, &spline->x, -1);
+      serializerealarray(s, &spline->y, -1);
+      serializerealarray(s, &spline->f, -1);
+      serializebooleanarray(s, &spline->ismissingnode, -1);
+      serializebooleanarray(s, &spline->ismissingcell, -1);
+   }
 }
 
 // Serializer: unserialization
@@ -25602,15 +28053,29 @@ void spline2dunserialize(ae_serializer *s, spline2dinterpolant *spline) {
    SetObj(spline2dinterpolant, spline);
 // Header
    scode = ae_serializer_unserialize_int(s);
-   ae_assert(scode == getspline2dserializationcode(), "spline2dunserialize: stream header corrupted");
+   ae_assert(scode == getspline2dserializationcode() || scode == getspline2dwithmissingnodesserializationcode(), "spline2dunserialize: stream header corrupted");
 // Data
-   spline->stype = ae_serializer_unserialize_int(s);
-   spline->n = ae_serializer_unserialize_int(s);
-   spline->m = ae_serializer_unserialize_int(s);
-   spline->d = ae_serializer_unserialize_int(s);
-   unserializerealarray(s, &spline->x);
-   unserializerealarray(s, &spline->y);
-   unserializerealarray(s, &spline->f);
+   if (scode == getspline2dserializationcode()) {
+      spline->stype = ae_serializer_unserialize_int(s);
+      spline->n = ae_serializer_unserialize_int(s);
+      spline->m = ae_serializer_unserialize_int(s);
+      spline->d = ae_serializer_unserialize_int(s);
+      unserializerealarray(s, &spline->x);
+      unserializerealarray(s, &spline->y);
+      unserializerealarray(s, &spline->f);
+      spline->hasmissingcells = false;
+   } else {
+      spline->stype = ae_serializer_unserialize_int(s);
+      spline->n = ae_serializer_unserialize_int(s);
+      spline->m = ae_serializer_unserialize_int(s);
+      spline->d = ae_serializer_unserialize_int(s);
+      unserializerealarray(s, &spline->x);
+      unserializerealarray(s, &spline->y);
+      unserializerealarray(s, &spline->f);
+      unserializebooleanarray(s, &spline->ismissingnode);
+      unserializebooleanarray(s, &spline->ismissingcell);
+      spline->hasmissingcells = true;
+   }
 }
 
 void spline2dinterpolant_init(void *_p, bool make_automatic) {
@@ -25618,18 +28083,23 @@ void spline2dinterpolant_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->y, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->f, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->ismissingnode, 0, DT_BOOL, make_automatic);
+   ae_vector_init(&p->ismissingcell, 0, DT_BOOL, make_automatic);
 }
 
 void spline2dinterpolant_copy(void *_dst, const void *_src, bool make_automatic) {
    spline2dinterpolant *dst = (spline2dinterpolant *)_dst;
    const spline2dinterpolant *src = (const spline2dinterpolant *)_src;
    dst->stype = src->stype;
+   dst->hasmissingcells = src->hasmissingcells;
    dst->n = src->n;
    dst->m = src->m;
    dst->d = src->d;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->y, &src->y, make_automatic);
    ae_vector_copy(&dst->f, &src->f, make_automatic);
+   ae_vector_copy(&dst->ismissingnode, &src->ismissingnode, make_automatic);
+   ae_vector_copy(&dst->ismissingcell, &src->ismissingcell, make_automatic);
 }
 
 void spline2dinterpolant_free(void *_p, bool make_automatic) {
@@ -25637,6 +28107,8 @@ void spline2dinterpolant_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->y, make_automatic);
    ae_vector_free(&p->f, make_automatic);
+   ae_vector_free(&p->ismissingnode, make_automatic);
+   ae_vector_free(&p->ismissingcell, make_automatic);
 }
 
 void spline2dbuilder_init(void *_p, bool make_automatic) {
@@ -25932,6 +28404,20 @@ void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::spline2dbuildbilinearv(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, f), d, ConstT(spline2dinterpolant, c));
+   alglib_impl::ae_state_clear();
+}
+
+void spline2dbuildbilinearmissing(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const boolean_1d_array &missing, const ae_int_t d, spline2dinterpolant &c) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::spline2dbuildbilinearmissing(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, f), ConstT(ae_vector, missing), d, ConstT(spline2dinterpolant, c));
+   alglib_impl::ae_state_clear();
+}
+
+void spline2dbuildbicubicmissing(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const boolean_1d_array &missing, const ae_int_t d, spline2dinterpolant &c) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::spline2dbuildbicubicmissing(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, f), ConstT(ae_vector, missing), d, ConstT(spline2dinterpolant, c));
    alglib_impl::ae_state_clear();
 }
 
@@ -29949,10 +32435,13 @@ static void rbf_rbfpreparenonserializablefields(rbfmodel *s) {
    s->lambdav = 0.0;
    s->aterm = 1;
    s->algorithmtype = 0;
+   s->rbfprofile = 0;
    s->epsort = rbf_eps;
    s->epserr = rbf_eps;
    s->maxits = 0;
+   s->v3tol = 0.000001;
    s->nnmaxits = 100;
+   s->fastevaltol = 0.001;
 }
 
 // Initialize V1 model (skip initialization for NX == 1 or NX > 3)
@@ -30579,9 +33068,11 @@ void rbfsetalgomultiquadricauto(rbfmodel *s, double lambdav) {
 // * no tunable parameters
 // * C0 continuous RBF model (the model has discontinuous derivatives at  the
 //   interpolation nodes)
-// * fast  model construction algorithm with O(N) memory and  O(N^2)  running
+// * fast model construction algorithm with O(N) memory and O(N*logN) running
 //   time requirements. Hundreds of thousands of points can be  handled  with
 //   this algorithm.
+// * accelerated evaluation using far field expansions  (aka  fast multipoles
+//   method) is supported. See rbffastcalc() for more information.
 // * controllable smoothing via optional nonlinearity penalty
 //
 // Inputs:
@@ -30750,6 +33241,34 @@ void rbfsetv2supportr(rbfmodel *s, double r) {
    s->model2.supportr = r;
 }
 
+// This function sets desired accuracy for a version 3 RBF model.
+//
+// As of ALGLIB 3.20.0, version 3 models include biharmonic RBFs, thin  plate
+// splines, multiquadrics.
+//
+// Version 3 models are fit  with  specialized  domain  decomposition  method
+// which splits problem into smaller  chunks.  Models  with  size  less  than
+// the DDM chunk size are computed nearly exactly in one step. Larger  models
+// are built with an iterative linear solver. This function controls accuracy
+// of the solver.
+//
+// Inputs:
+//     S       -   RBF model, initialized by RBFCreate() call
+//     TOL     -   desired precision:
+//                 * must be non-negative
+//                 * should be somewhere between 0.001 and 0.000001
+//                 * values higher than 0.001 make little sense   -  you  may
+//                   lose a lot of precision with no performance gains.
+//                 * values below 1E-6 usually require too much time to converge,
+//                   so they are silenly replaced by a 1E-6 cutoff value. Thus,
+//                   zero can be used to denote 'maximum precision'.
+// ALGLIB: Copyright 01.10.2022 by Sergey Bochkanov
+// API: void rbfsetv3tol(const rbfmodel &s, const double tol);
+void rbfsetv3tol(rbfmodel *s, double tol) {
+   ae_assert(isfinite(tol) && tol >= 0.0, "RBFSetV3TOL: TOL is negative or infinite");
+   s->v3tol = tol;
+}
+
 // This function sets stopping criteria of the underlying linear solver.
 //
 // Inputs:
@@ -30797,6 +33316,23 @@ void rbfsetcond(rbfmodel *s, double epsort, double epserr, ae_int_t maxits) {
       s->epserr = epserr;
       s->maxits = maxits;
    }
+}
+
+// This function changes evaluation tolerance of a fast evaluator (if present).
+// It is an actual implementation that is used by RBFSetFastEvalTol().
+//
+// It usually has O(N) running time because evaluator has to be rebuilt according
+// to the new tolerance.
+//
+// Inputs:
+//     S           -   RBF model object
+//     TOL         -   desired tolerance
+// ALGLIB: Copyright 19.09.2022 by Sergey Bochkanov
+void pushfastevaltol(rbfmodel *s, double tol) {
+   if (s->modelversion != 3) {
+      return;
+   }
+   rbf3pushfastevaltol(&s->model3, tol);
 }
 
 // This   function  builds  RBF  model  and  returns  report  (contains  some
@@ -30957,9 +33493,10 @@ void rbfbuildmodel(rbfmodel *s, rbfreport *rep) {
          }
       }
    // Build model
-      rbfv3build(&s->x, &s->y, s->n, &scalevec, v3bftype, v3bfparam, s->lambdav, s->aterm, &s->model3, &s->progress10000, &s->terminationrequest, &rep3);
+      rbfv3build(&s->x, &s->y, s->n, &scalevec, v3bftype, v3bfparam, s->lambdav, s->aterm, s->rbfprofile, s->v3tol, &s->model3, &s->progress10000, &s->terminationrequest, &rep3);
       s->modelversion = 3;
       rbfcreatecalcbuffer(s, &s->calcbuf);
+      pushfastevaltol(s, s->fastevaltol);
    // Convert report fields
       rep->iterationscount = rep3.iterationscount;
       rep->terminationtype = rep3.terminationtype;
@@ -31790,6 +34327,113 @@ void rbfcalc(rbfmodel *s, RVector *x, RVector *y) {
    rbfcalcbuf(s, x, y);
 }
 
+// This function sets absolute accuracy of a  fast evaluation  algorithm used
+// by rbffastcalc() and other fast evaluation functions.
+//
+// A fast evaluation algorithm is model-dependent and is available  only  for
+// some RBF models. Usually it utilizes far field expansions (a generalization
+// of the fast multipoles  method).  If  no  approximate  fast  evaluator  is
+// available for the  current RBF model type, this function has no effect.
+//
+// NOTE: this function can be called before or after the model was built. The
+//       result will be the same.
+//
+// NOTE: this  function  has  O(N) running time, where N is a  points  count.
+//       Most fast evaluators work by aggregating influence of  point groups,
+//       i.e. by computing so called far field. Changing evaluator  tolerance
+//       means that far field radii have to  be  recomputed  for  each  point
+//       cluster, and we have O(N) such clusters.
+//
+//       This function is still very fast, but  it  should  not be called too
+//       often, e.g. every time you call rbffastcalc() in a loop.
+//
+// NOTE: the tolerance  set  by this function is an accuracy of an  evaluator
+//       which computes the value of the model. It is  NOT  accuracy  of  the
+//       model itself.
+//
+//       E.g., if you set evaluation accuracy to 1E-12, the model value  will
+//       be computed with required precision. However, the model itself is an
+//       approximation of the target (the default requirement is to fit model
+//       with ~6 digits of precision) and THIS accuracy can  not  be  changed
+//       after the model was built.
+//
+// IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. Calling it while another thread
+//            tries to use rbffastcalc() is unsafe because it means that  the
+//            accuracy requirements will change in the middle of computations.
+//            The algorithm may behave unpredictably.
+//
+// Inputs:
+//     S       -   RBF model
+//     TOL     -   TOL > 0, desired evaluation tolerance:
+//                 * should be somewhere between 1E-3 and 1E-6
+//                 * values outside of this range will cause no problems (the
+//                   evaluator will do the job anyway). However,  too  strict
+//                   precision requirements may mean  that  no  approximation
+//                   speed-up will be achieved.
+// ALGLIB: Copyright 19.09.2022 by Sergey Bochkanov
+// API: void rbfsetfastevaltol(const rbfmodel &s, const double tol);
+void rbfsetfastevaltol(rbfmodel *s, double tol) {
+   ae_assert(isfinite(tol), "RBFSetFastEvalTol: TOL is not a finite number");
+   ae_assert(tol > 0.0, "RBFSetFastEvalTol: TOL <= 0");
+   s->fastevaltol = tol;
+   pushfastevaltol(s, tol);
+}
+
+// This function calculates values of the RBF model at the given point  using
+// a fast approximate algorithm whenever possible. If no  fast  algorithm  is
+// available for a given model type, traditional O(N) approach is used.
+//
+// Presently, fast evaluation is implemented only for biharmonic splines.
+//
+// The absolute approximation accuracy is controlled by the rbfsetfastevaltol()
+// function.
+//
+// IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+//            temporary arrays, i.e. it is  impossible  to  perform  parallel
+//            evaluation on the same rbfmodel object (parallel calls of  this
+//            function for independent rbfmodel objects are safe).
+//            If you want to perform parallel model evaluation  from multiple
+//            threads, use rbftscalcbuf() with a per-thread buffer object.
+//
+// This function returns 0.0 when model is not initialized.
+//
+// Inputs:
+//     S       -   RBF model
+//     X       -   coordinates, array[NX].
+//                 X may have more than NX elements, in this case only
+//                 leading NX will be used.
+//
+// Outputs:
+//     Y       -   function value, array[NY]. Y is out-parameter and
+//                 reallocated after call to this function. In case you  want
+//                 to reuse previously allocated Y, you may use RBFCalcBuf(),
+//                 which reallocates Y only when it is too small.
+// ALGLIB: Copyright 19.09.2022 by Sergey Bochkanov
+// API: void rbffastcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
+void rbffastcalc(rbfmodel *s, RVector *x, RVector *y) {
+   ae_int_t i;
+   SetVector(y);
+   ae_assert(x->cnt >= s->nx, "RBFCalc: Length(X) < NX");
+   ae_assert(isfinitevector(x, s->nx), "RBFCalc: X contains infinite or NaN values");
+   vectorsetlengthatleast(y, s->ny);
+   for (i = 0; i < s->ny; i++) {
+      y->xR[i] = 0.0;
+   }
+   if (s->modelversion == 1) {
+      rbfv1calcbuf(&s->model1, x, y);
+      return;
+   }
+   if (s->modelversion == 2) {
+      rbfv2calcbuf(&s->model2, x, y);
+      return;
+   }
+   if (s->modelversion == 3) {
+      rbfv3tsfastcalcbuf(&s->model3, &s->model3.calcbuf, x, y);
+      return;
+   }
+   ae_assert(false, "RBFCalcBuf: integrity check failed");
+}
+
 // This function, depending on SparseY, acts as RBFGridCalc2V (SparseY == False)
 // or RBFGridCalc2VSubset (SparseY == True) function.  See  comments  for  these
 // functions for more information
@@ -32557,6 +35201,22 @@ void rbfrequesttermination(rbfmodel *s) {
    s->terminationrequest = true;
 }
 
+// This function sets RBF profile to standard or debug
+//
+// Inputs:
+//     S           -   RBF model object
+//     P           -   profile type:
+//                     * 0 for standard
+//                     * -1 for debug
+//                     * -2 for debug with artificially worsened numerical
+//                       precision. This profile is designed to test algorithm
+//                       ability to deal with difficult problems,
+// ALGLIB: Copyright 17.11.2018 by Sergey Bochkanov
+void rbfsetprofile(rbfmodel *s, ae_int_t p) {
+   ae_assert(p == -2 || p == -1 || p == 0, "RBFSetProfile: incorrect P");
+   s->rbfprofile = p;
+}
+
 // Serializer: allocation
 // ALGLIB: Copyright 02.02.2012 by Sergey Bochkanov
 void rbfalloc(ae_serializer *s, rbfmodel *model) {
@@ -32656,6 +35316,7 @@ void rbfunserialize(ae_serializer *s, rbfmodel *model) {
       rbf_initializev2(model->nx, model->ny, &model->model2);
       rbf_initializev3(model->nx, model->ny, &model->model3);
       rbfcreatecalcbuffer(model, &model->calcbuf);
+      pushfastevaltol(model, model->fastevaltol);
       return;
    }
 // V2 model
@@ -32667,6 +35328,7 @@ void rbfunserialize(ae_serializer *s, rbfmodel *model) {
       rbf_initializev1(model->nx, model->ny, &model->model1);
       rbf_initializev3(model->nx, model->ny, &model->model3);
       rbfcreatecalcbuffer(model, &model->calcbuf);
+      pushfastevaltol(model, model->fastevaltol);
       return;
    }
 // V3 model
@@ -32678,6 +35340,7 @@ void rbfunserialize(ae_serializer *s, rbfmodel *model) {
       rbf_initializev1(model->nx, model->ny, &model->model1);
       rbf_initializev2(model->nx, model->ny, &model->model2);
       rbfcreatecalcbuffer(model, &model->calcbuf);
+      pushfastevaltol(model, model->fastevaltol);
       return;
    }
    ae_assert(false, "rbfunserialize: unserialiation error (unexpected model type)");
@@ -32742,17 +35405,20 @@ void rbfmodel_copy(void *_dst, const void *_src, bool make_automatic) {
    dst->nlayers = src->nlayers;
    dst->aterm = src->aterm;
    dst->algorithmtype = src->algorithmtype;
+   dst->rbfprofile = src->rbfprofile;
    dst->bftype = src->bftype;
    dst->bfparam = src->bfparam;
    dst->epsort = src->epsort;
    dst->epserr = src->epserr;
    dst->maxits = src->maxits;
+   dst->v3tol = src->v3tol;
    dst->nnmaxits = src->nnmaxits;
    dst->n = src->n;
    ae_matrix_copy(&dst->x, &src->x, make_automatic);
    ae_matrix_copy(&dst->y, &src->y, make_automatic);
    dst->hasscale = src->hasscale;
    ae_vector_copy(&dst->s, &src->s, make_automatic);
+   dst->fastevaltol = src->fastevaltol;
    dst->progress10000 = src->progress10000;
    dst->terminationrequest = src->terminationrequest;
 }
@@ -33049,6 +35715,13 @@ void rbfsetv2supportr(const rbfmodel &s, const double r) {
    alglib_impl::ae_state_clear();
 }
 
+void rbfsetv3tol(const rbfmodel &s, const double tol) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rbfsetv3tol(ConstT(rbfmodel, s), tol);
+   alglib_impl::ae_state_clear();
+}
+
 void rbfbuildmodel(const rbfmodel &s, rbfreport &rep) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -33161,6 +35834,20 @@ void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::rbfcalc(ConstT(rbfmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y));
+   alglib_impl::ae_state_clear();
+}
+
+void rbfsetfastevaltol(const rbfmodel &s, const double tol) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rbfsetfastevaltol(ConstT(rbfmodel, s), tol);
+   alglib_impl::ae_state_clear();
+}
+
+void rbffastcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rbffastcalc(ConstT(rbfmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y));
    alglib_impl::ae_state_clear();
 }
 

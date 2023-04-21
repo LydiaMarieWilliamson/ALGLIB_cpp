@@ -64279,6 +64279,441 @@ static bool testspline2dunit_testfittingblocksolver() {
    return Ok;
 }
 
+static bool testspline2dunit_samestatus2(bool a0, bool a1) {
+   return a0 == a1;
+}
+
+static bool testspline2dunit_samestatus5(bool a0, bool a1, bool a2, bool a3, bool a4) {
+   return a0 && a1 && a2 && a3 && a4 || !a0 && !a1 && !a2 && !a3 && !a4;
+}
+
+// Test grids with missing nodes
+static bool testspline2dunit_testnan() {
+   ae_frame _frame_block;
+   ae_int_t m;
+   ae_int_t n;
+   ae_int_t innerm;
+   ae_int_t innern;
+   ae_int_t shiftm;
+   ae_int_t shiftn;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t jj;
+   ae_int_t mm;
+   ae_int_t nn;
+   ae_int_t dd;
+   ae_int_t jobtype;
+   double ax;
+   double bx;
+   double ay;
+   double by;
+   bool missingcell;
+   double v;
+   double v2;
+   double vx;
+   double vy;
+   double h;
+   double hx;
+   double hy;
+   double hxy;
+   double g;
+   double gx;
+   double gy;
+   double gxy;
+   double a;
+   double b;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewVector(x, 0, DT_REAL);
+   NewVector(y, 0, DT_REAL);
+   NewVector(x2, 0, DT_REAL);
+   NewVector(y2, 0, DT_REAL);
+   NewVector(f, 0, DT_REAL);
+   NewVector(ft, 0, DT_REAL);
+   NewVector(z, 0, DT_REAL);
+   NewVector(xp, 0, DT_REAL);
+   NewVector(yp, 0, DT_REAL);
+   NewVector(fp, 0, DT_REAL);
+   NewVector(ismissing, 0, DT_BOOL);
+   NewVector(mp, 0, DT_BOOL);
+   NewMatrix(tbl, 0, 0, DT_REAL);
+   NewObj(spline2dinterpolant, c);
+   NewObj(spline2dinterpolant, c2);
+   NewObj(spline2dinterpolant, c3);
+   NewObj(hqrndstate, rs);
+   hqrndrandomize(&rs);
+// First problem: inner non-NAN rectangle
+// surrounded by NAN's.
+//
+// * interpolation at the nodes should return function values
+//   at nodes (even when node has NAN neighbors)
+// * interpolation in the inner points should give same
+//   results as interpolation built using only inner rectangle
+// * interpolation outside of inner rectangle should return NANs, unless we are really close to the feasible rectangle
+   for (m = 4; m <= 8; m++) {
+      for (n = 4; n <= 8; n++) {
+         for (jobtype = 0; jobtype <= 1; jobtype++) {
+         // Prepare problem, randomly reorder rows/cols to test sorting
+            innerm = 2 + hqrnduniformi(&rs, m - 3);
+            innern = 2 + hqrnduniformi(&rs, n - 3);
+            shiftm = hqrnduniformi(&rs, m - innerm);
+            shiftn = hqrnduniformi(&rs, n - innern);
+            rsetallocv(m * n, hqrndnormal(&rs), &f);
+            bsetallocv(m * n, true, &ismissing);
+            allocv(innerm * innern, &ft);
+            ae_vector_set_length(&x, n);
+            ae_vector_set_length(&y, m);
+            ae_vector_set_length(&x2, innern);
+            ae_vector_set_length(&y2, innerm);
+            for (i = 0; i < innerm; i++) {
+               for (j = 0; j < innern; j++) {
+                  v = hqrndnormal(&rs);
+                  ft.xR[i * innern + j] = v;
+                  f.xR[(shiftm + i) * n + (shiftn + j)] = v;
+                  ismissing.xB[(shiftm + i) * n + (shiftn + j)] = false;
+               }
+            }
+            for (j = 0; j < innern; j++) {
+               x2.xR[j] = shiftn + j;
+            }
+            for (j = 0; j < n; j++) {
+               x.xR[j] = j;
+            }
+            for (i = 0; i < innerm; i++) {
+               y2.xR[i] = shiftm + i;
+            }
+            for (i = 0; i < m; i++) {
+               y.xR[i] = i;
+            }
+            rcopyallocv(n, &x, &xp);
+            rcopyallocv(m, &y, &yp);
+            rcopyallocv(m * n, &f, &fp);
+            bcopyallocv(m * n, &ismissing, &mp);
+            for (i = 0; i < m; i++) {
+               k = hqrnduniformi(&rs, m);
+               if (k != i) {
+                  for (j = 0; j < n; j++) {
+                     swapentries(&fp, i * n + j, k * n + j, 1);
+                     swapentriesb(&mp, i * n + j, k * n + j, 1);
+                  }
+                  swapentries(&yp, i, k, 1);
+               }
+            }
+            for (j = 0; j < n; j++) {
+               k = hqrnduniformi(&rs, n);
+               if (k != j) {
+                  for (i = 0; i < m; i++) {
+                     swapentries(&fp, i * n + j, i * n + k, 1);
+                     swapentriesb(&mp, i * n + j, i * n + k, 1);
+                  }
+                  swapentries(&xp, j, k, 1);
+               }
+            }
+         // Build spline
+            if (jobtype == 0) {
+               if (hqrndnormal(&rs) > 0.0) {
+               // Straightforward construction
+                  spline2dbuildbilinearmissing(&xp, n, &yp, m, &fp, &mp, 1, &c);
+               } else {
+               // Build and serialize
+                  spline2dbuildbilinearmissing(&xp, n, &yp, m, &fp, &mp, 1, &c3);
+                  {
+                  // This code passes data structure through serializers
+                  // (serializes it to string and loads back)
+                     ae_frame _local_frame_block;
+                     ae_frame_make(&_local_frame_block);
+                     NewSerializer(_local_serializer);
+                     ae_serializer_alloc_start(&_local_serializer);
+                     spline2dalloc(&_local_serializer, &c3);
+                     size_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                     NewBlock(_local_dynamic_block, _local_ssize + 1);
+                     ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                     spline2dserialize(&_local_serializer, &c3);
+                     ae_serializer_stop(&_local_serializer);
+                     ae_serializer_init(&_local_serializer);
+                     ae_serializer_ustart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                     spline2dunserialize(&_local_serializer, &c);
+                     ae_serializer_stop(&_local_serializer);
+                     ae_frame_leave();
+                  }
+               }
+               spline2dbuildbilinearv(&x2, innern, &y2, innerm, &ft, 1, &c2);
+            } else {
+               if (hqrndnormal(&rs) > 0.0) {
+               // Straightforward construction
+                  spline2dbuildbicubicmissing(&xp, n, &yp, m, &fp, &mp, 1, &c);
+               } else {
+               // Build and serialize
+                  spline2dbuildbicubicmissing(&xp, n, &yp, m, &fp, &mp, 1, &c3);
+                  {
+                  // This code passes data structure through serializers
+                  // (serializes it to string and loads back)
+                     ae_serializer _local_serializer;
+                     size_t _local_ssize;
+                     ae_frame _local_frame_block;
+                     ae_frame_make(&_local_frame_block);
+                     ae_serializer_init(&_local_serializer);
+                     ae_serializer_alloc_start(&_local_serializer);
+                     spline2dalloc(&_local_serializer, &c3);
+                     _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                     NewBlock(_local_dynamic_block, _local_ssize + 1);
+                     ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                     spline2dserialize(&_local_serializer, &c3);
+                     ae_serializer_stop(&_local_serializer);
+                     ae_serializer_init(&_local_serializer);
+                     ae_serializer_ustart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                     spline2dunserialize(&_local_serializer, &c);
+                     ae_serializer_stop(&_local_serializer);
+                     ae_frame_leave();
+                  }
+               }
+               spline2dbuildbicubicv(&x2, innern, &y2, innerm, &ft, 1, &c2);
+            }
+         // Test values at nodes
+            for (i = 0; i < m; i++) {
+               for (j = 0; j < n; j++) {
+                  vx = x.xR[j] + 10.0 * machineepsilon * hqrnduniformi(&rs, 2) * hqrndnormal(&rs);
+                  vy = y.xR[i] + 10.0 * machineepsilon * hqrnduniformi(&rs, 2) * hqrndnormal(&rs);
+                  v = spline2dcalc(&c, vx, vy);
+                  Ok = Ok && (ismissing.xB[i * n + j] || !isnan(v) && NearAtR(v, f.xR[i * n + j], 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus2(ismissing.xB[i * n + j], isnan(v));
+                  spline2ddiff(&c, vx, vy, &g, &gx, &gy, &gxy);
+                  spline2ddiff(&c2, vx, vy, &h, &hx, &hy, &hxy);
+                  Ok = Ok && (ismissing.xB[i * n + j] || NearAtR(g, h, 0.00000001));
+                  Ok = Ok && (ismissing.xB[i * n + j] || jobtype != 1 || NearAtR(gx, hx, 0.00000001) && NearAtR(gy, hy, 0.00000001) && NearAtR(gxy, hxy, 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus5(ismissing.xB[i * n + j], isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2ddiffvi(&c, vx, vy, 0, &g, &gx, &gy, &gxy);
+                  spline2ddiffvi(&c2, vx, vy, 0, &h, &hx, &hy, &hxy);
+                  Ok = Ok && (ismissing.xB[i * n + j] || NearAtR(g, h, 0.00000001));
+                  Ok = Ok && (ismissing.xB[i * n + j] || jobtype != 1 || NearAtR(gx, hx, 0.00000001) && NearAtR(gy, hy, 0.00000001) && NearAtR(gxy, hxy, 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus5(ismissing.xB[i * n + j], isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2dcalcv(&c, vx, vy, &z);
+                  Ok = Ok && (ismissing.xB[i * n + j] || !isnan(z.xR[0]) && NearAtR(z.xR[0], f.xR[i * n + j], 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus2(ismissing.xB[i * n + j], isnan(z.xR[0]));
+                  spline2dcalcvbuf(&c, vx, vy, &z);
+                  Ok = Ok && (ismissing.xB[i * n + j] || !isnan(z.xR[0]) && NearAtR(z.xR[0], f.xR[i * n + j], 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus2(ismissing.xB[i * n + j], isnan(z.xR[0]));
+                  v = spline2dcalcvi(&c, vx, vy, 0);
+                  Ok = Ok && (ismissing.xB[i * n + j] || !isnan(v) && NearAtR(v, f.xR[i * n + j], 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus2(ismissing.xB[i * n + j], isnan(v));
+               }
+            }
+         // Test values between nodes
+            for (i = 0; i < m - 1; i++) {
+               for (j = 0; j < n - 1; j++) {
+                  vx = x.xR[j] + (0.1 + 0.8 * hqrnduniformr(&rs)) * (x.xR[j + 1] - x.xR[j]);
+                  vy = y.xR[i] + (0.1 + 0.8 * hqrnduniformr(&rs)) * (y.xR[i + 1] - y.xR[i]);
+                  missingcell = ismissing.xB[i * n + j] || ismissing.xB[(i + 1) * n + j] || ismissing.xB[i * n + (j + 1)] || ismissing.xB[(i + 1) * n + (j + 1)];
+                  v = spline2dcalc(&c, vx, vy);
+                  v2 = spline2dcalc(&c2, vx, vy);
+                  Ok = Ok && (missingcell || !isnan(v) && NearAtR(v, v2, 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus2(missingcell, isnan(v));
+                  spline2ddiff(&c, vx, vy, &g, &gx, &gy, &gxy);
+                  spline2ddiff(&c2, vx, vy, &h, &hx, &hy, &hxy);
+                  Ok = Ok && (missingcell || NearAtR(g, h, 0.00000001));
+                  Ok = Ok && (missingcell || jobtype != 1 || NearAtR(gx, hx, 0.00000001) && NearAtR(gy, hy, 0.00000001) && NearAtR(gxy, hxy, 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus5(missingcell, isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2ddiffvi(&c, vx, vy, 0, &g, &gx, &gy, &gxy);
+                  spline2ddiffvi(&c2, vx, vy, 0, &h, &hx, &hy, &hxy);
+                  Ok = Ok && (missingcell || NearAtR(g, h, 0.00000001));
+                  Ok = Ok && (missingcell || jobtype != 1 || NearAtR(gx, hx, 0.00000001) && NearAtR(gy, hy, 0.00000001) && NearAtR(gxy, hxy, 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus5(missingcell, isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2dcalcv(&c, vx, vy, &z);
+                  Ok = Ok && testspline2dunit_samestatus2(missingcell, isnan(z.xR[0]));
+                  spline2dcalcvbuf(&c, vx, vy, &z);
+                  Ok = Ok && testspline2dunit_samestatus2(missingcell, isnan(z.xR[0]));
+                  v = spline2dcalcvi(&c, vx, vy, 0);
+                  v2 = spline2dcalcvi(&c2, vx, vy, 0);
+                  Ok = Ok && (missingcell || !isnan(v) && NearAtR(v, v2, 0.00000001));
+                  Ok = Ok && testspline2dunit_samestatus2(missingcell, isnan(v));
+               }
+            }
+         // Test unpacking
+            spline2dunpackv(&c, &mm, &nn, &dd, &tbl);
+            Ok = Ok && mm == m;
+            Ok = Ok && nn == n;
+            Ok = Ok && dd == 1;
+            for (i = 0; i < m - 1; i++) {
+               for (j = 0; j < n - 1; j++) {
+                  missingcell = ismissing.xB[i * n + j] || ismissing.xB[(i + 1) * n + j] || ismissing.xB[i * n + (j + 1)] || ismissing.xB[(i + 1) * n + (j + 1)];
+                  k = i * (n - 1) + j;
+                  Ok = Ok && NearAtR(tbl.xyR[k][0], x.xR[j], 0.00000001);
+                  Ok = Ok && NearAtR(tbl.xyR[k][1], x.xR[j + 1], 0.00000001);
+                  Ok = Ok && NearAtR(tbl.xyR[k][2], y.xR[i], 0.00000001);
+                  Ok = Ok && NearAtR(tbl.xyR[k][3], y.xR[i + 1], 0.00000001);
+                  for (jj = 4; jj <= 19; jj++) {
+                     Ok = Ok && (!missingcell || tbl.xyR[k][jj] == 0.0);
+                  }
+                  Ok = Ok && testspline2dunit_samestatus2(missingcell, tbl.xyR[k][20] == 0.0);
+               }
+            }
+         // Test linear translation
+            a = hqrndnormal(&rs);
+            b = hqrndnormal(&rs);
+            spline2dcopy(&c, &c3);
+            spline2dlintransf(&c3, a, b);
+            for (i = 0; i <= 10; i++) {
+               vx = x.xR[0] + hqrnduniformr(&rs) * (x.xR[n - 1] - x.xR[0]);
+               vy = y.xR[0] + hqrnduniformr(&rs) * (y.xR[m - 1] - y.xR[0]);
+               Ok = Ok && testspline2dunit_samestatus2(isnan(spline2dcalc(&c, vx, vy)), isnan(spline2dcalc(&c3, vx, vy)));
+               Ok = Ok && (isnan(spline2dcalc(&c, vx, vy)) || NearAtR(a * spline2dcalc(&c, vx, vy) + b, spline2dcalc(&c3, vx, vy), 0.00000001));
+            }
+            ax = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            bx = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            ay = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            by = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            spline2dcopy(&c, &c3);
+            spline2dlintransxy(&c3, ax, bx, ay, by);
+            for (i = 0; i <= 10; i++) {
+               vx = x.xR[0] + hqrnduniformr(&rs) * (x.xR[n - 1] - x.xR[0]);
+               vy = y.xR[0] + hqrnduniformr(&rs) * (y.xR[m - 1] - y.xR[0]);
+               Ok = Ok && testspline2dunit_samestatus2(isnan(spline2dcalc(&c, ax * vx + bx, ay * vy + by)), isnan(spline2dcalc(&c3, vx, vy)));
+               Ok = Ok && (isnan(spline2dcalc(&c, ax * vx + bx, ay * vy + by)) || NearAtR(spline2dcalc(&c, ax * vx + bx, ay * vy + by), spline2dcalc(&c3, vx, vy), 0.00000001));
+            }
+         }
+      }
+   }
+// Second problem: missing and non-missing points are interleaved in a chess order.
+// As a result, any cell should be marked as missing.
+   for (m = 4; m <= 8; m++) {
+      for (n = 4; n <= 8; n++) {
+         for (jobtype = 0; jobtype <= 1; jobtype++) {
+         // Prepare problem, randomly reorder rows/cols to test sorting
+            allocv(m * n, &f);
+            allocv(m * n, &ismissing);
+            ae_vector_set_length(&x, n);
+            ae_vector_set_length(&y, m);
+            for (i = 0; i < m; i++) {
+               for (j = 0; j < n; j++) {
+                  f.xR[i * n + j] = hqrndnormal(&rs);
+                  ismissing.xB[i * n + j] = (i + j) % 2 == 0;
+               }
+            }
+            for (j = 0; j < n; j++) {
+               x.xR[j] = j;
+            }
+            for (i = 0; i < m; i++) {
+               y.xR[i] = i;
+            }
+            rcopyallocv(n, &x, &xp);
+            rcopyallocv(m, &y, &yp);
+            rcopyallocv(m * n, &f, &fp);
+            bcopyallocv(m * n, &ismissing, &mp);
+            for (i = 0; i < m; i++) {
+               k = hqrnduniformi(&rs, m);
+               if (k != i) {
+                  for (j = 0; j < n; j++) {
+                     swapentries(&fp, i * n + j, k * n + j, 1);
+                     swapentriesb(&mp, i * n + j, k * n + j, 1);
+                  }
+                  swapentries(&yp, i, k, 1);
+               }
+            }
+            for (j = 0; j < n; j++) {
+               k = hqrnduniformi(&rs, n);
+               if (k != j) {
+                  for (i = 0; i < m; i++) {
+                     swapentries(&fp, i * n + j, i * n + k, 1);
+                     swapentriesb(&mp, i * n + j, i * n + k, 1);
+                  }
+                  swapentries(&xp, j, k, 1);
+               }
+            }
+         // Build spline
+            if (jobtype == 0) {
+               spline2dbuildbilinearmissing(&xp, n, &yp, m, &fp, &mp, 1, &c);
+            } else {
+               spline2dbuildbicubicmissing(&xp, n, &yp, m, &fp, &mp, 1, &c);
+            }
+         // Test values at nodes
+            for (i = 0; i < m; i++) {
+               for (j = 0; j < n; j++) {
+                  vx = x.xR[j] + 10.0 * machineepsilon * hqrnduniformi(&rs, 2) * hqrndnormal(&rs);
+                  vy = y.xR[i] + 10.0 * machineepsilon * hqrnduniformi(&rs, 2) * hqrndnormal(&rs);
+                  v = spline2dcalc(&c, vx, vy);
+                  Ok = Ok && isnan(v);
+                  spline2ddiff(&c, vx, vy, &g, &gx, &gy, &gxy);
+                  spline2ddiff(&c2, vx, vy, &h, &hx, &hy, &hxy);
+                  Ok = Ok && testspline2dunit_samestatus5(true, isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2ddiffvi(&c, vx, vy, 0, &g, &gx, &gy, &gxy);
+                  spline2ddiffvi(&c2, vx, vy, 0, &h, &hx, &hy, &hxy);
+                  Ok = Ok && testspline2dunit_samestatus5(true, isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2dcalcv(&c, vx, vy, &z);
+                  Ok = Ok && testspline2dunit_samestatus2(true, isnan(z.xR[0]));
+                  spline2dcalcvbuf(&c, vx, vy, &z);
+                  Ok = Ok && testspline2dunit_samestatus2(true, isnan(z.xR[0]));
+                  v = spline2dcalcvi(&c, vx, vy, 0);
+                  Ok = Ok && testspline2dunit_samestatus2(true, isnan(v));
+               }
+            }
+         // Test values between nodes
+            for (i = 0; i < m - 1; i++) {
+               for (j = 0; j < n - 1; j++) {
+                  vx = x.xR[j] + (0.1 + 0.8 * hqrnduniformr(&rs)) * (x.xR[j + 1] - x.xR[j]);
+                  vy = y.xR[i] + (0.1 + 0.8 * hqrnduniformr(&rs)) * (y.xR[i + 1] - y.xR[i]);
+                  v = spline2dcalc(&c, vx, vy);
+                  Ok = Ok && isnan(v);
+                  spline2ddiff(&c, vx, vy, &g, &gx, &gy, &gxy);
+                  spline2ddiff(&c2, vx, vy, &h, &hx, &hy, &hxy);
+                  Ok = Ok && testspline2dunit_samestatus5(true, isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2ddiffvi(&c, vx, vy, 0, &g, &gx, &gy, &gxy);
+                  spline2ddiffvi(&c2, vx, vy, 0, &h, &hx, &hy, &hxy);
+                  Ok = Ok && testspline2dunit_samestatus5(true, isnan(g), isnan(gx), isnan(gy), isnan(gxy));
+                  spline2dcalcv(&c, vx, vy, &z);
+                  Ok = Ok && testspline2dunit_samestatus2(true, isnan(z.xR[0]));
+                  spline2dcalcvbuf(&c, vx, vy, &z);
+                  Ok = Ok && testspline2dunit_samestatus2(true, isnan(z.xR[0]));
+                  v = spline2dcalcvi(&c, vx, vy, 0);
+                  Ok = Ok && testspline2dunit_samestatus2(true, isnan(v));
+               }
+            }
+         // Test unpacking
+            spline2dunpackv(&c, &mm, &nn, &dd, &tbl);
+            Ok = Ok && mm == m;
+            Ok = Ok && nn == n;
+            Ok = Ok && dd == 1;
+            for (i = 0; i < m - 1; i++) {
+               for (j = 0; j < n - 1; j++) {
+                  k = i * (n - 1) + j;
+                  Ok = Ok && NearAtR(tbl.xyR[k][0], x.xR[j], 0.00000001);
+                  Ok = Ok && NearAtR(tbl.xyR[k][1], x.xR[j + 1], 0.00000001);
+                  Ok = Ok && NearAtR(tbl.xyR[k][2], y.xR[i], 0.00000001);
+                  Ok = Ok && NearAtR(tbl.xyR[k][3], y.xR[i + 1], 0.00000001);
+                  for (jj = 4; jj <= 19; jj++) {
+                     Ok = Ok && tbl.xyR[k][jj] == 0.0;
+                  }
+                  Ok = Ok && tbl.xyR[k][20] == 0.0;
+               }
+            }
+         // Test linear translation
+            a = hqrndnormal(&rs);
+            b = hqrndnormal(&rs);
+            spline2dcopy(&c, &c3);
+            spline2dlintransf(&c3, a, b);
+            for (i = 0; i <= 10; i++) {
+               vx = x.xR[0] + hqrnduniformr(&rs) * (x.xR[n - 1] - x.xR[0]);
+               vy = y.xR[0] + hqrnduniformr(&rs) * (y.xR[m - 1] - y.xR[0]);
+               Ok = Ok && isnan(spline2dcalc(&c3, vx, vy));
+            }
+            ax = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            bx = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            ay = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            by = hqrndnormal(&rs) * hqrnduniformi(&rs, 2);
+            spline2dcopy(&c, &c3);
+            spline2dlintransxy(&c3, ax, bx, ay, by);
+            for (i = 0; i <= 10; i++) {
+               vx = x.xR[0] + hqrnduniformr(&rs) * (x.xR[n - 1] - x.xR[0]);
+               vy = y.xR[0] + hqrnduniformr(&rs) * (y.xR[m - 1] - y.xR[0]);
+               Ok = Ok && isnan(spline2dcalc(&c3, vx, vy));
+            }
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 // Block solver test for fitting functionality
 static bool testspline2dunit_testfittingfastddmsolver() {
    ae_frame _frame_block;
@@ -64822,6 +65257,7 @@ bool testspline2d() {
    bool rlOk;
    bool rcOk;
    bool vfOk;
+   bool nanOk;
    bool fitfastddmsolverOk;
    bool fitblocksolverOk;
    bool fitpenaltyOk;
@@ -64897,10 +65333,13 @@ bool testspline2d() {
    rlOk = true;
    rcOk = true;
    vfOk = true;
+   nanOk = true;
    fitfastddmsolverOk = true;
    fitblocksolverOk = true;
    fitpriorOk = true;
    fitpenaltyOk = true;
+// Grids with missing cells
+   nanOk = nanOk && testspline2dunit_testnan();
 // Fitting functions
    fitfastddmsolverOk = fitfastddmsolverOk && testspline2dunit_testfittingfastddmsolver();
    fitpriorOk = fitpriorOk && testspline2dunit_testfittingprior();
@@ -65195,7 +65634,7 @@ bool testspline2d() {
 // Test for vector-function
    vfOk = testspline2dunit_testspline2dvf();
 // The final report.
-   Ok = blOk && bcOk && dsOk && cpOk && serOk && upOk && ltOk && syOk && rlOk && rcOk && vfOk && fitpriorOk && fitpenaltyOk && fitblocksolverOk && fitfastddmsolverOk;
+   Ok = blOk && bcOk && dsOk && cpOk && serOk && upOk && ltOk && syOk && rlOk && rcOk && vfOk && nanOk && fitpriorOk && fitpenaltyOk && fitblocksolverOk && fitfastddmsolverOk;
    if (!Ok || !silent) {
       printf("Spline 2D Interpolation Tests\n");
    // Normal tests
@@ -65209,6 +65648,7 @@ bool testspline2d() {
       printf("* Linear Transform:                       %s\n", ltOk ? "Ok" : "Failed");
       printf("* Special Symmetry Properties:            %s\n", syOk ? "Ok" : "Failed");
       printf("* Vector Spline:                          %s\n", vfOk ? "Ok" : "Failed");
+      printf("* Missing Cells (NANs):                   %s\n", nanOk ? "Ok" : "Failed");
       printf("Fitting Tests:\n");
       printf("* Linear Prior Term:                      %s\n", fitpriorOk ? "Ok" : "Failed");
       printf("* Non-Linearity Penalty Term:             %s\n", fitpenaltyOk ? "Ok" : "Failed");
@@ -65794,7 +66234,6 @@ bool testspline3d() {
 // === rbf testing unit ===
 static const ae_int_t testrbfunit_algorithmscnt = 6;
 static const ae_int_t testrbfunit_xrbfalgocnt = 3;
-static const ae_int_t testrbfunit_xrbfc1algocnt = 2;
 static const ae_int_t testrbfunit_xrbfsmoothingalgocnt = 3;
 static const double testrbfunit_tol = 1.0E-10;
 static const ae_int_t testrbfunit_mxits = 0;
@@ -67373,6 +67812,7 @@ static void testrbfunit_generategoodrandomgrid(ae_int_t n, ae_int_t nx, ae_int_t
 static void testrbfunit_setxrbfalgorithmexact(rbfmodel *s, ae_int_t algoidx, double meanpointsseparation) {
    if (algoidx == 0) {
       rbfsetalgothinplatespline(s, 0.0);
+      rbfsetprofile(s, randominteger(2) - 1);
       return;
    }
    if (algoidx == 1) {
@@ -67381,10 +67821,12 @@ static void testrbfunit_setxrbfalgorithmexact(rbfmodel *s, ae_int_t algoidx, dou
       } else {
          rbfsetalgomultiquadricauto(s, 0.0);
       }
+      rbfsetprofile(s, randominteger(2) - 1);
       return;
    }
    if (algoidx == 2) {
       rbfsetalgobiharmonic(s, 0.0);
+      rbfsetprofile(s, randominteger(2) - 1);
       return;
    }
    ae_assert(false, "SetXRBFAlgorithm: unknown AlgoIdx");
@@ -68329,6 +68771,7 @@ static void testrbfunit_generatenearlyregulargrid(ae_int_t n, ae_int_t nx, ae_in
 static void testrbfunit_setxrbfalgorithmsmoothing(rbfmodel *s, ae_int_t algoidx, double lambdav, double meanpointsseparation) {
    if (algoidx == 0) {
       rbfsetalgothinplatespline(s, lambdav);
+      rbfsetprofile(s, randominteger(2) - 1);
       return;
    }
    if (algoidx == 1) {
@@ -68337,10 +68780,12 @@ static void testrbfunit_setxrbfalgorithmsmoothing(rbfmodel *s, ae_int_t algoidx,
       } else {
          rbfsetalgomultiquadricauto(s, lambdav);
       }
+      rbfsetprofile(s, randominteger(2) - 1);
       return;
    }
    if (algoidx == 2) {
       rbfsetalgobiharmonic(s, lambdav);
+      rbfsetprofile(s, randominteger(2) - 1);
       return;
    }
    ae_assert(false, "SetXRBFAlgorithmSmoothing: unknown AlgoIdx");
@@ -68360,14 +68805,16 @@ static bool testrbfunit_basicxrbftest() {
    double lambdav;
    ae_int_t n;
    ae_int_t ntest;
-   ae_int_t gridsize;
+   ae_int_t n0;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
+   ae_int_t kk;
    double delta;
    double refrms;
    double refmax;
    double v;
+   double vv;
    ae_int_t functype;
    ae_int_t densitytype;
    double width;
@@ -68383,7 +68830,18 @@ static bool testrbfunit_basicxrbftest() {
    bool hasscale;
    ae_int_t nondistinctcnt;
    ae_int_t termtype;
+   ae_int_t clustersize;
+   ae_int_t nclusters;
    ae_int_t leadingzeros;
+   double fastcalctol;
+   double rmax;
+   double wmax;
+   double fftol;
+   ae_int_t maxp;
+   double rtrial;
+   double maxrtrial;
+   double f;
+   double ferr;
    bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(rbfmodel, s);
@@ -68391,6 +68849,7 @@ static bool testrbfunit_basicxrbftest() {
    NewObj(rbfreport, rep);
    NewObj(rbfcalcbuffer, tsbuf);
    NewMatrix(xy, 0, 0, DT_REAL);
+   NewMatrix(xw, 0, 0, DT_REAL);
    NewMatrix(xytest, 0, 0, DT_REAL);
    NewMatrix(uxwr, 0, 0, DT_REAL);
    NewMatrix(uv, 0, 0, DT_REAL);
@@ -68401,8 +68860,12 @@ static bool testrbfunit_basicxrbftest() {
    NewVector(xzero, 0, DT_REAL);
    NewVector(yref, 0, DT_REAL);
    NewVector(scalevec, 0, DT_REAL);
+   NewVector(dir, 0, DT_REAL);
    NewVector(bflags, 0, DT_BOOL);
    NewObj(hqrndstate, rs);
+   NewObj(savgcounter, avgratio);
+   NewObj(biharmonicevaluator, bheval);
+   NewObj(biharmonicpanel, bhpanel);
    hqrndrandomize(&rs);
    Ok = true;
 // First test - random problem, ability to build model
@@ -68420,179 +68883,132 @@ static bool testrbfunit_basicxrbftest() {
 // * RBFTsCalcBuf()
    errtol = 0.00001;
    for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
-      for (nx = 1; nx <= 4; nx++) {
-         for (ny = 1; ny <= 2; ny++) {
-         // problem setup
-            n = 150;
-            testrbfunit_generatenearlyregulargrid(n, nx, ny, &rs, &xy, &meanseparation);
-         // Build model
-            rbfcreate(nx, ny, &s);
-            testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
-            rbfsetpoints(&s, &xy, n);
-            rbfbuildmodel(&s, &rep);
-            if (rep.terminationtype <= 0) {
-               Ok = false;
+      for (nx = 1; nx <= 5; nx++) {
+      // problem setup
+         n = 150;
+         ny = 1 + hqrnduniformi(&rs, 2);
+         testrbfunit_generatenearlyregulargrid(n, nx, ny, &rs, &xy, &meanseparation);
+      // Build model
+         rbfcreate(nx, ny, &s);
+         testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+         rbfsetpoints(&s, &xy, n);
+         rbfbuildmodel(&s, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         Ok = Ok && (s.rbfprofile < 0 || s.model3.dbgworstfirstdecay <= 0.5) && s.model3.dbgworstfirstdecay <= 0.9;
+         rbfcreatecalcbuffer(&s, &tsbuf);
+      // Test ability to reproduce function value
+      //
+      // NOTE: we use RBFCalc(XZero) to guarantee that internal state of
+      //       RBF model is "reset" between subsequent calls of different
+      //       functions. It allows us to make sure that we have no bug
+      //       like function simply returning latest result
+         rsetallocv(nx, 0.0, &xzero);
+         ae_vector_set_length(&x, nx);
+         ae_vector_set_length(&y, ny);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < nx; j++) {
+               x.xR[j] = xy.xyR[i][j];
+            }
+            rbfcalc(&s, &xzero, &y);
+            if (randombool()) {
+               ae_vector_set_length(&yref, ny + 1);
+            } else {
+               ae_vector_set_length(&yref, 0);
+            }
+            rbfcalc(&s, &x, &yref);
+            Ok = Ok && yref.cnt == ny;
+            if (!Ok) {
                ae_frame_leave();
                return Ok;
             }
-            rbfcreatecalcbuffer(&s, &tsbuf);
-         // Test ability to reproduce function value
-         //
-         // NOTE: we use RBFCalc(XZero) to guarantee that internal state of
-         //       RBF model is "reset" between subsequent calls of different
-         //       functions. It allows us to make sure that we have no bug
-         //       like function simply returning latest result
-            rsetallocv(nx, 0.0, &xzero);
-            ae_vector_set_length(&x, nx);
-            ae_vector_set_length(&y, ny);
-            for (i = 0; i < n; i++) {
-               for (j = 0; j < nx; j++) {
-                  x.xR[j] = xy.xyR[i][j];
-               }
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol * n);
+            }
+            if (nx == 1 && ny == 1) {
                rbfcalc(&s, &xzero, &y);
-               if (randombool()) {
-                  ae_vector_set_length(&yref, ny + 1);
-               } else {
-                  ae_vector_set_length(&yref, 0);
-               }
-               rbfcalc(&s, &x, &yref);
-               Ok = Ok && yref.cnt == ny;
-               if (!Ok) {
-                  ae_frame_leave();
-                  return Ok;
-               }
-               for (j = 0; j < ny; j++) {
-                  Ok = Ok && NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol * n);
-               }
-               if (nx == 1 && ny == 1) {
-                  rbfcalc(&s, &xzero, &y);
-                  Ok = Ok && rbfcalc1(&s, x.xR[0]) == yref.xR[0];
-               } else {
-                  Ok = Ok && rbfcalc1(&s, 1.2) == 0.0;
-               }
-               if (nx == 2 && ny == 1) {
-                  rbfcalc(&s, &xzero, &y);
-                  Ok = Ok && rbfcalc2(&s, x.xR[0], x.xR[1]) == yref.xR[0];
-               } else {
-                  Ok = Ok && rbfcalc2(&s, 1.2, 3.4) == 0.0;
-               }
-               if (nx == 3 && ny == 1) {
-                  rbfcalc(&s, &xzero, &y);
-                  Ok = Ok && rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) == yref.xR[0];
-               } else {
-                  Ok = Ok && rbfcalc3(&s, 1.2, 3.4, 5.6) == 0.0;
-               }
+               Ok = Ok && rbfcalc1(&s, x.xR[0]) == yref.xR[0];
+            } else {
+               Ok = Ok && rbfcalc1(&s, 1.2) == 0.0;
+            }
+            if (nx == 2 && ny == 1) {
                rbfcalc(&s, &xzero, &y);
-               if (randombool()) {
-                  ae_vector_set_length(&y, ny + 1);
-                  rbfcalcbuf(&s, &x, &y);
-                  Ok = Ok && y.cnt == ny + 1;
-               } else {
-                  ae_vector_set_length(&y, ny - 1);
-                  rbfcalcbuf(&s, &x, &y);
-                  Ok = Ok && y.cnt == ny;
-               }
-               for (j = 0; j < ny; j++) {
-                  Ok = Ok && y.xR[j] == yref.xR[j];
-               }
+               Ok = Ok && rbfcalc2(&s, x.xR[0], x.xR[1]) == yref.xR[0];
+            } else {
+               Ok = Ok && rbfcalc2(&s, 1.2, 3.4) == 0.0;
+            }
+            if (nx == 3 && ny == 1) {
                rbfcalc(&s, &xzero, &y);
-               if (randombool()) {
-                  ae_vector_set_length(&y, ny + 1);
-                  rbftscalcbuf(&s, &tsbuf, &x, &y);
-                  Ok = Ok && y.cnt == ny + 1;
-               } else {
-                  ae_vector_set_length(&y, ny - 1);
-                  rbftscalcbuf(&s, &tsbuf, &x, &y);
-                  Ok = Ok && y.cnt == ny;
-               }
-               for (j = 0; j < ny; j++) {
-                  Ok = Ok && y.xR[j] == yref.xR[j];
-               }
+               Ok = Ok && rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) == yref.xR[0];
+            } else {
+               Ok = Ok && rbfcalc3(&s, 1.2, 3.4, 5.6) == 0.0;
+            }
+            rbfcalc(&s, &xzero, &y);
+            if (randombool()) {
+               ae_vector_set_length(&y, ny + 1);
+               rbfcalcbuf(&s, &x, &y);
+               Ok = Ok && y.cnt == ny + 1;
+            } else {
+               ae_vector_set_length(&y, ny - 1);
+               rbfcalcbuf(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+            }
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && y.xR[j] == yref.xR[j];
+            }
+            rbfcalc(&s, &xzero, &y);
+            if (randombool()) {
+               ae_vector_set_length(&y, ny + 1);
+               rbftscalcbuf(&s, &tsbuf, &x, &y);
+               Ok = Ok && y.cnt == ny + 1;
+            } else {
+               ae_vector_set_length(&y, ny - 1);
+               rbftscalcbuf(&s, &tsbuf, &x, &y);
+               Ok = Ok && y.cnt == ny;
+            }
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && y.xR[j] == yref.xR[j];
+            }
+            rbfcalc(&s, &xzero, &y);
+            fastcalctol = pow(10.0, -3.0 - 3.0 * hqrnduniformr(&rs));
+            rbfsetfastevaltol(&s, fastcalctol);
+            if (hqrndnormal(&rs) > 0.0) {
+               ae_vector_set_length(&y, ny + 1);
+               rbffastcalc(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+            } else {
+               ae_vector_set_length(&y, ny - 1);
+               rbffastcalc(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+            }
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && NearAtR(y.xR[j], yref.xR[j], fastcalctol);
             }
          }
       }
    }
-// Test ability to handle surface normal conditions
-   algoidx = hqrnduniformi(&rs, testrbfunit_xrbfc1algocnt);
-   nx = 2;
-   ny = hqrnduniformi(&rs, 4);
 // Test ability to handle all dataset sizes from 0 to 10
    errtol = 0.00001;
    for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
-      for (nx = 1; nx <= 4; nx++) {
-         for (ny = 1; ny <= 2; ny++) {
-            for (n = 0; n <= 10; n++) {
-               testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
-               rbfcreate(nx, ny, &s);
-               testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
-               if (n > 0) {
-                  if (hqrndnormal(&rs) > 0.0) {
-                     allocv(nx, &scalevec);
-                     for (i = 0; i < nx; i++) {
-                        scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
-                     }
-                     rbfsetpointsandscales(&s, &xy, n, &scalevec);
-                  } else {
-                     rbfsetpoints(&s, &xy, n);
-                  }
-               }
-               rbfbuildmodel(&s, &rep);
-               if (rep.terminationtype <= 0) {
-                  Ok = false;
-                  ae_frame_leave();
-                  return Ok;
-               }
-               for (i = 0; i < n; i++) {
-                  allocv(nx, &x);
-                  rcopyrv(nx, &xy, i, &x);
-                  rbfcalc(&s, &x, &y);
-                  Ok = Ok && y.cnt == ny;
-                  if (!Ok) {
-                     ae_frame_leave();
-                     return Ok;
-                  }
-                  for (j = 0; j < ny; j++) {
-#if 0 //@@
-                     Ok = Ok && NearAtR(y.xR[j], xy.xyR[i][nx + j], errtol); //@@
-#else //@@
-                     Ok = Ok && !(fabs(y.xR[j] - xy.xyR[i][nx + j]) > errtol); //@@
-#endif //@@
-                  }
-               }
-            }
-         }
-      }
-   }
-// Test ability to handle datasets with non-distinct points:
-// * the model correctly predicts mean value at non-distinct points
-// * Rep.RMSError and Rep.MaxError are correctly computed
-   errtol = 0.0001;
-   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
-      for (nx = 1; nx <= 4; nx++) {
-         for (ny = 1; ny <= 2; ny++) {
-            n = 1 + hqrnduniformi(&rs, 20);
+      for (nx = 1; nx <= 5; nx++) {
+         for (n = 0; n <= 10; n++) {
+            ny = 1 + hqrnduniformi(&rs, 2);
             testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
-            allocm(2 * n, nx + ny, &xy2);
-            for (i = 0; i < n; i++) {
-               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i);
-               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i + 1);
-               v = 0.001 + hqrnduniformr(&rs);
-               for (j = 0; j < ny; j++) {
-                  xy2.xyR[2 * i][nx + j] -= v;
-                  xy2.xyR[2 * i + 1][nx + j] += v;
-               }
-            }
             rbfcreate(nx, ny, &s);
             testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
-            if (hqrndnormal(&rs) > 0.0) {
-               allocv(nx, &scalevec);
-               for (i = 0; i < nx; i++) {
-                  scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
+            if (n > 0) {
+               if (hqrndnormal(&rs) > 0.0) {
+                  allocv(nx, &scalevec);
+                  for (i = 0; i < nx; i++) {
+                     scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
+                  }
+                  rbfsetpointsandscales(&s, &xy, n, &scalevec);
+               } else {
+                  rbfsetpoints(&s, &xy, n);
                }
-               rbfsetpointsandscales(&s, &xy2, 2 * n, &scalevec);
-            } else {
-               rsetallocv(nx, 1.0, &scalevec);
-               rbfsetpoints(&s, &xy2, 2 * n);
             }
             rbfbuildmodel(&s, &rep);
             if (rep.terminationtype <= 0) {
@@ -68600,10 +69016,10 @@ static bool testrbfunit_basicxrbftest() {
                ae_frame_leave();
                return Ok;
             }
-            refrms = 0.0;
-            refmax = 0.0;
             for (i = 0; i < n; i++) {
                allocv(nx, &x);
+            // Test RBFCalc()
+               ae_vector_set_length(&y, 0);
                rcopyrv(nx, &xy, i, &x);
                rbfcalc(&s, &x, &y);
                Ok = Ok && y.cnt == ny;
@@ -68613,23 +69029,247 @@ static bool testrbfunit_basicxrbftest() {
                }
                for (j = 0; j < ny; j++) {
 #if 0 //@@
-                  Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol); //@@
+                  Ok = Ok && NearAtR(y.xR[j], xy.xyR[i][nx + j], errtol); //@@
 #else //@@
-                  Ok = Ok && !(fabs(y.xR[j] - 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j])) > errtol); //@@
+                  Ok = Ok && !(fabs(y.xR[j] - xy.xyR[i][nx + j]) > errtol); //@@
 #endif //@@
-                  refrms += sqr(y.xR[j] - xy2.xyR[2 * i][nx + j]) + sqr(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]);
-                  refmax = rmax3(refmax, fabs(y.xR[j] - xy2.xyR[2 * i][nx + j]), fabs(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]));
+               }
+               rcopyallocv(ny, &y, &yref);
+            // Additionally, test RBFFastCalc() against reference value produced by RBFCalc().
+               fastcalctol = pow(10.0, -3.0 - 3.0 * hqrnduniformr(&rs));
+               rbfsetfastevaltol(&s, fastcalctol);
+               ae_vector_set_length(&y, 0);
+               rcopyrv(nx, &xy, i, &x);
+               rbffastcalc(&s, &x, &y);
+               Ok = Ok && y.cnt == ny;
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (j = 0; j < ny; j++) {
+                  Ok = Ok && NearAtR(y.xR[j], yref.xR[j], fastcalctol);
                }
             }
-            refrms = sqrt(refrms / (2 * n * ny));
-#if 0 //@@
-            Ok = Ok && NearAtR(refrms, rep.rmserror, errtol); //@@
-            Ok = Ok && NearAtR(refmax, rep.maxerror, errtol); //@@
-#else //@@
-            Ok = Ok && !(fabs(refrms - rep.rmserror) > errtol); //@@
-            Ok = Ok && !(fabs(refmax - rep.maxerror) > errtol); //@@
-#endif //@@
          }
+      }
+   }
+// Test far field expansions - direct testing of biharmonic panels
+   for (n = 1; n <= 10; n++) {
+      for (ny = 1; ny <= 4; ny++) {
+      // Prepare N points within RMax-sphere, with weights about WMax.
+      // Test expansion with MaxP=15 power.
+         rmax = pow(10.0, hqrndnormal(&rs));
+         wmax = pow(10.0, hqrndnormal(&rs));
+         maxp = 15;
+         fftol = pow(10.0, -6.0 * hqrnduniformr(&rs)) * wmax;
+         ae_matrix_set_length(&xw, n, 3 + ny);
+         for (i = 0; i < n; i++) {
+            v = 0.0;
+            for (j = 0; j <= 2; j++) {
+               xw.xyR[i][j] = hqrndnormal(&rs);
+               v += sqr(xw.xyR[i][j]);
+            }
+            v = rmax * hqrnduniformr(&rs) / sqrt(v + machineepsilon);
+            for (j = 0; j <= 2; j++) {
+               xw.xyR[i][j] *= v;
+            }
+            for (j = 0; j < ny; j++) {
+               xw.xyR[i][3 + j] = wmax * hqrndnormal(&rs);
+            }
+         }
+      // Generate evaluator, panel
+         n0 = hqrnduniformi(&rs, n);
+         biharmonicevaluatorinit(&bheval, maxp);
+         bhpanelinit(&bhpanel, &xw, n0, n, ny, &bheval);
+         bhpanelsetprec(&bhpanel, fftol);
+      // Generate trial points, perform evaluation, compare with reference values
+         maxrtrial = 5.0 * rmax;
+         Ok = Ok && bhpanel.useatdistance < maxrtrial;
+         for (kk = 0; kk <= 50; kk++) {
+         // Generate trial point
+            rtrial = bhpanel.useatdistance + (maxrtrial - bhpanel.useatdistance) * hqrnduniformr(&rs);
+            ae_vector_set_length(&x, 3);
+            v = 0.0;
+            for (j = 0; j <= 2; j++) {
+               x.xR[j] = hqrndnormal(&rs);
+               v += sqr(x.xR[j]);
+            }
+            v = rtrial / sqrt(v + machineepsilon);
+            for (j = 0; j <= 2; j++) {
+               x.xR[j] *= v;
+            }
+            x.xR[0] += bhpanel.c0;
+            x.xR[1] += bhpanel.c1;
+            x.xR[2] += bhpanel.c2;
+         // Compute reference values
+            rsetallocv(ny, 0.0, &yref);
+            for (i = n0; i < n; i++) {
+               v = -sqrt(sqr(xw.xyR[i][0] - x.xR[0]) + sqr(xw.xyR[i][1] - x.xR[1]) + sqr(xw.xyR[i][2] - x.xR[2]));
+               for (j = 0; j < ny; j++) {
+                  yref.xR[j] += v * xw.xyR[i][3 + j];
+               }
+            }
+         // Test evaluation functions
+            if (ny == 1) {
+               f = maxrealnumber;
+               ferr = 0.0;
+               bhpaneleval1(&bhpanel, &bheval, x.xR[0], x.xR[1], x.xR[2], &f, true, &ferr);
+               Ok = Ok && ferr <= fftol;
+               Ok = Ok && NearAtR(f, yref.xR[0], ferr);
+            }
+            ae_vector_set_length(&y, 0);
+            ferr = 0.0;
+            bhpaneleval(&bhpanel, &bheval, x.xR[0], x.xR[1], x.xR[2], &y, true, &ferr);
+            Ok = Ok && ferr <= fftol;
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && NearAtR(y.xR[j], yref.xR[j], ferr);
+            }
+         }
+      }
+   }
+// Test far field expansions: generate elongated dataset with geometry suitable
+// for far fields activation. Check that the model correctly reproduces target
+// values.
+   errtol = 0.001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      nx = 1 + hqrnduniformi(&rs, 4);
+      ny = 1 + hqrnduniformi(&rs, 2);
+      clustersize = rbf3getmaxpanelsize();
+      nclusters = 2;
+      n = nclusters * clustersize;
+      delta = 100.0;
+      meanseparation = 0.1 / (clustersize - 1);
+      hqrndnormalv(&rs, nx, &dir);
+      dir.xR[0] = coalesce(dir.xR[0], 1.0);
+      rmulv(nx, 1.0 / sqrt(rdotv2(nx, &dir)), &dir);
+      allocm(n, nx + ny, &xy);
+      for (i = 0; i < n; i++) {
+         k = i % nclusters;
+         kk = i / nclusters;
+         for (j = 0; j < nx; j++) {
+            xy.xyR[i][j] = ((double)kk / (clustersize - 1) + k * delta) * dir.xR[j];
+         }
+         for (j = 0; j < ny; j++) {
+            xy.xyR[i][nx + j] = hqrndnormal(&rs);
+         }
+      }
+      for (i = 0; i < n; i++) {
+         swaprows(&xy, i, i + hqrnduniformi(&rs, n - i), nx + ny);
+      }
+      rbfcreate(nx, ny, &s);
+      testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+      rbfsetpoints(&s, &xy, n);
+      rbfbuildmodel(&s, &rep);
+      if (rep.terminationtype <= 0) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      Ok = Ok && s.model3.dbgworstfirstdecay <= 0.85;
+      if (rep.rmserror > errtol) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      fastcalctol = pow(10.0, -3.0 - 3.0 * hqrnduniformr(&rs));
+      rbfsetfastevaltol(&s, fastcalctol);
+      v = 0.0;
+      vv = 0.0;
+      ae_vector_set_length(&x, nx);
+      for (i = 0; i < n; i++) {
+         rcopyrv(nx, &xy, i, &x);
+      // Compute average error of RBFCalc() against target values
+         rbfcalc(&s, &x, &yref);
+         Ok = Ok && yref.cnt == ny;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         for (j = 0; j < ny; j++) {
+            v += sqr(yref.xR[j] - xy.xyR[i][nx + j]);
+         }
+      // Compute average error of RBFFastCalc() against RBFCalc()
+         rbffastcalc(&s, &x, &y);
+         Ok = Ok && y.cnt == ny;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         for (j = 0; j < ny; j++) {
+            vv += sqr(y.xR[j] - yref.xR[j]);
+         }
+      }
+      v = sqrt(v / (n * ny));
+      vv = sqrt(vv / (n * ny));
+      Ok = Ok && v <= errtol;
+      Ok = Ok && vv <= fastcalctol;
+   }
+// Test ability to handle datasets with non-distinct points:
+// * the model correctly predicts mean value at non-distinct points
+// * Rep.RMSError and Rep.MaxError are correctly computed
+   errtol = 0.0001;
+   for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
+      for (nx = 1; nx <= 5; nx++) {
+         ny = 1 + hqrnduniformi(&rs, 2);
+         n = 1 + hqrnduniformi(&rs, 20);
+         testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+         allocm(2 * n, nx + ny, &xy2);
+         for (i = 0; i < n; i++) {
+            rcopyrr(nx + ny, &xy, i, &xy2, 2 * i);
+            rcopyrr(nx + ny, &xy, i, &xy2, 2 * i + 1);
+            v = 0.001 + hqrnduniformr(&rs);
+            for (j = 0; j < ny; j++) {
+               xy2.xyR[2 * i][nx + j] -= v;
+               xy2.xyR[2 * i + 1][nx + j] += v;
+            }
+         }
+         rbfcreate(nx, ny, &s);
+         testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+         if (hqrndnormal(&rs) > 0.0) {
+            allocv(nx, &scalevec);
+            for (i = 0; i < nx; i++) {
+               scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
+            }
+            rbfsetpointsandscales(&s, &xy2, 2 * n, &scalevec);
+         } else {
+            rsetallocv(nx, 1.0, &scalevec);
+            rbfsetpoints(&s, &xy2, 2 * n);
+         }
+         rbfbuildmodel(&s, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         refrms = 0.0;
+         refmax = 0.0;
+         for (i = 0; i < n; i++) {
+            allocv(nx, &x);
+            rcopyrv(nx, &xy, i, &x);
+            rbfcalc(&s, &x, &y);
+            Ok = Ok && y.cnt == ny;
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+            for (j = 0; j < ny; j++) {
+#if 0 //@@
+               Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol); //@@
+#else //@@
+               Ok = Ok && !(fabs(y.xR[j] - 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j])) > errtol); //@@
+#endif //@@
+               refrms += sqr(y.xR[j] - xy2.xyR[2 * i][nx + j]) + sqr(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]);
+               refmax = rmax3(refmax, fabs(y.xR[j] - xy2.xyR[2 * i][nx + j]), fabs(y.xR[j] - xy2.xyR[2 * i + 1][nx + j]));
+            }
+         }
+         refrms = sqrt(refrms / (2 * n * ny));
+#if 0 //@@
+         Ok = Ok && NearAtR(refrms, rep.rmserror, errtol); //@@
+         Ok = Ok && NearAtR(refmax, rep.maxerror, errtol); //@@
+#else //@@
+         Ok = Ok && !(fabs(refrms - rep.rmserror) > errtol); //@@
+         Ok = Ok && !(fabs(refmax - rep.maxerror) > errtol); //@@
+#endif //@@
       }
    }
 // Test ability of smoothing RBFs to handle datasets with nearly (but not exactly!) non-distinct points:
@@ -68640,92 +69280,91 @@ static bool testrbfunit_basicxrbftest() {
    errtol = 0.20;
    lambdav = 0.0001;
    for (algoidx = 0; algoidx < testrbfunit_xrbfsmoothingalgocnt; algoidx++) {
-      for (nx = 1; nx <= 4; nx++) {
-         for (ny = 1; ny <= 2; ny++) {
-            n = 1 + hqrnduniformi(&rs, 20);
-            n = imax2(n, iround(pow(2.0, nx)) + 1);
-            testrbfunit_generatenearlyregulargrid(n, nx, ny, &rs, &xy, &meanseparation);
-            allocm(2 * n, nx + ny, &xy2);
-            for (i = 0; i < n; i++) {
-               delta = 0.00001 * pow(10.0, -4.0 * hqrnduniformr(&rs));
-               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i);
-               rcopyrr(nx + ny, &xy, i, &xy2, 2 * i + 1);
-               j = hqrnduniformi(&rs, nx);
-               xy2.xyR[2 * i + 1][j] += hqrndnormal(&rs) * delta;
-               v = hqrnduniformr(&rs) - 0.5;
-               for (j = 0; j < ny; j++) {
-                  xy2.xyR[2 * i][nx + j] -= v;
-                  xy2.xyR[2 * i + 1][nx + j] += v;
-               }
+      for (nx = 1; nx <= 5; nx++) {
+         ny = 1 + hqrnduniformi(&rs, 2);
+         n = 1 + hqrnduniformi(&rs, 20);
+         n = imax2(n, iround(pow(2.0, nx)) + 1);
+         testrbfunit_generatenearlyregulargrid(n, nx, ny, &rs, &xy, &meanseparation);
+         allocm(2 * n, nx + ny, &xy2);
+         for (i = 0; i < n; i++) {
+            delta = 0.00001 * pow(10.0, -4.0 * hqrnduniformr(&rs));
+            rcopyrr(nx + ny, &xy, i, &xy2, 2 * i);
+            rcopyrr(nx + ny, &xy, i, &xy2, 2 * i + 1);
+            j = hqrnduniformi(&rs, nx);
+            xy2.xyR[2 * i + 1][j] += hqrndnormal(&rs) * delta;
+            v = hqrnduniformr(&rs) - 0.5;
+            for (j = 0; j < ny; j++) {
+               xy2.xyR[2 * i][nx + j] -= v;
+               xy2.xyR[2 * i + 1][nx + j] += v;
             }
-            rbfcreate(nx, ny, &s);
-            testrbfunit_setxrbfalgorithmsmoothing(&s, algoidx, lambdav, meanseparation);
-            if (hqrndnormal(&rs) > 0.0) {
-               allocv(nx, &scalevec);
-               for (i = 0; i < nx; i++) {
-                  scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
-               }
-               rbfsetpointsandscales(&s, &xy2, 2 * n, &scalevec);
-            } else {
-               rsetallocv(nx, 1.0, &scalevec);
-               rbfsetpoints(&s, &xy2, 2 * n);
+         }
+         rbfcreate(nx, ny, &s);
+         testrbfunit_setxrbfalgorithmsmoothing(&s, algoidx, lambdav, meanseparation);
+         if (hqrndnormal(&rs) > 0.0) {
+            allocv(nx, &scalevec);
+            for (i = 0; i < nx; i++) {
+               scalevec.xR[i] = pow(2.0, 0.15 * hqrndnormal(&rs));
             }
-            rbfbuildmodel(&s, &rep);
-            if (rep.terminationtype <= 0) {
-               Ok = false;
+            rbfsetpointsandscales(&s, &xy2, 2 * n, &scalevec);
+         } else {
+            rsetallocv(nx, 1.0, &scalevec);
+            rbfsetpoints(&s, &xy2, 2 * n);
+         }
+         rbfbuildmodel(&s, &rep);
+         if (rep.terminationtype <= 0) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         for (i = 0; i < n; i++) {
+            allocv(nx, &x);
+            rcopyrv(nx, &xy2, 2 * i, &x);
+            rbfcalc(&s, &x, &y);
+            Ok = Ok && y.cnt == ny;
+            if (!Ok) {
                ae_frame_leave();
                return Ok;
             }
-            for (i = 0; i < n; i++) {
-               allocv(nx, &x);
-               rcopyrv(nx, &xy2, 2 * i, &x);
-               rbfcalc(&s, &x, &y);
-               Ok = Ok && y.cnt == ny;
-               if (!Ok) {
-                  ae_frame_leave();
-                  return Ok;
-               }
-               for (j = 0; j < ny; j++) {
-                  Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol);
-               }
-               rcopyrv(nx, &xy2, 2 * i + 1, &x);
-               rbfcalc(&s, &x, &y);
-               Ok = Ok && y.cnt == ny;
-               if (!Ok) {
-                  ae_frame_leave();
-                  return Ok;
-               }
-               for (j = 0; j < ny; j++) {
-                  Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol);
-               }
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol);
             }
-            refrms = 0.0;
-            refmax = 0.0;
-            for (i = 0; i < 2 * n; i++) {
-               allocv(nx, &x);
-               rcopyrv(nx, &xy2, i, &x);
-               rbfcalc(&s, &x, &y);
-               Ok = Ok && y.cnt == ny;
-               if (!Ok) {
-                  ae_frame_leave();
-                  return Ok;
-               }
-               for (j = 0; j < ny; j++) {
-                  refrms += sqr(y.xR[j] - xy2.xyR[i][nx + j]);
-                  refmax = rmax2(refmax, fabs(y.xR[j] - xy2.xyR[i][nx + j]));
-               }
+            rcopyrv(nx, &xy2, 2 * i + 1, &x);
+            rbfcalc(&s, &x, &y);
+            Ok = Ok && y.cnt == ny;
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
             }
-            refrms = sqrt(refrms / (2 * n * ny));
-            Ok = Ok && NearAtR(refrms, rep.rmserror, 0.00001);
-            Ok = Ok && NearAtR(refmax, rep.maxerror, 0.00001);
+            for (j = 0; j < ny; j++) {
+               Ok = Ok && NearAtR(y.xR[j], 0.5 * (xy2.xyR[2 * i][nx + j] + xy2.xyR[2 * i + 1][nx + j]), errtol);
+            }
          }
+         refrms = 0.0;
+         refmax = 0.0;
+         for (i = 0; i < 2 * n; i++) {
+            allocv(nx, &x);
+            rcopyrv(nx, &xy2, i, &x);
+            rbfcalc(&s, &x, &y);
+            Ok = Ok && y.cnt == ny;
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+            for (j = 0; j < ny; j++) {
+               refrms += sqr(y.xR[j] - xy2.xyR[i][nx + j]);
+               refmax = rmax2(refmax, fabs(y.xR[j] - xy2.xyR[i][nx + j]));
+            }
+         }
+         refrms = sqrt(refrms / (2 * n * ny));
+         Ok = Ok && NearAtR(refrms, rep.rmserror, 0.00001);
+         Ok = Ok && NearAtR(refmax, rep.maxerror, 0.00001);
       }
    }
 // Test ability to handle datasets consisting of several isolated "islands",
 // far away from each other
    errtol = 0.001;
    for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
-      for (nx = 1; nx <= 4; nx++) {
+      for (nx = 1; nx <= 5; nx++) {
          ny = 1;
          n = 50;
          testrbfunit_generategoodrandomgrid(n, nx, 1, &rs, &xy2, &meanseparation);
@@ -68818,7 +69457,7 @@ static bool testrbfunit_basicxrbftest() {
 // * directly access model term and check that corresponding entries are zero
    errtol = 0.001;
    for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
-      for (nx = 1; nx <= 4; nx++) {
+      for (nx = 1; nx <= 5; nx++) {
          for (ny = 1; ny <= 2; ny++) {
             for (termtype = 0; termtype <= 2; termtype++) {
                n = nx + 2 + hqrnduniformi(&rs, 10);
@@ -68890,26 +69529,11 @@ static bool testrbfunit_basicxrbftest() {
    }
 // Test rbfunpack()
    for (algoidx = 0; algoidx < testrbfunit_xrbfalgocnt; algoidx++) {
-      for (nx = 1; nx <= 4; nx++) {
+      for (nx = 1; nx <= 5; nx++) {
          for (ny = 1; ny <= 2; ny++) {
          // problem setup
             n = 150;
-            gridsize = iround(pow(n, 1.0 / nx)) + 1;
-            n = iround(pow(gridsize, nx));
-            meanseparation = 1.0 / gridsize;
-            ae_matrix_set_length(&xy, n, nx + ny);
-            ae_assert(gridsize > 1, "Assertion failed");
-            ae_assert(n == pow(gridsize, nx), "Assertion failed");
-            for (i = 0; i < n; i++) {
-               k = i;
-               for (j = 0; j < nx; j++) {
-                  xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
-                  k /= gridsize;
-               }
-               for (j = 0; j < ny; j++) {
-                  xy.xyR[i][nx + j] = hqrndnormal(&rs);
-               }
-            }
+            testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
             hasscale = hqrndnormal(&rs) > 0.0;
             if (hasscale) {
                ae_vector_set_length(&scalevec, nx);
@@ -69066,6 +69690,37 @@ static bool testrbfunit_basicxrbftest() {
          }
       }
    }
+// Test that SetV3TOL() indeed controls precision of the GMRES solver.
+   savgcounterinit(&avgratio, 1.0);
+   for (kk = 1; kk <= 20; kk++) {
+   // problem setup
+      algoidx = hqrnduniformi(&rs, testrbfunit_xrbfalgocnt);
+      n = 150;
+      errtol = pow(10.0, -2.0 - 4.0 * hqrnduniformr(&rs));
+      nx = 1 + hqrnduniformi(&rs, 2);
+      ny = 1 + hqrnduniformi(&rs, 2);
+      testrbfunit_generategoodrandomgrid(n, nx, ny, &rs, &xy, &meanseparation);
+   // Build model using debug profile
+      rbfcreate(nx, ny, &s);
+      testrbfunit_setxrbfalgorithmexact(&s, algoidx, meanseparation);
+      rbfsetpoints(&s, &xy, n);
+      rbfsetprofile(&s, -2);
+      rbfsetv3tol(&s, errtol);
+      rbfbuildmodel(&s, &rep);
+   // Test that the RMS error is not too far away from the desired value
+      if (rep.terminationtype <= 0) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      if (rep.rmserror > 10.0 * errtol) {
+         Ok = false;
+         ae_frame_leave();
+         return Ok;
+      }
+      savgcounterenqueue(&avgratio, rep.rmserror / errtol);
+   }
+   Ok = Ok && savgcounterget(&avgratio) >= 0.05;
 // Test that smooth 1D function is reproduced (between nodes)
 // with good precision. We test two model types: model with
 // three layers and moderate initial radius, and model with
@@ -71154,6 +71809,7 @@ static void testrbfunit_setalgorithm(rbfmodel *s, ae_int_t n, ae_int_t nx, ae_in
    }
    if (algoidx == 3) {
       rbfsetalgothinplatespline(s, randominteger(2) * pow(10.0, -6.0 * randomreal()));
+      rbfsetprofile(s, randominteger(2) - 1);
       *hashessianatnodes = false;
       return;
    }
@@ -71163,10 +71819,12 @@ static void testrbfunit_setalgorithm(rbfmodel *s, ae_int_t n, ae_int_t nx, ae_in
       } else {
          rbfsetalgomultiquadricauto(s, randominteger(2) * pow(10.0, -6.0 * randomreal()));
       }
+      rbfsetprofile(s, randominteger(2) - 1);
       return;
    }
    if (algoidx == 5) {
       rbfsetalgobiharmonic(s, randominteger(2) * pow(10.0, -6.0 * randomreal()));
+      rbfsetprofile(s, randominteger(2) - 1);
       *hasgradientatnodes = false;
       *hashessianatnodes = false;
       return;
@@ -71231,8 +71889,8 @@ static bool testrbfunit_gradtest() {
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
 // Generate good random grid, build model, check derivatives at random points and at grid nodes
-   stp = 0.000001;
-   stp2 = 0.000001;
+   stp = 0.000005;
+   stp2 = 0.000005;
    errtol = 0.005;
    errtol2 = 0.005;
    for (algoidx = 0; algoidx < testrbfunit_algorithmscnt; algoidx++) {

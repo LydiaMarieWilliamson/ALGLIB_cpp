@@ -8282,7 +8282,7 @@ int main() {
             spline2dbuildbilinearv(x, 2, y, 2, f, 1, s);
          // unpack and test
             spline2dunpackv(s, m, n, d, c);
-            Ok = Ok && doc_test_real_matrix(c, "[[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0 ]]", 0.00005);
+            Ok = Ok && doc_test_real_matrix(c, "[[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0, 1]]", 0.00005);
             Ok = Ok && Test == -1;
          } catch(ap_error) {
             Ok = Ok && Test != -1;

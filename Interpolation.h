@@ -717,6 +717,59 @@ void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 // === RBFV3FARFIELDS Package ===
 // Depends on: (AlgLibInternal) SCODES, TSORT
 namespace alglib_impl {
+struct biharmonicevaluator {
+   ae_int_t maxp;
+   ae_int_t precomputedcount;
+   ae_vector tdoublefactorial;
+   ae_vector tfactorial;
+   ae_vector tsqrtfactorial;
+   ae_vector tpowminus1;
+   ae_vector tpowi;
+   ae_vector tpowminusi;
+   ae_vector ynma;
+   ae_vector pnma;
+   ae_vector pnmb;
+   ae_vector pmmc;
+   ae_vector pmmcdiag;
+   ae_vector mnma;
+   ae_vector nnma;
+   ae_vector inma;
+};
+void biharmonicevaluator_init(void *_p, bool make_automatic);
+void biharmonicevaluator_copy(void *_dst, const void *_src, bool make_automatic);
+void biharmonicevaluator_free(void *_p, bool make_automatic);
+
+struct biharmonicpanel {
+   double c0;
+   double c1;
+   double c2;
+   double rmax;
+   double useatdistance;
+   ae_int_t ny;
+   ae_int_t p;
+   ae_int_t sizen;
+   ae_int_t sizem;
+   ae_int_t stride;
+   ae_int_t sizeinner;
+   ae_vector tbln;
+   ae_vector tblm;
+   ae_vector tblmodn;
+   ae_vector tblmodm;
+   ae_vector tblpowrmax;
+   ae_vector tblrmodmn;
+   double maxsumabs;
+   ae_vector funcsphericaly;
+   ae_vector tpowr;
+};
+void biharmonicpanel_init(void *_p, bool make_automatic);
+void biharmonicpanel_copy(void *_dst, const void *_src, bool make_automatic);
+void biharmonicpanel_free(void *_p, bool make_automatic);
+
+void biharmonicevaluatorinit(biharmonicevaluator *eval, ae_int_t maxp);
+void bhpanelinit(biharmonicpanel *panel, RMatrix *xw, ae_int_t xidx0, ae_int_t xidx1, ae_int_t ny, biharmonicevaluator *eval);
+void bhpanelsetprec(biharmonicpanel *panel, double tol);
+void bhpaneleval1(biharmonicpanel *panel, biharmonicevaluator *eval, double x0, double x1, double x2, double *f, bool neederrbnd, double *errbnd);
+void bhpaneleval(biharmonicpanel *panel, biharmonicevaluator *eval, double x0, double x1, double x2, RVector *f, bool neederrbnd, double *errbnd);
 } // end of namespace alglib_impl
 
 // === RBFV3 Package ===
@@ -727,17 +780,64 @@ namespace alglib_impl {
 namespace alglib_impl {
 struct rbf3evaluatorbuffer {
    ae_vector x;
+   ae_vector y;
    ae_vector coeffbuf;
    ae_vector funcbuf;
    ae_vector wrkbuf;
    ae_vector mindist2;
    ae_vector df1;
    ae_vector df2;
+   ae_vector x2;
+   ae_vector y2;
    ae_matrix deltabuf;
 };
 void rbf3evaluatorbuffer_init(void *_p, bool make_automatic);
 void rbf3evaluatorbuffer_copy(void *_dst, const void *_src, bool make_automatic);
 void rbf3evaluatorbuffer_free(void *_p, bool make_automatic);
+
+struct rbf3panel {
+   ae_int_t paneltype;
+   double clusterrad;
+   ae_vector clustercenter;
+   double c0;
+   double c1;
+   double c2;
+   double c3;
+   ae_int_t farfieldexpansion;
+   double farfielddistance;
+   ae_int_t idx0;
+   ae_int_t idx1;
+   ae_int_t childa;
+   ae_int_t childb;
+   ae_vector ptidx;
+   ae_matrix xt;
+   ae_matrix wt;
+   biharmonicpanel bhexpansion;
+   rbf3evaluatorbuffer tgtbuf;
+};
+void rbf3panel_init(void *_p, bool make_automatic);
+void rbf3panel_copy(void *_dst, const void *_src, bool make_automatic);
+void rbf3panel_free(void *_p, bool make_automatic);
+
+struct rbf3fastevaluator {
+   ae_int_t n;
+   ae_int_t nx;
+   ae_int_t ny;
+   ae_int_t maxpanelsize;
+   ae_int_t functype;
+   double funcparam;
+   ae_matrix permx;
+   ae_vector origptidx;
+   ae_matrix wstoredorig;
+   bool isloaded;
+   ae_obj_array panels;
+   biharmonicevaluator bheval;
+   ae_shared_pool bufferpool;
+   ae_matrix tmpx3w;
+};
+void rbf3fastevaluator_init(void *_p, bool make_automatic);
+void rbf3fastevaluator_copy(void *_dst, const void *_src, bool make_automatic);
+void rbf3fastevaluator_free(void *_p, bool make_automatic);
 
 struct rbf3evaluator {
    ae_int_t n;
@@ -762,6 +862,8 @@ struct rbfv3calcbuffer {
    rbf3evaluatorbuffer evalbuf;
    ae_vector x123;
    ae_vector y123;
+   ae_matrix x2d;
+   ae_matrix y2d;
    ae_vector xg;
    ae_vector yg;
 };
@@ -901,9 +1003,11 @@ struct rbfv3model {
    ae_vector pointindexes;
    ae_int_t nc;
    rbf3evaluator evaluator;
+   rbf3fastevaluator fasteval;
    ae_matrix wchunked;
    rbfv3calcbuffer calcbuf;
    bool dbgregqrusedforddm;
+   double dbgworstfirstdecay;
 };
 void rbfv3model_init(void *_p, bool make_automatic);
 void rbfv3model_copy(void *_dst, const void *_src, bool make_automatic);
@@ -924,8 +1028,11 @@ void rbfv3unserialize(ae_serializer *s, rbfv3model *model);
 
 void rbfv3create(ae_int_t nx, ae_int_t ny, ae_int_t bf, double bfp, rbfv3model *s);
 void rbfv3createcalcbuffer(rbfv3model *s, rbfv3calcbuffer *buf);
-void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, ae_int_t bftype, double bfparamraw, double lambdavraw, ae_int_t aterm, rbfv3model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv3report *rep);
+ae_int_t rbf3getmaxpanelsize();
+void rbfv3build(RMatrix *xraw, RMatrix *yraw, ae_int_t nraw, RVector *scaleraw, ae_int_t bftype, double bfparamraw, double lambdavraw, ae_int_t aterm, ae_int_t rbfprofile, double tol, rbfv3model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv3report *rep);
 void rbfv3tscalcbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y);
+void rbfv3tsfastcalcbuf(rbfv3model *s, rbfv3calcbuffer *buf, RVector *x, RVector *y);
+void rbf3pushfastevaltol(rbfv3model *s, double tol);
 void rbfv3calcbuf(rbfv3model *s, RVector *x, RVector *y);
 double rbfv3calc1(rbfv3model *s, double x0);
 double rbfv3calc2(rbfv3model *s, double x0, double x1);
@@ -941,12 +1048,15 @@ void rbfv3unpack(rbfv3model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 namespace alglib_impl {
 struct spline2dinterpolant {
    ae_int_t stype;
+   bool hasmissingcells;
    ae_int_t n;
    ae_int_t m;
    ae_int_t d;
    ae_vector x;
    ae_vector y;
    ae_vector f;
+   ae_vector ismissingnode;
+   ae_vector ismissingcell;
 };
 void spline2dinterpolant_init(void *_p, bool make_automatic);
 void spline2dinterpolant_copy(void *_dst, const void *_src, bool make_automatic);
@@ -1053,6 +1163,8 @@ void spline2dresamplebicubic(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, 
 void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, RMatrix *b, ae_int_t newheight, ae_int_t newwidth);
 void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, ae_int_t d, spline2dinterpolant *c);
 void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, ae_int_t d, spline2dinterpolant *c);
+void spline2dbuildbilinearmissing(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, BVector *missing, ae_int_t d, spline2dinterpolant *c);
+void spline2dbuildbicubicmissing(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, BVector *missing, ae_int_t d, spline2dinterpolant *c);
 void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int_t n, spline2dinterpolant *c);
 void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int_t n, spline2dinterpolant *c);
 void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay, double by);
@@ -1093,6 +1205,8 @@ void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc);
 void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth);
 void spline2dresamplebilinear(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth);
 void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c);
+void spline2dbuildbilinearmissing(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const boolean_1d_array &missing, const ae_int_t d, spline2dinterpolant &c);
+void spline2dbuildbicubicmissing(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const boolean_1d_array &missing, const ae_int_t d, spline2dinterpolant &c);
 void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c);
 void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c);
 void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c);
@@ -1289,17 +1403,20 @@ struct rbfmodel {
    ae_int_t nlayers;
    ae_int_t aterm;
    ae_int_t algorithmtype;
+   ae_int_t rbfprofile;
    ae_int_t bftype;
    double bfparam;
    double epsort;
    double epserr;
    ae_int_t maxits;
+   double v3tol;
    ae_int_t nnmaxits;
    ae_int_t n;
    ae_matrix x;
    ae_matrix y;
    bool hasscale;
    ae_vector s;
+   double fastevaltol;
    ae_int_t progress10000;
    bool terminationrequest;
 };
@@ -1341,7 +1458,9 @@ void rbfsetzeroterm(rbfmodel *s);
 void rbfsetv2bf(rbfmodel *s, ae_int_t bf);
 void rbfsetv2its(rbfmodel *s, ae_int_t maxits);
 void rbfsetv2supportr(rbfmodel *s, double r);
+void rbfsetv3tol(rbfmodel *s, double tol);
 void rbfsetcond(rbfmodel *s, double epsort, double epserr, ae_int_t maxits);
+void pushfastevaltol(rbfmodel *s, double tol);
 void rbfbuildmodel(rbfmodel *s, rbfreport *rep);
 double rbfcalc1(rbfmodel *s, double x0);
 double rbfcalc2(rbfmodel *s, double x0, double x1);
@@ -1358,6 +1477,8 @@ void rbfhess(rbfmodel *s, RVector *x, RVector *y, RVector *dy, RVector *d2y);
 void rbftscalcbuf(rbfmodel *s, rbfcalcbuffer *buf, RVector *x, RVector *y);
 void rbfcalcbuf(rbfmodel *s, RVector *x, RVector *y);
 void rbfcalc(rbfmodel *s, RVector *x, RVector *y);
+void rbfsetfastevaltol(rbfmodel *s, double tol);
+void rbffastcalc(rbfmodel *s, RVector *x, RVector *y);
 void rbfgridcalc2vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, BVector *flagy, bool sparsey, RVector *y);
 void rbfgridcalc2v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *y);
 void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, BVector *flagy, RVector *y);
@@ -1369,6 +1490,7 @@ void rbfunpack(rbfmodel *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *
 ae_int_t rbfgetmodelversion(rbfmodel *s);
 double rbfpeekprogress(rbfmodel *s);
 void rbfrequesttermination(rbfmodel *s);
+void rbfsetprofile(rbfmodel *s, ae_int_t p);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1405,6 +1527,7 @@ void rbfsetzeroterm(const rbfmodel &s);
 void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf);
 void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits);
 void rbfsetv2supportr(const rbfmodel &s, const double r);
+void rbfsetv3tol(const rbfmodel &s, const double tol);
 void rbfbuildmodel(const rbfmodel &s, rbfreport &rep);
 double rbfcalc1(const rbfmodel &s, const double x0);
 double rbfcalc2(const rbfmodel &s, const double x0, const double x1);
@@ -1421,6 +1544,8 @@ void rbfhess(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, real_1
 void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y);
 void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
 void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
+void rbfsetfastevaltol(const rbfmodel &s, const double tol);
+void rbffastcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
 void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_1d_array &y);
 void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const boolean_1d_array &flagy, real_1d_array &y);
 void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y);

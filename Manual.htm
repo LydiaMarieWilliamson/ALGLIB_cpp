@@ -19670,6 +19670,7 @@ ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 <a href=#sub_rbfdiff2 class=toc>rbfdiff2</a> |
 <a href=#sub_rbfdiff3 class=toc>rbfdiff3</a> |
 <a href=#sub_rbfdiffbuf class=toc>rbfdiffbuf</a> |
+<a href=#sub_rbffastcalc class=toc>rbffastcalc</a> |
 <a href=#sub_rbfgetmodelversion class=toc>rbfgetmodelversion</a> |
 <a href=#sub_rbfgridcalc2 class=toc>rbfgridcalc2</a> |
 <a href=#sub_rbfgridcalc2v class=toc>rbfgridcalc2v</a> |
@@ -19689,12 +19690,14 @@ ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 <a href=#sub_rbfsetalgoqnn class=toc>rbfsetalgoqnn</a> |
 <a href=#sub_rbfsetalgothinplatespline class=toc>rbfsetalgothinplatespline</a> |
 <a href=#sub_rbfsetconstterm class=toc>rbfsetconstterm</a> |
+<a href=#sub_rbfsetfastevaltol class=toc>rbfsetfastevaltol</a> |
 <a href=#sub_rbfsetlinterm class=toc>rbfsetlinterm</a> |
 <a href=#sub_rbfsetpoints class=toc>rbfsetpoints</a> |
 <a href=#sub_rbfsetpointsandscales class=toc>rbfsetpointsandscales</a> |
 <a href=#sub_rbfsetv2bf class=toc>rbfsetv2bf</a> |
 <a href=#sub_rbfsetv2its class=toc>rbfsetv2its</a> |
 <a href=#sub_rbfsetv2supportr class=toc>rbfsetv2supportr</a> |
+<a href=#sub_rbfsetv3tol class=toc>rbfsetv3tol</a> |
 <a href=#sub_rbfsetzeroterm class=toc>rbfsetzeroterm</a> |
 <a href=#sub_rbftscalcbuf class=toc>rbftscalcbuf</a> |
 <a href=#sub_rbftsdiffbuf class=toc>rbftsdiffbuf</a> |
@@ -20304,6 +20307,44 @@ ALGLIB: Copyright 13.12.2021 by Sergey Bochkanov
 <pre class=declaration>
 <b>void</b> rbfdiffbuf(rbfmodel s, real_1d_array x, real_1d_array &amp;y, real_1d_array &amp;dy);
 </pre>
+<a name=sub_rbffastcalc></a><h6 class=pageheader>rbffastcalc Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function calculates values of the RBF model at the given point  using
+a fast approximate algorithm whenever possible. If no  fast  algorithm  is
+available for a given model type, traditional O(N) approach is used.
+
+Presently, fast evaluation is implemented only for biharmonic splines.
+
+The absolute approximation accuracy is controlled by the rbfsetfastevaltol()
+function.
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. It uses fields of  rbfmodel  as
+           temporary arrays, i.e. it is  impossible  to  perform  parallel
+           evaluation on the same rbfmodel object (parallel calls of  this
+           function for independent rbfmodel objects are safe).
+           If you want to perform parallel model evaluation  from multiple
+           threads, use rbftscalcbuf() with a per-thread buffer object.
+
+This function returns 0.0 when model is not initialized.
+
+Inputs:
+    S       -   RBF model
+    X       -   coordinates, array[NX].
+                X may have more than NX elements, in this case only
+                leading NX will be used.
+
+Outputs:
+    Y       -   function value, array[NY]. Y is out-parameter and
+                reallocated after call to this function. In case you  want
+                to reuse previously allocated Y, you may use RBFCalcBuf(),
+                which reallocates Y only when it is too small.
+ALGLIB: Copyright 19.09.2022 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbffastcalc(rbfmodel s, real_1d_array x, real_1d_array &amp;y);
+</pre>
 <a name=sub_rbfgetmodelversion></a><h6 class=pageheader>rbfgetmodelversion Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -20800,9 +20841,11 @@ This algorithm has following important features:
 * no tunable parameters
 * C0 continuous RBF model (the model has discontinuous derivatives at  the
   interpolation nodes)
-* fast  model construction algorithm with O(N) memory and  O(N^2)  running
+* fast model construction algorithm with O(N) memory and O(N*logN) running
   time requirements. Hundreds of thousands of points can be  handled  with
   this algorithm.
+* accelerated evaluation using far field expansions  (aka  fast multipoles
+  method) is supported. See rbffastcalc() for more information.
 * controllable smoothing via optional nonlinearity penalty
 
 Inputs:
@@ -21166,6 +21209,58 @@ ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 <b>void</b> rbfsetconstterm(rbfmodel s);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_rbf_d_polterm class=nav>rbf_d_polterm</a> ]</p>
+<a name=sub_rbfsetfastevaltol></a><h6 class=pageheader>rbfsetfastevaltol Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets absolute accuracy of a  fast evaluation  algorithm used
+by rbffastcalc() and other fast evaluation functions.
+
+A fast evaluation algorithm is model-dependent and is available  only  for
+some RBF models. Usually it utilizes far field expansions (a generalization
+of the fast multipoles  method).  If  no  approximate  fast  evaluator  is
+available for the  current RBF model type, this function has no effect.
+
+NOTE: this function can be called before or after the model was built. The
+      result will be the same.
+
+NOTE: this  function  has  O(N) running time, where N is a  points  count.
+      Most fast evaluators work by aggregating influence of  point groups,
+      i.e. by computing so called far field. Changing evaluator  tolerance
+      means that far field radii have to  be  recomputed  for  each  point
+      cluster, and we have O(N) such clusters.
+
+      This function is still very fast, but  it  should  not be called too
+      often, e.g. every time you call rbffastcalc() in a loop.
+
+NOTE: the tolerance  set  by this function is an accuracy of an  evaluator
+      which computes the value of the model. It is  NOT  accuracy  of  the
+      model itself.
+
+      E.g., if you set evaluation accuracy to 1E-12, the model value  will
+      be computed with required precision. However, the model itself is an
+      approximation of the target (the default requirement is to fit model
+      with ~6 digits of precision) and THIS accuracy can  not  be  changed
+      after the model was built.
+
+IMPORTANT: THIS FUNCTION IS THREAD-UNSAFE. Calling it while another thread
+           tries to use rbffastcalc() is unsafe because it means that  the
+           accuracy requirements will change in the middle of computations.
+           The algorithm may behave unpredictably.
+
+Inputs:
+    S       -   RBF model
+    TOL     -   TOL &gt; 0, desired evaluation tolerance:
+                * should be somewhere between 1E-3 and 1E-6
+                * values outside of this range will cause no problems (the
+                  evaluator will do the job anyway). However,  too  strict
+                  precision requirements may mean  that  no  approximation
+                  speed-up will be achieved.
+ALGLIB: Copyright 19.09.2022 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfsetfastevaltol(rbfmodel s, <b>double</b> tol);
+</pre>
 <a name=sub_rbfsetlinterm></a><h6 class=pageheader>rbfsetlinterm Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -21349,6 +21444,36 @@ ALGLIB: Copyright 01.02.2017 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> rbfsetv2supportr(rbfmodel s, <b>double</b> r);
+</pre>
+<a name=sub_rbfsetv3tol></a><h6 class=pageheader>rbfsetv3tol Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets desired accuracy for a version 3 RBF model.
+
+As of ALGLIB 3.20.0, version 3 models include biharmonic RBFs, thin  plate
+splines, multiquadrics.
+
+Version 3 models are fit  with  specialized  domain  decomposition  method
+which splits problem into smaller  chunks.  Models  with  size  less  than
+the DDM chunk size are computed nearly exactly in one step. Larger  models
+are built with an iterative linear solver. This function controls accuracy
+of the solver.
+
+Inputs:
+    S       -   RBF model, initialized by RBFCreate() call
+    TOL     -   desired precision:
+                * must be non-negative
+                * should be somewhere between 0.001 and 0.000001
+                * values higher than 0.001 make little sense   -  you  may
+                  lose a lot of precision with no performance gains.
+                * values below 1E-6 usually require too much time to converge,
+                  so they are silenly replaced by a 1E-6 cutoff value. Thus,
+                  zero can be used to denote 'maximum precision'.
+ALGLIB: Copyright 01.10.2022 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> rbfsetv3tol(rbfmodel s, <b>double</b> tol);
 </pre>
 <a name=sub_rbfsetzeroterm></a><h6 class=pageheader>rbfsetzeroterm Function</h6>
 <hr width=600 align=left>
@@ -22871,8 +22996,10 @@ using namespace alglib;
 ]</font>
 <h5>Functions</h5><font size=2>[
 <a href=#sub_spline2dbuildbicubic class=toc>spline2dbuildbicubic</a> |
+<a href=#sub_spline2dbuildbicubicmissing class=toc>spline2dbuildbicubicmissing</a> |
 <a href=#sub_spline2dbuildbicubicv class=toc>spline2dbuildbicubicv</a> |
 <a href=#sub_spline2dbuildbilinear class=toc>spline2dbuildbilinear</a> |
+<a href=#sub_spline2dbuildbilinearmissing class=toc>spline2dbuildbilinearmissing</a> |
 <a href=#sub_spline2dbuildbilinearv class=toc>spline2dbuildbilinearv</a> |
 <a href=#sub_spline2dbuildercreate class=toc>spline2dbuildercreate</a> |
 <a href=#sub_spline2dbuildersetalgoblocklls class=toc>spline2dbuildersetalgoblocklls</a> |
@@ -22964,6 +23091,49 @@ ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 <pre class=declaration>
 <b>void</b> spline2dbuildbicubic(real_1d_array x, real_1d_array y, real_2d_array f, ae_int_t m, ae_int_t n, spline2dinterpolant &amp;c);
 </pre>
+<a name=sub_spline2dbuildbicubicmissing></a><h6 class=pageheader>spline2dbuildbicubicmissing Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This  subroutine builds bicubic vector-valued  spline,  with  some  spline
+cells being missing due to missing nodes.
+
+When the node (i,j) is missing, it means that: a) we don't  have  function
+value at this point (elements of F[] are ignored), and  b)  we  don't need
+spline value at cells adjacent to the node (i,j), i.e. up to 4 spline cells
+will be dropped. An attempt to compute spline value at  the  missing  cell
+will return NAN.
+
+It is important to  understand  that  this  subroutine  does  NOT  support
+interpolation on scattered grids. It allows us to drop some nodes, but  at
+the cost of making a &quot;hole in the spline&quot; around this point. If  you  want
+function  that   can   &quot;fill  the  gap&quot;,  use  RBF  or  another  scattered
+interpolation method.
+
+The  intended  usage  for  this  subroutine  are  regularly  sampled,  but
+non-rectangular datasets.
+
+Inputs:
+    X   -   spline abscissas, array[0..N-1]
+    Y   -   spline ordinates, array[0..M-1]
+    F   -   function values, array[0..M*N*D-1]:
+            * first D elements store D values at (X[0],Y[0])
+            * next D elements store D values at (X[1],Y[0])
+            * general form - D function values at (X[i],Y[j]) are stored
+              at F[D*(J*N+I)...D*(J*N+I)+D-1].
+            * missing values are ignored
+    Missing array[M*N], Missing[J*N+I] == True means that corresponding entries
+            of F[] are missing nodes.
+    M,N -   grid size, M &ge; 2, N &ge; 2
+    D   -   vector dimension, D &ge; 1
+
+Outputs:
+    C   -   spline interpolant
+ALGLIB Project: Copyright 27.06.2022 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> spline2dbuildbicubicmissing(real_1d_array x, ae_int_t n, real_1d_array y, ae_int_t m, real_1d_array f, boolean_1d_array missing, ae_int_t d, spline2dinterpolant &amp;c);
+</pre>
 <a name=sub_spline2dbuildbicubicv></a><h6 class=pageheader>spline2dbuildbicubicv Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -23001,6 +23171,49 @@ ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> spline2dbuildbilinear(real_1d_array x, real_1d_array y, real_2d_array f, ae_int_t m, ae_int_t n, spline2dinterpolant &amp;c);
+</pre>
+<a name=sub_spline2dbuildbilinearmissing></a><h6 class=pageheader>spline2dbuildbilinearmissing Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This subroutine builds bilinear vector-valued  spline,  with  some  spline
+cells being missing due to missing nodes.
+
+When the node (i,j) is missing, it means that: a) we don't  have  function
+value at this point (elements of F[] are ignored), and  b)  we  don't need
+spline value at cells adjacent to the node (i,j), i.e. up to 4 spline cells
+will be dropped. An attempt to compute spline value at  the  missing  cell
+will return NAN.
+
+It is important to  understand  that  this  subroutine  does  NOT  support
+interpolation on scattered grids. It allows us to drop some nodes, but  at
+the cost of making a &quot;hole in the spline&quot; around this point. If  you  want
+function  that   can   &quot;fill  the  gap&quot;,  use  RBF  or  another  scattered
+interpolation method.
+
+The  intended  usage  for  this  subroutine  are  regularly  sampled,  but
+non-rectangular datasets.
+
+Inputs:
+    X   -   spline abscissas, array[0..N-1]
+    Y   -   spline ordinates, array[0..M-1]
+    F   -   function values, array[0..M*N*D-1]:
+            * first D elements store D values at (X[0],Y[0])
+            * next D elements store D values at (X[1],Y[0])
+            * general form - D function values at (X[i],Y[j]) are stored
+              at F[D*(J*N+I)...D*(J*N+I)+D-1].
+            * missing values are ignored
+    Missing array[M*N], Missing[J*N+I] == True means that corresponding entries
+            of F[] are missing nodes.
+    M,N -   grid size, M &ge; 2, N &ge; 2
+    D   -   vector dimension, D &ge; 1
+
+Outputs:
+    C   -   spline interpolant
+ALGLIB Project: Copyright 27.06.2022 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> spline2dbuildbilinearmissing(real_1d_array x, ae_int_t n, real_1d_array y, ae_int_t m, real_1d_array f, boolean_1d_array missing, ae_int_t d, spline2dinterpolant &amp;c);
 </pre>
 <a name=sub_spline2dbuildbilinearv></a><h6 class=pageheader>spline2dbuildbilinearv Function</h6>
 <hr width=600 align=left>
@@ -23656,7 +23869,7 @@ Result:
     M, N-   grid size (x-axis and y-axis)
     D   -   number of components
     Tbl -   coefficients table, unpacked format,
-            D - components: [0..(N-1)*(M-1)*D-1, 0..19].
+            D - components: [0..(N-1)*(M-1)*D-1, 0..20].
             For T = 0..D-1 (component index), I = 0...N-2 (x index),
             J = 0..M-2 (y index):
                 K = T + I*D + J*D*(N-1)
@@ -23676,6 +23889,8 @@ Result:
                 Tbl[K,9] = C11
                 ...
                 Tbl[K,19] = C33
+                Tbl[K,20] = 1 if the cell is present, 0 if the cell is missing.
+                            In the latter case Tbl[4..19] are exactly zero.
             On each grid square spline is equals to:
                 S(x) = SUM(c[i,j]*(t^i)*(u^j), i = 0..3, j = 0..3)
                 t = x-x[j]
@@ -23879,7 +24094,7 @@ using namespace alglib;
    spline2dbuildbilinearv(x, 2, y, 2, f, 1, s);
 <font color=navy>// unpack and test</font>
    spline2dunpackv(s, m, n, d, c);
-   printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(4).c_str()); <font color=navy>// EXPECTED: [[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0 ]]</font>
+   printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(4).c_str()); <font color=navy>// EXPECTED: [[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0, 1]]</font>
    <b>return</b> 0;
 }
 </pre>
