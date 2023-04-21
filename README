@@ -54,4 +54,4 @@ and further nativization into C++, are all pending.
 ALGLIB++ undergoes a process of automated upgrade/reengineering/refactoring/testing.
 It does not use version numbers but, instead, is marked by the timestamp of the most recent test.
 The latest updates of the testing and development sequence are listed in section A6 of the ALGLIB++ Supplementary Sections (Notes.htm).
-The timestamp of the current revision is 1681937187 (64405323).
+The timestamp of the current revision is 1682091340 (6442ad4c).

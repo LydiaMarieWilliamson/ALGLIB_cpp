@@ -51,6 +51,8 @@ struct optguardnonc0report {
    ae_int_t cnt;
    ae_int_t stpidxa;
    ae_int_t stpidxb;
+   ae_int_t inneriter;
+   ae_int_t outeriter;
 };
 void optguardnonc0report_init(void *_p, bool make_automatic);
 void optguardnonc0report_copy(void *_dst, const void *_src, bool make_automatic);
@@ -67,6 +69,8 @@ struct optguardnonc1test0report {
    ae_int_t cnt;
    ae_int_t stpidxa;
    ae_int_t stpidxb;
+   ae_int_t inneriter;
+   ae_int_t outeriter;
 };
 void optguardnonc1test0report_init(void *_p, bool make_automatic);
 void optguardnonc1test0report_copy(void *_dst, const void *_src, bool make_automatic);
@@ -84,6 +88,8 @@ struct optguardnonc1test1report {
    ae_int_t cnt;
    ae_int_t stpidxa;
    ae_int_t stpidxb;
+   ae_int_t inneriter;
+   ae_int_t outeriter;
 };
 void optguardnonc1test1report_init(void *_p, bool make_automatic);
 void optguardnonc1test1report_copy(void *_dst, const void *_src, bool make_automatic);
@@ -98,9 +104,9 @@ bool optguardallclear(optguardreport *rep);
 
 namespace alglib {
 DecClass(optguardreport, bool &nonc0suspected; bool &nonc0test0positive; ae_int_t &nonc0fidx; double &nonc0lipschitzc; bool &nonc1suspected; bool &nonc1test0positive; bool &nonc1test1positive; ae_int_t &nonc1fidx; double &nonc1lipschitzc; bool &badgradsuspected; ae_int_t &badgradfidx; ae_int_t &badgradvidx; real_1d_array badgradxbase; real_2d_array badgraduser; real_2d_array badgradnum;);
-DecClass(optguardnonc0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
-DecClass(optguardnonc1test0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
-DecClass(optguardnonc1test1report, bool &positive; ae_int_t &fidx; ae_int_t &vidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array g; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
+DecClass(optguardnonc0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb; ae_int_t &inneriter; ae_int_t &outeriter;);
+DecClass(optguardnonc1test0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb; ae_int_t &inneriter; ae_int_t &outeriter;);
+DecClass(optguardnonc1test1report, bool &positive; ae_int_t &fidx; ae_int_t &vidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array g; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb; ae_int_t &inneriter; ae_int_t &outeriter;);
 } // end of namespace alglib
 
 // === OPTSERV Package ===
@@ -134,6 +140,49 @@ void precbuflowrank_init(void *_p, bool make_automatic);
 void precbuflowrank_copy(void *_dst, const void *_src, bool make_automatic);
 void precbuflowrank_free(void *_p, bool make_automatic);
 
+struct xbfgshessian {
+   ae_int_t htype;
+   ae_int_t n;
+   ae_int_t resetfreq;
+   double stpshort;
+   double gammasml;
+   double reg;
+   double smallreg;
+   double microreg;
+   ae_int_t m;
+   ae_matrix hcurrent;
+   ae_int_t hage;
+   double sumy2;
+   double sums2;
+   double sumsy;
+   ae_int_t memlen;
+   double sigma;
+   double gamma;
+   ae_matrix s;
+   ae_matrix y;
+   bool lowrankmodelvalid;
+   ae_int_t lowrankk;
+   ae_matrix lowrankcp;
+   ae_matrix lowrankcm;
+   bool lowrankeffdvalid;
+   ae_vector lowrankeffd;
+   ae_matrix lowranksst;
+   ae_matrix lowranksyt;
+   ae_int_t updatestatus;
+   ae_matrix hincoming;
+   ae_vector sk;
+   ae_vector yk;
+   ae_vector hsk;
+   ae_vector buf;
+   ae_matrix corr2;
+   ae_matrix blk;
+   ae_matrix jk;
+   ae_matrix invsqrtdlk;
+};
+void xbfgshessian_init(void *_p, bool make_automatic);
+void xbfgshessian_copy(void *_dst, const void *_src, bool make_automatic);
+void xbfgshessian_free(void *_p, bool make_automatic);
+
 struct smoothnessmonitor {
    ae_int_t n;
    ae_int_t k;
@@ -148,18 +197,26 @@ struct smoothnessmonitor {
    ae_vector sortedstp;
    ae_vector sortedidx;
    ae_int_t sortedcnt;
-   double probingstp;
-   ae_vector probingf;
-   ae_int_t probingnvalues;
-   double probingstepmax;
-   double probingstepscale;
-   ae_int_t probingnstepsstored;
-   ae_vector probingsteps;
-   ae_matrix probingvalues;
-   ae_matrix probingslopes;
+   ae_int_t lagprobinneriter;
+   ae_int_t lagprobouteriter;
+   double lagprobstepmax;
+   ae_int_t lagprobnstepsstored;
+   ae_vector lagprobxs;
+   ae_vector lagprobd;
+   double lagprobstp;
+   ae_vector lagprobx;
+   ae_vector lagprobfi;
+   double lagprobrawlag;
+   ae_matrix lagprobj;
+   ae_matrix lagprobvalues;
+   ae_matrix lagprobjacobians;
+   ae_vector lagprobsteps;
+   ae_vector lagproblagrangians;
    ae_int_t ProbePQ;
    bool linesearchspoiled;
    bool linesearchstarted;
+   ae_int_t linesearchinneridx;
+   ae_int_t linesearchouteridx;
    double nonc0currentrating;
    double nonc1currentrating;
    bool badgradhasxj;
@@ -227,14 +284,20 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
 void applylowrankpreconditioner(RVector *s, precbuflowrank *buf);
 void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, ae_int_t k, bool checksmoothness);
 void smoothnessmonitorfinalizelinesearch(smoothnessmonitor *monitor);
-void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RVector *fi, RMatrix *jac);
-void smoothnessmonitorstartlinesearch1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *x, double f0, RVector *j0);
+void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RVector *fi, RMatrix *jac, ae_int_t inneriter, ae_int_t outeriter);
+void smoothnessmonitorstartlinesearch1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *x, double f0, RVector *j0, ae_int_t inneriter, ae_int_t outeriter);
 void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, double stp, RVector *x, RVector *fi, RMatrix *jac);
 void smoothnessmonitorenqueuepoint1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *d, double stp, RVector *x, double f0, RVector *j0);
-void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae_int_t nvalues, double stepscale);
-bool smoothnessmonitorprobe(smoothnessmonitor *monitor);
+void smoothnessmonitorstartlagrangianprobing(smoothnessmonitor *monitor, RVector *x, RVector *d, double stpmax, ae_int_t inneriter, ae_int_t outeriter);
+bool smoothnessmonitorprobelagrangian(smoothnessmonitor *monitor);
 void smoothnessmonitorexportreport(smoothnessmonitor *monitor, optguardreport *rep);
 bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *unscaledx0, RVector *s, RVector *bndl, RVector *bndu, bool hasboxconstraints, double teststep);
+void hessianinitbfgs(xbfgshessian *hess, ae_int_t n, ae_int_t resetfreq, double stpshort);
+void hessianinitlowrank(xbfgshessian *hess, ae_int_t n, ae_int_t m, double stpshort);
+void hessianupdate(xbfgshessian *hess, RVector *x0, RVector *g0, RVector *x1, RVector *g1);
+void hessiangetdiagonal(xbfgshessian *hess, RVector *d);
+void hessiangetmatrix(xbfgshessian *hess, bool isupper, RMatrix *h);
+void hessianmv(xbfgshessian *hess, RVector *x, RVector *hx);
 } // end of namespace alglib_impl
 
 // === MINLBFGS Package ===
@@ -446,11 +509,11 @@ void scaleshiftbcinplace(RVector *s, RVector *xorigin, RVector *bndl, RVector *b
 void scaleshiftdensebrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, RMatrix *densea, RVector *ab, RVector *ar, ae_int_t m);
 void scaleshiftmixedbrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, sparsematrix *sparsea, ae_int_t msparse, RMatrix *densea, ae_int_t mdense, RVector *ab, RVector *ar);
 void scaledenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RVector *denseb, ae_int_t ntotal, RVector *s);
-void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RVector *denseb);
+void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RMatrix *densecorrc, RVector *densecorrd, ae_int_t corrrank, RVector *denseb);
 void normalizedensebrlcinplace(RMatrix *densea, RVector *ab, RVector *ar, ae_int_t n, ae_int_t m, RVector *rownorms, bool neednorms);
 void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix *densea, ae_int_t mdense, RVector *ab, RVector *ar, ae_int_t n, bool limitedamplification, RVector *rownorms, bool neednorms);
 double normalizedenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RVector *denseb, ae_int_t ntotal);
-double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector *denseb, ae_int_t n);
+double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RMatrix *densecorrc, RVector *densecorrd, ae_int_t corrrank, RVector *denseb, ae_int_t n);
 void unscaleunshiftpointbc(RVector *s, RVector *xorigin, RVector *rawbndl, RVector *rawbndu, RVector *sclsftbndl, RVector *sclsftbndu, BVector *hasbndl, BVector *hasbndu, RVector *x, ae_int_t n);
 } // end of namespace alglib_impl
 
@@ -959,6 +1022,11 @@ struct vipmreducedsparsesystem {
    ae_int_t ntotal;
    spcholanalysis analysis;
    ae_vector priorities;
+   ae_vector diagterm;
+   ae_vector dampterm;
+   ae_vector tmpb;
+   ae_vector tmprhs;
+   ae_vector tmpcorr;
 };
 void vipmreducedsparsesystem_init(void *_p, bool make_automatic);
 void vipmreducedsparsesystem_copy(void *_dst, const void *_src, bool make_automatic);
@@ -1055,6 +1123,7 @@ struct vipmstate {
    ae_vector factinvregdzrz;
    ae_vector factregewave;
    ae_vector facttmpdiag;
+   ae_vector facttmpdamp;
    vipmreducedsparsesystem reducedsparsesystem;
    vipmrighthandside rhs;
    ae_vector rhsalphacap;
@@ -1137,6 +1206,7 @@ struct minqpstate {
    ae_vector elaglc;
    ae_vector elagmlt;
    ae_vector elagidx;
+   ae_vector dummyr;
    ae_matrix dummyr2;
    sparsematrix dummysparse;
    ae_matrix tmpr2;
@@ -1598,14 +1668,13 @@ struct minsqpsubsolver {
    sparsematrix sparserawlc;
    sparsematrix sparseefflc;
    ae_vector d0;
-   ae_matrix h;
+   ae_matrix denseh;
+   ae_vector dummy1;
    ae_matrix densedummy;
    sparsematrix sparsedummy;
    ae_vector tmp0;
    ae_vector tmp1;
    ae_vector tmp2;
-   ae_vector sk;
-   ae_vector yk;
    ae_vector hasbndl;
    ae_vector hasbndu;
    ae_vector hasal;
@@ -1641,7 +1710,8 @@ struct minsqpmeritphasestate {
    ae_int_t nlec;
    ae_int_t nlic;
    ae_vector d;
-   ae_vector dx;
+   ae_vector d0;
+   ae_vector d1;
    ae_vector stepkx;
    ae_vector stepkxc;
    ae_vector stepkxn;
@@ -1660,6 +1730,7 @@ struct minsqpmeritphasestate {
    ae_vector stepknlaggrad;
    ae_int_t status;
    bool increasebigc;
+   ae_vector tmphdiag;
    ae_int_t PQ;
 };
 void minsqpmeritphasestate_init(void *_p, bool make_automatic);
@@ -1681,6 +1752,7 @@ struct minsqpstate {
    ae_vector scaledbndu;
    double epsx;
    ae_int_t maxits;
+   ae_int_t bfgsresetfreq;
    ae_vector x;
    ae_vector fi;
    ae_matrix j;
@@ -1706,6 +1778,7 @@ struct minsqpstate {
    ae_matrix abslagmemory;
    ae_vector fscales;
    minsqpsubsolver subsolver;
+   xbfgshessian hess;
    minsqptmpmerit tmpmerit;
    ae_int_t repsimplexiterations;
    ae_int_t repsimplexiterations1;
@@ -1732,28 +1805,82 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
 // === LPQPPRESOLVE Package ===
 // Depends on: (LinAlg) SPARSE
 namespace alglib_impl {
+struct dynamiccrs {
+   ae_int_t m;
+   ae_int_t n;
+   ae_vector rowbegin;
+   ae_vector rowend;
+   ae_vector idx;
+   ae_vector vals;
+};
+void dynamiccrs_init(void *_p, bool make_automatic);
+void dynamiccrs_copy(void *_dst, const void *_src, bool make_automatic);
+void dynamiccrs_free(void *_p, bool make_automatic);
+
+struct presolvebuffers {
+   niset setn;
+   niset setm;
+};
+void presolvebuffers_init(void *_p, bool make_automatic);
+void presolvebuffers_copy(void *_dst, const void *_src, bool make_automatic);
+void presolvebuffers_free(void *_p, bool make_automatic);
+
+struct presolverstack {
+   ae_int_t n;
+   ae_int_t m;
+   ae_int_t ntrf;
+   ae_vector trftype;
+   ae_vector idata;
+   ae_vector rdata;
+   ae_vector idataridx;
+   ae_vector rdataridx;
+   ae_int_t sourceidx;
+   ae_int_t isrc;
+   ae_int_t rsrc;
+   ae_vector sparseidx0;
+   ae_vector sparseval0;
+};
+void presolverstack_init(void *_p, bool make_automatic);
+void presolverstack_copy(void *_dst, const void *_src, bool make_automatic);
+void presolverstack_free(void *_p, bool make_automatic);
+
 struct presolveinfo {
    ae_int_t newn;
    ae_int_t oldn;
    ae_int_t newm;
    ae_int_t oldm;
+   ae_vector rawc;
    ae_vector rawbndl;
    ae_vector rawbndu;
-   ae_vector colscales;
-   ae_vector rowscales;
-   double costscale;
+   sparsematrix rawa;
+   ae_int_t problemstatus;
+   ae_vector lagrangefromresidual;
    ae_vector c;
    ae_vector bndl;
    ae_vector bndu;
    sparsematrix sparsea;
    ae_vector al;
    ae_vector au;
+   ae_vector packxperm;
+   ae_vector packyperm;
+   ae_vector packstatperm;
+   ae_vector unpackxperm;
+   ae_vector unpackyperm;
+   ae_vector unpackstatperm;
+   presolverstack trfstack;
+   ae_vector s1;
+   ae_vector bc1;
+   ae_vector x1;
+   ae_vector y1;
+   ae_vector d;
+   presolvebuffers buf;
 };
 void presolveinfo_init(void *_p, bool make_automatic);
 void presolveinfo_copy(void *_dst, const void *_src, bool make_automatic);
 void presolveinfo_free(void *_p, bool make_automatic);
 
 void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, sparsematrix *sparsea, RVector *al, RVector *au, ae_int_t k, presolveinfo *info);
+void presolvelp(RVector *raws, RVector *rawc, RVector *rawbndl, RVector *rawbndu, ae_int_t n, sparsematrix *rawsparsea, RVector *rawal, RVector *rawau, ae_int_t m, presolveinfo *presolved);
 void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc, RVector *laglc);
 } // end of namespace alglib_impl
 
@@ -2038,8 +2165,7 @@ struct minslpsubsolver {
    ae_vector curau;
    sparsematrix sparserawlc;
    sparsematrix sparseefflc;
-   ae_int_t hessiantype;
-   ae_matrix h;
+   xbfgshessian hess;
    ae_matrix curhd;
    ae_matrix densedummy;
    sparsematrix sparsedummy;
@@ -2130,7 +2256,6 @@ struct minslpstate {
    ae_vector scaledbndu;
    double epsx;
    ae_int_t maxits;
-   ae_int_t hessiantype;
    ae_vector x;
    ae_vector fi;
    ae_matrix j;

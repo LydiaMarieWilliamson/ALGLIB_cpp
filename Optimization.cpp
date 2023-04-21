@@ -103,6 +103,8 @@ void smoothnessmonitorexportc1test0report(optguardnonc1test0report *srcrep, RVec
    if (srcrep->positive) {
       dstrep->stpidxa = srcrep->stpidxa;
       dstrep->stpidxb = srcrep->stpidxb;
+      dstrep->inneriter = srcrep->inneriter;
+      dstrep->outeriter = srcrep->outeriter;
       dstrep->fidx = srcrep->fidx;
       dstrep->cnt = srcrep->cnt;
       dstrep->n = srcrep->n;
@@ -121,6 +123,8 @@ void smoothnessmonitorexportc1test0report(optguardnonc1test0report *srcrep, RVec
    } else {
       dstrep->stpidxa = -1;
       dstrep->stpidxb = -1;
+      dstrep->inneriter = -1;
+      dstrep->outeriter = -1;
       dstrep->fidx = -1;
       dstrep->cnt = 0;
       dstrep->n = 0;
@@ -146,6 +150,8 @@ void smoothnessmonitorexportc1test1report(optguardnonc1test1report *srcrep, RVec
       ae_assert(srcrep->vidx >= 0 && srcrep->vidx < srcrep->n, "SmoothnessMonitorExportC1Test1Report: integrity check failed");
       dstrep->stpidxa = srcrep->stpidxa;
       dstrep->stpidxb = srcrep->stpidxb;
+      dstrep->inneriter = srcrep->inneriter;
+      dstrep->outeriter = srcrep->outeriter;
       dstrep->fidx = srcrep->fidx;
       dstrep->vidx = srcrep->vidx;
       dstrep->cnt = srcrep->cnt;
@@ -165,6 +171,8 @@ void smoothnessmonitorexportc1test1report(optguardnonc1test1report *srcrep, RVec
    } else {
       dstrep->stpidxa = -1;
       dstrep->stpidxb = -1;
+      dstrep->inneriter = -1;
+      dstrep->outeriter = -1;
       dstrep->fidx = -1;
       dstrep->vidx = -1;
       dstrep->cnt = 0;
@@ -240,6 +248,8 @@ void optguardnonc0report_copy(void *_dst, const void *_src, bool make_automatic)
    dst->cnt = src->cnt;
    dst->stpidxa = src->stpidxa;
    dst->stpidxb = src->stpidxb;
+   dst->inneriter = src->inneriter;
+   dst->outeriter = src->outeriter;
 }
 
 void optguardnonc0report_free(void *_p, bool make_automatic) {
@@ -271,6 +281,8 @@ void optguardnonc1test0report_copy(void *_dst, const void *_src, bool make_autom
    dst->cnt = src->cnt;
    dst->stpidxa = src->stpidxa;
    dst->stpidxb = src->stpidxb;
+   dst->inneriter = src->inneriter;
+   dst->outeriter = src->outeriter;
 }
 
 void optguardnonc1test0report_free(void *_p, bool make_automatic) {
@@ -303,6 +315,8 @@ void optguardnonc1test1report_copy(void *_dst, const void *_src, bool make_autom
    dst->cnt = src->cnt;
    dst->stpidxa = src->stpidxa;
    dst->stpidxb = src->stpidxb;
+   dst->inneriter = src->inneriter;
+   dst->outeriter = src->outeriter;
 }
 
 void optguardnonc1test1report_free(void *_p, bool make_automatic) {
@@ -444,12 +458,14 @@ DefClass(optguardreport, DecVal(nonc0suspected) DecVal(nonc0test0positive) DecVa
 //   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
+// * inneriter, outeriter - inner and outer iteration indexes (can be -1 if no
+//   iteration information was specified)
 //
 // You can plot function values stored in stp[]  and  f[]  arrays  and  study
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(f) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb))
+DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(f) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb) DecVal(inneriter) DecVal(outeriter))
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C1
 // continuity violation as flagged by C1 test #0 (OptGuard  has several tests
@@ -487,12 +503,14 @@ DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d)
 //   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
+// * inneriter, outeriter - inner and outer iteration indexes (can be -1 if no
+//   iteration information was specified)
 //
 // You can plot function values stored in stp[]  and  f[]  arrays  and  study
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(f) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb))
+DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(f) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb) DecVal(inneriter) DecVal(outeriter))
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C1
 // continuity violation as flagged by C1 test #1 (OptGuard  has several tests
@@ -541,12 +559,14 @@ DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecV
 //   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
+// * inneriter, outeriter - inner and outer iteration indexes (can be -1 if  no
+//   iteration information was specified)
 //
 // You can plot function values stored in stp[]  and  g[]  arrays  and  study
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc1test1report, DecVal(positive) DecVal(fidx) DecVal(vidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(g) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb))
+DefClass(optguardnonc1test1report, DecVal(positive) DecVal(fidx) DecVal(vidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(g) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb) DecVal(inneriter) DecVal(outeriter))
 } // end of namespace alglib
 
 // === OPTSERV Package ===
@@ -2160,6 +2180,8 @@ void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, a
    monitor->checksmoothness = checksmoothness;
    monitor->linesearchspoiled = false;
    monitor->linesearchstarted = false;
+   monitor->linesearchinneridx = -1;
+   monitor->linesearchouteridx = -1;
    monitor->enqueuedcnt = 0;
    monitor->sortedcnt = 0;
    vectorsetlengthatleast(&monitor->s, n);
@@ -2193,7 +2215,7 @@ void smoothnessmonitorfinalizelinesearch(smoothnessmonitor *monitor) {
 
 // This subroutine starts line search
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RVector *fi, RMatrix *jac) {
+void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RVector *fi, RMatrix *jac, ae_int_t inneriter, ae_int_t outeriter) {
    ae_int_t n;
    ae_int_t k;
    ae_int_t i;
@@ -2227,6 +2249,8 @@ void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RV
    }
 // Store initial point
    monitor->linesearchstarted = true;
+   monitor->linesearchinneridx = inneriter;
+   monitor->linesearchouteridx = outeriter;
    monitor->enqueuedcnt = 1;
    rvectorgrowto(&monitor->enqueuedstp, monitor->enqueuedcnt);
    rvectorgrowto(&monitor->enqueuedx, monitor->enqueuedcnt * n);
@@ -2255,7 +2279,7 @@ void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RV
 // This subroutine starts line search for a scalar function - convenience
 // wrapper for ....StartLineSearch() with unscaled variables.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-void smoothnessmonitorstartlinesearch1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *x, double f0, RVector *j0) {
+void smoothnessmonitorstartlinesearch1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *x, double f0, RVector *j0, ae_int_t inneriter, ae_int_t outeriter) {
    ae_int_t n;
    ae_int_t k;
    ae_int_t i;
@@ -2273,7 +2297,7 @@ void smoothnessmonitorstartlinesearch1u(smoothnessmonitor *monitor, RVector *s, 
       monitor->xu.xR[i] = x->xR[i] * invs->xR[i];
       monitor->j0.xyR[0][i] = j0->xR[i] * s->xR[i];
    }
-   smoothnessmonitorstartlinesearch(monitor, &monitor->xu, &monitor->f0, &monitor->j0);
+   smoothnessmonitorstartlinesearch(monitor, &monitor->xu, &monitor->f0, &monitor->j0, inneriter, outeriter);
 }
 
 // This  subroutine  checks  C0  continuity  and  returns  continuity  rating
@@ -2430,6 +2454,8 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
          monitor->nonc1test0strrep.cnt = sortedcnt;
          monitor->nonc1test0strrep.stpidxa = stpidx + 1;
          monitor->nonc1test0strrep.stpidxb = stpidx + 4;
+         monitor->nonc1test0strrep.inneriter = monitor->linesearchinneridx;
+         monitor->nonc1test0strrep.outeriter = monitor->linesearchouteridx;
          vectorsetlengthatleast(&monitor->nonc1test0strrep.x0, n);
          vectorsetlengthatleast(&monitor->nonc1test0strrep.d, n);
          for (i = 0; i < n; i++) {
@@ -2460,6 +2486,8 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
          monitor->nonc1test0lngrep.cnt = sortedcnt;
          monitor->nonc1test0lngrep.stpidxa = stpidx + 1;
          monitor->nonc1test0lngrep.stpidxb = stpidx + 4;
+         monitor->nonc1test0lngrep.inneriter = monitor->linesearchinneridx;
+         monitor->nonc1test0lngrep.outeriter = monitor->linesearchouteridx;
          vectorsetlengthatleast(&monitor->nonc1test0lngrep.x0, n);
          vectorsetlengthatleast(&monitor->nonc1test0lngrep.d, n);
          for (i = 0; i < n; i++) {
@@ -2535,6 +2563,8 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
             monitor->nonc1test1strrep.cnt = sortedcnt;
             monitor->nonc1test1strrep.stpidxa = stpidx;
             monitor->nonc1test1strrep.stpidxb = stpidx + 3;
+            monitor->nonc1test1strrep.inneriter = monitor->linesearchinneridx;
+            monitor->nonc1test1strrep.outeriter = monitor->linesearchouteridx;
             vectorsetlengthatleast(&monitor->nonc1test1strrep.x0, n);
             vectorsetlengthatleast(&monitor->nonc1test1strrep.d, n);
             for (i = 0; i < n; i++) {
@@ -2566,6 +2596,8 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
             monitor->nonc1test1lngrep.cnt = sortedcnt;
             monitor->nonc1test1lngrep.stpidxa = stpidx;
             monitor->nonc1test1lngrep.stpidxb = stpidx + 3;
+            monitor->nonc1test1lngrep.inneriter = monitor->linesearchinneridx;
+            monitor->nonc1test1lngrep.outeriter = monitor->linesearchouteridx;
             vectorsetlengthatleast(&monitor->nonc1test1lngrep.x0, n);
             vectorsetlengthatleast(&monitor->nonc1test1lngrep.d, n);
             for (i = 0; i < n; i++) {
@@ -2733,6 +2765,8 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                   monitor->nonc0strrep.cnt = sortedcnt;
                   monitor->nonc0strrep.stpidxa = stpidx;
                   monitor->nonc0strrep.stpidxb = stpidx + 3;
+                  monitor->nonc0strrep.inneriter = monitor->linesearchinneridx;
+                  monitor->nonc0strrep.outeriter = monitor->linesearchouteridx;
                   vectorsetlengthatleast(&monitor->nonc0strrep.x0, n);
                   vectorsetlengthatleast(&monitor->nonc0strrep.d, n);
                   for (i = 0; i < n; i++) {
@@ -2763,6 +2797,8 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                   monitor->nonc0lngrep.cnt = sortedcnt;
                   monitor->nonc0lngrep.stpidxa = stpidx;
                   monitor->nonc0lngrep.stpidxb = stpidx + 3;
+                  monitor->nonc0lngrep.inneriter = monitor->linesearchinneridx;
+                  monitor->nonc0lngrep.outeriter = monitor->linesearchouteridx;
                   vectorsetlengthatleast(&monitor->nonc0lngrep.x0, n);
                   vectorsetlengthatleast(&monitor->nonc0lngrep.d, n);
                   for (i = 0; i < n; i++) {
@@ -2789,15 +2825,15 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
          noise3 = optserv_ognoiselevelf * rmax2(fabs(f3), 1.0);
       // Decide whether we want to test this interval or not; for target
       // function we test intervals around minimum, for constraints we
-      // test intervals of sign change.
+      // additionally test intervals of sign change.
          if (funcidx == 0) {
-         // Skip if not minimum
+         // Target function: skip if not minimum
             if (!(f3 < f2 + (noise2 + noise3) && f3 < f4)) {
                continue;
             }
          } else {
-         // Skip if sign does not change
-            if (sign(f2 * f4) > 0) {
+         // Constraint: skip if both (a) sign does not change, and (b) is not minumum
+            if (sign(f2 * f4) > 0 && !(f3 < f2 + (noise2 + noise3) && f3 < f4)) {
                continue;
             }
          }
@@ -2817,7 +2853,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
          noise3 = optserv_ognoiselevelf * rmax2(fabs(f3), 1.0);
       // Decide whether we want to test this interval or not; for target
       // function we test intervals around minimum, for constraints we
-      // test intervals of sign change.
+      // additionally test intervals of sign change.
          if (funcidx == 0) {
          // Skip if not minimum
             if (!(f1 < f0 + (noise0 + noise1) && f2 < f3 + (noise2 + noise3))) {
@@ -2825,7 +2861,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
             }
          } else {
          // Skip if sign does not change
-            if (sign(f0 * f3) > 0) {
+            if (sign(f0 * f3) > 0 && !(f1 < f0 + (noise0 + noise1) && f2 < f3 + (noise2 + noise3))) {
                continue;
             }
          }
@@ -2861,37 +2897,64 @@ void smoothnessmonitorenqueuepoint1u(smoothnessmonitor *monitor, RVector *s, RVe
    smoothnessmonitorenqueuepoint(monitor, &monitor->du, stp, &monitor->xu, &monitor->f0, &monitor->j0);
 }
 
-// This function starts aggressive probing for a range of step lengths [0,StpMax].
+// This function starts aggressive probing of the Lagrangian for a  range  of
+// step lengths [0,StpMax].
 //
-// This function stores NValues values per step, with the first one (index 0)
-// value being "primary" one (target function / merit function) and the rest
-// being supplementary ones.
+// Inputs:
+//     Monitor         -   monitor object
+//     LagMult         -   array[K-1], lagrange multipliers for nonlinear
+//                         constraints
+//     X               -   array[N], initial point for probing
+//     D               -   array[N], probing direction
+//     StpMax          -   range of steps to probe
+//
 // ALGLIB: Copyright 10.10.2019 by Sergey Bochkanov
-void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae_int_t nvalues, double stepscale) {
-   ae_assert(isfinite(stpmax) && stpmax > 0.0, "SmoothnessMonitorStartProbing: StpMax <= 0");
-   ae_assert(nvalues >= 1, "SmoothnessMonitorStartProbing: NValues < 1");
-   ae_assert(isfinite(stepscale) && stepscale >= 0.0, "SmoothnessMonitorStartProbing: StepScale < 0");
-   monitor->probingnvalues = nvalues;
-   monitor->probingnstepsstored = 0;
-   monitor->probingstepmax = stpmax;
-   monitor->probingstepscale = stepscale;
-   vectorsetlengthatleast(&monitor->probingf, nvalues);
+void smoothnessmonitorstartlagrangianprobing(smoothnessmonitor *monitor, RVector *x, RVector *d, double stpmax, ae_int_t inneriter, ae_int_t outeriter) {
+   ae_int_t n;
+   ae_int_t k;
+   ae_int_t i;
+   n = monitor->n;
+   k = monitor->k;
+   ae_assert(isfinitevector(x, n), "SmoothnessMonitorStartLagrangianProbing: bad X[] array");
+   ae_assert(isfinitevector(d, n), "SmoothnessMonitorStartLagrangianProbing: bad D[] array");
+   ae_assert(isfinite(stpmax) && stpmax > 0.0, "SmoothnessMonitorStartLagrangianProbing: StpMax <= 0");
+   ae_assert(k >= 1, "SmoothnessMonitorStartLagrangianProbing: monitor object is initialized with K <= 0");
+   monitor->lagprobnstepsstored = 0;
+   monitor->lagprobstepmax = stpmax;
+   monitor->lagprobinneriter = inneriter;
+   monitor->lagprobouteriter = outeriter;
+   vectorsetlengthatleast(&monitor->lagprobxs, n);
+   vectorsetlengthatleast(&monitor->lagprobd, n);
+   for (i = 0; i < n; i++) {
+      monitor->lagprobxs.xR[i] = x->xR[i];
+      monitor->lagprobd.xR[i] = d->xR[i];
+   }
+   vectorsetlengthatleast(&monitor->lagprobx, n);
+   vectorsetlengthatleast(&monitor->lagprobfi, k);
+   matrixsetlengthatleast(&monitor->lagprobj, k, n);
    monitor->ProbePQ = -1;
 }
 
 #if 0 //(@) Not used.
-// This function performs aggressive probing.
+// This function performs aggressive probing and sends points  to  smoothness
+// monitoring queue via EnqueuePoint() call.
 //
-// After each call it returns step to evaluate  in  Monitor.ProbingStp.  Load
-// values being probed into Monitor.ProbingF and continue iteration.
+// After  each  call  it  returns  point to evaluate in  Monitor.LagProbX and
+// current step in Monitor.LagProbStp. Caller has to load function values and
+// Jacobian at X into Monitor.LagProbFi and Monitor.LagProbJ, current Lagrangian
+// to Monitor.LagProbRawLag and continue iteration.
 //
-// Monitor.ProbingF[0] is a special value which is used to guide probing process
-// towards discontinuities and nonsmooth points.
+// NOTE: LagProbX[] is not guarded against constraint violation. Both non-box
+//       and box constraints are ignored.  It  is  caller  responsibility  to
+//       provide appropriate  X[],  D[]  and  StpMax  which  do  not  violate
+//       important constraints
 // ALGLIB: Copyright 10.10.2019 by Sergey Bochkanov
-bool smoothnessmonitorprobe(smoothnessmonitor *monitor) {
+bool smoothnessmonitorprobelagrangian(smoothnessmonitor *monitor) {
+   AutoS ae_int_t stpidx;
    AutoS ae_int_t i;
    AutoS ae_int_t j;
    AutoS ae_int_t idx;
+   AutoS double stp;
    AutoS double vlargest;
    AutoS double v;
    AutoS double v0;
@@ -2906,70 +2969,103 @@ bool smoothnessmonitorprobe(smoothnessmonitor *monitor) {
       default: goto Exit;
    }
 Spawn:
-   for (i = 0; i < 40; i++) {
+   for (stpidx = 0; stpidx < 40; stpidx++) {
    // Increase storage size
-      rvectorgrowto(&monitor->probingsteps, monitor->probingnstepsstored + 1);
-      rmatrixgrowrowsto(&monitor->probingvalues, monitor->probingnstepsstored + 1, monitor->probingnvalues);
-      rmatrixgrowrowsto(&monitor->probingslopes, monitor->probingnstepsstored + 1, monitor->probingnvalues);
+      rvectorgrowto(&monitor->lagprobsteps, monitor->lagprobnstepsstored + 1);
+      rvectorgrowto(&monitor->lagproblagrangians, monitor->lagprobnstepsstored + 1);
+      rmatrixgrowrowsto(&monitor->lagprobvalues, monitor->lagprobnstepsstored + 1, monitor->k);
+      rmatrixgrowrowsto(&monitor->lagprobjacobians, monitor->lagprobnstepsstored + 1, monitor->n * monitor->k);
    // Determine probing step length, save step to the end of the storage
-      if (i <= 10) {
+      if (stpidx <= 10) {
       // First 11 steps are performed over equidistant grid
-         monitor->probingstp = i / 10.0 * monitor->probingstepmax;
+         stp = stpidx / 10.0 * monitor->lagprobstepmax;
       } else {
-      // Subsequent steps target either points with maximum change in F[0]
-      // (search for discontinuity) or maximum change in slope of F[0] (search
-      // for nonsmoothness)
-         ae_assert(monitor->probingnstepsstored >= 3, "SMonitor: critical integrity check failed");
-         if (i % 2 == 0) {
-         // Target interval with maximum change in F[0]
+      // Subsequent steps target interesting points
+         ae_assert(monitor->lagprobnstepsstored >= 3, "SMonitor: critical integrity check failed");
+         stp = 0.0;
+         if (stpidx % 3 == 0) {
+         // Target interval with maximum change in Lagrangian
             idx = -1;
             vlargest = 0.0;
-            for (j = 0; j < monitor->probingnstepsstored - 1; j++) {
-               v = fabs(monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j][0]);
+            for (j = 0; j < monitor->lagprobnstepsstored - 1; j++) {
+               v = fabs(monitor->lagproblagrangians.xR[j + 1] - monitor->lagproblagrangians.xR[j]);
                if (idx < 0 || v > vlargest) {
                   idx = j;
                   vlargest = v;
                }
             }
-            monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx] + monitor->probingsteps.xR[idx + 1]);
-         } else {
-         // Target interval [J,J+2] with maximum change in slope of F[0], select
-         // subinterval [J,J+1] or [J+1,J+2] with maximum length.
+            stp = 0.5 * (monitor->lagprobsteps.xR[idx] + monitor->lagprobsteps.xR[idx + 1]);
+         }
+         if (stpidx % 3 == 1) {
+         // Target interval [J,J+2] with maximum change in slope of Lagrangian,
+         // select subinterval [J,J+1] or [J+1,J+2] (one with maximum length).
             idx = -1;
             vlargest = 0.0;
-            for (j = 0; j < monitor->probingnstepsstored - 2; j++) {
-               v0 = (monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j][0]) / (monitor->probingsteps.xR[j + 1] - monitor->probingsteps.xR[j] + machineepsilon);
-               v1 = (monitor->probingvalues.xyR[j + 2][0] - monitor->probingvalues.xyR[j + 1][0]) / (monitor->probingsteps.xR[j + 2] - monitor->probingsteps.xR[j + 1] + machineepsilon);
+            for (j = 0; j < monitor->lagprobnstepsstored - 2; j++) {
+               v0 = (monitor->lagproblagrangians.xR[j + 1] - monitor->lagproblagrangians.xR[j]) / (monitor->lagprobsteps.xR[j + 1] - monitor->lagprobsteps.xR[j] + machineepsilon);
+               v1 = (monitor->lagproblagrangians.xR[j + 2] - monitor->lagproblagrangians.xR[j + 1]) / (monitor->lagprobsteps.xR[j + 2] - monitor->lagprobsteps.xR[j + 1] + machineepsilon);
                v = fabs(v0 - v1);
                if (idx < 0 || v > vlargest) {
                   idx = j;
                   vlargest = v;
                }
             }
-            if (monitor->probingsteps.xR[idx + 2] - monitor->probingsteps.xR[idx + 1] > monitor->probingsteps.xR[idx + 1] - monitor->probingsteps.xR[idx]) {
-               monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 2] + monitor->probingsteps.xR[idx + 1]);
+            if (monitor->lagprobsteps.xR[idx + 2] - monitor->lagprobsteps.xR[idx + 1] > monitor->lagprobsteps.xR[idx + 1] - monitor->lagprobsteps.xR[idx]) {
+               stp = 0.5 * (monitor->lagprobsteps.xR[idx + 2] + monitor->lagprobsteps.xR[idx + 1]);
             } else {
-               monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 1] + monitor->probingsteps.xR[idx]);
+               stp = 0.5 * (monitor->lagprobsteps.xR[idx + 1] + monitor->lagprobsteps.xR[idx]);
             }
          }
+         if (stpidx % 3 == 2) {
+         // Target interval with maximum change in sum of squared Jacobian differences
+            idx = -1;
+            vlargest = 0.0;
+            for (j = 0; j < monitor->lagprobnstepsstored - 1; j++) {
+               v = 0.0;
+               for (i = 0; i < monitor->k * monitor->n; i++) {
+                  v += sqr(monitor->lagprobjacobians.xyR[j + 1][i] - monitor->lagprobjacobians.xyR[j][i]);
+               }
+               if (idx < 0 || v > vlargest) {
+                  idx = j;
+                  vlargest = v;
+               }
+            }
+            stp = 0.5 * (monitor->lagprobsteps.xR[idx] + monitor->lagprobsteps.xR[idx + 1]);
+         }
       }
-      monitor->probingsteps.xR[monitor->probingnstepsstored] = monitor->probingstp;
+      monitor->lagprobsteps.xR[monitor->lagprobnstepsstored] = stp;
    // Retrieve user values
-      monitor->ProbePQ = 0; goto Pause; Resume0:
-      for (j = 0; j < monitor->probingnvalues; j++) {
-         monitor->probingvalues.xyR[monitor->probingnstepsstored][j] = monitor->probingf.xR[j];
-         monitor->probingslopes.xyR[monitor->probingnstepsstored][j] = 0.0;
+      for (i = 0; i < monitor->n; i++) {
+         monitor->lagprobx.xR[i] = monitor->lagprobxs.xR[i] + monitor->lagprobd.xR[i] * stp;
       }
-      monitor->probingnstepsstored++;
+      monitor->lagprobstp = stp;
+      monitor->ProbePQ = 0; goto Pause; Resume0:
+      for (i = 0; i < monitor->k; i++) {
+         monitor->lagprobvalues.xyR[monitor->lagprobnstepsstored][i] = monitor->lagprobfi.xR[i];
+         for (j = 0; j < monitor->n; j++) {
+            monitor->lagprobjacobians.xyR[monitor->lagprobnstepsstored][i * monitor->n + j] = monitor->lagprobj.xyR[i][j];
+         }
+      }
+      monitor->lagproblagrangians.xR[monitor->lagprobnstepsstored] = monitor->lagprobrawlag;
+      monitor->lagprobnstepsstored++;
+      if (stpidx == 0) {
+         ae_assert(stp == 0.0, "SmoothnessMonitorProbeLagrangian: integrity check failed");
+         smoothnessmonitorstartlinesearch(monitor, &monitor->lagprobx, &monitor->lagprobfi, &monitor->lagprobj, monitor->lagprobinneriter, monitor->lagprobouteriter);
+      } else {
+         smoothnessmonitorenqueuepoint(monitor, &monitor->lagprobd, stp, &monitor->lagprobx, &monitor->lagprobfi, &monitor->lagprobj);
+      }
    // Resort
-      for (j = monitor->probingnstepsstored - 1; j >= 1; j--) {
-         if (monitor->probingsteps.xR[j - 1] <= monitor->probingsteps.xR[j]) {
+      for (j = monitor->lagprobnstepsstored - 1; j >= 1; j--) {
+         if (monitor->lagprobsteps.xR[j - 1] <= monitor->lagprobsteps.xR[j]) {
             break;
          }
-         swapelements(&monitor->probingsteps, j - 1, j);
-         swaprows(&monitor->probingvalues, j - 1, j, monitor->probingnvalues);
+         swapelements(&monitor->lagprobsteps, j - 1, j);
+         swapelements(&monitor->lagproblagrangians, j - 1, j);
+         swaprows(&monitor->lagprobvalues, j - 1, j, monitor->k);
+         swaprows(&monitor->lagprobjacobians, j - 1, j, monitor->n * monitor->k);
       }
    }
+   smoothnessmonitorfinalizelinesearch(monitor);
 Exit:
    monitor->ProbePQ = -1;
    return false;
@@ -3135,6 +3231,607 @@ Pause:
    return true;
 }
 
+// Lowe-level Hessian update function, to be used by HessianUpdate()
+//
+// Inputs:
+//     Hess            -   Hessian state
+//     H               -   specific Hessian matrix to update, usually one
+//                         of the Hess fields
+//     X0, G0          -   point #0 and gradient at #0, array[N]
+//     X1, G1          -   point #1 and gradient at #1, array[N]
+//
+// Outputs:
+//     Status          -   sets update status (informative)
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+static void optserv_hessianupdatelowlevel(xbfgshessian *hess, RMatrix *h, RVector *sk, RVector *yk, ae_int_t *status) {
+   ae_int_t i;
+   ae_int_t n;
+   double shs;
+   double sy;
+   double snrm2;
+   double hsnrm2;
+   double ynrm2;
+   double ski;
+   double yki;
+   double mxs;
+   double mxy;
+   double mxhs;
+   double mxd;
+   double big;
+   *status = 0;
+   n = hess->n;
+   *status = 0;
+   big = 1.0 / hess->reg;
+// Perform preliminary analysis
+   vectorsetlengthatleast(&hess->hsk, n);
+   rmatrixgemv(n, n, 1.0, h, 0, 0, 0, sk, 0, 0.0, &hess->hsk, 0);
+   shs = 0.0;
+   sy = 0.0;
+   snrm2 = 0.0;
+   ynrm2 = 0.0;
+   mxs = 0.0;
+   mxy = 0.0;
+   mxhs = 0.0;
+   hsnrm2 = 0.0;
+   mxd = 0.0;
+   for (i = 0; i < n; i++) {
+      ski = sk->xR[i];
+      yki = yk->xR[i];
+      shs += ski * hess->hsk.xR[i];
+      sy += ski * yki;
+      snrm2 += ski * ski;
+      ynrm2 += yki * yki;
+      mxs = rmax2(mxs, fabs(ski));
+      mxy = rmax2(mxy, fabs(yki));
+      mxhs = rmax2(mxhs, fabs(hess->hsk.xR[i]));
+      hsnrm2 += sqr(hess->hsk.xR[i]);
+      mxd = rmax2(mxd, fabs(h->xyR[i][i]));
+   }
+// Completely skip updates with too short steps and degenerate updates
+//
+// NOTE: may prevent us from updating Hessian near the solution
+   if (mxs <= hess->stpshort) {
+   // Sk is too small
+      return;
+   }
+   if (hsnrm2 == 0.0) {
+   // H*Sk is exactly zero, exit
+      return;
+   }
+   if (shs <= 0.0 || shs <= mxs * mxd * mxs * hess->microreg) {
+   // Sk'*H*Sk is too small.
+   //
+   // Apply regularization to Hessian before exiting
+      ae_assert(hsnrm2 > 0.0, "UpdateHessian: integrity check failed");
+      rmatrixger(n, n, h, 0, 0, hess->reg / hsnrm2, &hess->hsk, 0, &hess->hsk, 0);
+      return;
+   }
+// First, we discard Hessian components which give non-zero product with Sk.
+//
+// We apply some damping in order to avoid problems arising with very small
+// Sk'*H*Sk, and we apply some regularization term in order to have Sk'*Hnew*Sk
+// still slightly larger than zero.
+//
+// Traditional BFGS update adds -(Hk*Sk)*(Hk*Sk)'/(Sk'*H*Sk). We use
+// modified, more robust formula (below Z=(H*Sk)/|H*Sk|)
+//
+//     (                         (H*Sk,H*Sk)                               )
+//     ( - --------------------------------------------------------- + Reg ) * Z * Z'
+//     (    Sk'*H*Sk + Reg*(H*Sk,H*Sk) + MicroReg*(max(H)*max(S))^2        )
+   ae_assert(hsnrm2 > 0.0, "UpdateHessian: integrity check failed");
+   rmatrixger(n, n, h, 0, 0, -1.0 / (shs + hsnrm2 * hess->reg + sqr(mxd * mxs) * hess->microreg) + hess->reg / hsnrm2, &hess->hsk, 0, &hess->hsk, 0);
+   *status = 1;
+// Before we update Hessian with Yk, decide whether we need this update - or
+// maybe it is better to leave Hessian as is, with small curvature along Sk
+// (in the latter case we still treat BFGS update as successful).
+//
+// Traditional BFGS update adds Yk*Yk'/(Sk,Yk) to the Hessian. Instead we
+// use modified update (below U == Yk/|Yk|)
+//
+//               (Yk,Yk)
+//     -------------------------------------- * U * U'
+//      (Sk,Yk)+Reg*(Yk,Yk)+MicroReg*(Sk,Sk)
+   if (ynrm2 == 0.0) {
+      return;
+   }
+   if (sy <= 0.0) {
+      return;
+   }
+   if (sqr(mxy) >= sy * big) {
+      return;
+   }
+   ae_assert(sy > 0.0, "UpdateHessian: integrity check failed");
+   rmatrixger(n, n, h, 0, 0, 1.0 / (sy + hess->reg * ynrm2 + hess->microreg * snrm2), yk, 0, yk, 0);
+   *status = 2;
+}
+
+// Invalidate low-rank model
+//
+// Inputs:
+//     Hess            -   Hessian state
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+static void optserv_resetlowrankmodel(xbfgshessian *hess) {
+   ae_assert(hess->htype == 3, "OPTSERV: integrity check 9940 failed");
+   hess->lowrankmodelvalid = false;
+   hess->lowrankeffdvalid = false;
+}
+
+// Recomputes low-rank model (DIAG and CORR fields) according to the  current
+// state of the LBFGS memory
+//
+// Inputs:
+//     Hess            -   Hessian state
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+static void optserv_recomputelowrankmodel(xbfgshessian *hess) {
+   ae_int_t n;
+   ae_int_t memlen;
+   ae_int_t i;
+   ae_int_t j;
+   bool success;
+   n = hess->n;
+   memlen = hess->memlen;
+// If the model is valid, exit.
+// Otherwise, recompute it from scratch
+   if (hess->lowrankmodelvalid) {
+      return;
+   }
+   optserv_resetlowrankmodel(hess);
+// Quick exit for MemLen == 0.
+// After this block we assume that MemLen > 0
+   if (memlen == 0) {
+      hess->lowrankmodelvalid = true;
+      hess->lowrankk = 0;
+      hess->sigma = 1.0;
+      return;
+   }
+// Prepare RAW_CORR2, a right part of correction matrix
+//
+//     Bk = sigma*I - RAW_CORR2'*RAW_BLOCK*RAW_CORR2
+//
+// with RAW_CORR2 being 2MEMLEN*N matrix and RAW_BLOCK being 2MEMLEN*2MEMLEN matrix,
+// as defined by equations 2.17 and 3.22 in 'REPRESENTATION OF QUASI-NEWTON MATRICES
+// AND THEIR USE IN LIMITED MEMORY METHODS' by Byrd, Nocedal and Schnabel.
+//
+// The initial form for Bk is
+//
+//                    [          ]   [ -Dk     Lk' ]-1 [  Y   ]
+//     Bk = sigma*I - [ Y' B0*S' ] * [             ] * [      ]
+//                    [          ]   [ Lk  S*B0*S' ]   [ S*B0 ]
+//
+// with
+//
+//     Lk[i,j]=(Si,Yj) for i>j, 0 otherwise
+//     Dk = diag[(Si,Yj)]
+//
+   allocm(2 * memlen, n, &hess->corr2);
+   for (i = 0; i < memlen; i++) {
+      rcopyrr(n, &hess->s, i, &hess->corr2, memlen + i);
+      rmulr(n, hess->sigma, &hess->corr2, memlen + i);
+      rcopyrr(n, &hess->y, i, &hess->corr2, i);
+   }
+// Start factorizing central block. Whilst it is indefinite, it has
+// pretty simple factorization
+//
+//     [ -Dk     Lk' ]   [ Dk^(0.5)          ]   [ -I      ]   [ Dk^(0.5)  -Dk^(-0.5)*Lk' ]
+//     [             ] = [                   ] * [         ] * [                          ]
+//     [ Lk  S*B0*S' ]   [ -Lk*Dk^(-0.5)  Jk ]   [      +I ]   [                      Jk' ]
+//
+// First, we compute lower triangular Jk such that Jk*Jk' = S*B0*S' + Lk*inv(Dk)*Lk'
+   allocv(memlen, &hess->buf);
+   for (i = 0; i < memlen; i++) {
+      hess->buf.xR[i] = 1.0 / sqrt(hess->lowranksyt.xyR[i][i]);
+   }
+   rsetallocm(memlen, memlen, 0.0, &hess->invsqrtdlk);
+   for (i = 1; i < memlen; i++) {
+      rcopyrr(i, &hess->lowranksyt, i, &hess->invsqrtdlk, i);
+      rmergemulvr(i, &hess->buf, &hess->invsqrtdlk, i);
+   }
+   rcopyallocm(memlen, memlen, &hess->lowranksst, &hess->jk);
+   rmatrixgemm(memlen, memlen, memlen, 1.0, &hess->invsqrtdlk, 0, 0, 0, &hess->invsqrtdlk, 0, 0, 1, hess->sigma, &hess->jk, 0, 0);
+   success = spdmatrixcholeskyrec(&hess->jk, 0, memlen, false, &hess->buf);
+   ae_assert(success, "OPTSERV: integrity check 9828 failed");
+// After computing Jk we proceed to form triangular factorization of the entire block matrix
+   rsetallocm(2 * memlen, 2 * memlen, 0.0, &hess->blk);
+   for (i = 0; i < memlen; i++) {
+      hess->blk.xyR[i][i] = sqrt(hess->lowranksyt.xyR[i][i]);
+   }
+   for (i = 0; i < memlen; i++) {
+      for (j = 0; j < i; j++) {
+         hess->blk.xyR[memlen + i][j] = -hess->invsqrtdlk.xyR[i][j];
+      }
+   }
+   for (i = 0; i < memlen; i++) {
+      for (j = 0; j <= i; j++) {
+         hess->blk.xyR[memlen + i][memlen + j] = hess->jk.xyR[i][j];
+      }
+   }
+// And finally we merge triangular factor into CORR2 in order to get desired two-factor
+// low rank representation without additional middle matrix. This representation is
+// computed in CORR2 and unpacked into LowRankCp and LowRankCm ('minus' and 'plus' terms).
+   rmatrixlefttrsm(2 * memlen, n, &hess->blk, 0, 0, false, false, 0, &hess->corr2, 0, 0);
+   allocm(memlen, n, &hess->lowrankcp);
+   for (i = 0; i < memlen; i++) {
+      rcopyrr(n, &hess->corr2, i, &hess->lowrankcp, i);
+   }
+   allocm(memlen, n, &hess->lowrankcm);
+   for (i = 0; i < memlen; i++) {
+      rcopyrr(n, &hess->corr2, memlen + i, &hess->lowrankcm, i);
+   }
+// The model was created
+   hess->lowrankmodelvalid = true;
+   hess->lowrankk = memlen;
+}
+
+// Recomputes diagonal of the low-rank model (EFFD) according to the  current
+// state of the LBFGS memory
+//
+// Inputs:
+//     Hess            -   Hessian state
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+static void optserv_recomputelowrankdiagonal(xbfgshessian *hess) {
+   ae_int_t n;
+   ae_int_t memlen;
+   ae_int_t i;
+   n = hess->n;
+   memlen = hess->memlen;
+// If the diagonal is valid, exit.
+// Otherwise, recompute it from scratch
+   if (hess->lowrankeffdvalid) {
+      return;
+   }
+   optserv_recomputelowrankmodel(hess);
+// Quick exit for MemLen == 0
+   if (memlen == 0) {
+      hess->lowrankeffdvalid = true;
+      rsetallocv(n, hess->sigma, &hess->lowrankeffd);
+      return;
+   }
+// Assuming MemLen > 0
+   rsetallocv(n, hess->sigma, &hess->lowrankeffd);
+   allocv(n, &hess->buf);
+   for (i = 0; i < hess->lowrankk; i++) {
+      rcopyrv(n, &hess->lowrankcp, i, &hess->buf);
+      rmuladdv(n, &hess->buf, &hess->buf, &hess->lowrankeffd);
+      rcopyrv(n, &hess->lowrankcm, i, &hess->buf);
+      rnegmuladdv(n, &hess->buf, &hess->buf, &hess->lowrankeffd);
+   }
+   hess->lowrankeffdvalid = true;
+}
+
+// This function initializes approximation of a Hessian.
+//
+// Direct BFGS (Hessian matrix H is stored) with stability improvements is used.
+//
+// Inputs:
+//     Hess            -   Hessian structure, initial state is ignored, but
+//                         previously allocated memory is reused as much as
+//                         possible
+//     N               -   dimensions count
+//     ResetFreq       -   reset frequency for BFGS :
+//                         * ResetFreq == 0 for standard BFGS
+//                         * ResetFreq > 0 for BFGS with periodic resets (helps
+//                           to maintain fresh curvature information, works
+//                           better for highly nonquadratic problems)
+//     StpShort        -   short step length (INF-norm); steps shorter than that
+//                         are not used for Hessian updates
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+void hessianinitbfgs(xbfgshessian *hess, ae_int_t n, ae_int_t resetfreq, double stpshort) {
+   ae_int_t i;
+   ae_assert(resetfreq >= 0, "HessianInit: ResetFreq < 0");
+   resetfreq = imin2(resetfreq, n);
+   hess->htype = 0;
+   hess->n = n;
+   hess->resetfreq = resetfreq;
+   hess->stpshort = stpshort;
+   hess->hage = 0;
+   hess->gammasml = 0.000001;
+   hess->reg = 100.0 * sqrt(machineepsilon);
+   hess->smallreg = 0.01 * sqrt(machineepsilon);
+   hess->microreg = (1000.0 + sqrt(n)) * machineepsilon;
+   hess->sumsy = sqr(machineepsilon);
+   hess->sumy2 = hess->sumsy * hess->gammasml;
+   hess->sums2 = 0.0;
+   hess->updatestatus = 0;
+   vectorsetlengthatleast(&hess->sk, n);
+   vectorsetlengthatleast(&hess->yk, n);
+   rsetallocm(n, n, 0.0, &hess->hcurrent);
+   rsetallocm(n, n, 0.0, &hess->hincoming);
+   for (i = 0; i < n; i++) {
+      hess->hcurrent.xyR[i][i] = 1.0;
+      hess->hincoming.xyR[i][i] = 1.0;
+   }
+}
+
+// This function initializes approximation of a Hessian.
+//
+// Explicit low-rank representation of LBFGS is used.
+//
+// Inputs:
+//     Hess            -   Hessian structure, initial state is ignored, but
+//                         previously allocated memory is reused as much as
+//                         possible
+//     N               -   dimensions count, N > 0
+//     M               -   memory size, M >= 0 (values above N will be reduced
+//                         to N)
+//     StpShort        -   short step length (INF-norm); steps shorter than that
+//                         are not used for Hessian updates
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+void hessianinitlowrank(xbfgshessian *hess, ae_int_t n, ae_int_t m, double stpshort) {
+   ae_assert(n > 0, "HessianInitLowRank: N <= 0");
+   ae_assert(m >= 0, "HessianInitLowRank: M < 0");
+   m = imin2(m, n);
+// Initialize generic fields
+   hess->htype = 3;
+   hess->n = n;
+// Initialize mode-specific fields
+   hess->m = m;
+   hess->memlen = 0;
+   hess->sigma = 1.0;
+   hess->gamma = 1.0;
+   if (m > 0) {
+      allocm(m, n, &hess->s);
+      allocm(m, n, &hess->y);
+      allocm(m, m, &hess->lowranksst);
+      allocm(m, m, &hess->lowranksyt);
+   }
+   optserv_resetlowrankmodel(hess);
+// Other fields
+   hess->resetfreq = 0;
+   hess->stpshort = stpshort;
+   hess->hage = 0;
+   hess->gammasml = 0.000001;
+   hess->reg = 100.0 * sqrt(machineepsilon);
+   hess->smallreg = 0.01 * sqrt(machineepsilon);
+   hess->microreg = (1000.0 + sqrt(n)) * machineepsilon;
+   hess->sumsy = 0.0;
+   hess->sumy2 = 0.0;
+   hess->sums2 = 0.0;
+   hess->updatestatus = 0;
+   allocv(n, &hess->sk);
+   allocv(n, &hess->yk);
+}
+
+// Updates Hessian estimate, uses regularized formula which prevents  Hessian
+// eigenvalues from decreasing below ~sqrt(Eps)  and  rejects  updates larger
+// than ~1/sqrt(Eps) in magnitude.
+//
+// Either BFGS or LBFGS formula is used, depending on Hessian model settings.
+//
+// Inputs:
+//     Hess            -   Hessian state
+//     X0, G0          -   point #0 and gradient at #0, array[N]
+//     X1, G1          -   point #1 and gradient at #1, array[N]
+//
+// On return sets Hess.UpdateStatus flag
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+void hessianupdate(xbfgshessian *hess, RVector *x0, RVector *g0, RVector *x1, RVector *g1) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t n;
+   double gamma;
+   double sy;
+   double snrm2;
+   double ynrm2;
+   double ski;
+   double yki;
+   n = hess->n;
+// Prepare Sk, Yk
+   sy = 0.0;
+   snrm2 = 0.0;
+   ynrm2 = 0.0;
+   for (i = 0; i < n; i++) {
+      ski = x1->xR[i] - x0->xR[i];
+      yki = g1->xR[i] - g0->xR[i];
+      hess->sk.xR[i] = ski;
+      hess->yk.xR[i] = yki;
+      sy += ski * yki;
+      snrm2 += ski * ski;
+      ynrm2 += yki * yki;
+   }
+   hess->updatestatus = 0;
+// Update current and incoming Hessians
+   ae_assert(hess->htype == 0 || hess->htype == 3, "HessianUpdate: Hessian mode not supported");
+   if (hess->htype == 0) {
+   // Update dense Hessian using BFGS formula for Bk
+      optserv_hessianupdatelowlevel(hess, &hess->hcurrent, &hess->sk, &hess->yk, &hess->updatestatus);
+      optserv_hessianupdatelowlevel(hess, &hess->hincoming, &hess->sk, &hess->yk, &i);
+      if (sy > 0.0) {
+         hess->sumsy += sy;
+         hess->sumy2 += ynrm2;
+      }
+      hess->sums2 += snrm2;
+      hess->hage++;
+   // Perform Hessian reset if needed
+      if (hess->resetfreq > 0 && hess->hage >= hess->resetfreq) {
+         rmatrixcopy(n, n, &hess->hincoming, 0, 0, &hess->hcurrent, 0, 0);
+         gamma = hess->sumy2 / (hess->sumsy + hess->reg * hess->sumy2 + hess->smallreg * hess->sums2);
+         rsetm(n, n, 0.0, &hess->hincoming);
+         for (i = 0; i < n; i++) {
+            hess->hincoming.xyR[i][i] = gamma;
+         }
+         hess->sumsy = sqr(machineepsilon);
+         hess->sumy2 = hess->sumsy * hess->gammasml;
+         hess->sums2 = 0.0;
+         hess->hage = 0;
+         hess->updatestatus = 3;
+      }
+      return;
+   }
+   if (hess->htype == 3) {
+   // Decide whether update is good enough to be remembered
+      if (hess->m == 0) {
+      // Zero memory was specified, update ignored
+         return;
+      }
+      if (rmaxabsv(n, &hess->sk) <= hess->stpshort) {
+      // Sk is too small, skip update
+         return;
+      }
+      if (rdotv2(n, &hess->yk) == 0.0) {
+      // The function is linear in the step direction, no update applied
+         return;
+      }
+      if (rdotv(n, &hess->sk, &hess->yk) <= 0.0) {
+      // The function is nonconvex in the step direction, no update applied
+         return;
+      }
+   // Apply regularization:
+   // * first,  add REG*Sk to Yk in order to make model at least slightly convex (Sigma is at least REG
+   // * second, add REG*Yk to Xk in order to limit model curvature (Sigma is at most 1/REG)
+   //
+   // Whilst specific order of these operations is not very important, we prefer to Yk+ == REG*Sk be first
+   // due to Sk being better guarded away from zero.
+      raddv(n, hess->reg, &hess->sk, &hess->yk);
+      raddv(n, hess->reg, &hess->yk, &hess->sk);
+   // Update low rank Hessian data
+      ae_assert(hess->memlen <= hess->m, "HessianUpdate: integrity check 5763 failed");
+      if (hess->memlen == hess->m) {
+      // Memory is full, shift data
+         for (i = 0; i < hess->memlen - 1; i++) {
+            rcopyrr(n, &hess->s, i + 1, &hess->s, i);
+            rcopyrr(n, &hess->y, i + 1, &hess->y, i);
+         }
+         for (i = 0; i < hess->memlen - 1; i++) {
+            for (j = 0; j < hess->memlen - 1; j++) {
+               hess->lowranksst.xyR[i][j] = hess->lowranksst.xyR[i + 1][j + 1];
+               hess->lowranksyt.xyR[i][j] = hess->lowranksyt.xyR[i + 1][j + 1];
+            }
+         }
+      } else {
+      // There is a place in a buffer, just append data
+         hess->memlen++;
+      }
+   // Append to S and Y
+      rcopyvr(n, &hess->sk, &hess->s, hess->memlen - 1);
+      rcopyvr(n, &hess->yk, &hess->y, hess->memlen - 1);
+   // Append row/col to LowRankSST and LowRankSYT
+      allocv(hess->memlen, &hess->buf);
+      rgemv(hess->memlen, n, 1.0, &hess->s, 0, &hess->sk, 0.0, &hess->buf);
+      rcopyvr(hess->memlen, &hess->buf, &hess->lowranksst, hess->memlen - 1);
+      rcopyvc(hess->memlen, &hess->buf, &hess->lowranksst, hess->memlen - 1);
+      rgemv(hess->memlen, n, 1.0, &hess->y, 0, &hess->sk, 0.0, &hess->buf);
+      rcopyvr(hess->memlen, &hess->buf, &hess->lowranksyt, hess->memlen - 1);
+      rgemv(hess->memlen, n, 1.0, &hess->s, 0, &hess->yk, 0.0, &hess->buf);
+      rcopyvc(hess->memlen, &hess->buf, &hess->lowranksyt, hess->memlen - 1);
+   // Recompute scaling
+      hess->sigma = rdotv2(n, &hess->yk) / rdotv(n, &hess->sk, &hess->yk);
+      hess->sigma = rmin2(hess->sigma, 1.0 / (hess->reg + machineepsilon));
+      hess->gamma = 1.0 / hess->sigma;
+   // Invalidate model
+      optserv_resetlowrankmodel(hess);
+   }
+}
+
+// Get diagonal of the Hessian.
+//
+// This function works only with the following Hessian modes:
+// * direct BFGS
+// * low-rank LBFGS
+//
+// Any attempt to call it for other Hessian type will result in exception.
+//
+// Inputs:
+//     Hess            -   Hessian state
+//     D               -   possibly preallocated array; resized if needed
+//
+// Outputs:
+//     D               -   first N elements are filled with Hessian diagonal
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+void hessiangetdiagonal(xbfgshessian *hess, RVector *d) {
+   ae_int_t i;
+   ae_int_t n;
+   ae_assert(hess->htype == 0 || hess->htype == 3, "HessianGetDiagonal: Hessian mode is not supported");
+   n = hess->n;
+   allocv(n, d);
+   if (hess->htype == 0) {
+   // Explicit dense Hessian
+      for (i = 0; i < n; i++) {
+         d->xR[i] = hess->hcurrent.xyR[i][i];
+      }
+   }
+   if (hess->htype == 3) {
+   // Low-rank model
+      optserv_recomputelowrankmodel(hess);
+      optserv_recomputelowrankdiagonal(hess);
+      rcopyv(n, &hess->lowrankeffd, d);
+   }
+}
+
+// Get Hessian matrix in a dense format.
+//
+// This function works only with the following Hessian modes:
+// * direct BFGS
+// * low-rank LBFGS (needs k*N*N operations)
+//
+// Any attempt to call it for other Hessian type will result in exception.
+//
+// Inputs:
+//     Hess            -   Hessian state
+//     IsUpper         -   whether upper or lower triangle is needed
+//     H               -   possibly preallocated array; resized if needed
+//
+// Outputs:
+//     H               -   either upper or lower NxN elements are filled
+//                         with Hessian
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+void hessiangetmatrix(xbfgshessian *hess, bool isupper, RMatrix *h) {
+   ae_int_t i;
+   ae_int_t n;
+   ae_assert(hess->htype == 0 || hess->htype == 3, "HessianGetHessian: Hessian mode is not supported");
+   n = hess->n;
+   allocm(n, n, h);
+   if (hess->htype == 0) {
+   // Dense direct Hessian
+      rcopym(n, n, &hess->hcurrent, h);
+   }
+   if (hess->htype == 3) {
+   // Low-rank model
+      optserv_recomputelowrankmodel(hess);
+      rsetm(n, n, 0.0, h);
+      for (i = 0; i < n; i++) {
+         h->xyR[i][i] = hess->sigma;
+      }
+      rmatrixgemm(n, n, hess->lowrankk, 1.0, &hess->lowrankcp, 0, 0, 1, &hess->lowrankcp, 0, 0, 0, 1.0, h, 0, 0);
+      rmatrixgemm(n, n, hess->lowrankk, -1.0, &hess->lowrankcm, 0, 0, 1, &hess->lowrankcm, 0, 0, 0, 1.0, h, 0, 0);
+   }
+}
+
+// Computes direct product H*x (here H is a Hessian matrix, not its inverse).
+// Either BFGS or LBFGS formula is used, depending on Hessian model settings.
+//
+// NOTE: this function modifies internal state of Hess,  it  uses  temporary
+//       arrays allocated in Hess. Thus, it is not thread-safe.
+//
+// Inputs:
+//     Hess            -   Hessian state
+//     X               -   array[N]
+//
+// Outputs:
+//     HX              -   array[N], H*x
+// ALGLIB: Copyright 28.11.2022 by Sergey Bochkanov
+void hessianmv(xbfgshessian *hess, RVector *x, RVector *hx) {
+   ae_int_t n;
+   ae_assert(hess->htype == 0 || hess->htype == 3, "HessianGetHessian: Hessian mode is not supported");
+   n = hess->n;
+   allocv(n, hx);
+   if (hess->htype == 0) {
+   // Dense direct Hessian
+      rgemv(n, n, 1.0, &hess->hcurrent, 0, x, 0.0, hx);
+   }
+   if (hess->htype == 3) {
+   // Low-rank model
+      optserv_recomputelowrankmodel(hess);
+      rcopymulv(n, hess->sigma, x, hx);
+      if (hess->lowrankk > 0) {
+         allocv(hess->lowrankk, &hess->buf);
+         rgemv(hess->lowrankk, n, 1.0, &hess->lowrankcp, 0, x, 0.0, &hess->buf);
+         rgemv(n, hess->lowrankk, 1.0, &hess->lowrankcp, 1, &hess->buf, 1.0, hx);
+         rgemv(hess->lowrankk, n, 1.0, &hess->lowrankcm, 0, x, 0.0, &hess->buf);
+         rgemv(n, hess->lowrankk, -1.0, &hess->lowrankcm, 1, &hess->buf, 1.0, hx);
+      }
+   }
+}
+
 void precbuflbfgs_init(void *_p, bool make_automatic) {
    precbuflbfgs *p = (precbuflbfgs *)_p;
    ae_vector_init(&p->norms, 0, DT_REAL, make_automatic);
@@ -3202,6 +3899,90 @@ void precbuflowrank_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->tmp, make_automatic);
 }
 
+void xbfgshessian_init(void *_p, bool make_automatic) {
+   xbfgshessian *p = (xbfgshessian *)_p;
+   ae_matrix_init(&p->hcurrent, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->s, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->y, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->lowrankcp, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->lowrankcm, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->lowrankeffd, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->lowranksst, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->lowranksyt, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->hincoming, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->sk, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->yk, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->hsk, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->buf, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->corr2, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->blk, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->jk, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->invsqrtdlk, 0, 0, DT_REAL, make_automatic);
+}
+
+void xbfgshessian_copy(void *_dst, const void *_src, bool make_automatic) {
+   xbfgshessian *dst = (xbfgshessian *)_dst;
+   const xbfgshessian *src = (const xbfgshessian *)_src;
+   dst->htype = src->htype;
+   dst->n = src->n;
+   dst->resetfreq = src->resetfreq;
+   dst->stpshort = src->stpshort;
+   dst->gammasml = src->gammasml;
+   dst->reg = src->reg;
+   dst->smallreg = src->smallreg;
+   dst->microreg = src->microreg;
+   dst->m = src->m;
+   ae_matrix_copy(&dst->hcurrent, &src->hcurrent, make_automatic);
+   dst->hage = src->hage;
+   dst->sumy2 = src->sumy2;
+   dst->sums2 = src->sums2;
+   dst->sumsy = src->sumsy;
+   dst->memlen = src->memlen;
+   dst->sigma = src->sigma;
+   dst->gamma = src->gamma;
+   ae_matrix_copy(&dst->s, &src->s, make_automatic);
+   ae_matrix_copy(&dst->y, &src->y, make_automatic);
+   dst->lowrankmodelvalid = src->lowrankmodelvalid;
+   dst->lowrankk = src->lowrankk;
+   ae_matrix_copy(&dst->lowrankcp, &src->lowrankcp, make_automatic);
+   ae_matrix_copy(&dst->lowrankcm, &src->lowrankcm, make_automatic);
+   dst->lowrankeffdvalid = src->lowrankeffdvalid;
+   ae_vector_copy(&dst->lowrankeffd, &src->lowrankeffd, make_automatic);
+   ae_matrix_copy(&dst->lowranksst, &src->lowranksst, make_automatic);
+   ae_matrix_copy(&dst->lowranksyt, &src->lowranksyt, make_automatic);
+   dst->updatestatus = src->updatestatus;
+   ae_matrix_copy(&dst->hincoming, &src->hincoming, make_automatic);
+   ae_vector_copy(&dst->sk, &src->sk, make_automatic);
+   ae_vector_copy(&dst->yk, &src->yk, make_automatic);
+   ae_vector_copy(&dst->hsk, &src->hsk, make_automatic);
+   ae_vector_copy(&dst->buf, &src->buf, make_automatic);
+   ae_matrix_copy(&dst->corr2, &src->corr2, make_automatic);
+   ae_matrix_copy(&dst->blk, &src->blk, make_automatic);
+   ae_matrix_copy(&dst->jk, &src->jk, make_automatic);
+   ae_matrix_copy(&dst->invsqrtdlk, &src->invsqrtdlk, make_automatic);
+}
+
+void xbfgshessian_free(void *_p, bool make_automatic) {
+   xbfgshessian *p = (xbfgshessian *)_p;
+   ae_matrix_free(&p->hcurrent, make_automatic);
+   ae_matrix_free(&p->s, make_automatic);
+   ae_matrix_free(&p->y, make_automatic);
+   ae_matrix_free(&p->lowrankcp, make_automatic);
+   ae_matrix_free(&p->lowrankcm, make_automatic);
+   ae_vector_free(&p->lowrankeffd, make_automatic);
+   ae_matrix_free(&p->lowranksst, make_automatic);
+   ae_matrix_free(&p->lowranksyt, make_automatic);
+   ae_matrix_free(&p->hincoming, make_automatic);
+   ae_vector_free(&p->sk, make_automatic);
+   ae_vector_free(&p->yk, make_automatic);
+   ae_vector_free(&p->hsk, make_automatic);
+   ae_vector_free(&p->buf, make_automatic);
+   ae_matrix_free(&p->corr2, make_automatic);
+   ae_matrix_free(&p->blk, make_automatic);
+   ae_matrix_free(&p->jk, make_automatic);
+   ae_matrix_free(&p->invsqrtdlk, make_automatic);
+}
+
 void smoothnessmonitor_init(void *_p, bool make_automatic) {
    smoothnessmonitor *p = (smoothnessmonitor *)_p;
    ae_vector_init(&p->s, 0, DT_REAL, make_automatic);
@@ -3212,10 +3993,15 @@ void smoothnessmonitor_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->enqueuedjac, 0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->sortedstp, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->sortedidx, 0, DT_INT, make_automatic);
-   ae_vector_init(&p->probingf, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->probingsteps, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->probingvalues, 0, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->probingslopes, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->lagprobxs, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->lagprobd, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->lagprobx, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->lagprobfi, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->lagprobj, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->lagprobvalues, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->lagprobjacobians, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->lagprobsteps, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->lagproblagrangians, 0, DT_REAL, make_automatic);
    optguardreport_init(&p->rep, make_automatic);
    optguardnonc0report_init(&p->nonc0strrep, make_automatic);
    optguardnonc0report_init(&p->nonc0lngrep, make_automatic);
@@ -3265,18 +4051,26 @@ void smoothnessmonitor_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->sortedstp, &src->sortedstp, make_automatic);
    ae_vector_copy(&dst->sortedidx, &src->sortedidx, make_automatic);
    dst->sortedcnt = src->sortedcnt;
-   dst->probingstp = src->probingstp;
-   ae_vector_copy(&dst->probingf, &src->probingf, make_automatic);
-   dst->probingnvalues = src->probingnvalues;
-   dst->probingstepmax = src->probingstepmax;
-   dst->probingstepscale = src->probingstepscale;
-   dst->probingnstepsstored = src->probingnstepsstored;
-   ae_vector_copy(&dst->probingsteps, &src->probingsteps, make_automatic);
-   ae_matrix_copy(&dst->probingvalues, &src->probingvalues, make_automatic);
-   ae_matrix_copy(&dst->probingslopes, &src->probingslopes, make_automatic);
+   dst->lagprobinneriter = src->lagprobinneriter;
+   dst->lagprobouteriter = src->lagprobouteriter;
+   dst->lagprobstepmax = src->lagprobstepmax;
+   dst->lagprobnstepsstored = src->lagprobnstepsstored;
+   ae_vector_copy(&dst->lagprobxs, &src->lagprobxs, make_automatic);
+   ae_vector_copy(&dst->lagprobd, &src->lagprobd, make_automatic);
+   dst->lagprobstp = src->lagprobstp;
+   ae_vector_copy(&dst->lagprobx, &src->lagprobx, make_automatic);
+   ae_vector_copy(&dst->lagprobfi, &src->lagprobfi, make_automatic);
+   dst->lagprobrawlag = src->lagprobrawlag;
+   ae_matrix_copy(&dst->lagprobj, &src->lagprobj, make_automatic);
+   ae_matrix_copy(&dst->lagprobvalues, &src->lagprobvalues, make_automatic);
+   ae_matrix_copy(&dst->lagprobjacobians, &src->lagprobjacobians, make_automatic);
+   ae_vector_copy(&dst->lagprobsteps, &src->lagprobsteps, make_automatic);
+   ae_vector_copy(&dst->lagproblagrangians, &src->lagproblagrangians, make_automatic);
    dst->ProbePQ = src->ProbePQ;
    dst->linesearchspoiled = src->linesearchspoiled;
    dst->linesearchstarted = src->linesearchstarted;
+   dst->linesearchinneridx = src->linesearchinneridx;
+   dst->linesearchouteridx = src->linesearchouteridx;
    dst->nonc0currentrating = src->nonc0currentrating;
    dst->nonc1currentrating = src->nonc1currentrating;
    dst->badgradhasxj = src->badgradhasxj;
@@ -3331,10 +4125,15 @@ void smoothnessmonitor_free(void *_p, bool make_automatic) {
    ae_matrix_free(&p->enqueuedjac, make_automatic);
    ae_vector_free(&p->sortedstp, make_automatic);
    ae_vector_free(&p->sortedidx, make_automatic);
-   ae_vector_free(&p->probingf, make_automatic);
-   ae_vector_free(&p->probingsteps, make_automatic);
-   ae_matrix_free(&p->probingvalues, make_automatic);
-   ae_matrix_free(&p->probingslopes, make_automatic);
+   ae_vector_free(&p->lagprobxs, make_automatic);
+   ae_vector_free(&p->lagprobd, make_automatic);
+   ae_vector_free(&p->lagprobx, make_automatic);
+   ae_vector_free(&p->lagprobfi, make_automatic);
+   ae_matrix_free(&p->lagprobj, make_automatic);
+   ae_matrix_free(&p->lagprobvalues, make_automatic);
+   ae_matrix_free(&p->lagprobjacobians, make_automatic);
+   ae_vector_free(&p->lagprobsteps, make_automatic);
+   ae_vector_free(&p->lagproblagrangians, make_automatic);
    optguardreport_free(&p->rep, make_automatic);
    optguardnonc0report_free(&p->nonc0strrep, make_automatic);
    optguardnonc0report_free(&p->nonc0lngrep, make_automatic);
@@ -4012,7 +4811,7 @@ Spawn:
          state->stp = 1.0;
       }
       linminnormalized(&state->d, &state->stp, n);
-      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g);
+      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g, state->k, -1);
       while (mcsrch(n, &state->x, state->f, &state->g, &state->d, &state->stp, state->stpmax, gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage)) {
          if (state->diffstep == 0.0) {
             state->needfg = true, state->PQ = 8; goto Pause; Resume08: state->needfg = false;
@@ -6421,15 +7220,19 @@ void scaledenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RVector 
 //                         * I-th element contains scale of I-th variable,
 //                         * SC[I] > 0
 //     N               -   number of variables.
-//     SparseA         -   NxN SparseMatrix in CRS format (any triangle can
-//                         be present, we will scale everything)
+//     SparseA         -   quadratic term, NxN SparseMatrix in CRS format
+//                         (any triangle can be present, we will scale everything)
+//     DenseCorrC      -   array[CorrRank,N], low rank correction C'*D*C being
+//                         added to the quadratic term
+//     DenseCorrD      -   array[CorrRank], low rank correction, diagonal factors
+//     CorrRank        -   correction rank, >= 0
 //     DenseB          -   array[N], linear term
 //
 // Outputs:
 //     SparseA         -   replaced by scaled term
 //     DenseB          -   replaced by scaled term
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RVector *denseb) {
+void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RMatrix *densecorrc, RVector *densecorrd, ae_int_t corrrank, RVector *denseb) {
    ae_int_t i;
    ae_int_t k0;
    ae_int_t k1;
@@ -6444,6 +7247,11 @@ void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RVector
          sparsea->vals.xR[k] *= si * s->xR[sparsea->idx.xZ[k]];
       }
       denseb->xR[i] *= si;
+   }
+   for (k = 0; k < corrrank; k++) {
+      for (i = 0; i < n; i++) {
+         densecorrc->xyR[k][i] *= s->xR[i];
+      }
    }
 }
 
@@ -6708,6 +7516,10 @@ double normalizedenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RV
 //     SparseA         -   Sparse NxN matrix, either upper or lower triangle,
 //                         diagonal MUST be present
 //     IsUpper         -   which triangle is present (other one is ignored)
+//     DenseCorrC      -   array[CorrRank,N], low rank correction C'*D*C being
+//                         added to the quadratic term
+//     DenseCorrD      -   array[CorrRank], low rank correction, diagonal factors
+//     CorrRank        -   correction rank, >= 0
 //     DenseB          -   array[N], linear term
 //     N               -   number of variables.
 //
@@ -6718,7 +7530,7 @@ double normalizedenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RV
 // Result:
 //     max(max(A),max(B)) is returned
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector *denseb, ae_int_t n) {
+double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RMatrix *densecorrc, RVector *densecorrd, ae_int_t corrrank, RVector *denseb, ae_int_t n) {
    ae_int_t i;
    ae_int_t k;
    ae_int_t k0;
@@ -6730,16 +7542,11 @@ double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector *de
    mx = 0.0;
    for (i = 0; i < n; i++) {
       ae_assert(sparsea->didx.xZ[i] + 1 == sparsea->uidx.xZ[i], "NormalizeSparseQPInplace: critical integrity check failed, sparse diagonal not found");
-      if (isupper) {
-         k0 = sparsea->didx.xZ[i];
-         k1 = sparsea->ridx.xZ[i + 1] - 1;
-      } else {
-         k0 = sparsea->ridx.xZ[i];
-         k1 = sparsea->didx.xZ[i];
+      v = sparsea->vals.xR[sparsea->didx.xZ[i]];
+      for (k = 0; k < corrrank; k++) {
+         v += densecorrd->xR[k] * sqr(densecorrc->xyR[k][i]);
       }
-      for (k = k0; k <= k1; k++) {
-         mx = rmax2(mx, fabs(sparsea->vals.xR[k]));
-      }
+      mx = rmax2(mx, fabs(v));
       mx = rmax2(mx, fabs(denseb->xR[i]));
    }
    result = mx;
@@ -6754,6 +7561,9 @@ double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector *de
          sparsea->vals.xR[k] *= v;
       }
       denseb->xR[i] *= v;
+   }
+   for (k = 0; k < corrrank; k++) {
+      densecorrd->xR[k] *= v;
    }
    return result;
 }
@@ -13281,7 +14091,7 @@ Spawn:
          ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
          state->fn = state->fc;
          state->mcstage = 0;
-         smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
+         smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn, state->repinneriterationscount, -1);
          while (mcsrch(n, &state->xn, state->fn, &state->ugn, &state->d, &state->stp, state->curstpmax, gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage)) {
          // Perform correction (constraints are enforced)
          // Copy XN to X
@@ -15025,13 +15835,14 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
          ae_assert(isfinite(vv), "VIPMSetQuadraticLinear: SparseH contains infinite or NaN values!");
          ae_assert(offs <= state->sparseh.vals.cnt && offs <= state->sparseh.idx.cnt, "VIPMSetQuadraticLinear: integrity check failed");
          sparsecreatecrsinplace(&state->sparseh);
-         if (isupper) {
-            sparsecopytransposecrsbuf(&state->sparseh, &state->tmpsparse0);
-            sparsecopybuf(&state->tmpsparse0, &state->sparseh);
-         }
       }
-      scalesparseqpinplace(&state->scl, n, &state->sparseh, &state->c);
-      state->targetscale = normalizesparseqpinplace(&state->sparseh, false, &state->c, n);
+      if (isupper) {
+         sparsecopytransposecrsbuf(&state->sparseh, &state->tmpsparse0);
+         sparsecopybuf(&state->tmpsparse0, &state->sparseh);
+      }
+   // Finalize
+      scalesparseqpinplace(&state->scl, n, &state->sparseh, &state->tmpr2, &state->dummyr, 0, &state->c);
+      state->targetscale = normalizesparseqpinplace(&state->sparseh, false, &state->tmpr2, &state->dummyr, 0, &state->c, n);
       state->isdiagonalh = state->sparseh.ridx.xZ[n] == n;
    }
    ae_assert(state->hkind >= 0, "VIPMSetQuadraticLinear: integrity check failed");
@@ -15616,7 +16427,6 @@ static double vipmsolver_varscomputemu(vipmstate *state, vipmvars *vstate) {
 // Works only for sparse IPM.
 // ALGLIB: Copyright 15.11.2021 by Sergey Bochkanov
 static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *solver) {
-   const double muquasidense = 2.0;
    ae_int_t ntotal;
    ae_int_t nnzmax;
    ae_int_t factldlt;
@@ -15628,11 +16438,8 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
    ae_int_t k;
    ae_int_t k0;
    ae_int_t k1;
-   ae_int_t sumdeg;
-   ae_int_t colthreshold;
-   ae_int_t rowthreshold;
-   ae_int_t eligiblecols;
-   ae_int_t eligiblerows;
+   ae_int_t sumcoldeg;
+   ae_int_t sumrowdeg;
    ae_assert(solver->factorizationtype == 1, "ReducedSystemInit: unexpected factorization type");
    ae_assert(solver->hkind == 1, "ReducedSystemInit: unexpected HKind");
    ntotal = solver->n + solver->mdense + solver->msparse;
@@ -15647,7 +16454,10 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
       nnzmax += solver->n * solver->mdense;
    }
    nnzmax += ntotal;
-// Prepare strictly lower triangle of template KKT matrix (KKT system without D and E
+// Default DIAG and DAMP terms
+   rsetallocv(ntotal, 0.0, &s->diagterm);
+   rsetallocv(ntotal, 0.0, &s->dampterm);
+// Prepare lower triangle of template KKT matrix (KKT system without D and E
 // terms being added to diagonals)
    s->rawsystem.m = ntotal;
    s->rawsystem.n = ntotal;
@@ -15657,7 +16467,8 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
    s->rawsystem.ridx.xZ[0] = 0;
    offs = 0;
    rowoffs = 0;
-   sumdeg = 0;
+   sumcoldeg = 0;
+   sumrowdeg = 0;
    isetallocv(solver->n, 0, &s->coldegrees);
    isetallocv(solver->msparse + solver->mdense, 0, &s->rowdegrees);
    bsetallocv(solver->n, true, &s->isdiagonal);
@@ -15675,6 +16486,9 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
                s->rawsystem.vals.xR[offs] = -solver->sparseh.vals.xR[k];
                s->isdiagonal.xB[i] = false;
                s->isdiagonal.xB[j] = false;
+               s->coldegrees.xZ[i]++;
+               s->coldegrees.xZ[j]++;
+               sumcoldeg += 2;
                offs++;
             }
          }
@@ -15701,7 +16515,8 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
             s->rawsystem.vals.xR[offs] = solver->sparseafull.vals.xR[k];
             s->rowdegrees.xZ[i]++;
             s->coldegrees.xZ[j]++;
-            sumdeg++;
+            sumcoldeg++;
+            sumrowdeg++;
             offs++;
          }
       }
@@ -15718,7 +16533,8 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
             s->rawsystem.vals.xR[offs] = solver->denseafull.xyR[i][k];
             s->rowdegrees.xZ[solver->msparse + i]++;
             s->coldegrees.xZ[k]++;
-            sumdeg++;
+            sumcoldeg++;
+            sumrowdeg++;
             offs++;
          }
       }
@@ -15732,21 +16548,7 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
    ae_assert(offs <= nnzmax, "ReducedSystemInit: critical integrity check failed");
    sparsecreatecrsinplace(&s->rawsystem);
 // Prepare reordering
-   colthreshold = iround(muquasidense * sumdeg / solver->n) + 2;
-   rowthreshold = iround(muquasidense * sumdeg / (solver->msparse + solver->mdense + 1)) + 2;
-   eligiblecols = 0;
-   eligiblerows = 0;
    isetallocv(ntotal, 0, &s->priorities);
-   for (i = 0; i < solver->n; i++) {
-      if (s->isdiagonal.xB[i] && s->coldegrees.xZ[i] <= colthreshold) {
-         eligiblecols++;
-      }
-   }
-   for (i = 0; i < solver->mdense + solver->msparse; i++) {
-      if (s->rowdegrees.xZ[i] <= rowthreshold) {
-         eligiblerows++;
-      }
-   }
 // Perform factorization analysis using sparsity pattern (but not numerical values)
    factldlt = 1;
    permpriorityamd = 3;
@@ -15755,9 +16557,14 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
    }
 }
 
-// Computes factorization of A+D, where A is  internally  stored  KKT  matrix
-// and D is user-supplied diagonal term. The factorization is stored internally
-// and should never be accessed directly.
+// Computes factorization of A+Diag+Damp, where A is an internally stored KKT
+// matrix and Diag and Damp are user-supplied diagonal terms.
+//
+// The Diag term is assumed to be a "true" modification of the system, and
+// Damp is assumed to be a small damping factor. The difference is that the
+// damping factor is added during the factorization, but not accounted for
+// during the iterative refinement stage, i.e. we factor A+Diag+Damp, but aim
+// to solve A+Diag.
 //
 // ModEps and BadChol are user supplied tolerances for modified Cholesky/LDLT.
 //
@@ -15766,20 +16573,23 @@ static void vipmsolver_reducedsysteminit(vipmreducedsparsesystem *s, vipmstate *
 // On success outputs diagonal reproduction error ErrSq, and sum of squared
 // diagonal elements SumSq
 // ALGLIB: Copyright 15.11.2021 by Sergey Bochkanov
-static bool vipmsolver_reducedsystemfactorizewithaddend(vipmreducedsparsesystem *s, RVector *d, double modeps, double badchol, double *sumsq, double *errsq) {
+static bool vipmsolver_reducedsystemfactorizewithaddends(vipmreducedsparsesystem *s, RVector *diag, RVector *damp, double modeps, double badchol, double *sumsq, double *errsq) {
    ae_int_t ntotal;
    ae_int_t i;
    bool result;
    *sumsq = 0.0;
    *errsq = 0.0;
    ntotal = s->ntotal;
+   rcopyv(ntotal, diag, &s->diagterm);
+   rcopyv(ntotal, damp, &s->dampterm);
    for (i = 0; i < ntotal; i++) {
-      s->effectivediag.xR[i] = s->rawsystem.vals.xR[s->rawsystem.didx.xZ[i]] + d->xR[i];
+      s->effectivediag.xR[i] = s->rawsystem.vals.xR[s->rawsystem.didx.xZ[i]] + diag->xR[i] + damp->xR[i];
    }
    spsymmreloaddiagonal(&s->analysis, &s->effectivediag);
    result = true;
    spsymmsetmodificationstrategy(&s->analysis, 1, modeps, badchol, 0.0, 0.0);
    if (spsymmfactorize(&s->analysis)) {
+   // Compute diagonal reproduction error
       spsymmdiagerr(&s->analysis, sumsq, errsq);
    } else {
       *sumsq = 0.0;
@@ -15792,7 +16602,38 @@ static bool vipmsolver_reducedsystemfactorizewithaddend(vipmreducedsparsesystem 
 // Solve reduced KKT system, replacing right part by its solution.
 // ALGLIB: Copyright 15.11.2021 by Sergey Bochkanov
 static void vipmsolver_reducedsystemsolve(vipmreducedsparsesystem *s, RVector *b) {
+   const ae_int_t maxrefinementits = 5;
+   ae_int_t iteridx;
+   double bnrm2;
+   double relerr;
+   double prevrelerr;
+// Perform initial solution
+   rcopyallocv(s->ntotal, b, &s->tmpb);
    spsymmsolve(&s->analysis, b);
+// Trace residual and relative error
+   bnrm2 = rmax2(rdotv2(s->ntotal, &s->tmpb), 1.0);
+   sparsesmv(&s->rawsystem, false, b, &s->tmprhs);
+   rmuladdv(s->ntotal, b, &s->diagterm, &s->tmprhs);
+   rmulv(s->ntotal, -1.0, &s->tmprhs);
+   raddv(s->ntotal, 1.0, &s->tmpb, &s->tmprhs);
+   relerr = sqrt(rdotv2(s->ntotal, &s->tmprhs) / bnrm2);
+// Perform iterative refinement, if necessary
+   prevrelerr = 1.0E50;
+   iteridx = 0;
+   while (iteridx < maxrefinementits && relerr > 10.0 * machineepsilon && relerr < 0.5 * prevrelerr) {
+   // Compute correction and update solution
+      rcopyallocv(s->ntotal, &s->tmprhs, &s->tmpcorr);
+      spsymmsolve(&s->analysis, &s->tmpcorr);
+      raddv(s->ntotal, 1.0, &s->tmpcorr, b);
+   // Recompute residual
+      sparsesmv(&s->rawsystem, false, b, &s->tmprhs);
+      rmuladdv(s->ntotal, b, &s->diagterm, &s->tmprhs);
+      rmulv(s->ntotal, -1.0, &s->tmprhs);
+      raddv(s->ntotal, 1.0, &s->tmpb, &s->tmprhs);
+      prevrelerr = relerr;
+      relerr = sqrt(rdotv2(s->ntotal, &s->tmprhs) / bnrm2);
+      iteridx++;
+   }
 }
 
 // Computes target function 0.5*x'*H*x+c'*x
@@ -16200,6 +17041,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
    if (state->factorizationtype == 1) {
    // Generate reduced KKT matrix
       allocv(n + m, &state->facttmpdiag);
+      allocv(n + m, &state->facttmpdamp);
       for (i = 0; i < n; i++) {
          vv = 0.0;
          if (alpha0 > 0.0) {
@@ -16209,8 +17051,8 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
             vv += alpha11;
          }
          vv += state->diagr.xR[i];
-         vv += dampeps;
          state->facttmpdiag.xR[i] = -vv;
+         state->facttmpdamp.xR[i] = -dampeps;
          ae_assert(vv > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
       }
       for (i = 0; i < msparse + mdense; i++) {
@@ -16221,13 +17063,13 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
          if (beta11 > 0.0) {
             vv += beta11;
          }
-         vv += dampeps;
          state->facttmpdiag.xR[n + i] = vv;
+         state->facttmpdamp.xR[n + i] = dampeps;
          ae_assert(vv > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
       }
    // Perform factorization
    // Perform additional integrity check: LDLT should reproduce diagonal of initial KKT system with good precision
-      if (!vipmsolver_reducedsystemfactorizewithaddend(&state->reducedsparsesystem, &state->facttmpdiag, modeps, badchol, &sumsq, &errsq)) {
+      if (!vipmsolver_reducedsystemfactorizewithaddends(&state->reducedsparsesystem, &state->facttmpdiag, &state->facttmpdamp, modeps, badchol, &sumsq, &errsq)) {
          result = false;
          return result;
       }
@@ -17136,12 +17978,13 @@ static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
 //     StepDecay           -   decay parameter, the step is multiplied by this
 //                             coefficient. 1.0 corresponds to full step
 //                             length being returned. Values in (0,1] range.
+//     SeparateStep        -   separate step for primal and dual vars
 //
 // Outputs:
 //     AlphaP              -   primal step (after applying decay coefficient)
 //     AlphaD              -   dual   step (after applying decay coefficient)
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vipmvars *vs, double stepdecay, double *alphap, double *alphad) {
+static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vipmvars *vs, double stepdecay, bool separatestep, double *alphap, double *alphad) {
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
@@ -17185,11 +18028,17 @@ static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vip
          *alphad = safeminposrv(v0->q.xR[i], -vs->q.xR[i], *alphad);
       }
    }
-// Because we may solve QP problem, step length has to be same for primal and dual variables
-   alpha = rmin2(*alphap, *alphad);
-// Apply decay
-   *alphap = stepdecay * alpha;
-   *alphad = stepdecay * alpha;
+// Separate step or joint step?
+   if (separatestep) {
+   // Separate step on primal/dual
+      *alphap *= stepdecay;
+      *alphad *= stepdecay;
+   } else {
+   // Because we may solve QP problem, step length has to be same for primal and dual variables
+      alpha = rmin2(*alphap, *alphad);
+      *alphap = stepdecay * alpha;
+      *alphad = stepdecay * alpha;
+   }
 }
 
 // This function performs IPM step, updates  iteration  counts  and  performs
@@ -17447,6 +18296,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    const double steplengthdecay = 0.95, stagnationdelta = 0.99999;
    const double primalinfeasible1 = 0.001, dualinfeasible1 = 0.001;
    const double bigy = 100000000.0, ygrowth = 1000000.0;
+   const ae_int_t phase0length = 10;
    const ae_int_t itersfortoostringentcond = 25;
    const ae_int_t minitersbeforedroppingbounds = 3, minitersbeforeinfeasible = 3;
    const ae_int_t minitersbeforestagnation = 5, minitersbeforeeworststagnation = 50;
@@ -17467,6 +18317,8 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    ae_int_t primalstagnationcnt;
    ae_int_t dualstagnationcnt;
    double regeps;
+   double regeps0;
+   double regeps1;
    double dampeps;
    double safedampeps;
    double modeps;
@@ -17521,9 +18373,11 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 // * DampFree - additional damping coefficient for free variables
    regfree = pow(machineepsilon, 0.75);
    dampfree = 0.0;
-   regeps = 100.0 * machineepsilon;
+   regeps0 = sqrt(machineepsilon);
+   regeps1 = 10.0 * machineepsilon;
+   regeps = regeps0;
    modeps = (100.0 + sqrt(n)) * machineepsilon;
-   dampeps = (100.0 + sqrt(n)) * machineepsilon;
+   dampeps = 10.0 * machineepsilon;
    safedampeps = sqrt(machineepsilon);
    maxdampeps = sqrt(sqrt(machineepsilon));
 // Set up initial state
@@ -17554,6 +18408,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    errp2 = maxrealnumber;
    errd2 = maxrealnumber;
    for (iteridx = 0; iteridx < maxipmits; iteridx++) {
+      regeps = iteridx < phase0length ? regeps0 : regeps1;
    // Check regularization status, terminate if overregularized
       if (dampeps >= maxdampeps) {
          *terminationtype = 7;
@@ -17577,7 +18432,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          dampeps *= 10.0;
          continue;
       }
-      vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltaaff, steplengthdecay, &alphaaffp, &alphaaffd);
+      vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltaaff, steplengthdecay, false, &alphaaffp, &alphaaffd);
    // Compute MuAff and centering parameter
       vipmsolver_varsinitfrom(&state->trial, &state->current);
       vipmsolver_varsaddstep(&state->trial, &state->deltaaff, alphaaffp, alphaaffd);
@@ -17591,7 +18446,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          dampeps *= 10.0;
          continue;
       }
-      vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltacorr, steplengthdecay, &alphap, &alphad);
+      vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltacorr, steplengthdecay, false, &alphap, &alphad);
       if (iteridx >= minitersbeforesafeguards && (alphap <= badsteplength || alphad <= badsteplength)) {
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
@@ -17833,6 +18688,11 @@ void vipmreducedsparsesystem_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->coldegrees, 0, DT_INT, make_automatic);
    spcholanalysis_init(&p->analysis, make_automatic);
    ae_vector_init(&p->priorities, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->diagterm, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->dampterm, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmpb, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmprhs, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmpcorr, 0, DT_REAL, make_automatic);
 }
 
 void vipmreducedsparsesystem_copy(void *_dst, const void *_src, bool make_automatic) {
@@ -17846,6 +18706,11 @@ void vipmreducedsparsesystem_copy(void *_dst, const void *_src, bool make_automa
    dst->ntotal = src->ntotal;
    spcholanalysis_copy(&dst->analysis, &src->analysis, make_automatic);
    ae_vector_copy(&dst->priorities, &src->priorities, make_automatic);
+   ae_vector_copy(&dst->diagterm, &src->diagterm, make_automatic);
+   ae_vector_copy(&dst->dampterm, &src->dampterm, make_automatic);
+   ae_vector_copy(&dst->tmpb, &src->tmpb, make_automatic);
+   ae_vector_copy(&dst->tmprhs, &src->tmprhs, make_automatic);
+   ae_vector_copy(&dst->tmpcorr, &src->tmpcorr, make_automatic);
 }
 
 void vipmreducedsparsesystem_free(void *_p, bool make_automatic) {
@@ -17857,6 +18722,11 @@ void vipmreducedsparsesystem_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->coldegrees, make_automatic);
    spcholanalysis_free(&p->analysis, make_automatic);
    ae_vector_free(&p->priorities, make_automatic);
+   ae_vector_free(&p->diagterm, make_automatic);
+   ae_vector_free(&p->dampterm, make_automatic);
+   ae_vector_free(&p->tmpb, make_automatic);
+   ae_vector_free(&p->tmprhs, make_automatic);
+   ae_vector_free(&p->tmpcorr, make_automatic);
 }
 
 void vipmrighthandside_init(void *_p, bool make_automatic) {
@@ -17957,6 +18827,7 @@ void vipmstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->factinvregdzrz, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->factregewave, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->facttmpdiag, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->facttmpdamp, 0, DT_REAL, make_automatic);
    vipmreducedsparsesystem_init(&p->reducedsparsesystem, make_automatic);
    vipmrighthandside_init(&p->rhs, make_automatic);
    ae_vector_init(&p->rhsalphacap, 0, DT_REAL, make_automatic);
@@ -18056,6 +18927,7 @@ void vipmstate_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->factinvregdzrz, &src->factinvregdzrz, make_automatic);
    ae_vector_copy(&dst->factregewave, &src->factregewave, make_automatic);
    ae_vector_copy(&dst->facttmpdiag, &src->facttmpdiag, make_automatic);
+   ae_vector_copy(&dst->facttmpdamp, &src->facttmpdamp, make_automatic);
    vipmreducedsparsesystem_copy(&dst->reducedsparsesystem, &src->reducedsparsesystem, make_automatic);
    vipmrighthandside_copy(&dst->rhs, &src->rhs, make_automatic);
    ae_vector_copy(&dst->rhsalphacap, &src->rhsalphacap, make_automatic);
@@ -18133,6 +19005,7 @@ void vipmstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->factinvregdzrz, make_automatic);
    ae_vector_free(&p->factregewave, make_automatic);
    ae_vector_free(&p->facttmpdiag, make_automatic);
+   ae_vector_free(&p->facttmpdamp, make_automatic);
    vipmreducedsparsesystem_free(&p->reducedsparsesystem, make_automatic);
    vipmrighthandside_free(&p->rhs, make_automatic);
    ae_vector_free(&p->rhsalphacap, make_automatic);
@@ -20256,6 +21129,7 @@ void minqpstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->elaglc, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->elagmlt, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->elagidx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->dummyr, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->dummyr2, 0, 0, DT_REAL, make_automatic);
    sparsematrix_init(&p->dummysparse, make_automatic);
    ae_matrix_init(&p->tmpr2, 0, 0, DT_REAL, make_automatic);
@@ -20318,6 +21192,7 @@ void minqpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->elaglc, &src->elaglc, make_automatic);
    ae_vector_copy(&dst->elagmlt, &src->elagmlt, make_automatic);
    ae_vector_copy(&dst->elagidx, &src->elagidx, make_automatic);
+   ae_vector_copy(&dst->dummyr, &src->dummyr, make_automatic);
    ae_matrix_copy(&dst->dummyr2, &src->dummyr2, make_automatic);
    sparsematrix_copy(&dst->dummysparse, &src->dummysparse, make_automatic);
    ae_matrix_copy(&dst->tmpr2, &src->tmpr2, make_automatic);
@@ -20362,6 +21237,7 @@ void minqpstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->elaglc, make_automatic);
    ae_vector_free(&p->elagmlt, make_automatic);
    ae_vector_free(&p->elagidx, make_automatic);
+   ae_vector_free(&p->dummyr, make_automatic);
    ae_matrix_free(&p->dummyr2, make_automatic);
    sparsematrix_free(&p->dummysparse, make_automatic);
    ae_matrix_free(&p->tmpr2, make_automatic);
@@ -24158,7 +25034,7 @@ Spawn:
          goto Exit;
       }
    // Minimization along D
-      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g);
+      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g, state->repiterationscount, -1);
       while (mcsrch(n, &state->x, state->f, &state->g, &state->d, &state->stp, state->curstpmax, gtol, &state->mcinfo, &state->nfev, &state->work0, &state->lstate, &state->mcstage)) {
       // Calculate function/gradient using either
       // analytical gradient supplied by user
@@ -25168,17 +26044,8 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
    vectorsetlengthatleast(&subsolver->curbndl, nslack);
    vectorsetlengthatleast(&subsolver->curbndu, nslack);
    vectorsetlengthatleast(&subsolver->curb, nslack);
-   vectorsetlengthatleast(&subsolver->sk, n);
-   vectorsetlengthatleast(&subsolver->yk, n);
 // Initial state
    subsolver->algokind = 0;
-   matrixsetlengthatleast(&subsolver->h, n, n);
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < n; j++) {
-         subsolver->h.xyR[i][j] = 0.0;
-      }
-      subsolver->h.xyR[i][i] = 1.0;
-   }
 // Linear constraints do not change across subiterations, that's
 // why we allocate storage for them at the start of the program.
 //
@@ -25226,128 +26093,6 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
 static void nlcsqp_qpsubsolversetalgoipm(minsqpsubsolver *subsolver) {
    subsolver->algokind = 0;
-}
-
-// Updates Hessian estimate, uses regularized formula which prevents  Hessian
-// eigenvalues from decreasing below sqrt(Eps)  and  rejects  updates  larger
-// than 1/sqrt(Eps) in magnitude.
-//
-// Inputs:
-//     SState          -   solver state
-//     Subsolver       -   SQP subproblem to initialize
-//     X0, G0          -   point #0 and gradient at #0, array[N]
-//     X1, G1          -   point #1 and gradient at #1, array[N]
-// ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
-static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1) {
-   ae_int_t i;
-   ae_int_t n;
-   double shs;
-   double rawsy;
-   double sy;
-   double snrm2;
-   double ynrm2;
-   double v2;
-   double gk;
-   double sk;
-   double yk;
-   double mxs;
-   double mxy;
-   double mxhs;
-   double reg;
-   double big;
-   double growth;
-   double eigold;
-   double eignew;
-   double eigcorrection;
-   bool result;
-// Algorithm parameters
-   reg = 100.0 * sqrt(machineepsilon);
-   big = 1.0 / reg;
-   growth = 100.0;
-// Proceed
-   result = false;
-   n = sstate->n;
-   vectorsetlengthatleast(&subsolver->tmp0, n);
-   rawsy = 0.0;
-   sy = 0.0;
-   snrm2 = 0.0;
-   ynrm2 = 0.0;
-   v2 = 0.0;
-   mxs = 0.0;
-   mxy = 0.0;
-   for (i = 0; i < n; i++) {
-   // Fetch components
-      sk = x1->xR[i] - x0->xR[i];
-      yk = g1->xR[i] - g0->xR[i];
-      gk = g0->xR[i];
-   // Compute raw (S,Y) without regularization (to be used later
-   // during comparison with zero)
-      rawsy += sk * yk;
-   // Convexify Y
-      yk += reg * sk;
-   // Compute various coefficients using regularized values
-      sy += sk * yk;
-      snrm2 += sk * sk;
-      ynrm2 += yk * yk;
-      v2 += gk * gk;
-      mxs = rmax2(mxs, fabs(sk));
-      mxy = rmax2(mxy, fabs(yk));
-      subsolver->sk.xR[i] = sk;
-      subsolver->yk.xR[i] = yk;
-   }
-   shs = rmatrixsyvmv(n, &subsolver->h, 0, 0, true, &subsolver->sk, 0, &subsolver->tmp0);
-   rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, &subsolver->sk, 0, 0.0, &subsolver->tmp0, 0);
-   mxhs = 0.0;
-   for (i = 0; i < n; i++) {
-      mxhs = rmax2(mxhs, fabs(subsolver->tmp0.xR[i]));
-   }
-// Skip updates if (Sk,Yk) <= 0 or Sk*H*Sk <= 0
-//
-// NOTE: we use 0.5*(SY+RawSY) in place of (Sk,Yk) which allows us to have slight
-//       nonconvexity due to numerical noise.
-   if (0.5 * (sy + rawsy) <= 0.0) {
-      return result;
-   }
-   if (shs <= 0.0) {
-      return result;
-   }
-   if (snrm2 <= 0.0) {
-      return result;
-   }
-   ae_assert(sy > 0.0, "UpdateHessian: integrity check failed");
-// Skip updates with too short steps
-//
-// NOTE: may prevent us from updating Hessian near the solution
-   if (mxs <= coalesce(sstate->epsx, sqrt(machineepsilon))) {
-      return result;
-   }
-// Too large Hessian updates sometimes may come from noisy or nonsmooth problems.
-//
-// Skip updates with max(Yk)^2/(Yk,Sk) >= BIG or max(H*Sk)^2/(Sk*H*Sk) >= BIG
-   if (sqr(mxy) >= sy * big) {
-      return result;
-   }
-   if (sqr(mxhs) >= shs * big) {
-      return result;
-   }
-// Compare eigenvalues of H: old one removed by update, and new one.
-// We require that new eigenvalue is not much larger/smaller than the old one.
-// In order to enforce this condition we compute correction coefficient and
-// multiply one of the rank-1 updates by this coefficient.
-   eigold = shs / snrm2;
-   eignew = ynrm2 / sy;
-   eigcorrection = 1.0;
-   if (eignew > eigold * growth) {
-      eigcorrection = eigold * growth / eignew;
-   }
-   if (eignew * growth < eigold) {
-      eigcorrection = eigold / (eignew * growth);
-   }
-// Update Hessian
-   rmatrixger(n, n, &subsolver->h, 0, 0, -1.0 / shs, &subsolver->tmp0, 0, &subsolver->tmp0, 0);
-   rmatrixger(n, n, &subsolver->h, 0, 0, eigcorrection * (1.0 / sy), &subsolver->yk, 0, &subsolver->yk, 0);
-   result = true;
-   return result;
 }
 
 // This function solves QP subproblem given by initial point X, function vector Fi
@@ -25435,6 +26180,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    ae_int_t nnz;
    ae_int_t j0;
    ae_int_t j1;
+   double rescaleby;
    bool result;
    *terminationtype = 0;
    n = state->n;
@@ -25529,7 +26275,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       j1 = subsolver->sparserawlc.ridx.xZ[i + 1] - 1;
       for (k = j0; k <= j1; k++) {
          j = subsolver->sparserawlc.idx.xZ[k];
-         v = subsolver->tmp0.xR[j];
+         v = x->xR[j];
          vv = subsolver->sparserawlc.vals.xR[k];
          vright += vv * v;
          if (vv >= 0.0) {
@@ -25607,18 +26353,42 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    subsolver->sparseefflc.m += nec + nic;
 // Append nonlinear equality/inequality constraints
    for (i = 0; i < nlec + nlic; i++) {
-   // Calculate scale coefficient
+   // Calculate:
+   // * rescale coefficient used to normalize constraints
+   // * VMax - maximum of constraint value over trust region
+      vmax = fi->xR[1 + i];
       vv = 0.0;
       for (j = 0; j < n; j++) {
          v = jac->xyR[1 + i][j];
          vv += v * v;
+         if (v >= 0.0) {
+            vmax += v * subsolver->curbndu.xR[j];
+         } else {
+            vmax += v * subsolver->curbndl.xR[j];
+         }
       }
-      vv = 1.0 / coalesce(sqrt(vv), 1.0);
+      rescaleby = 1.0 / coalesce(sqrt(vv), 1.0);
+   // If constraint is an inequality one and guaranteed to be inactive
+   // within trust region, it is skipped (row itself is retained but
+   // filled by zeros).
+      if (i >= nlec && vmax <= 0.0) {
+         offs = subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m + i];
+         subsolver->sparseefflc.vals.xR[offs] = -1.0;
+         subsolver->sparseefflc.idx.xZ[offs] = offsslacknlic + (i - nlec);
+         subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m + i + 1] = offs + 1;
+         v = rescaleby * fi->xR[1 + i];
+         subsolver->cural.xR[subsolver->sparseefflc.m + i] = 0.0;
+         subsolver->curau.xR[subsolver->sparseefflc.m + i] = 0.0;
+         subsolver->curbndl.xR[offsslacknlic + (i - nlec)] = 0.0;
+         subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = 0.0;
+         subsolver->d0.xR[offsslacknlic + (i - nlec)] = 0.0;
+         continue;
+      }
    // Copy scaled row
       offs = subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m + i];
       for (j = 0; j < n; j++) {
          if (jac->xyR[1 + i][j] != 0.0) {
-            subsolver->sparseefflc.vals.xR[offs] = vv * jac->xyR[1 + i][j];
+            subsolver->sparseefflc.vals.xR[offs] = rescaleby * jac->xyR[1 + i][j];
             subsolver->sparseefflc.idx.xZ[offs] = j;
             offs++;
          }
@@ -25638,7 +26408,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       }
       subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m + i + 1] = offs;
    // Set box constraints on slack variables and bounds on linear equality/inequality constraints
-      v = vv * fi->xR[1 + i];
+      v = rescaleby * fi->xR[1 + i];
       if (i < nlec) {
       // Equality constraint
          subsolver->cural.xR[subsolver->sparseefflc.m + i] = -v;
@@ -25679,14 +26449,11 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    //
    // NOTE: because we cleaned up constraints that are DEFINITELY inactive within
    //       trust region, we do not have to worry about StopOnExcessiveBounds option.
-      vectorsetlengthatleast(&subsolver->tmp0, nslack);
-      vectorsetlengthatleast(&subsolver->tmp1, nslack);
-      for (i = 0; i < nslack; i++) {
-         subsolver->tmp0.xR[i] = state->trustrad;
-         subsolver->tmp1.xR[i] = 0.0;
-      }
+      rsetallocv(nslack, state->trustrad, &subsolver->tmp0);
+      rsetallocv(nslack, 0.0, &subsolver->tmp1);
+      hessiangetmatrix(&state->hess, true, &subsolver->denseh);
       vipminitdensewithslacks(&subsolver->ipmsolver, &subsolver->tmp0, &subsolver->tmp1, n, nslack);
-      vipmsetquadraticlinear(&subsolver->ipmsolver, &subsolver->h, &subsolver->sparsedummy, 0, true, &subsolver->curb);
+      vipmsetquadraticlinear(&subsolver->ipmsolver, &subsolver->denseh, &subsolver->sparsedummy, 0, true, &subsolver->curb);
       vipmsetconstraints(&subsolver->ipmsolver, &subsolver->curbndl, &subsolver->curbndu, &subsolver->sparseefflc, subsolver->sparseefflc.m, &subsolver->densedummy, 0, &subsolver->cural, &subsolver->curau);
       vipmoptimize(&subsolver->ipmsolver, false, &subsolver->tmp0, &subsolver->tmp1, &subsolver->tmp2, terminationtype);
       for (i = 0; i < nslack; i++) {
@@ -25699,7 +26466,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    }
    if (subsolver->algokind == 1) {
    // Use fast active set
-      nlcsqp_fassolve(subsolver, &subsolver->d0, &subsolver->h, n, &subsolver->curb, nslack, &subsolver->curbndl, &subsolver->curbndu, &subsolver->sparseefflc, subsolver->sparseefflc.m, &subsolver->cural, &subsolver->curau, state->trustrad, terminationtype, d, lagmult);
+      nlcsqp_fassolve(subsolver, &subsolver->d0, &state->hess.hcurrent, n, &subsolver->curb, nslack, &subsolver->curbndl, &subsolver->curbndu, &subsolver->sparseefflc, subsolver->sparseefflc.m, &subsolver->cural, &subsolver->curau, state->trustrad, terminationtype, d, lagmult);
       if (*terminationtype <= 0) {
       // QP solver failed due to numerical errors; exit
          result = false;
@@ -25739,7 +26506,8 @@ static void nlcsqp_meritphaseinit(minsqpmeritphasestate *meritstate, RVector *cu
    meritstate->nlec = nlec;
    meritstate->nlic = nlic;
    vectorsetlengthatleast(&meritstate->d, nslack);
-   vectorsetlengthatleast(&meritstate->dx, nslack);
+   vectorsetlengthatleast(&meritstate->d0, nslack);
+   vectorsetlengthatleast(&meritstate->d1, nslack);
    vectorsetlengthatleast(&meritstate->stepkx, n);
    vectorsetlengthatleast(&meritstate->stepkxc, n);
    vectorsetlengthatleast(&meritstate->stepkxn, n);
@@ -25802,10 +26570,10 @@ static bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *js)
    for (i = 0; i <= nlec + nlic; i++) {
       vv = 1.0 / state->fscales.xR[i];
       fis->xR[i] = vv * state->fi.xR[i];
-      v = 0.1 * v + fis->xR[i];
+      v += fis->xR[i];
       for (j = 0; j < n; j++) {
          js->xyR[i][j] = vv * state->j.xyR[i][j];
-         v = 0.1 * v + js->xyR[i][j];
+         v += js->xyR[i][j];
       }
    }
    result = isfinite(v);
@@ -26043,9 +26811,13 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    AutoS double tol;
    AutoS double stepklagval;
    AutoS double stepknlagval;
-   AutoS bool hessianupdateperformed;
    AutoS double stp;
    AutoS double expandedrad;
+   AutoS bool socperformed;
+   AutoS ae_int_t didx;
+   AutoS double sksk;
+   AutoS double ykyk;
+   AutoS double skyk;
 // Manually threaded two-way signalling.
 // Locals are zeroed out the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
@@ -26063,18 +26835,22 @@ Spawn:
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
    ae_assert(meritstate->lagmult.cnt >= nec + nic + nlec + nlic, "MeritPhaseIteration: integrity check failed");
+   rsetv(nslack, 0.0, &meritstate->d0);
+   rsetv(nslack, 0.0, &meritstate->d1);
 // Default decision is to continue algorithm
    meritstate->status = 1;
    meritstate->increasebigc = false;
    stp = 0.0;
 // Determine step direction using initial quadratic model.
 // Update penalties vector with current Lagrange multipliers.
-   if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->d, &meritstate->lagmult, &j)) {
+   socperformed = false;
+   if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->d0, &meritstate->lagmult, &j)) {
       goto Exit;
    }
    for (i = 0; i < nec + nic + nlec + nlic; i++) {
       meritstate->penalties.xR[i] = rmax2(meritstate->penalties.xR[i], fabs(meritstate->lagmult.xR[i]));
    }
+   rcopyv(nslack, &meritstate->d0, &meritstate->d);
 // Perform merit function line search.
 //
 // First, we try unit step. If it does not decrease merit function,
@@ -26099,6 +26875,7 @@ Spawn:
    // * use original model of the target
    // * extrapolate model of nonlinear constraints at StepKX+D back to origin
    //
+      socperformed = true;
       meritstate->stepkfic.xR[0] = meritstate->stepkfi.xR[0];
       for (j = 0; j < n; j++) {
          meritstate->stepkjc.xyR[0][j] = meritstate->stepkj.xyR[0][j];
@@ -26106,22 +26883,20 @@ Spawn:
       for (i = 1; i <= nlec + nlic; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
-            v += meritstate->d.xR[j] * meritstate->stepkj.xyR[i][j];
+            v += meritstate->d0.xR[j] * meritstate->stepkj.xyR[i][j];
             meritstate->stepkjc.xyR[i][j] = meritstate->stepkj.xyR[i][j];
          }
          meritstate->stepkfic.xR[i] = meritstate->stepkfin.xR[i] - v;
       }
-      if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfic, &meritstate->stepkjc, &meritstate->dx, &meritstate->dummylagmult, &j)) {
+      if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfic, &meritstate->stepkjc, &meritstate->d1, &meritstate->dummylagmult, &j)) {
          goto Exit;
       }
-      for (i = 0; i < n; i++) {
-         meritstate->d.xR[i] = meritstate->dx.xR[i];
-      }
+      rcopyv(n, &meritstate->d1, &meritstate->d);
    // Perform line search, we again try full step (maybe it will work after SOC)
       localstp = 1.0;
       nu = 0.5;
       f1 = f0;
-      smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
+      smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, state->repiterationscount, -1);
       while (true) {
          for (i = 0; i < n; i++) {
             meritstate->stepkxn.xR[i] = meritstate->stepkx.xR[i] + localstp * meritstate->d.xR[i];
@@ -26207,80 +26982,79 @@ Spawn:
       }
    }
 #if 0 //(@) Not used.
+// Update debug curvature information. Let
+//
+//     Sk = X(k+1)-X(k), Yk = G(k+1)-G(k)
+//
+// for a function Fi and store maximum over curvatures
+//
+//     gamma = (Yk,Yk)/|(Sk,Yk)|
+//
+// to TraceGamma[] array. Set MaxNewGamma to maximum of new values, set GammaIncreased
+// flag if at least one of TraceGamma[] entries was increased.
+   sksk = 0.0;
+   for (j = 0; j < n; j++) {
+      v = meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j];
+      sksk += v * v;
+   }
+   if (sksk > 0.0) {
+      for (i = 0; i <= nlec + nlic; i++) {
+         ykyk = 0.0;
+         skyk = 0.0;
+         for (j = 0; j < n; j++) {
+            v = meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j];
+            vv = meritstate->stepkjn.xyR[i][j] - meritstate->stepkj.xyR[i][j];
+            skyk += v * vv;
+            ykyk += vv * vv;
+         }
+         v = ykyk / (fabs(skyk) + machineepsilon * ykyk + machineepsilon * sksk);
+      }
+   }
 // Perform aggressive probing of the search direction - additional function evaluations
 // which help us to determine possible discontinuity and nonsmoothness of the problem
 #   if 0 //(@) Not used.
-   smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
-   smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
-   while (smoothnessmonitorprobe(smonitor)) {
-      for (j = 0; j < n; j++) {
-         meritstate->stepkxc.xR[j] = meritstate->stepkx.xR[j] + smonitor->probingstp * meritstate->d.xR[j];
-         if (state->hasbndl.xB[j]) {
-            meritstate->stepkxc.xR[j] = rmax2(meritstate->stepkxc.xR[j], state->scaledbndl.xR[j]);
-         }
-         if (state->hasbndu.xB[j]) {
-            meritstate->stepkxc.xR[j] = rmin2(meritstate->stepkxc.xR[j], state->scaledbndu.xR[j]);
-         }
-      }
-      nlcsqp_sqpsendx(state, &meritstate->stepkxc);
-      state->needfij = true, meritstate->PQ = 2; goto Pause; Resume2: state->needfij = false;
-      if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfic, &meritstate->stepkjc)) {
+   for (didx = 0; didx < 2; didx++) {
+      if (didx == 1 && !socperformed) {
          break;
       }
-      smonitor->probingf.xR[0] = nlcsqp_rawlagrangian(state, &meritstate->stepkxc, &meritstate->stepkfic, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit);
-      smonitor->probingf.xR[1] = meritstate->stepkfic.xR[0];
-      smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, smonitor->probingstp, &meritstate->stepkxc, &meritstate->stepkfic, &meritstate->stepkjc);
-   }
-   smoothnessmonitorfinalizelinesearch(smonitor);
-#   endif
-// Update debug curvature information - TraceGamma[]
-   v = 0.0;
-   for (j = 0; j < n; j++) {
-      vv = meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j];
-      v += vv * vv;
-   }
-   if (v > 0.0) {
-   // Step is long enough, update curvature information (used for debugging)
-      for (i = 0; i <= nlec + nlic; i++) {
-         vv = 0.0;
+      if (didx == 0) {
+         smoothnessmonitorstartlagrangianprobing(smonitor, &meritstate->stepkx, &meritstate->d0, 1.0, state->repiterationscount, -1);
+      } else {
+         smoothnessmonitorstartlagrangianprobing(smonitor, &meritstate->stepkx, &meritstate->d1, 1.0, state->repiterationscount, -1);
+      }
+      while (smoothnessmonitorprobelagrangian(smonitor)) {
          for (j = 0; j < n; j++) {
-            vv += (meritstate->stepkjn.xyR[i][j] - meritstate->stepkj.xyR[i][j]) * (meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j]);
+            meritstate->stepkxc.xR[j] = smonitor->lagprobx.xR[j];
+            if (state->hasbndl.xB[j]) {
+               meritstate->stepkxc.xR[j] = rmax2(meritstate->stepkxc.xR[j], state->scaledbndl.xR[j]);
+            }
+            if (state->hasbndu.xB[j]) {
+               meritstate->stepkxc.xR[j] = rmin2(meritstate->stepkxc.xR[j], state->scaledbndu.xR[j]);
+            }
          }
+         nlcsqp_sqpsendx(state, &meritstate->stepkxc);
+         state->needfij = true, meritstate->PQ = 2; goto Pause; Resume2: state->needfij = false;
+         if (!nlcsqp_sqpretrievefij(state, &smonitor->lagprobfi, &smonitor->lagprobj)) {
+            break;
+         }
+         smonitor->lagprobrawlag = nlcsqp_rawlagrangian(state, &meritstate->stepkxc, &smonitor->lagprobfi, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit);
       }
    }
+#   endif
 // Output other information
-   v = 0.0;
+   hessiangetdiagonal(&state->hess, &meritstate->tmphdiag);
+   v = meritstate->tmphdiag.xR[0];
    for (i = 0; i < n; i++) {
-      v += (meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i]) * (meritstate->stepknlaggrad.xR[i] - meritstate->stepklaggrad.xR[i]);
+      v = rmin2(v, meritstate->tmphdiag.xR[i]);
    }
-   v = 0.0;
+   v = meritstate->tmphdiag.xR[0];
    for (i = 0; i < n; i++) {
-      v += sqr(meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i]);
-   }
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(meritstate->stepknlaggrad.xR[i] - meritstate->stepklaggrad.xR[i]);
-   }
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i]) * state->subsolver.h.xyR[i][i];
-      for (j = i + 1; j < n; j++) {
-         v += 2.0 * (meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i]) * state->subsolver.h.xyR[i][j] * (meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j]);
-      }
-   }
-   v = state->subsolver.h.xyR[0][0];
-   for (i = 0; i < n; i++) {
-      v = rmin2(v, state->subsolver.h.xyR[i][i]);
-   }
-   v = state->subsolver.h.xyR[0][0];
-   for (i = 0; i < n; i++) {
-      v = rmax2(v, state->subsolver.h.xyR[i][i]);
+      v = rmax2(v, meritstate->tmphdiag.xR[i]);
    }
 #endif
 // Perform Hessian update
-   hessianupdateperformed = false;
    if (localstp > 0.0) {
-      hessianupdateperformed = nlcsqp_qpsubproblemupdatehessian(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepklaggrad, &meritstate->stepkxn, &meritstate->stepknlaggrad);
+      hessianupdate(&state->hess, &meritstate->stepkx, &meritstate->stepklaggrad, &meritstate->stepkxn, &meritstate->stepknlaggrad);
    }
 // Move to new point
    stp = localstp;
@@ -26338,6 +27112,7 @@ static void nlcsqp_meritphaseresults(minsqpmeritphasestate *meritstate, RVector 
 }
 
 void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minsqpstate *state) {
+   const ae_int_t defaultbfgsresetfreq = 999999;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -26415,9 +27190,10 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
          state->step0x.xR[i] = rmin2(state->step0x.xR[i], state->scaledbndu.xR[i]);
       }
    }
-// Stopping criteria
+// Stopping criteria and settings
    state->epsx = epsx;
    state->maxits = maxits;
+   state->bfgsresetfreq = defaultbfgsresetfreq;
 // Report fields
    state->repsimplexiterations = 0;
    state->repsimplexiterations1 = 0;
@@ -26531,6 +27307,7 @@ Spawn:
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
 // Perform outer (NLC) iterations
    state->bigc = 500.0;
+   hessianinitbfgs(&state->hess, n, state->bfgsresetfreq, coalesce(state->epsx, sqrt(machineepsilon)));
    nlcsqp_initqpsubsolver(state, &state->subsolver);
    while (true) {
    // Before beginning new outer iteration:
@@ -26670,14 +27447,13 @@ void minsqpsubsolver_init(void *_p, bool make_automatic) {
    sparsematrix_init(&p->sparserawlc, make_automatic);
    sparsematrix_init(&p->sparseefflc, make_automatic);
    ae_vector_init(&p->d0, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->h, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->denseh, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->dummy1, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->densedummy, 0, 0, DT_REAL, make_automatic);
    sparsematrix_init(&p->sparsedummy, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmp2, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->sk, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->yk, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->hasbndl, 0, DT_BOOL, make_automatic);
    ae_vector_init(&p->hasbndu, 0, DT_BOOL, make_automatic);
    ae_vector_init(&p->hasal, 0, DT_BOOL, make_automatic);
@@ -26700,14 +27476,13 @@ void minsqpsubsolver_copy(void *_dst, const void *_src, bool make_automatic) {
    sparsematrix_copy(&dst->sparserawlc, &src->sparserawlc, make_automatic);
    sparsematrix_copy(&dst->sparseefflc, &src->sparseefflc, make_automatic);
    ae_vector_copy(&dst->d0, &src->d0, make_automatic);
-   ae_matrix_copy(&dst->h, &src->h, make_automatic);
+   ae_matrix_copy(&dst->denseh, &src->denseh, make_automatic);
+   ae_vector_copy(&dst->dummy1, &src->dummy1, make_automatic);
    ae_matrix_copy(&dst->densedummy, &src->densedummy, make_automatic);
    sparsematrix_copy(&dst->sparsedummy, &src->sparsedummy, make_automatic);
    ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
    ae_vector_copy(&dst->tmp1, &src->tmp1, make_automatic);
    ae_vector_copy(&dst->tmp2, &src->tmp2, make_automatic);
-   ae_vector_copy(&dst->sk, &src->sk, make_automatic);
-   ae_vector_copy(&dst->yk, &src->yk, make_automatic);
    ae_vector_copy(&dst->hasbndl, &src->hasbndl, make_automatic);
    ae_vector_copy(&dst->hasbndu, &src->hasbndu, make_automatic);
    ae_vector_copy(&dst->hasal, &src->hasal, make_automatic);
@@ -26729,14 +27504,13 @@ void minsqpsubsolver_free(void *_p, bool make_automatic) {
    sparsematrix_free(&p->sparserawlc, make_automatic);
    sparsematrix_free(&p->sparseefflc, make_automatic);
    ae_vector_free(&p->d0, make_automatic);
-   ae_matrix_free(&p->h, make_automatic);
+   ae_matrix_free(&p->denseh, make_automatic);
+   ae_vector_free(&p->dummy1, make_automatic);
    ae_matrix_free(&p->densedummy, make_automatic);
    sparsematrix_free(&p->sparsedummy, make_automatic);
    ae_vector_free(&p->tmp0, make_automatic);
    ae_vector_free(&p->tmp1, make_automatic);
    ae_vector_free(&p->tmp2, make_automatic);
-   ae_vector_free(&p->sk, make_automatic);
-   ae_vector_free(&p->yk, make_automatic);
    ae_vector_free(&p->hasbndl, make_automatic);
    ae_vector_free(&p->hasbndu, make_automatic);
    ae_vector_free(&p->hasal, make_automatic);
@@ -26784,7 +27558,8 @@ void minsqptmpmerit_free(void *_p, bool make_automatic) {
 void minsqpmeritphasestate_init(void *_p, bool make_automatic) {
    minsqpmeritphasestate *p = (minsqpmeritphasestate *)_p;
    ae_vector_init(&p->d, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->dx, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->d0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->d1, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->stepkx, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->stepkxc, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->stepkxn, 0, DT_REAL, make_automatic);
@@ -26801,6 +27576,7 @@ void minsqpmeritphasestate_init(void *_p, bool make_automatic) {
    minsqptmplagrangian_init(&p->tmplagrangianfg, make_automatic);
    ae_vector_init(&p->stepklaggrad, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->stepknlaggrad, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmphdiag, 0, DT_REAL, make_automatic);
 }
 
 void minsqpmeritphasestate_copy(void *_dst, const void *_src, bool make_automatic) {
@@ -26812,7 +27588,8 @@ void minsqpmeritphasestate_copy(void *_dst, const void *_src, bool make_automati
    dst->nlec = src->nlec;
    dst->nlic = src->nlic;
    ae_vector_copy(&dst->d, &src->d, make_automatic);
-   ae_vector_copy(&dst->dx, &src->dx, make_automatic);
+   ae_vector_copy(&dst->d0, &src->d0, make_automatic);
+   ae_vector_copy(&dst->d1, &src->d1, make_automatic);
    ae_vector_copy(&dst->stepkx, &src->stepkx, make_automatic);
    ae_vector_copy(&dst->stepkxc, &src->stepkxc, make_automatic);
    ae_vector_copy(&dst->stepkxn, &src->stepkxn, make_automatic);
@@ -26831,13 +27608,15 @@ void minsqpmeritphasestate_copy(void *_dst, const void *_src, bool make_automati
    ae_vector_copy(&dst->stepknlaggrad, &src->stepknlaggrad, make_automatic);
    dst->status = src->status;
    dst->increasebigc = src->increasebigc;
+   ae_vector_copy(&dst->tmphdiag, &src->tmphdiag, make_automatic);
    dst->PQ = src->PQ;
 }
 
 void minsqpmeritphasestate_free(void *_p, bool make_automatic) {
    minsqpmeritphasestate *p = (minsqpmeritphasestate *)_p;
    ae_vector_free(&p->d, make_automatic);
-   ae_vector_free(&p->dx, make_automatic);
+   ae_vector_free(&p->d0, make_automatic);
+   ae_vector_free(&p->d1, make_automatic);
    ae_vector_free(&p->stepkx, make_automatic);
    ae_vector_free(&p->stepkxc, make_automatic);
    ae_vector_free(&p->stepkxn, make_automatic);
@@ -26854,6 +27633,7 @@ void minsqpmeritphasestate_free(void *_p, bool make_automatic) {
    minsqptmplagrangian_free(&p->tmplagrangianfg, make_automatic);
    ae_vector_free(&p->stepklaggrad, make_automatic);
    ae_vector_free(&p->stepknlaggrad, make_automatic);
+   ae_vector_free(&p->tmphdiag, make_automatic);
 }
 
 void minsqpstate_init(void *_p, bool make_automatic) {
@@ -26882,6 +27662,7 @@ void minsqpstate_init(void *_p, bool make_automatic) {
    ae_matrix_init(&p->abslagmemory, 0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->fscales, 0, DT_REAL, make_automatic);
    minsqpsubsolver_init(&p->subsolver, make_automatic);
+   xbfgshessian_init(&p->hess, make_automatic);
    minsqptmpmerit_init(&p->tmpmerit, make_automatic);
 }
 
@@ -26902,6 +27683,7 @@ void minsqpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->scaledbndu, &src->scaledbndu, make_automatic);
    dst->epsx = src->epsx;
    dst->maxits = src->maxits;
+   dst->bfgsresetfreq = src->bfgsresetfreq;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->fi, &src->fi, make_automatic);
    ae_matrix_copy(&dst->j, &src->j, make_automatic);
@@ -26927,6 +27709,7 @@ void minsqpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_matrix_copy(&dst->abslagmemory, &src->abslagmemory, make_automatic);
    ae_vector_copy(&dst->fscales, &src->fscales, make_automatic);
    minsqpsubsolver_copy(&dst->subsolver, &src->subsolver, make_automatic);
+   xbfgshessian_copy(&dst->hess, &src->hess, make_automatic);
    minsqptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, make_automatic);
    dst->repsimplexiterations = src->repsimplexiterations;
    dst->repsimplexiterations1 = src->repsimplexiterations1;
@@ -26969,15 +27752,1326 @@ void minsqpstate_free(void *_p, bool make_automatic) {
    ae_matrix_free(&p->abslagmemory, make_automatic);
    ae_vector_free(&p->fscales, make_automatic);
    minsqpsubsolver_free(&p->subsolver, make_automatic);
+   xbfgshessian_free(&p->hess, make_automatic);
    minsqptmpmerit_free(&p->tmpmerit, make_automatic);
 }
 } // end of namespace alglib_impl
 
 // === LPQPPRESOLVE Package ===
+// Depends on: (AlgLibInternal) APSTRUCT
 // Depends on: (LinAlg) SPARSE
 namespace alglib_impl {
+// Initialize dynamic CRS matrix using SparseMatrix structure
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_dyncrsinitfromsparsecrs(sparsematrix *s, dynamiccrs *r) {
+   ae_int_t m;
+   ae_int_t n;
+   m = s->m;
+   n = s->n;
+   ae_assert(s->matrixtype == 1, "DynCRSInitFromSparseCRS: S is not CRS matrix");
+   r->m = m;
+   r->n = n;
+   icopyallocv(s->ridx.xZ[m], &s->idx, &r->idx);
+   rcopyallocv(s->ridx.xZ[m], &s->vals, &r->vals);
+   allocv(m, &r->rowbegin);
+   allocv(m, &r->rowend);
+   icopyvx(m, &s->ridx, 0, &r->rowbegin, 0);
+   icopyvx(m, &s->ridx, 1, &r->rowend, 0);
+}
+
+// Drops numerical zeros from the matrix
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_dyncrsdropzeros(dynamiccrs *a) {
+   ae_int_t m;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t jj;
+   ae_int_t offs;
+   double v;
+   m = a->m;
+   for (i = 0; i < m; i++) {
+      offs = a->rowbegin.xZ[i];
+      for (jj = a->rowbegin.xZ[i]; jj < a->rowend.xZ[i]; jj++) {
+         j = a->idx.xZ[jj];
+         v = a->vals.xR[jj];
+         if (v == 0.0) {
+            continue;
+         }
+         a->idx.xZ[offs] = j;
+         a->vals.xR[offs] = v;
+         offs++;
+      }
+      a->rowend.xZ[i] = offs;
+   }
+}
+
+// Removes rows
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_dyncrsremoverow(dynamiccrs *a, ae_int_t rowidx) {
+   a->rowend.xZ[rowidx] = a->rowbegin.xZ[rowidx];
+}
+
+// Removes element from the row
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_dyncrsremovefromrow(dynamiccrs *a, ae_int_t rowidx, ae_int_t j) {
+   ae_int_t ii;
+   ae_int_t offs;
+   offs = a->rowbegin.xZ[rowidx];
+   for (ii = a->rowbegin.xZ[rowidx]; ii < a->rowend.xZ[rowidx]; ii++) {
+      if (a->idx.xZ[ii] != j) {
+         a->idx.xZ[offs] = a->idx.xZ[ii];
+         a->vals.xR[offs] = a->vals.xR[ii];
+         offs++;
+      }
+   }
+   a->rowend.xZ[rowidx] = offs;
+}
+
+// Removes elements with indexes in the set from the row
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_dyncrsremovesetfromrow(dynamiccrs *a, ae_int_t rowidx, niset *s) {
+   ae_int_t ii;
+   ae_int_t offs;
+   offs = a->rowbegin.xZ[rowidx];
+   for (ii = a->rowbegin.xZ[rowidx]; ii < a->rowend.xZ[rowidx]; ii++) {
+      if (s->locationof.xZ[a->idx.xZ[ii]] < 0) {
+         a->idx.xZ[offs] = a->idx.xZ[ii];
+         a->vals.xR[offs] = a->vals.xR[ii];
+         offs++;
+      }
+   }
+   a->rowend.xZ[rowidx] = offs;
+}
+
+// Initialize presolver stack
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverstackinit(ae_int_t n, ae_int_t m, presolverstack *s) {
+   s->n = n;
+   s->m = m;
+   s->ntrf = 0;
+   isetallocv(1, 0, &s->idataridx);
+   isetallocv(1, 0, &s->rdataridx);
+}
+
+// Streams boolean value to the presolver stack data storage (the data
+// are appended to the last transform on top of the stack).
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverstreamb(presolverstack *s, bool b) {
+   ae_int_t ilast;
+   ilast = s->idataridx.xZ[s->ntrf];
+   igrowv(ilast + 1, &s->idata);
+   s->idata.xZ[ilast] = b ? 1 : 0;
+   s->idataridx.xZ[s->ntrf] = ilast + 1;
+}
+
+// Streams integer value to the presolver stack data storage (the data
+// are appended to the last transform on top of the stack).
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverstreami(presolverstack *s, ae_int_t i) {
+   ae_int_t ilast;
+   ilast = s->idataridx.xZ[s->ntrf];
+   igrowv(ilast + 1, &s->idata);
+   s->idata.xZ[ilast] = i;
+   s->idataridx.xZ[s->ntrf] = ilast + 1;
+}
+
+// Streams real value to the presolver stack data storage (the data
+// are appended to the last transform on top of the stack).
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverstreamr(presolverstack *s, double v) {
+   ae_int_t rlast;
+   rlast = s->rdataridx.xZ[s->ntrf];
+   rgrowv(rlast + 1, &s->rdata);
+   s->rdata.xR[rlast] = v;
+   s->rdataridx.xZ[s->ntrf] = rlast + 1;
+}
+
+// Streams a integer/real pair to the presolver stack data storage (the data
+// are appended to the last transform on top of the stack).
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverstreamir(presolverstack *s, ae_int_t i, double v) {
+   ae_int_t ilast;
+   ae_int_t rlast;
+   ilast = s->idataridx.xZ[s->ntrf];
+   rlast = s->rdataridx.xZ[s->ntrf];
+   igrowv(ilast + 1, &s->idata);
+   rgrowv(rlast + 1, &s->rdata);
+   s->idata.xZ[ilast] = i;
+   s->rdata.xR[rlast] = v;
+   s->idataridx.xZ[s->ntrf] = ilast + 1;
+   s->rdataridx.xZ[s->ntrf] = rlast + 1;
+}
+
+// Streams DynamicCRS row.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverstreamcrsrow(presolverstack *s, dynamiccrs *a, ae_int_t i) {
+   ae_int_t k;
+   lpqppresolve_presolverstreami(s, a->rowend.xZ[i] - a->rowbegin.xZ[i]);
+   for (k = a->rowbegin.xZ[i]; k < a->rowend.xZ[i]; k++) {
+      lpqppresolve_presolverstreamir(s, a->idx.xZ[k], a->vals.xR[k]);
+   }
+}
+
+// Select transformation TIdx as the source for stream reads
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverselectstreamsource(presolverstack *s, ae_int_t tidx) {
+   s->sourceidx = tidx;
+   s->isrc = s->idataridx.xZ[tidx];
+   s->rsrc = s->rdataridx.xZ[tidx];
+}
+
+// Reads from presolver stack boolean value, advances stream pointer
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverunstreamb(presolverstack *s, bool *v) {
+   *v = false;
+   *v = s->idata.xZ[s->isrc] != 0;
+   s->isrc++;
+}
+
+// Reads from presolver stack integer value, advances stream pointer
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverunstreami(presolverstack *s, ae_int_t *v) {
+   *v = 0;
+   *v = s->idata.xZ[s->isrc];
+   s->isrc++;
+}
+
+// Reads from presolver stack real value, advances stream pointer
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverunstreamr(presolverstack *s, double *v) {
+   *v = 0.0;
+   *v = s->rdata.xR[s->rsrc];
+   s->rsrc++;
+}
+
+// Reads from presolver stack int/real pair, advances stream pointers
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverunstreamir(presolverstack *s, ae_int_t *vi, double *vr) {
+   *vi = 0;
+   *vr = 0.0;
+   *vi = s->idata.xZ[s->isrc];
+   s->isrc++;
+   *vr = s->rdata.xR[s->rsrc];
+   s->rsrc++;
+}
+
+// Reads from presolver stack compressed sparse vector, advances stream pointers
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverunstreamsparsevec(presolverstack *s, ae_int_t *cnt, ZVector *idx, RVector *vals) {
+   ae_int_t i;
+   ae_int_t j;
+   double v;
+   lpqppresolve_presolverunstreami(s, cnt);
+   allocv(*cnt, idx);
+   allocv(*cnt, vals);
+   for (i = 0; i < *cnt; i++) {
+      lpqppresolve_presolverunstreamir(s, &j, &v);
+      idx->xZ[i] = j;
+      vals->xR[i] = v;
+   }
+}
+
+// Checks that we are at the end of the stream corresponding to transfrom #TIdx
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverasserteos(presolverstack *s) {
+   ae_assert(s->isrc == s->idataridx.xZ[s->sourceidx + 1], "PresolverAssertEOS: unread integers in the stream");
+   ae_assert(s->rsrc == s->rdataridx.xZ[s->sourceidx + 1], "PresolverAssertEOS: unread reals in the stream");
+}
+
+// Appends transform placeholder
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendtrf(presolverstack *s, ae_int_t tt) {
+   igrowv(s->ntrf + 1, &s->trftype);
+   igrowv(s->ntrf + 2, &s->idataridx);
+   igrowv(s->ntrf + 2, &s->rdataridx);
+   s->trftype.xZ[s->ntrf] = tt;
+   s->idataridx.xZ[s->ntrf + 1] = s->idataridx.xZ[s->ntrf];
+   s->rdataridx.xZ[s->ntrf + 1] = s->rdataridx.xZ[s->ntrf];
+   s->ntrf++;
+}
+
+// Appends cost scaling to the presolver stack.
+//
+// The cost vector is MULTIPLIED by the scale coefficient.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendcostscaling(presolverstack *s, double vmul) {
+   lpqppresolve_presolverappendtrf(s, 0);
+   lpqppresolve_presolverstreamr(s, vmul);
+}
+
+// Appends column scaling to the presolver stack.
+//
+// The variable is MULTIPLIED by the scale coefficient.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendcolscaling(presolverstack *s, ae_int_t colidx, double vmul) {
+   lpqppresolve_presolverappendtrf(s, 1);
+   lpqppresolve_presolverstreamir(s, colidx, vmul);
+}
+
+// Appends row scaling to the presolver stack.
+//
+// The row is MULTIPLIED by the scale coefficient.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendrowscaling(presolverstack *s, ae_int_t rowidx, double vmul) {
+   lpqppresolve_presolverappendtrf(s, 2);
+   lpqppresolve_presolverstreamir(s, rowidx, vmul);
+}
+
+// Appends command to drop empty col and set variable and Lagrange multiplier
+// to prescribed values
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappenddropemptycol(presolverstack *s, ae_int_t colidx, double varval, double lagval, ae_int_t statval) {
+   lpqppresolve_presolverappendtrf(s, 3);
+   lpqppresolve_presolverstreami(s, colidx);
+   lpqppresolve_presolverstreamr(s, varval);
+   lpqppresolve_presolverstreamr(s, lagval);
+   lpqppresolve_presolverstreami(s, statval);
+}
+
+// Appends command to drop empty row
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappenddropemptyrow(presolverstack *s, ae_int_t rowidx) {
+   lpqppresolve_presolverappendtrf(s, 4);
+   lpqppresolve_presolverstreami(s, rowidx);
+}
+
+// Appends command to convert singleton row to box constraint
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendsingletonrow(presolverstack *s, ae_int_t i, ae_int_t j, double v, double swapsign, double bndl, bool bndlisbc, double bndu, bool bnduisbc) {
+   lpqppresolve_presolverappendtrf(s, 5);
+   lpqppresolve_presolverstreami(s, i);
+   lpqppresolve_presolverstreami(s, j);
+   lpqppresolve_presolverstreamr(s, v);
+   lpqppresolve_presolverstreamr(s, swapsign);
+   lpqppresolve_presolverstreamr(s, bndl);
+   lpqppresolve_presolverstreamb(s, bndlisbc);
+   lpqppresolve_presolverstreamr(s, bndu);
+   lpqppresolve_presolverstreamb(s, bnduisbc);
+}
+
+// Appends command to fix variable
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendfixedvar(presolverstack *s, ae_int_t colidx, double fixval, double ci, dynamiccrs *at) {
+   lpqppresolve_presolverappendtrf(s, 6);
+   lpqppresolve_presolverstreami(s, colidx);
+   lpqppresolve_presolverstreamr(s, fixval);
+   lpqppresolve_presolverstreamr(s, ci);
+   lpqppresolve_presolverstreamcrsrow(s, at, colidx);
+}
+
+// Appends explicit slack transformation
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendexplicitslack(presolverstack *s, ae_int_t i, ae_int_t j, double aij, double slackbndl, double slackbndu, double al, double au, dynamiccrs *a) {
+   lpqppresolve_presolverappendtrf(s, 7);
+   lpqppresolve_presolverstreami(s, i);
+   lpqppresolve_presolverstreami(s, j);
+   lpqppresolve_presolverstreamr(s, aij);
+   lpqppresolve_presolverstreamr(s, slackbndl);
+   lpqppresolve_presolverstreamr(s, slackbndu);
+   lpqppresolve_presolverstreamr(s, al);
+   lpqppresolve_presolverstreamr(s, au);
+   lpqppresolve_presolverstreamcrsrow(s, a, i);
+}
+
+// Appends implicit slack transformation
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverappendimplicitslack(presolverstack *s, ae_int_t i, ae_int_t j, double aij, double cj, double equalitybnd, dynamiccrs *a) {
+   lpqppresolve_presolverappendtrf(s, 8);
+   lpqppresolve_presolverstreami(s, i);
+   lpqppresolve_presolverstreami(s, j);
+   lpqppresolve_presolverstreamr(s, aij);
+   lpqppresolve_presolverstreamr(s, cj);
+   lpqppresolve_presolverstreamr(s, equalitybnd);
+   lpqppresolve_presolverstreamcrsrow(s, a, i);
+}
+
+// This function restores original solution, given the solution of the
+// transformed problem.
+//
+// Below N and M denote column/row count for both the original problem and
+// transformed one PRIOR to removal of dropped columns and rows.
+//
+// Inputs:
+//     S   -           a sequence of presolve transformations
+//     X   -           array[N], transformed solution after permutation
+//                     that restores original variable order (moves all
+//                     fixed variables to their positions)
+//     LagBC-          array[N], Lagrange coeffs for box constraints
+//     LagLC-          array[M], Lagrange coeffs for linear constraints
+//                     after permutation that restores original row order
+//                     (moves all dropped rows to their positions)
+//     Stats-          array[N+M], constraint stats
+//
+// Outputs:
+//     X, LagBC, LagLC, Stats-restored solution
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolverrestoresolution(presolverstack *s, RVector *x, RVector *lagbc, RVector *laglc, ZVector *stats) {
+   ae_int_t tidx;
+   ae_int_t tt;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t cnt;
+   ae_int_t vstat;
+   double aij;
+   double v;
+   double vvar;
+   double vlag;
+   double vswap;
+   double fixval;
+   double ci;
+   double cj;
+   double equalitybnd;
+   double bndl;
+   double bndu;
+   double al;
+   double au;
+   bool bndlisbc;
+   bool bnduisbc;
+   bool transferlagtobc;
+   double ratingl;
+   double ratingu;
+   for (tidx = s->ntrf - 1; tidx >= 0; tidx--) {
+      tt = s->trftype.xZ[tidx];
+      if (tt == 0) {
+      // Reverse cost scaling
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreamr(s, &v);
+         lpqppresolve_presolverasserteos(s);
+         rmulv(s->n, 1.0 / v, lagbc);
+         rmulv(s->m, 1.0 / v, laglc);
+         continue;
+      }
+      if (tt == 1) {
+      // Reverse column scaling
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreamir(s, &k, &v);
+         lpqppresolve_presolverasserteos(s);
+         x->xR[k] /= v;
+         lagbc->xR[k] *= v;
+         continue;
+      }
+      if (tt == 2) {
+      // Reverse row scaling
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreamir(s, &k, &v);
+         lpqppresolve_presolverasserteos(s);
+         laglc->xR[k] *= v;
+         continue;
+      }
+      if (tt == 3) {
+      // Reverse dropping empty col
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreami(s, &k);
+         lpqppresolve_presolverunstreamr(s, &vvar);
+         lpqppresolve_presolverunstreamr(s, &vlag);
+         lpqppresolve_presolverunstreami(s, &vstat);
+         lpqppresolve_presolverasserteos(s);
+         x->xR[k] = vvar;
+         lagbc->xR[k] = vlag;
+         stats->xZ[k] = vstat;
+         continue;
+      }
+      if (tt == 4) {
+      // Reverse dropping empty row
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreami(s, &k);
+         lpqppresolve_presolverasserteos(s);
+         laglc->xR[k] = 0.0;
+         stats->xZ[k] = 0;
+         continue;
+      }
+      if (tt == 5) {
+      // Handle singleton row.
+      // Read data from stream.
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreami(s, &i);
+         lpqppresolve_presolverunstreami(s, &j);
+         lpqppresolve_presolverunstreamr(s, &v);
+         lpqppresolve_presolverunstreamr(s, &vswap);
+         lpqppresolve_presolverunstreamr(s, &bndl);
+         lpqppresolve_presolverunstreamb(s, &bndlisbc);
+         lpqppresolve_presolverunstreamr(s, &bndu);
+         lpqppresolve_presolverunstreamb(s, &bnduisbc);
+         lpqppresolve_presolverasserteos(s);
+      // Determine bound that is "most active" using rating that combines Lagrangian magnitude
+         ae_assert(isfinite(bndl) || isfinite(bndu), "PRESOLVE: singleton row with both bounds absent");
+         ae_assert(fabs(vswap) == 1.0, "PRESOLVE: unexpected VSwap");
+         ratingl = x->xR[j] - bndl + rmax2(lagbc->xR[j], 0.0);
+         ratingu = bndu - x->xR[j] + rmax2(-lagbc->xR[j], 0.0);
+         if (ratingl < ratingu) {
+         // Lower bound is more likely
+            transferlagtobc = bndlisbc;
+         } else {
+         // Upper bound is more likely
+            transferlagtobc = bnduisbc;
+         }
+      // Transfer constraint activity from the transformed problem to the original one
+         if (transferlagtobc) {
+         // Box constraint of the original problem is active, linear singleton constraint is inactive
+            laglc->xR[i] = 0.0;
+            stats->xZ[s->n + i] = 0;
+         } else {
+         // Linear constraint of the original problem is active, box constraint is inactive.
+            laglc->xR[i] = lagbc->xR[j] / v * vswap;
+            stats->xZ[s->n + i] = iround(stats->xZ[j] * vswap);
+            lagbc->xR[j] = 0.0;
+            stats->xZ[j] = 0;
+         }
+         continue;
+      }
+      if (tt == 6) {
+      // Fixed variable
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreami(s, &j);
+         lpqppresolve_presolverunstreamr(s, &fixval);
+         lpqppresolve_presolverunstreamr(s, &ci);
+         lpqppresolve_presolverunstreamsparsevec(s, &cnt, &s->sparseidx0, &s->sparseval0);
+         lpqppresolve_presolverasserteos(s);
+         x->xR[j] = fixval;
+         v = ci;
+         for (i = 0; i < cnt; i++) {
+            v += s->sparseval0.xR[i] * laglc->xR[s->sparseidx0.xZ[i]];
+         }
+         lagbc->xR[j] = -v;
+         stats->xZ[j] = sign(lagbc->xR[j]);
+         continue;
+      }
+      if (tt == 7) {
+      // Explicit slack variable:
+      // * deduce its bounds from row activity
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreami(s, &i);
+         lpqppresolve_presolverunstreami(s, &j);
+         lpqppresolve_presolverunstreamr(s, &aij);
+         lpqppresolve_presolverunstreamr(s, &bndl);
+         lpqppresolve_presolverunstreamr(s, &bndu);
+         lpqppresolve_presolverunstreamr(s, &al);
+         lpqppresolve_presolverunstreamr(s, &au);
+         lpqppresolve_presolverunstreamsparsevec(s, &cnt, &s->sparseidx0, &s->sparseval0);
+         lpqppresolve_presolverasserteos(s);
+         x->xR[j] = 0.0;
+         v = 0.0;
+         for (k = 0; k < cnt; k++) {
+            v += s->sparseval0.xR[k] * x->xR[s->sparseidx0.xZ[k]];
+         }
+         if (isfinite(al)) {
+            al = (al - v) / aij;
+         }
+         if (isfinite(au)) {
+            au = (au - v) / aij;
+         }
+         if (aij < 0.0) {
+            swapr(&al, &au);
+            if (!isfinite(al)) {
+               al = -INFINITY;
+            }
+            if (!isfinite(au)) {
+               au = +INFINITY;
+            }
+         }
+         if (isfinite(al) && al > bndl) {
+            bndl = al;
+         }
+         if (isfinite(au) && au < bndu) {
+            bndu = au;
+         }
+         if (isfinite(bndl)) {
+            x->xR[j] = bndl;
+         } else {
+            if (isfinite(bndu)) {
+               x->xR[j] = bndu;
+            } else {
+               x->xR[j] = 0.0;
+            }
+         }
+         lagbc->xR[j] = -aij * laglc->xR[i];
+         stats->xZ[j] = -sign(aij) * stats->xZ[s->n + i];
+         continue;
+      }
+      if (tt == 8) {
+      // Implicit slack variable:
+      // * deduce its bounds from row activity
+         lpqppresolve_presolverselectstreamsource(s, tidx);
+         lpqppresolve_presolverunstreami(s, &i);
+         lpqppresolve_presolverunstreami(s, &j);
+         lpqppresolve_presolverunstreamr(s, &aij);
+         lpqppresolve_presolverunstreamr(s, &cj);
+         lpqppresolve_presolverunstreamr(s, &equalitybnd);
+         lpqppresolve_presolverunstreamsparsevec(s, &cnt, &s->sparseidx0, &s->sparseval0);
+         lpqppresolve_presolverasserteos(s);
+         x->xR[j] = 0.0;
+         v = 0.0;
+         for (k = 0; k < cnt; k++) {
+            v += s->sparseval0.xR[k] * x->xR[s->sparseidx0.xZ[k]];
+         }
+         x->xR[j] = (equalitybnd - v) / aij;
+         lagbc->xR[j] = -aij * laglc->xR[i];
+         laglc->xR[i] -= cj / aij;
+         stats->xZ[j] = -sign(aij) * stats->xZ[s->n + i];
+         continue;
+      }
+      ae_assert(false, "PresolverRestoreSolution: unexpected transform type");
+   }
+}
+
+// Prepare temporaries
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_presolvebuffersinit(presolvebuffers *buf, ae_int_t n, ae_int_t m) {
+   if (n > 0) {
+      nisinitemptyslow(n, &buf->setn);
+   }
+   if (m > 0) {
+      nisinitemptyslow(m, &buf->setm);
+   }
+}
+
+// This function drops empty columns from the matrix. It may detect unbounded
+// problems (when unboundedness is caused by unconstrained column).
+//
+// Inputs:
+//     C, BndL, BndU  -   array[N], current cost and box constraints.
+//     IsDroppedCol-   array[N], column statuses; only non-dropped ones are examined.
+//     LagrangeFromResidual- array[N], whether we want to compute Lagrange coeffs
+//                     for box constraints using residual costs
+//     N           -   variables count (including both fixed and non-fixed)
+//     A, AT       -   current A and AT, dynamic CRS matrices
+//     AL, AU      -   array[M], lower/upper bounds for linear constraints
+//     M           -   linear constraints count
+//     Eps         -   unboundedness is checked subject to small dual feasibility
+//                     error tolerance
+//     DoTrace     -   whether tracing is needed or not
+//     SomethingChanged-flag variable
+//     CntFixed    -   debug counter, updated by the function
+//     trfStack    -   sequence of already applied transformations
+//
+// Outputs:
+//     IsDroppedCol-   array[N], dropped columns are marked
+//     LagrangeFromResidual-
+//                     array[N], dropped cols are marked
+//     ProblemStatus-  on failure (unboundedness detected) is set to -2,
+//                     unchanged otherwise
+//     SomethingChanged-is set to True if at least one col was dropped
+//                     It is not changed otherwise.
+//     CntDropped  -   debug counter, updated by the function
+//     trfStack -      updated with new transforms
+//
+// Result:
+//     if unboundedness was detected, False is returned.
+//     True is returned otherwise.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static bool lpqppresolve_dropemptycol(RVector *c, RVector *bndl, RVector *bndu, BVector *isdroppedcol, BVector *lagrangefromresidual, ae_int_t n, dynamiccrs *a, dynamiccrs *at, RVector *al, RVector *au, ae_int_t m, double eps, presolvebuffers *buf, presolverstack *trfstack, ae_int_t *problemstatus, bool *somethingchanged, ae_int_t *cntdropped) {
+   ae_int_t i;
+   double v;
+   ae_int_t statsval;
+   bool result;
+   ae_assert(eps >= 0.0, "LPPRESOLVE: Eps < 0");
+   result = true;
+// Scan columns, search for an empty one
+   for (i = 0; i < n; i++) {
+      if (!isdroppedcol->xB[i] && at->rowbegin.xZ[i] == at->rowend.xZ[i]) {
+      // Try to detect unboundedness
+         if (c->xR[i] < -eps && isposinf(bndu->xR[i]) || c->xR[i] > eps && isneginf(bndl->xR[i])) {
+            *problemstatus = -2;
+            *somethingchanged = true;
+            ++*cntdropped;
+            result = false;
+            return result;
+         }
+      // Mark variable as fixed and issue transformation
+         isdroppedcol->xB[i] = true;
+         *somethingchanged = true;
+         ++*cntdropped;
+         v = 0.0;
+         statsval = 0;
+         if (c->xR[i] > 0.0 && isfinite(bndl->xR[i])) {
+         // Variable has to be fixed at the lower bound
+            v = bndl->xR[i];
+            statsval = -1;
+         }
+         if (c->xR[i] < 0.0 && isfinite(bndu->xR[i])) {
+         // Variable has to be fixed at the upper bound
+            v = bndu->xR[i];
+            statsval = 1;
+         }
+         if (statsval == 0) {
+         // Variable value can be chosen arbitrarily, choose as close to zero as possible
+            if (isfinite(bndl->xR[i])) {
+               v = rmax2(v, bndl->xR[i]);
+            }
+            if (isfinite(bndu->xR[i])) {
+               v = rmin2(v, bndu->xR[i]);
+            }
+         }
+         lpqppresolve_presolverappenddropemptycol(trfstack, i, v, -c->xR[i], statsval);
+      }
+   }
+   return result;
+}
+
+// This function drops clearly nonbinding rows from the matrix: empty and ones
+// with infinite bounds.
+//
+// It may detect infeasible problems (when infeasibility is caused by
+// constraint ranges  that  do  not include zero - the only value possible for
+// an empty row).
+//
+// Inputs:
+//     N           -   vars count
+//     IsDroppedRow-   array[M], column statuses; only non-dropped ones are examined.
+//     A, AT       -   current A and AT, dynamic CRS matrices
+//     AL, AU      -   array[M], lower/upper bounds for linear constraints
+//     M           -   linear constraints count
+//     Eps         -   small primal feasibility error is allowed
+//     DoTrace     -   whether tracing is needed or not
+//     SomethingChanged-flag variable
+//     TrfYLag, TrfYTgt, TrfStat, TrfStatTgt -
+//                     sequence of already applied transformations
+//
+// Outputs:
+//     IsDroppedRow-   array[M], dropped rows are marked
+//     ProblemStatus-  on failure (infeasibility detected) is set to -3,
+//                     unchanged otherwise
+//     SomethingChanged-is set to True if at least one row was dropped
+//                     It is not changed otherwise.
+//     CntEmpty    -   debug counter, updated by the function
+//     CntNoBounds -   debug counter, updated by the function
+//     TrfYLag, TrfYTgt, TrfStat, TrfStatTgt -
+//                     sequence of already applied transformations
+//
+// Result:
+//     if infeasibility was detected, False is returned.
+//     True is returned otherwise.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static bool lpqppresolve_dropclearlynonbindingrows(ae_int_t n, BVector *isdroppedrow, dynamiccrs *a, dynamiccrs *at, RVector *al, RVector *au, ae_int_t m, double eps, presolvebuffers *buf, presolverstack *trfstack, ae_int_t *problemstatus, bool *somethingchanged, ae_int_t *cntempty, ae_int_t *cntnobounds) {
+   ae_int_t i;
+   ae_int_t ii;
+   ae_int_t jj;
+   bool result;
+   result = true;
+// Scan rows
+   nisclear(&buf->setn);
+   nisclear(&buf->setm);
+   for (i = 0; i < m; i++) {
+      if (!isdroppedrow->xB[i]) {
+      // Empty row
+         if (a->rowbegin.xZ[i] == a->rowend.xZ[i]) {
+         // Try to detect infeasibility
+            if (isfinite(al->xR[i]) && al->xR[i] > eps || isfinite(au->xR[i]) && au->xR[i] < -eps) {
+               *problemstatus = -3;
+               *somethingchanged = true;
+               result = false;
+               return result;
+            }
+         // Mark row as dropped and issue transformation
+            isdroppedrow->xB[i] = true;
+            *somethingchanged = true;
+            ++*cntempty;
+            lpqppresolve_presolverappenddropemptyrow(trfstack, i);
+            continue;
+         }
+      // No bounds
+         if (isneginf(al->xR[i]) && isposinf(au->xR[i])) {
+         // Add row and column containing its elements to the cleanup list
+            nisaddelement(&buf->setm, i);
+            for (jj = a->rowbegin.xZ[i]; jj < a->rowend.xZ[i]; jj++) {
+               nisaddelement(&buf->setn, a->idx.xZ[jj]);
+            }
+         // Mark row as dropped and issue transformation
+            isdroppedrow->xB[i] = true;
+            *somethingchanged = true;
+            ++*cntnobounds;
+            lpqppresolve_presolverappenddropemptyrow(trfstack, i);
+            continue;
+         }
+      }
+   }
+// Clean up the matrix
+   for (ii = 0; ii < buf->setm.nstored; ii++) {
+      a->rowend.xZ[buf->setm.items.xZ[ii]] = a->rowbegin.xZ[buf->setm.items.xZ[ii]];
+   }
+   for (jj = 0; jj < buf->setn.nstored; jj++) {
+      lpqppresolve_dyncrsremovesetfromrow(at, buf->setn.items.xZ[jj], &buf->setm);
+   }
+   return result;
+}
+
+// This function scans rows and converts singleton rows to box constraints.
+//
+// Inputs:
+//     BndL, BndU  -   array[N], box constraints.
+//     IsDroppedCol-   array[N], column statuses, used for integrity checks
+//     N           -   variables count (including both fixed and non-fixed)
+//     A, AT       -   current A and AT, dynamic CRS matrices
+//     AL, AU      -   array[M], lower/upper bounds for linear constraints
+//     M           -   linear constraints count
+//     Eps         -   tolerance used to resolve infeasibilities
+//     DoTrace     -   whether tracing is needed or not
+//     SomethingChanged-flag variable
+//     CntFixed    -   debug counter, updated by the function
+//     trfStack    -   sequence of already applied transformations
+//
+// Outputs:
+//     IsDroppedCol-   array[N], dropped columns are marked
+//     LagrangeFromResidual-
+//                     array[N], dropped cols are marked
+//     ProblemStatus-  on failure (unboundedness detected) is set to -2,
+//                     unchanged otherwise
+//     SomethingChanged-is set to True if at least one col was dropped
+//                     It is not changed otherwise.
+//     CntDropped  -   debug counter, updated by the function
+//     trfStack -      updated with new transforms
+//
+// Result:
+//     if unboundedness was detected, False is returned.
+//     True is returned otherwise.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static bool lpqppresolve_singletonrowtobc(RVector *bndl, RVector *bndu, BVector *isdroppedcol, ae_int_t n, dynamiccrs *a, dynamiccrs *at, RVector *al, RVector *au, BVector *isdroppedrow, ae_int_t m, double eps, presolvebuffers *buf, presolverstack *trfstack, ae_int_t *problemstatus, bool *somethingchanged, ae_int_t *cntsingleton) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t ii;
+   ae_int_t offs;
+   double v;
+   double prevbndl;
+   double prevbndu;
+   double wrkal;
+   double wrkau;
+   double swapsign;
+   double midpoint;
+   bool lowerboundisbc;
+   bool upperboundisbc;
+   bool result;
+   result = true;
+   for (i = 0; i < m; i++) {
+      if (a->rowbegin.xZ[i] + 1 == a->rowend.xZ[i] && (isfinite(al->xR[i]) || isfinite(au->xR[i]))) {
+      // Read singleton row, perform integrity checks and normalization
+         j = a->idx.xZ[a->rowbegin.xZ[i]];
+         v = a->vals.xR[a->rowbegin.xZ[i]];
+         ae_assert(!isdroppedrow->xB[i], "SingletonRowToBC: integrity check 6363 failed");
+         ae_assert(!isdroppedcol->xB[j], "SingletonRowToBC: integrity check 6364 failed");
+         ae_assert(v != 0.0, "SingletonRowToBC: integrity check 6366 failed");
+         wrkal = al->xR[i];
+         wrkau = au->xR[i];
+         swapsign = 1.0;
+         if (v < 0.0) {
+            swapr(&wrkal, &wrkau);
+            wrkal = -wrkal;
+            wrkau = -wrkau;
+            v = -v;
+            swapsign = -1.0;
+         }
+         wrkal /= v;
+         wrkau /= v;
+         prevbndl = bndl->xR[j];
+         prevbndu = bndu->xR[j];
+      // Check feasibility
+         if (prevbndl > prevbndu + eps) {
+            *problemstatus = -3;
+            *somethingchanged = true;
+            result = false;
+            return result;
+         }
+         if (wrkal > prevbndu + eps || wrkau < prevbndl - eps) {
+            *problemstatus = -3;
+            *somethingchanged = true;
+            result = false;
+            return result;
+         }
+      // Modify problem, perform constraint harmonization for slightly infeasible box constraints
+         lowerboundisbc = true;
+         upperboundisbc = true;
+         if (isfinite(wrkal) && wrkal > prevbndl) {
+            bndl->xR[j] = wrkal;
+            lowerboundisbc = false;
+         }
+         if (isfinite(wrkau) && wrkau < prevbndu) {
+            bndu->xR[j] = wrkau;
+            upperboundisbc = false;
+         }
+         if (bndu->xR[j] < bndl->xR[j]) {
+            midpoint = 0.5 * (bndu->xR[j] + bndl->xR[j]);
+            bndl->xR[j] = midpoint;
+            bndu->xR[j] = midpoint;
+         }
+         a->rowend.xZ[i] = a->rowbegin.xZ[i];
+         offs = at->rowbegin.xZ[j];
+         for (ii = at->rowbegin.xZ[j]; ii < at->rowend.xZ[j]; ii++) {
+            if (at->idx.xZ[ii] != i) {
+               at->idx.xZ[offs] = at->idx.xZ[ii];
+               at->vals.xR[offs] = at->vals.xR[ii];
+               offs++;
+            }
+         }
+         at->rowend.xZ[j] = offs;
+         isdroppedrow->xB[i] = true;
+         *somethingchanged = true;
+         ++*cntsingleton;
+         lpqppresolve_presolverappendsingletonrow(trfstack, i, j, v, swapsign, bndl->xR[j], lowerboundisbc, bndu->xR[j], upperboundisbc);
+      }
+   }
+   return result;
+}
+
+// This function tries to process singleton cols using various heuristics:
+// * detect explicit slacks
+//
+// Inputs:
+//     C. BndL, BndU-  array[N], cost and box constraints.
+//     IsDroppedCol-   array[N], column statuses, used for integrity checks
+//     N           -   variables count (including both fixed and non-fixed)
+//     A, AT       -   current A and AT, dynamic CRS matrices
+//     AL, AU      -   array[M], lower/upper bounds for linear constraints
+//     M           -   linear constraints count
+//     Eps         -   tolerance used to resolve infeasibilities
+//     DoTrace     -   whether tracing is needed or not
+//     SomethingChanged-flag variable
+//     CntFixed    -   debug counter, updated by the function
+//     trfStack    -   sequence of already applied transformations
+//
+// Outputs:
+//     C, BndL, BndU-  may be modified
+//     IsDroppedCol-   array[N], dropped columns are marked
+//     LagrangeFromResidual-
+//                     array[N], dropped cols are marked
+//     ProblemStatus-  on failure (unboundedness detected) is set to -2,
+//                     unchanged otherwise
+//     SomethingChanged-is set to True if at least one col was dropped
+//                     It is not changed otherwise.
+//     CntSlackVars-   debug counter, updated by the function
+//     trfStack -      updated with new transforms
+//
+// Result:
+//     if infeasibility or unboundedness was detected, False is returned.
+//     True is returned otherwise.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static bool lpqppresolve_singletoncols(RVector *c, RVector *bndl, RVector *bndu, BVector *isdroppedcol, ae_int_t n, dynamiccrs *a, dynamiccrs *at, RVector *al, RVector *au, BVector *isdroppedrow, ae_int_t m, double eps, presolvebuffers *buf, presolverstack *trfstack, ae_int_t *problemstatus, bool *somethingchanged, ae_int_t *cntslackvars, ae_int_t *cntimplicitslacks, ae_int_t *cntfreecolumnsingletons) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t ii;
+   double preval;
+   double prevau;
+   double prevabnd;
+   double aij;
+   double aslk;
+   double vslk;
+   double v;
+   double cj;
+   bool result;
+   result = true;
+   for (j = 0; j < n; j++) {
+      if (!isdroppedcol->xB[j] && at->rowbegin.xZ[j] + 1 == at->rowend.xZ[j]) {
+         i = at->idx.xZ[at->rowbegin.xZ[j]];
+         aij = at->vals.xR[at->rowbegin.xZ[j]];
+      // Skip rows with no bounds, at least one bound is expected for the transformations below
+         if (!(isfinite(al->xR[i]) || isfinite(au->xR[i]))) {
+            continue;
+         }
+      // Is it an explicit slack?
+         if (SmallAtR(c->xR[j], eps)) {
+         // Clear Cj
+         // Update constraint bounds
+         // Issue "explicit slack" transformation
+            c->xR[j] = 0.0;
+            preval = al->xR[i];
+            prevau = au->xR[i];
+            if (aij > 0.0) {
+               if (isfinite(bndl->xR[j])) {
+                  au->xR[i] -= aij * bndl->xR[j];
+               } else {
+                  au->xR[i] = +INFINITY;
+               }
+               if (isfinite(bndu->xR[j])) {
+                  al->xR[i] -= aij * bndu->xR[j];
+               } else {
+                  al->xR[i] = -INFINITY;
+               }
+            } else {
+               if (isfinite(bndu->xR[j])) {
+                  au->xR[i] -= aij * bndu->xR[j];
+               } else {
+                  au->xR[i] = +INFINITY;
+               }
+               if (isfinite(bndl->xR[j])) {
+                  al->xR[i] -= aij * bndl->xR[j];
+               } else {
+                  al->xR[i] = -INFINITY;
+               }
+            }
+            lpqppresolve_presolverappendexplicitslack(trfstack, i, j, aij, bndl->xR[j], bndu->xR[j], preval, prevau, a);
+         // Remove variable from A and AT
+            lpqppresolve_dyncrsremoverow(at, j);
+            lpqppresolve_dyncrsremovefromrow(a, i, j);
+            isdroppedcol->xB[j] = true;
+         // Done
+            *somethingchanged = true;
+            ++*cntslackvars;
+            continue;
+         }
+      // Is it equality row? The variable can be treated as an implicit slack
+         if (isfinite(al->xR[i]) && isfinite(au->xR[i]) && NearAtR(al->xR[i], au->xR[i], eps)) {
+         // Enforce AL == AU, set Cj to zero
+            prevabnd = 0.5 * (al->xR[i] + au->xR[i]);
+            al->xR[i] = prevabnd;
+            au->xR[i] = prevabnd;
+            cj = c->xR[j];
+            v = c->xR[j] / aij;
+            for (ii = a->rowbegin.xZ[i]; ii < a->rowend.xZ[i]; ii++) {
+               c->xR[a->idx.xZ[ii]] -= v * a->vals.xR[ii];
+            }
+            c->xR[j] = 0.0;
+         // Update constraint bounds
+         // Issue "implicit slack" transformation
+            if (aij > 0.0) {
+               if (isfinite(bndl->xR[j])) {
+                  au->xR[i] -= aij * bndl->xR[j];
+               } else {
+                  au->xR[i] = +INFINITY;
+               }
+               if (isfinite(bndu->xR[j])) {
+                  al->xR[i] -= aij * bndu->xR[j];
+               } else {
+                  al->xR[i] = -INFINITY;
+               }
+            } else {
+               if (isfinite(bndu->xR[j])) {
+                  au->xR[i] -= aij * bndu->xR[j];
+               } else {
+                  au->xR[i] = +INFINITY;
+               }
+               if (isfinite(bndl->xR[j])) {
+                  al->xR[i] -= aij * bndl->xR[j];
+               } else {
+                  al->xR[i] = -INFINITY;
+               }
+            }
+            lpqppresolve_presolverappendimplicitslack(trfstack, i, j, aij, cj, prevabnd, a);
+         // Remove variable from A and AT, set Cj to zero
+            lpqppresolve_dyncrsremoverow(at, j);
+            lpqppresolve_dyncrsremovefromrow(a, i, j);
+            isdroppedcol->xB[j] = true;
+         // Done
+            *somethingchanged = true;
+            ++*cntimplicitslacks;
+            continue;
+         }
+      // Is it a free column singleton?
+         if (!isfinite(bndl->xR[j]) && !isfinite(bndu->xR[j])) {
+         // Handle single-sided linear constraints or two-sided one.
+         //
+         // A general inequality/range constraint is converted to an equality one by
+         // adding temporary slack variable SLK. This variable is not actually added
+         // to the problem - we analytically remove it right after the addition.
+         //
+         // See 3.2.2 from "A modular presolve procedure for large scale linear programming"
+         // by Swietanowski for more information
+            if (!isfinite(al->xR[i]) || !isfinite(au->xR[i])) {
+            // Single-sided constraint
+            //
+            // Determine multiplier for the artificial temporary slack variable S.
+            // Check for unboundedness. If bounded, the slack S is zero, right-hand
+            // side of the equality constraint is not modified.
+               aslk = isfinite(au->xR[i]) ? +1.0 : -1.0;
+               if (aslk * c->xR[j] / aij > eps) {
+                  *problemstatus = -2;
+                  *somethingchanged = true;
+                  result = false;
+                  return result;
+               }
+               vslk = 0.0;
+               if (!isfinite(au->xR[i])) {
+                  au->xR[i] = al->xR[i];
+               }
+            } else {
+            // Two-sided constraint
+            //
+            // Determine value of the temporary slack variable, modify right-hand side
+            // of the constraint.
+               vslk = c->xR[j] / aij > 0.0 ? au->xR[i] - al->xR[i] : 0.0;
+            }
+            cj = c->xR[j];
+            v = cj / aij;
+            for (ii = a->rowbegin.xZ[i]; ii < a->rowend.xZ[i]; ii++) {
+               c->xR[a->idx.xZ[ii]] -= v * a->vals.xR[ii];
+            }
+            c->xR[j] = 0.0;
+            lpqppresolve_presolverappendimplicitslack(trfstack, i, j, aij, cj, au->xR[i] - vslk, a);
+            al->xR[i] = -INFINITY;
+            au->xR[i] = +INFINITY;
+            lpqppresolve_dyncrsremoverow(at, j);
+            lpqppresolve_dyncrsremovefromrow(a, i, j);
+            isdroppedcol->xB[j] = true;
+            ++*cntfreecolumnsingletons;
+            continue;
+         }
+      }
+   }
+   return result;
+}
+
+// This function scans box constraints list and tries  to  fix  variables  by
+// removing them from the A and AT matrices and by  recording  transformation
+// in trfStack.
+//
+// If infeasibility is detected, returns False.
+//
+// Inputs:
+//     BndL, BndU  -   array[N], current set of box constraints. Only entries
+//                     with IsDroppedCol[] == False are examined
+//     IsDroppedCol-   array[N], column statuses; only non-dropped ones are examined.
+//     N           -   variables count (including both fixed and non-fixed)
+//     A, AT       -   current A and AT, dynamic CRS matrices
+//     AL, AU      -   array[M], lower/upper bounds for linear constraints
+//     M           -   linear constraints count
+//     Eps         -   tolerance to resolve slightly infeasible constraints
+//     DoTrace     -   whether tracing is needed or not
+//     SomethingChanged-flag variable
+//     CntFixed    -   debug counter, updated by the function
+//
+// Outputs:
+//     IsDroppedCol-   array[N], fixed vars are marked
+//     LagrangeFromResidual-
+//                     array[N], fixed vars are marked
+//     A           -   columns corresponding to fixed vars are removed from A.
+//                     The matrix size does not change.
+//     AT          -   rows corresponding to fixed vars are removed from A.
+//                     The matrix size does not change.
+//     AL, AU      -   updated with fixed values
+//     SomethingChanged-is set to True if at least one variable was fixed.
+//                     It is not changed otherwise.
+//     CntFixed    -   debug counter, updated by the function
+//
+// Result:
+//     if infeasibility is detected, returns False.
+//     True otherwise.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static bool lpqppresolve_fixvariables(RVector *c, RVector *bndl, RVector *bndu, BVector *isdroppedcol, ae_int_t n, dynamiccrs *a, dynamiccrs *at, RVector *al, RVector *au, ae_int_t m, double eps, presolvebuffers *buf, presolverstack *trfstack, ae_int_t *problemstatus, bool *somethingchanged, ae_int_t *cntfixed) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t ii;
+   ae_int_t jj;
+   ae_int_t offs;
+   double v;
+   bool result;
+   result = true;
+// Scan variables, determine rows to update
+   nisclear(&buf->setn);
+   nisclear(&buf->setm);
+   for (i = 0; i < n; i++) {
+      if (!isdroppedcol->xB[i] && isfinite(bndl->xR[i]) && isfinite(bndu->xR[i]) && bndl->xR[i] >= bndu->xR[i] - eps) {
+      // Detect infeasibility
+         if (bndl->xR[i] > bndu->xR[i] + eps) {
+            *somethingchanged = true;
+            *problemstatus = -3;
+            result = false;
+            return result;
+         }
+      // Fix variable and issue transformation
+         isdroppedcol->xB[i] = true;
+         *somethingchanged = true;
+         ++*cntfixed;
+         lpqppresolve_presolverappendfixedvar(trfstack, i, rboundval(0.5 * (bndl->xR[i] + bndu->xR[i]), bndl->xR[i], bndu->xR[i]), c->xR[i], at);
+      // Save dependent row indexes to SetM
+         nisaddelement(&buf->setn, i);
+         for (jj = at->rowbegin.xZ[i]; jj < at->rowend.xZ[i]; jj++) {
+            nisaddelement(&buf->setm, at->idx.xZ[jj]);
+         }
+      }
+   }
+   if (!*somethingchanged) {
+      return result;
+   }
+// Clear columns of AT corresponding to fixed variables
+   for (jj = 0; jj < buf->setn.nstored; jj++) {
+      i = buf->setn.items.xZ[jj];
+      at->rowend.xZ[i] = at->rowend.xZ[i];
+   }
+// Scan marked rows of A and remove fixed variables
+   for (ii = 0; ii < buf->setm.nstored; ii++) {
+      i = buf->setm.items.xZ[ii];
+      offs = a->rowbegin.xZ[i];
+      v = 0.0;
+      for (jj = a->rowbegin.xZ[i]; jj < a->rowend.xZ[i]; jj++) {
+         j = a->idx.xZ[jj];
+         if (buf->setn.locationof.xZ[j] >= 0) {
+         // Update constraint bounds with fixed variables, remove from linear constraint
+            v += bndl->xR[j] * a->vals.xR[jj];
+         } else {
+         // Non-fixed variable, retain it
+            a->idx.xZ[offs] = j;
+            a->vals.xR[offs] = a->vals.xR[jj];
+            offs++;
+         }
+      }
+      a->rowend.xZ[i] = offs;
+      if (isfinite(al->xR[i])) {
+         al->xR[i] -= v;
+      }
+      if (isfinite(au->xR[i])) {
+         au->xR[i] -= v;
+      }
+   }
+   return result;
+}
+
+// Scale cost vector and constraints, normalize cost.
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+static void lpqppresolve_scalecostandconstraints(RVector *s, ae_int_t n, RVector *c, RVector *bndl, RVector *bndu, sparsematrix *sparsea, RVector *al, RVector *au, ae_int_t m, presolverstack *trfstack) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t j0;
+   ae_int_t j1;
+   double costscale;
+   double avgln;
+   double v;
+   double rowscale;
+// Apply scaling to cost, determine additional scaling due to normalization
+   avgln = 0.0;
+   for (i = 0; i < n; i++) {
+      c->xR[i] *= s->xR[i];
+      avgln += log(1.0 + fabs(c->xR[i]));
+   }
+   costscale = exp(avgln / n);
+   rmulv(n, 1.0 / costscale, c);
+   lpqppresolve_presolverappendcostscaling(trfstack, 1.0 / costscale);
+// Apply column scaling to BndL/BndU, output backward transformation
+   for (i = 0; i < n; i++) {
+   // Transform problem
+      lpqppresolve_presolverappendcolscaling(trfstack, i, 1.0 / s->xR[i]);
+      bndl->xR[i] /= s->xR[i];
+      bndu->xR[i] /= s->xR[i];
+   }
+   for (i = 0; i < m; i++) {
+      rowscale = 0.0;
+      j0 = sparsea->ridx.xZ[i];
+      j1 = sparsea->ridx.xZ[i + 1] - 1;
+      for (j = j0; j <= j1; j++) {
+         v = s->xR[sparsea->idx.xZ[j]] * sparsea->vals.xR[j];
+         sparsea->vals.xR[j] = v;
+         rowscale = rmax2(rowscale, fabs(v));
+      }
+      rowscale = rmax2(rowscale, 1.0);
+   // Apply transformation to A/AL/AU
+      v = 1.0 / rowscale;
+      for (j = j0; j <= j1; j++) {
+         sparsea->vals.xR[j] *= v;
+      }
+      al->xR[i] *= v;
+      au->xR[i] *= v;
+      lpqppresolve_presolverappendrowscaling(trfstack, i, 1.0 / rowscale);
+   }
+}
+
 // No presolve, just user-supplied scaling + constraint and cost vector
 // normalization.
+//
+// Inputs:
+//     S           -   array[N], user-supplied scale vector, S[I] > 0
+//     C           -   array[N], costs
+//     BndL        -   array[N], lower bounds (may contain -INF)
+//     BndU        -   array[N], upper bounds (may contain +INF)
+//     N           -   variable count, N > 0
+//     SparseA     -   matrix[K,N], sparse constraints
+//     AL          -   array[K], lower constraint bounds (may contain -INF)
+//     AU          -   array[K], upper constraint bounds (may contain +INF)
+//     K           -   constraint count, K >= 0
+//     Info        -   presolve info structure; temporaries allocated during
+//                     previous calls may be reused by this function.
+//
+// Outputs:
+//     Info        -   contains transformed C, BndL, bndU,  SparseA,  AL,  AU
+//                     and   information   necessary   to   perform  backward
+//                     transformation.
+//                     Following fields can be accessed:
+//                     * ProblemStatus    which is:
+//                                        *  0 for successful transformation
+//                                        * -3 for infeasible problem
+//                                        * -4 for unbounded problem
+//
+//                     If Info.ProblemStatus == 0, then the following fields can
+//                     be accessed:
+//                     * Info.NewN > 0  for transformed problem size
+//                     * Info.NewM >= 0 for transformed constraint count
+//                     * always:          Info.C, Info.BndL, Info.BndU - array[NewN]
+//                     * for Info.NewM > 0: Info.SparseA, Info.AL, Info.AU
+//
+// NOTE: this routine does not reallocate arrays if NNew <= NOld and/or KNew <= KOld.
+// ALGLIB: Copyright 01.07.2020 by Sergey Bochkanov
+void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, sparsematrix *sparsea, RVector *al, RVector *au, ae_int_t k, presolveinfo *info) {
+   ae_int_t i;
+// Integrity checks
+   ae_assert(bndl->cnt >= n, "PresolveNoneScaleUser: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "PresolveNoneScaleUser: Length(BndU) < N");
+   ae_assert(s->cnt >= n, "PresolveNoneScaleUser: Length(S) < N");
+   ae_assert(isfinitevector(s, n), "PresolveNoneScaleUser: S contains infinite or NaN elements");
+   ae_assert(c->cnt >= n, "PresolveNoneScaleUser: Length(C) < N");
+   ae_assert(isfinitevector(c, n), "PresolveNoneScaleUser: C contains infinite or NaN elements");
+   ae_assert(k >= 0, "PresolveNoneScaleUser: K < 0");
+   ae_assert(k == 0 || sparseiscrs(sparsea), "PresolveNoneScaleUser: A is not CRS");
+   ae_assert(k == 0 || sparsea->m == k, "PresolveNoneScaleUser: rows(A) != K");
+   ae_assert(k == 0 || sparsea->n == n, "PresolveNoneScaleUser: cols(A) != N");
+// Initial check for constraint feasibility
+   for (i = 0; i < n; i++) {
+      if (isfinite(bndl->xR[i]) && isfinite(bndu->xR[i]) && bndl->xR[i] > bndu->xR[i]) {
+         info->problemstatus = -3;
+         return;
+      }
+   }
+   for (i = 0; i < k; i++) {
+      if (isfinite(al->xR[i]) && isfinite(au->xR[i]) && al->xR[i] > au->xR[i]) {
+         info->problemstatus = -3;
+         return;
+      }
+   }
+// Reallocate storage
+   rvectorgrowto(&info->rawc, n);
+   rvectorgrowto(&info->rawbndl, n);
+   rvectorgrowto(&info->rawbndu, n);
+// Save original problem formulation
+   lpqppresolve_presolverstackinit(n, k, &info->trfstack);
+   info->problemstatus = 0;
+   info->newn = n;
+   info->oldn = n;
+   info->newm = k;
+   info->oldm = k;
+   bsetallocv(n, false, &info->lagrangefromresidual);
+   allocv(n, &info->packxperm);
+   allocv(n, &info->unpackxperm);
+   for (i = 0; i < n; i++) {
+      ae_assert(s->xR[i] > 0.0, "PresolveNoneScaleUser: S <= 0");
+      ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "PresolveNoneScaleUser: BndL contains NAN or +INF");
+      ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "PresolveNoneScaleUser: BndU contains NAN or -INF");
+      info->rawc.xR[i] = c->xR[i];
+      info->rawbndl.xR[i] = bndl->xR[i];
+      info->rawbndu.xR[i] = bndu->xR[i];
+      info->packxperm.xZ[i] = i;
+      info->unpackxperm.xZ[i] = i;
+   }
+   allocv(k, &info->packyperm);
+   allocv(k, &info->unpackyperm);
+   for (i = 0; i < k; i++) {
+      info->packyperm.xZ[i] = i;
+      info->unpackyperm.xZ[i] = i;
+   }
+   allocv(n + k, &info->packstatperm);
+   allocv(n + k, &info->unpackstatperm);
+   for (i = 0; i < n + k; i++) {
+      info->packstatperm.xZ[i] = i;
+      info->unpackstatperm.xZ[i] = i;
+   }
+   sparsecopytocrsbuf(sparsea, &info->rawa);
+// Scale cost and box constraints
+   rcopyallocv(n, c, &info->c);
+   rcopyallocv(n, bndl, &info->bndl);
+   rcopyallocv(n, bndu, &info->bndu);
+   if (k > 0) {
+      rcopyallocv(k, al, &info->al);
+      rcopyallocv(k, au, &info->au);
+      sparsecopybuf(sparsea, &info->sparsea);
+   }
+   lpqppresolve_scalecostandconstraints(s, n, &info->c, &info->bndl, &info->bndu, &info->sparsea, &info->al, &info->au, k, &info->trfstack);
+}
+
+// Extensive presolving for an LP problem, all techniques are used
 //
 // Inputs:
 //     S           -   array[N], user-supplied scale vector, S[I] > 0
@@ -27003,84 +29097,212 @@ namespace alglib_impl {
 //                     * for Info.NewM > 0: Info.SparseA, Info.AL, Info.AU
 //
 // NOTE: this routine does not reallocate arrays if NNew <= NOld and/or KNew <= KOld.
-// ALGLIB: Copyright 01.07.2020 by Sergey Bochkanov
-void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, sparsematrix *sparsea, RVector *al, RVector *au, ae_int_t k, presolveinfo *info) {
+// ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
+void presolvelp(RVector *raws, RVector *rawc, RVector *rawbndl, RVector *rawbndu, ae_int_t n, sparsematrix *rawsparsea, RVector *rawal, RVector *rawau, ae_int_t m, presolveinfo *presolved) {
+   ae_frame _frame_block;
+   bool somethingchanged;
    ae_int_t i;
    ae_int_t j;
+   ae_int_t jj;
    ae_int_t j0;
    ae_int_t j1;
-   double v;
-   double avgln;
-// Integrity checks
-   ae_assert(bndl->cnt >= n, "PresolveNoneScaleUser: Length(BndL) < N");
-   ae_assert(bndu->cnt >= n, "PresolveNoneScaleUser: Length(BndU) < N");
-   ae_assert(s->cnt >= n, "PresolveNoneScaleUser: Length(S) < N");
-   ae_assert(isfinitevector(s, n), "PresolveNoneScaleUser: S contains infinite or NaN elements");
-   ae_assert(c->cnt >= n, "PresolveNoneScaleUser: Length(C) < N");
-   ae_assert(isfinitevector(c, n), "PresolveNoneScaleUser: C contains infinite or NaN elements");
-   ae_assert(k >= 0, "PresolveNoneScaleUser: K < 0");
-   ae_assert(k == 0 || sparseiscrs(sparsea), "PresolveNoneScaleUser: A is not CRS");
-   ae_assert(k == 0 || sparsea->m == k, "PresolveNoneScaleUser: rows(A) != K");
-   ae_assert(k == 0 || sparsea->n == n, "PresolveNoneScaleUser: cols(A) != N");
-// Reallocate storage
-   rvectorgrowto(&info->rawbndl, n);
-   rvectorgrowto(&info->rawbndu, n);
-   rvectorgrowto(&info->colscales, n);
-   rvectorgrowto(&info->rowscales, k);
-// Save original problem formulation
-   info->newn = n;
-   info->oldn = n;
-   info->newm = k;
-   info->oldm = k;
-   for (i = 0; i < n; i++) {
-      ae_assert(s->xR[i] > 0.0, "PresolveNoneScaleUser: S <= 0");
-      ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "PresolveNoneScaleUser: BndL contains NAN or +INF");
-      ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "PresolveNoneScaleUser: BndU contains NAN or -INF");
-      info->colscales.xR[i] = s->xR[i];
-      info->rawbndl.xR[i] = bndl->xR[i];
-      info->rawbndu.xR[i] = bndu->xR[i];
-   }
-// Scale cost and box constraints
-   vectorsetlengthatleast(&info->c, n);
-   vectorsetlengthatleast(&info->bndl, n);
-   vectorsetlengthatleast(&info->bndu, n);
-   for (i = 0; i < n; i++) {
-      info->c.xR[i] = c->xR[i] * s->xR[i];
-      info->bndl.xR[i] = bndl->xR[i] / s->xR[i];
-      info->bndu.xR[i] = bndu->xR[i] / s->xR[i];
-   }
-   avgln = 0.0;
-   for (i = 0; i < n; i++) {
-      avgln += log(1 + fabs(info->c.xR[i]));
-   }
-   info->costscale = exp(avgln / n);
-   rmulv(n, 1.0 / info->costscale, &info->c);
-// Quick exit if no linear constraints is present
-   if (k == 0) {
+   ae_int_t offs;
+   ae_int_t dbgemptycol;
+   ae_int_t dbgemptyrow;
+   ae_int_t dbgnonbindingrows;
+   ae_int_t dbgfixed;
+   ae_int_t dbgsingletonrow;
+   ae_int_t dbgslackvars;
+   ae_int_t dbgimplicitslacks;
+   ae_int_t dbgfreecolumnsingletons;
+   double eps;
+   ae_int_t presolverounds;
+   ae_frame_make(&_frame_block);
+   NewVector(isdroppedcol, 0, DT_BOOL);
+   NewVector(isdroppedrow, 0, DT_BOOL);
+   NewObj(sparsematrix, normsparsea);
+   NewObj(sparsematrix, normsparseat);
+   NewObj(dynamiccrs, a);
+   NewObj(dynamiccrs, at);
+   NewVector(c, 0, DT_REAL);
+   NewVector(bndl, 0, DT_REAL);
+   NewVector(bndu, 0, DT_REAL);
+   NewVector(al, 0, DT_REAL);
+   NewVector(au, 0, DT_REAL);
+   ae_assert(m == 0 || sparseiscrs(rawsparsea), "PRESOLVER: A is non-CRS sparse matrix");
+// Quick exit for M == 0
+   if (m == 0) {
+      presolvenonescaleuser(raws, rawc, rawbndl, rawbndu, n, rawsparsea, rawal, rawau, m, presolved);
+      ae_frame_leave();
       return;
    }
-// Scale constraint matrix
-   rcopyallocv(k, al, &info->al);
-   rcopyallocv(k, au, &info->au);
-   sparsecopybuf(sparsea, &info->sparsea);
-   for (i = 0; i < k; i++) {
-      ae_assert(isfinite(info->al.xR[i]) || isneginf(info->al.xR[i]), "PresolveNoneScaleUser: AL contains NAN or +INF");
-      ae_assert(isfinite(info->au.xR[i]) || isposinf(info->au.xR[i]), "PresolveNoneScaleUser: AU contains NAN or -INF");
-      info->rowscales.xR[i] = 0.0;
-      j0 = info->sparsea.ridx.xZ[i];
-      j1 = info->sparsea.ridx.xZ[i + 1] - 1;
-      for (j = j0; j <= j1; j++) {
-         v = info->sparsea.vals.xR[j] *= s->xR[info->sparsea.idx.xZ[j]];
-         info->rowscales.xR[i] = rmax2(info->rowscales.xR[i], v);
+// Initial check for constraint feasibility
+   for (i = 0; i < n; i++) {
+      if (isfinite(rawbndl->xR[i]) && isfinite(rawbndu->xR[i]) && rawbndl->xR[i] > rawbndu->xR[i]) {
+         presolved->problemstatus = -3;
+         ae_frame_leave();
+         return;
       }
-      info->rowscales.xR[i] = rmax2(info->rowscales.xR[i], 1.0);
-      v = 1.0 / info->rowscales.xR[i];
-      for (j = j0; j <= j1; j++) {
-         info->sparsea.vals.xR[j] *= v;
-      }
-      info->al.xR[i] *= v;
-      info->au.xR[i] *= v;
    }
+   for (i = 0; i < m; i++) {
+      if (isfinite(rawal->xR[i]) && isfinite(rawau->xR[i]) && rawal->xR[i] > rawau->xR[i]) {
+         presolved->problemstatus = -3;
+         ae_frame_leave();
+         return;
+      }
+   }
+// Trace counters
+   dbgemptycol = 0;
+   dbgemptyrow = 0;
+   dbgnonbindingrows = 0;
+   dbgfixed = 0;
+   dbgsingletonrow = 0;
+   dbgslackvars = 0;
+   dbgimplicitslacks = 0;
+   dbgfreecolumnsingletons = 0;
+// Initial state of the presolver
+   eps = (1000 + n + m) * machineepsilon;
+   lpqppresolve_presolverstackinit(n, m, &presolved->trfstack);
+   presolved->problemstatus = 0;
+   rcopyallocv(n, rawc, &c);
+   rcopyallocv(n, rawbndl, &bndl);
+   rcopyallocv(n, rawbndu, &bndu);
+   sparsecopybuf(rawsparsea, &normsparsea);
+   rcopyallocv(m, rawal, &al);
+   rcopyallocv(m, rawau, &au);
+   lpqppresolve_scalecostandconstraints(raws, n, &c, &bndl, &bndu, &normsparsea, &al, &au, m, &presolved->trfstack);
+   sparsecopytransposecrsbuf(&normsparsea, &normsparseat);
+   lpqppresolve_dyncrsinitfromsparsecrs(&normsparsea, &a);
+   lpqppresolve_dyncrsinitfromsparsecrs(&normsparseat, &at);
+   lpqppresolve_dyncrsdropzeros(&a);
+   lpqppresolve_dyncrsdropzeros(&at);
+   bsetallocv(n, false, &presolved->lagrangefromresidual);
+   bsetallocv(n, false, &isdroppedcol);
+   bsetallocv(m, false, &isdroppedrow);
+   lpqppresolve_presolvebuffersinit(&presolved->buf, n, m);
+// While something changes, keep iterating
+   presolverounds = 0;
+   somethingchanged = true;
+   while (somethingchanged) {
+      somethingchanged = false;
+   // Try the very basic reductions:
+   // * empty column
+   // * empty row
+   // * fixed variables removal
+   // * singleton rows to box constraints
+      if (!lpqppresolve_dropemptycol(&c, &bndl, &bndu, &isdroppedcol, &presolved->lagrangefromresidual, n, &a, &at, &al, &au, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgemptycol)) {
+         ae_frame_leave();
+         return;
+      }
+      if (!lpqppresolve_dropclearlynonbindingrows(n, &isdroppedrow, &a, &at, &al, &au, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgemptyrow, &dbgnonbindingrows)) {
+         ae_frame_leave();
+         return;
+      }
+      if (!lpqppresolve_singletonrowtobc(&bndl, &bndu, &isdroppedcol, n, &a, &at, &al, &au, &isdroppedrow, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgsingletonrow)) {
+         ae_frame_leave();
+         return;
+      }
+      if (!lpqppresolve_fixvariables(&c, &bndl, &bndu, &isdroppedcol, n, &a, &at, &al, &au, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgfixed)) {
+         ae_frame_leave();
+         return;
+      }
+      if (!lpqppresolve_singletoncols(&c, &bndl, &bndu, &isdroppedcol, n, &a, &at, &al, &au, &isdroppedrow, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgslackvars, &dbgimplicitslacks, &dbgfreecolumnsingletons)) {
+         ae_frame_leave();
+         return;
+      }
+      presolverounds++;
+   }
+// Starting output
+   rcopyallocv(n, rawc, &presolved->rawc);
+   rcopyallocv(n, rawbndl, &presolved->rawbndl);
+   rcopyallocv(n, rawbndu, &presolved->rawbndu);
+   sparsecopytocrsbuf(rawsparsea, &presolved->rawa);
+// Output data that are permuted by XPerm[]
+   presolved->oldn = n;
+   presolved->newn = 0;
+   isetallocv(n, -1, &presolved->packxperm);
+   isetallocv(n, -1, &presolved->unpackxperm);
+   for (i = 0; i < n; i++) {
+      if (!isdroppedcol.xB[i]) {
+         presolved->unpackxperm.xZ[presolved->newn] = i;
+         presolved->packxperm.xZ[i] = presolved->newn;
+         presolved->newn++;
+      }
+   }
+   allocv(presolved->newn, &presolved->bndl);
+   allocv(presolved->newn, &presolved->bndu);
+   allocv(presolved->newn, &presolved->c);
+   for (i = 0; i < presolved->newn; i++) {
+      presolved->c.xR[i] = c.xR[presolved->unpackxperm.xZ[i]];
+      presolved->bndl.xR[i] = bndl.xR[presolved->unpackxperm.xZ[i]];
+      presolved->bndu.xR[i] = bndu.xR[presolved->unpackxperm.xZ[i]];
+   }
+// Output data that are permuted by YPerm[]
+   presolved->oldm = m;
+   presolved->newm = 0;
+   isetallocv(m, -1, &presolved->packyperm);
+   isetallocv(m, -1, &presolved->unpackyperm);
+   for (i = 0; i < m; i++) {
+      if (!isdroppedrow.xB[i]) {
+         presolved->unpackyperm.xZ[presolved->newm] = i;
+         presolved->packyperm.xZ[i] = presolved->newm;
+         presolved->newm++;
+      }
+   }
+   allocv(presolved->newm, &presolved->al);
+   allocv(presolved->newm, &presolved->au);
+   for (i = 0; i < presolved->newm; i++) {
+      presolved->al.xR[i] = al.xR[presolved->unpackyperm.xZ[i]];
+      presolved->au.xR[i] = au.xR[presolved->unpackyperm.xZ[i]];
+   }
+// Output A which is permuted by both XPerm[] and YPerm[]
+   presolved->sparsea.m = 0;
+   presolved->sparsea.n = presolved->newn;
+   allocv(presolved->newm + 1, &presolved->sparsea.ridx);
+   presolved->sparsea.ridx.xZ[0] = 0;
+   for (i = 0; i < m; i++) {
+      if (!isdroppedrow.xB[i]) {
+         offs = presolved->sparsea.ridx.xZ[presolved->sparsea.m];
+         igrowv(offs + n, &presolved->sparsea.idx);
+         rgrowv(offs + n, &presolved->sparsea.vals);
+         j0 = a.rowbegin.xZ[i];
+         j1 = a.rowend.xZ[i] - 1;
+         for (jj = j0; jj <= j1; jj++) {
+            j = presolved->packxperm.xZ[a.idx.xZ[jj]];
+            ae_assert(j >= 0, "PRESOLVE: integrity check 54fc failed");
+            presolved->sparsea.idx.xZ[offs] = j;
+            presolved->sparsea.vals.xR[offs] = a.vals.xR[jj];
+            offs++;
+         }
+         presolved->sparsea.m++;
+         presolved->sparsea.ridx.xZ[presolved->sparsea.m] = offs;
+      }
+   }
+   ae_assert(presolved->sparsea.m == presolved->newm, "PRESOLVE: integrity check ee3a failed");
+   sparsecreatecrsinplace(&presolved->sparsea);
+// Prepare permutation for constraint Stats[]
+   isetallocv(n + m, -1, &presolved->packstatperm);
+   isetallocv(n + m, -1, &presolved->unpackstatperm);
+   offs = 0;
+   for (i = 0; i < n; i++) {
+      if (!isdroppedcol.xB[i]) {
+         presolved->packstatperm.xZ[i] = offs;
+         offs++;
+      }
+   }
+   for (i = 0; i < m; i++) {
+      if (!isdroppedrow.xB[i]) {
+         presolved->packstatperm.xZ[n + i] = offs;
+         offs++;
+      }
+   }
+   ae_assert(offs == presolved->newn + presolved->newm, "PRESOLVE: integrity check 3632 failed");
+   for (i = 0; i < n + m; i++) {
+      if (presolved->packstatperm.xZ[i] >= 0) {
+         presolved->unpackstatperm.xZ[presolved->packstatperm.xZ[i]] = i;
+      }
+   }
+   ae_frame_leave();
 }
 
 // Backward transformation which extracts original solution from that of  the
@@ -27109,50 +29331,170 @@ void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu,
 // NOTE: this routine does not reallocate arrays if NOld <= NNew and/or KOld <= KNew.
 // ALGLIB: Copyright 01.07.2020 by Sergey Bochkanov
 void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc, RVector *laglc) {
-   ae_int_t n;
-   ae_int_t m;
    ae_int_t i;
-   ae_assert(info->oldn == info->newn, "PresolveBwd: integrity check failed");
-   ae_assert(info->oldm == info->newm, "PresolveBwd: integrity check failed");
-   n = info->oldn;
-   m = info->oldm;
-   for (i = 0; i < n; i++) {
-      if (stats->xZ[i] < 0) {
-         x->xR[i] = info->rawbndl.xR[i];
-         continue;
-      }
-      if (stats->xZ[i] > 0) {
-         x->xR[i] = info->rawbndu.xR[i];
-         continue;
-      }
-      x->xR[i] *= info->colscales.xR[i];
+// Read state of the transformed problem into storage allocated for the original problem
+   isetallocv(info->oldn + info->oldm, 0, &info->s1);
+   for (i = 0; i < info->newn + info->newm; i++) {
+      info->s1.xZ[info->unpackstatperm.xZ[i]] = stats->xZ[i];
+   }
+   rsetallocv(info->oldn, 0.0, &info->x1);
+   for (i = 0; i < info->newn; i++) {
+      info->x1.xR[info->unpackxperm.xZ[i]] = x->xR[i];
+   }
+   rsetallocv(info->oldn, 0.0, &info->bc1);
+   for (i = 0; i < info->newn; i++) {
+      info->bc1.xR[info->unpackxperm.xZ[i]] = lagbc->xR[i];
+   }
+   rsetallocv(info->oldm, 0.0, &info->y1);
+   for (i = 0; i < info->newm; i++) {
+      info->y1.xR[info->unpackyperm.xZ[i]] = laglc->xR[i];
+   }
+// Apply reverse transformation
+   lpqppresolve_presolverrestoresolution(&info->trfstack, &info->x1, &info->bc1, &info->y1, &info->s1);
+// Polish X according to box constraints and info from newly recovered Stats[]
+// Recompute coefficients corresponding to variables fixed during presolve using residual costs.
+   for (i = 0; i < info->oldn; i++) {
       if (isfinite(info->rawbndl.xR[i])) {
-         x->xR[i] = rmax2(x->xR[i], info->rawbndl.xR[i]);
+         info->x1.xR[i] = rmax2(info->x1.xR[i], info->rawbndl.xR[i]);
       }
       if (isfinite(info->rawbndu.xR[i])) {
-         x->xR[i] = rmin2(x->xR[i], info->rawbndu.xR[i]);
+         info->x1.xR[i] = rmin2(info->x1.xR[i], info->rawbndu.xR[i]);
+      }
+      if (info->s1.xZ[i] < 0) {
+         info->x1.xR[i] = info->rawbndl.xR[i];
+      }
+      if (info->s1.xZ[i] > 0) {
+         info->x1.xR[i] = info->rawbndu.xR[i];
       }
    }
-   for (i = 0; i < n; i++) {
-      lagbc->xR[i] *= info->costscale / info->colscales.xR[i];
+   rcopyallocv(info->oldn, &info->rawc, &info->d);
+   if (info->oldm > 0) {
+      sparsegemv(&info->rawa, 1.0, 1, &info->y1, 0, 1.0, &info->d, 0);
    }
-   for (i = 0; i < m; i++) {
-      laglc->xR[i] *= info->costscale / info->rowscales.xR[i];
+   for (i = 0; i < info->oldn; i++) {
+      if (info->lagrangefromresidual.xB[i]) {
+         info->bc1.xR[i] = -info->d.xR[i];
+      }
    }
+// Output
+   rcopyallocv(info->oldn, &info->x1, x);
+   rcopyallocv(info->oldm, &info->y1, laglc);
+   icopyallocv(info->oldn + info->oldm, &info->s1, stats);
+   rcopyallocv(info->oldn, &info->bc1, lagbc);
+}
+
+void dynamiccrs_init(void *_p, bool make_automatic) {
+   dynamiccrs *p = (dynamiccrs *)_p;
+   ae_vector_init(&p->rowbegin, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->rowend, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->idx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->vals, 0, DT_REAL, make_automatic);
+}
+
+void dynamiccrs_copy(void *_dst, const void *_src, bool make_automatic) {
+   dynamiccrs *dst = (dynamiccrs *)_dst;
+   const dynamiccrs *src = (const dynamiccrs *)_src;
+   dst->m = src->m;
+   dst->n = src->n;
+   ae_vector_copy(&dst->rowbegin, &src->rowbegin, make_automatic);
+   ae_vector_copy(&dst->rowend, &src->rowend, make_automatic);
+   ae_vector_copy(&dst->idx, &src->idx, make_automatic);
+   ae_vector_copy(&dst->vals, &src->vals, make_automatic);
+}
+
+void dynamiccrs_free(void *_p, bool make_automatic) {
+   dynamiccrs *p = (dynamiccrs *)_p;
+   ae_vector_free(&p->rowbegin, make_automatic);
+   ae_vector_free(&p->rowend, make_automatic);
+   ae_vector_free(&p->idx, make_automatic);
+   ae_vector_free(&p->vals, make_automatic);
+}
+
+void presolvebuffers_init(void *_p, bool make_automatic) {
+   presolvebuffers *p = (presolvebuffers *)_p;
+   niset_init(&p->setn, make_automatic);
+   niset_init(&p->setm, make_automatic);
+}
+
+void presolvebuffers_copy(void *_dst, const void *_src, bool make_automatic) {
+   presolvebuffers *dst = (presolvebuffers *)_dst;
+   const presolvebuffers *src = (const presolvebuffers *)_src;
+   niset_copy(&dst->setn, &src->setn, make_automatic);
+   niset_copy(&dst->setm, &src->setm, make_automatic);
+}
+
+void presolvebuffers_free(void *_p, bool make_automatic) {
+   presolvebuffers *p = (presolvebuffers *)_p;
+   niset_free(&p->setn, make_automatic);
+   niset_free(&p->setm, make_automatic);
+}
+
+void presolverstack_init(void *_p, bool make_automatic) {
+   presolverstack *p = (presolverstack *)_p;
+   ae_vector_init(&p->trftype, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->idata, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->rdata, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->idataridx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->rdataridx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->sparseidx0, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->sparseval0, 0, DT_REAL, make_automatic);
+}
+
+void presolverstack_copy(void *_dst, const void *_src, bool make_automatic) {
+   presolverstack *dst = (presolverstack *)_dst;
+   const presolverstack *src = (const presolverstack *)_src;
+   dst->n = src->n;
+   dst->m = src->m;
+   dst->ntrf = src->ntrf;
+   ae_vector_copy(&dst->trftype, &src->trftype, make_automatic);
+   ae_vector_copy(&dst->idata, &src->idata, make_automatic);
+   ae_vector_copy(&dst->rdata, &src->rdata, make_automatic);
+   ae_vector_copy(&dst->idataridx, &src->idataridx, make_automatic);
+   ae_vector_copy(&dst->rdataridx, &src->rdataridx, make_automatic);
+   dst->sourceidx = src->sourceidx;
+   dst->isrc = src->isrc;
+   dst->rsrc = src->rsrc;
+   ae_vector_copy(&dst->sparseidx0, &src->sparseidx0, make_automatic);
+   ae_vector_copy(&dst->sparseval0, &src->sparseval0, make_automatic);
+}
+
+void presolverstack_free(void *_p, bool make_automatic) {
+   presolverstack *p = (presolverstack *)_p;
+   ae_vector_free(&p->trftype, make_automatic);
+   ae_vector_free(&p->idata, make_automatic);
+   ae_vector_free(&p->rdata, make_automatic);
+   ae_vector_free(&p->idataridx, make_automatic);
+   ae_vector_free(&p->rdataridx, make_automatic);
+   ae_vector_free(&p->sparseidx0, make_automatic);
+   ae_vector_free(&p->sparseval0, make_automatic);
 }
 
 void presolveinfo_init(void *_p, bool make_automatic) {
    presolveinfo *p = (presolveinfo *)_p;
+   ae_vector_init(&p->rawc, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->rawbndl, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->rawbndu, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->colscales, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->rowscales, 0, DT_REAL, make_automatic);
+   sparsematrix_init(&p->rawa, make_automatic);
+   ae_vector_init(&p->lagrangefromresidual, 0, DT_BOOL, make_automatic);
    ae_vector_init(&p->c, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, make_automatic);
    sparsematrix_init(&p->sparsea, make_automatic);
    ae_vector_init(&p->al, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->au, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->packxperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->packyperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->packstatperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->unpackxperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->unpackyperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->unpackstatperm, 0, DT_INT, make_automatic);
+   presolverstack_init(&p->trfstack, make_automatic);
+   ae_vector_init(&p->s1, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->bc1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->y1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->d, 0, DT_REAL, make_automatic);
+   presolvebuffers_init(&p->buf, make_automatic);
 }
 
 void presolveinfo_copy(void *_dst, const void *_src, bool make_automatic) {
@@ -27162,31 +29504,59 @@ void presolveinfo_copy(void *_dst, const void *_src, bool make_automatic) {
    dst->oldn = src->oldn;
    dst->newm = src->newm;
    dst->oldm = src->oldm;
+   ae_vector_copy(&dst->rawc, &src->rawc, make_automatic);
    ae_vector_copy(&dst->rawbndl, &src->rawbndl, make_automatic);
    ae_vector_copy(&dst->rawbndu, &src->rawbndu, make_automatic);
-   ae_vector_copy(&dst->colscales, &src->colscales, make_automatic);
-   ae_vector_copy(&dst->rowscales, &src->rowscales, make_automatic);
-   dst->costscale = src->costscale;
+   sparsematrix_copy(&dst->rawa, &src->rawa, make_automatic);
+   dst->problemstatus = src->problemstatus;
+   ae_vector_copy(&dst->lagrangefromresidual, &src->lagrangefromresidual, make_automatic);
    ae_vector_copy(&dst->c, &src->c, make_automatic);
    ae_vector_copy(&dst->bndl, &src->bndl, make_automatic);
    ae_vector_copy(&dst->bndu, &src->bndu, make_automatic);
    sparsematrix_copy(&dst->sparsea, &src->sparsea, make_automatic);
    ae_vector_copy(&dst->al, &src->al, make_automatic);
    ae_vector_copy(&dst->au, &src->au, make_automatic);
+   ae_vector_copy(&dst->packxperm, &src->packxperm, make_automatic);
+   ae_vector_copy(&dst->packyperm, &src->packyperm, make_automatic);
+   ae_vector_copy(&dst->packstatperm, &src->packstatperm, make_automatic);
+   ae_vector_copy(&dst->unpackxperm, &src->unpackxperm, make_automatic);
+   ae_vector_copy(&dst->unpackyperm, &src->unpackyperm, make_automatic);
+   ae_vector_copy(&dst->unpackstatperm, &src->unpackstatperm, make_automatic);
+   presolverstack_copy(&dst->trfstack, &src->trfstack, make_automatic);
+   ae_vector_copy(&dst->s1, &src->s1, make_automatic);
+   ae_vector_copy(&dst->bc1, &src->bc1, make_automatic);
+   ae_vector_copy(&dst->x1, &src->x1, make_automatic);
+   ae_vector_copy(&dst->y1, &src->y1, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, make_automatic);
+   presolvebuffers_copy(&dst->buf, &src->buf, make_automatic);
 }
 
 void presolveinfo_free(void *_p, bool make_automatic) {
    presolveinfo *p = (presolveinfo *)_p;
+   ae_vector_free(&p->rawc, make_automatic);
    ae_vector_free(&p->rawbndl, make_automatic);
    ae_vector_free(&p->rawbndu, make_automatic);
-   ae_vector_free(&p->colscales, make_automatic);
-   ae_vector_free(&p->rowscales, make_automatic);
+   sparsematrix_free(&p->rawa, make_automatic);
+   ae_vector_free(&p->lagrangefromresidual, make_automatic);
    ae_vector_free(&p->c, make_automatic);
    ae_vector_free(&p->bndl, make_automatic);
    ae_vector_free(&p->bndu, make_automatic);
    sparsematrix_free(&p->sparsea, make_automatic);
    ae_vector_free(&p->al, make_automatic);
    ae_vector_free(&p->au, make_automatic);
+   ae_vector_free(&p->packxperm, make_automatic);
+   ae_vector_free(&p->packyperm, make_automatic);
+   ae_vector_free(&p->packstatperm, make_automatic);
+   ae_vector_free(&p->unpackxperm, make_automatic);
+   ae_vector_free(&p->unpackyperm, make_automatic);
+   ae_vector_free(&p->unpackstatperm, make_automatic);
+   presolverstack_free(&p->trfstack, make_automatic);
+   ae_vector_free(&p->s1, make_automatic);
+   ae_vector_free(&p->bc1, make_automatic);
+   ae_vector_free(&p->x1, make_automatic);
+   ae_vector_free(&p->y1, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   presolvebuffers_free(&p->buf, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -31070,7 +33440,7 @@ void minlpsetalgodss(minlpstate *state, double eps) {
 // Inputs:
 //     State   -   optimizer
 //     Eps     -   stopping condition, Eps >= 0:
-//                 * should be small number about 1E-7 or 1E-8.
+//                 * should be small number about 1E-6 or 1E-8.
 //                 * zero value means that solver automatically selects good
 //                   value (can be different in different ALGLIB versions)
 //                 * default value is zero
@@ -31740,28 +34110,18 @@ void minlpoptimize(minlpstate *state) {
    ae_int_t m;
    ae_int_t i;
    double v;
-   bool badconstr;
    ae_frame_make(&_frame_block);
    NewObj(dualsimplexsettings, settings);
+   NewVector(dummy1, 0, DT_REAL);
    NewMatrix(dummy, 0, 0, DT_REAL);
    NewObj(dualsimplexbasis, dummybasis);
    n = state->n;
    m = state->m;
    minlp_clearreportfields(state);
-// Most basic check for correctness of constraints
-   badconstr = false;
-   for (i = 0; i < n; i++) {
-      if (isfinite(state->bndl.xR[i]) && isfinite(state->bndu.xR[i]) && state->bndl.xR[i] > state->bndu.xR[i]) {
-         badconstr = true;
-      }
-   }
-   for (i = 0; i < m; i++) {
-      if (isfinite(state->al.xR[i]) && isfinite(state->au.xR[i]) && state->al.xR[i] > state->au.xR[i]) {
-         badconstr = true;
-      }
-   }
-   if (badconstr) {
-      state->repterminationtype = -3;
+// Run presolver
+   presolvelp(&state->s, &state->c, &state->bndl, &state->bndu, n, &state->a, &state->al, &state->au, m, &state->presolver);
+   if (state->presolver.problemstatus == -3 || state->presolver.problemstatus == -2) {
+      state->repterminationtype = state->presolver.problemstatus;
       state->repn = n;
       state->repm = m;
       rsetallocv(n, 0.0, &state->xs);
@@ -31794,61 +34154,55 @@ void minlpoptimize(minlpstate *state) {
       ae_frame_leave();
       return;
    }
+   ae_assert(state->presolver.problemstatus == 0, "MINLP: integrity check 4432 failed");
 // Call current solver
    if (state->algokind == 1 || state->algokind == 2) {
-   // Call the solver
-      if (state->algokind == 1) {
-      // Dual simplex method with presolve
-         presolvenonescaleuser(&state->s, &state->c, &state->bndl, &state->bndu, n, &state->a, &state->al, &state->au, m, &state->presolver);
-         dsssettingsinit(&settings);
-         settings.xtolabs = state->dsseps;
-         settings.dtolabs = state->dsseps;
-         dssinit(state->presolver.newn, &state->dss);
-         dsssetproblem(&state->dss, &state->presolver.c, &state->presolver.bndl, &state->presolver.bndu, &dummy, &state->presolver.sparsea, 1, &state->presolver.al, &state->presolver.au, state->presolver.newm, &dummybasis, alllogicalsbasis, &settings);
-         dssoptimize(&state->dss, &settings);
-      // Export results, convert from presolve
-         vectorsetlengthatleast(&state->xs, state->presolver.newn);
-         vectorsetlengthatleast(&state->lagbc, state->presolver.newn);
-         vectorsetlengthatleast(&state->laglc, state->presolver.newm);
-         vectorsetlengthatleast(&state->cs, state->presolver.newn + state->presolver.newm);
-         for (i = 0; i < state->presolver.newn; i++) {
-            state->xs.xR[i] = state->dss.repx.xR[i];
-            state->lagbc.xR[i] = state->dss.replagbc.xR[i];
+   // If presolver did NOT remove all variables (NewN > 0), call the current solver
+      if (state->presolver.newn > 0) {
+         if (state->algokind == 1) {
+         // Dual simplex method with presolve
+            dsssettingsinit(&settings);
+            settings.xtolabs = state->dsseps;
+            settings.dtolabs = state->dsseps;
+            dssinit(state->presolver.newn, &state->dss);
+            dsssetproblem(&state->dss, &state->presolver.c, &state->presolver.bndl, &state->presolver.bndu, &dummy, &state->presolver.sparsea, 1, &state->presolver.al, &state->presolver.au, state->presolver.newm, &dummybasis, alllogicalsbasis, &settings);
+            dssoptimize(&state->dss, &settings);
+         // Export results, convert from presolve
+            rcopyallocv(state->presolver.newn, &state->dss.repx, &state->xs);
+            rcopyallocv(state->presolver.newn, &state->dss.replagbc, &state->lagbc);
+            rcopyallocv(state->presolver.newm, &state->dss.replaglc, &state->laglc);
+            icopyallocv(state->presolver.newn + state->presolver.newm, &state->dss.repstats, &state->cs);
+            state->repiterationscount = state->dss.repiterationscount;
+            state->repterminationtype = state->dss.repterminationtype;
          }
-         for (i = 0; i < state->presolver.newm; i++) {
-            state->laglc.xR[i] = state->dss.replaglc.xR[i];
+         if (state->algokind == 2) {
+         // Interior point method with presolve
+            rsetallocv(state->presolver.newn, 1.0, &state->units);
+            rsetallocv(state->presolver.newn, 0.0, &state->zeroorigin);
+            sparsecreatesksbandbuf(state->presolver.newn, state->presolver.newn, 0, &state->ipmquadratic);
+            for (i = 0; i < state->presolver.newn; i++) {
+               sparseset(&state->ipmquadratic, i, i, state->ipmlambda);
+            }
+            sparseconverttocrs(&state->ipmquadratic);
+            vipminitsparse(&state->ipm, &state->units, &state->zeroorigin, state->presolver.newn);
+            vipmsetquadraticlinear(&state->ipm, &dummy, &state->ipmquadratic, 1, false, &state->presolver.c);
+            vipmsetconstraints(&state->ipm, &state->presolver.bndl, &state->presolver.bndu, &state->presolver.sparsea, state->presolver.newm, &dummy, 0, &state->presolver.al, &state->presolver.au);
+            vipmsetcond(&state->ipm, state->ipmeps, state->ipmeps, state->ipmeps);
+            vipmoptimize(&state->ipm, true, &state->xs, &state->lagbc, &state->laglc, &state->repterminationtype);
+            isetallocv(state->presolver.newn + state->presolver.newm, 0, &state->cs);
+            state->repiterationscount = state->ipm.repiterationscount;
          }
-         for (i = 0; i < state->presolver.newn + state->presolver.newm; i++) {
-            state->cs.xZ[i] = state->dss.repstats.xZ[i];
-         }
-         state->repiterationscount = state->dss.repiterationscount;
-         state->repterminationtype = state->dss.repterminationtype;
-         presolvebwd(&state->presolver, &state->xs, &state->cs, &state->lagbc, &state->laglc);
-         state->repn = n;
-         state->repm = m;
-      }
-      if (state->algokind == 2) {
-      // Interior point method with presolve
-         presolvenonescaleuser(&state->s, &state->c, &state->bndl, &state->bndu, n, &state->a, &state->al, &state->au, m, &state->presolver);
-         rsetallocv(state->presolver.newn, 1.0, &state->units);
-         rsetallocv(state->presolver.newn, 0.0, &state->zeroorigin);
-         sparsecreatesksbandbuf(state->presolver.newn, state->presolver.newn, 0, &state->ipmquadratic);
-         for (i = 0; i < state->presolver.newn; i++) {
-            sparseset(&state->ipmquadratic, i, i, state->ipmlambda);
-         }
-         sparseconverttocrs(&state->ipmquadratic);
-         vipminitsparse(&state->ipm, &state->units, &state->zeroorigin, state->presolver.newn);
-         vipmsetquadraticlinear(&state->ipm, &dummy, &state->ipmquadratic, 1, false, &state->presolver.c);
-         vipmsetconstraints(&state->ipm, &state->presolver.bndl, &state->presolver.bndu, &state->presolver.sparsea, state->presolver.newm, &dummy, 0, &state->presolver.al, &state->presolver.au);
-         vipmsetcond(&state->ipm, state->ipmeps, state->ipmeps, state->ipmeps);
-         vipmoptimize(&state->ipm, true, &state->xs, &state->lagbc, &state->laglc, &state->repterminationtype);
-      // Export results, convert from presolve
+      } else {
+      // Presolver removed all variables, manually set up XS and Lagrange multipliers
+         rsetallocv(state->presolver.newm, 0.0, &state->laglc);
          isetallocv(state->presolver.newn + state->presolver.newm, 0, &state->cs);
-         presolvebwd(&state->presolver, &state->xs, &state->cs, &state->lagbc, &state->laglc);
-         state->repn = n;
-         state->repm = m;
-         state->repiterationscount = state->ipm.repiterationscount;
+         state->repterminationtype = 1;
+         state->repiterationscount = 0;
       }
+   // Convert back from presolved format
+      presolvebwd(&state->presolver, &state->xs, &state->cs, &state->lagbc, &state->laglc);
+      state->repn = n;
+      state->repm = m;
    // Compute F, primal and dual errors
       state->repf = rdotv(n, &state->xs, &state->c);
       state->repprimalerror = 0.0;
@@ -32289,13 +34643,12 @@ static const ae_int_t nlcslp_nonmonotonicphase2limit = 5;
 // Inputs:
 //     SState          -   solver state
 //     Subsolver       -   SLP subproblem to initialize
-//     HessianType     -   0 for identity Hessian, 1 for BFGS update
 //
 // Return Value:
 //     True on success
 //     False on failure of the LP solver (unexpected... but possible due to numerical errors)
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
-static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolver, ae_int_t hessiantype) {
+static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolver) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -32333,17 +34686,7 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
 // Initial state
    subsolver->basispresent = false;
    subsolver->curdcnt = 0;
-   subsolver->hessiantype = hessiantype;
-   if (hessiantype == 1 || hessiantype == 2) {
-   // Prepare Hessian matrix
-      matrixsetlengthatleast(&subsolver->h, n, n);
-      for (i = 0; i < n; i++) {
-         for (j = 0; j < n; j++) {
-            subsolver->h.xyR[i][j] = 0.0;
-         }
-         subsolver->h.xyR[i][i] = 1.0;
-      }
-   }
+   hessianinitbfgs(&subsolver->hess, n, 0, coalesce(sstate->epsx, sqrt(machineepsilon)));
 // Linear constraints do not change across subiterations, that's
 // why we allocate storage for them at the start of the program.
 //
@@ -32395,55 +34738,6 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
 static void nlcslp_lpsubproblemrestart(minslpstate *sstate, minslpsubsolver *subsolver) {
    subsolver->curdcnt = 0;
-}
-
-// Updates Hessian estimate
-//
-// Inputs:
-//     SState          -   solver state
-//     Subsolver       -   SLP subproblem to initialize
-// ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
-static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1) {
-   ae_int_t i;
-   ae_int_t n;
-   double vv;
-   double v;
-   double v0;
-   double v1;
-   double v2;
-   double gk;
-   double sk;
-   double yk;
-   n = sstate->n;
-   if (subsolver->hessiantype == 1 || subsolver->hessiantype == 2) {
-      vectorsetlengthatleast(&subsolver->tmp0, n);
-      v = 0.0;
-      v0 = 0.0;
-      v1 = 0.0;
-      v2 = 0.0;
-      for (i = 0; i < n; i++) {
-         sk = x1->xR[i] - x0->xR[i];
-         yk = g1->xR[i] - g0->xR[i];
-         gk = g0->xR[i];
-         v += sk * yk;
-         v0 += sk * sk;
-         v1 += yk * yk;
-         v2 += gk * gk;
-         subsolver->sk.xR[i] = sk;
-         subsolver->yk.xR[i] = yk;
-      }
-      if (sqrt(v0) > rmax2(sstate->epsx, nlcslp_bfgstol) && sqrt(v1) > nlcslp_bfgstol * sqrt(v2) && v > nlcslp_bfgstol * sqrt(v0) * sqrt(v1)) {
-      // Update Hessian if following criteria hold:
-      // * MCINFO == 1 (good step)
-      // * step length is large enough
-      // * |Yk| is large enough when compared with |G|
-      // * (Sk,Yk) is large enough when compared with |S| and |G|
-         vv = rmatrixsyvmv(n, &subsolver->h, 0, 0, true, &subsolver->sk, 0, &subsolver->tmp0);
-         rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, &subsolver->sk, 0, 0.0, &subsolver->tmp0, 0);
-         rmatrixger(n, n, &subsolver->h, 0, 0, +1.0 / v, &subsolver->yk, 0, &subsolver->yk, 0);
-         rmatrixger(n, n, &subsolver->h, 0, 0, -1.0 / vv, &subsolver->tmp0, 0, &subsolver->tmp0, 0);
-      }
-   }
 }
 
 // This function solves LP subproblem given by initial point X, function vector Fi
@@ -32768,25 +35062,15 @@ static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, min
    ae_int_t i;
    ae_int_t j;
    n = state->n;
-// Update matrix of products H*Dprev
+// Conjugacy constraint d*H*Dprev == 0, only last row of (H*Dprev) is recomputed
    ae_assert(subsolver->curdcnt < subsolver->curd.rows, "SLP: CurD is too small");
    for (i = 0; i < n; i++) {
-   // Store direction and default conjugacy constraint d'*I*Dprev == 0
       subsolver->curd.xyR[subsolver->curdcnt][i] = d->xR[i];
-      subsolver->curhd.xyR[subsolver->curdcnt][i] = d->xR[i];
    }
    subsolver->curdcnt++;
-   if (state->hessiantype == 1) {
-   // Conjugacy constraint d*H*Dprev == 0, full recomputation of (H*Dprev)
-      rmatrixgemm(subsolver->curdcnt, n, n, 1.0, &subsolver->curd, 0, 0, 0, &subsolver->h, 0, 0, 0, 0.0, &subsolver->curhd, 0, 0);
-   }
-   if (state->hessiantype == 2) {
-   // Conjugacy constraint d*H*Dprev == 0, only last row of (H*Dprev) is recomputed
-      vectorsetlengthatleast(&subsolver->tmp0, n);
-      rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, d, 0, 0.0, &subsolver->tmp0, 0);
-      for (j = 0; j < n; j++) {
-         subsolver->curhd.xyR[subsolver->curdcnt - 1][j] = subsolver->tmp0.xR[j];
-      }
+   hessianmv(&subsolver->hess, d, &subsolver->tmp0);
+   for (j = 0; j < n; j++) {
+      subsolver->curhd.xyR[subsolver->curdcnt - 1][j] = subsolver->tmp0.xR[j];
    }
 }
 
@@ -33262,7 +35546,7 @@ Spawn:
    nu = 0.5;
    f0 = nlcslp_meritfunction(state, curx, curfi, lagmult, mu, &state13->tmpmerit);
    f1 = f0;
-   smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj);
+   smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj, state->repinneriterationscount, state->repouteriterationscount);
    while (true) {
       for (i = 0; i < n; i++) {
          state13->stepkxn.xR[i] = curx->xR[i] + localstp * state13->d.xR[i];
@@ -33308,9 +35592,9 @@ Spawn:
    }
 #if 0 //(@) Not used.
 #   if 0 //(@) Not used.
-   for (smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad); smoothnessmonitorprobe(smonitor); ) {
+   for (smoothnessmonitorstartlagrangianprobing(smonitor, curx, &state13->d, 1.0, 0, state->repouteriterationscount); smoothnessmonitorprobelagrangian(smonitor); ) {
       for (j = 0; j < n; j++) {
-         state13->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state13->d.xR[j];
+         state13->stepkxc.xR[j] = smonitor->lagprobx.xR[j];
          if (state->hasbndl.xB[j]) {
             state13->stepkxc.xR[j] = rmax2(state13->stepkxc.xR[j], state->scaledbndl.xR[j]);
          }
@@ -33320,11 +35604,10 @@ Spawn:
       }
       nlcslp_slpsendx(state, &state13->stepkxc);
       state->needfij = true, state13->Ph13PQ = 2; goto Pause; Resume2: state->needfij = false;
-      if (!nlcslp_slpretrievefij(state, &state13->stepkfic, &state13->stepkjc)) {
+      if (!nlcslp_slpretrievefij(state, &smonitor->lagprobfi, &smonitor->lagprobj)) {
          break;
       }
-      smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state13->stepkxc, &state13->stepkfic, lagmult, &state13->tmpmerit);
-      smonitor->probingf.xR[1] = state13->stepkfic.xR[0];
+      smonitor->lagprobrawlag = nlcslp_rawlagrangian(state, &state13->stepkxc, &smonitor->lagprobfi, lagmult, &state13->tmpmerit);
    }
 #   endif
    double mx = 0.0;
@@ -33537,7 +35820,7 @@ Spawn:
          }
          continue;
       }
-      smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj);
+      smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj, state->repinneriterationscount, state->repouteriterationscount);
       stepknlagval = stepklagval;
       mcnfev = 0;
       mcstage = 0;
@@ -33578,7 +35861,7 @@ Spawn:
          goto Exit;
       }
       if (mcinfo == 1) {
-         nlcslp_lpsubproblemupdatehessian(state, &state->subsolver, curx, &state2->stepklaggrad, &state2->stepkxn, &state2->stepknlaggrad);
+         hessianupdate(&state->subsolver.hess, curx, &state2->stepklaggrad, &state2->stepkxn, &state2->stepknlaggrad);
       }
    // Update GammaMax - estimate of the function Hessian norm
       v = 0.0;
@@ -33595,9 +35878,9 @@ Spawn:
       }
 #if 0 //(@) Not used.
 #   if 0 //(@) Not used.
-      for (smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad); smoothnessmonitorprobe(smonitor); ) {
+      for (smoothnessmonitorstartlagrangianprobing(smonitor, curx, &state2->d, 1.0, innerk, state->repouteriterationscount); smoothnessmonitorprobelagrangian(smonitor); ) {
          for (j = 0; j < n; j++) {
-            state2->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state2->d.xR[j];
+            state2->stepkxc.xR[j] = smonitor->lagprobx.xR[j];
             if (state->hasbndl.xB[j]) {
                state2->stepkxc.xR[j] = rmax2(state2->stepkxc.xR[j], state->scaledbndl.xR[j]);
             }
@@ -33607,11 +35890,10 @@ Spawn:
          }
          nlcslp_slpsendx(state, &state2->stepkxc);
          state->needfij = true, state2->Ph2PQ = 1; goto Pause; Resume1: state->needfij = false;
-         if (!nlcslp_slpretrievefij(state, &state2->stepkfic, &state2->stepkjc)) {
+         if (!nlcslp_slpretrievefij(state, &smonitor->lagprobfi, &smonitor->lagprobj)) {
             break;
          }
-         smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state2->stepkxc, &state2->stepkfic, lagmult, &state2->tmpmerit);
-         smonitor->probingf.xR[1] = state2->stepkfic.xR[0];
+         smonitor->lagprobrawlag = nlcslp_rawlagrangian(state, &state2->stepkxc, &smonitor->lagprobfi, lagmult, &state2->tmpmerit);
       }
 #   endif
       mx = 0.0;
@@ -33681,8 +35963,6 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    state->nic = nic;
    state->nlec = nlec;
    state->nlic = nlic;
-// Settings
-   state->hessiantype = 2;
 // Prepare RCOMM state
    state->PQ = -1;
    ae_vector_set_length(&state->x, n);
@@ -33894,7 +36174,7 @@ Spawn:
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
 // Perform outer (NLC) iterations
-   nlcslp_initlpsubsolver(state, &state->subsolver, state->hessiantype);
+   nlcslp_initlpsubsolver(state, &state->subsolver);
    while (true) {
    // Before beginning new outer iteration:
    // * renormalize target function and/or constraints, if some of them have too large magnitudes
@@ -34113,7 +36393,7 @@ void minslpsubsolver_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->curau, 0, DT_REAL, make_automatic);
    sparsematrix_init(&p->sparserawlc, make_automatic);
    sparsematrix_init(&p->sparseefflc, make_automatic);
-   ae_matrix_init(&p->h, 0, 0, DT_REAL, make_automatic);
+   xbfgshessian_init(&p->hess, make_automatic);
    ae_matrix_init(&p->curhd, 0, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->densedummy, 0, 0, DT_REAL, make_automatic);
    sparsematrix_init(&p->sparsedummy, make_automatic);
@@ -34144,8 +36424,7 @@ void minslpsubsolver_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->curau, &src->curau, make_automatic);
    sparsematrix_copy(&dst->sparserawlc, &src->sparserawlc, make_automatic);
    sparsematrix_copy(&dst->sparseefflc, &src->sparseefflc, make_automatic);
-   dst->hessiantype = src->hessiantype;
-   ae_matrix_copy(&dst->h, &src->h, make_automatic);
+   xbfgshessian_copy(&dst->hess, &src->hess, make_automatic);
    ae_matrix_copy(&dst->curhd, &src->curhd, make_automatic);
    ae_matrix_copy(&dst->densedummy, &src->densedummy, make_automatic);
    sparsematrix_copy(&dst->sparsedummy, &src->sparsedummy, make_automatic);
@@ -34173,7 +36452,7 @@ void minslpsubsolver_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->curau, make_automatic);
    sparsematrix_free(&p->sparserawlc, make_automatic);
    sparsematrix_free(&p->sparseefflc, make_automatic);
-   ae_matrix_free(&p->h, make_automatic);
+   xbfgshessian_free(&p->hess, make_automatic);
    ae_matrix_free(&p->curhd, make_automatic);
    ae_matrix_free(&p->densedummy, make_automatic);
    sparsematrix_free(&p->sparsedummy, make_automatic);
@@ -34379,7 +36658,6 @@ void minslpstate_copy(void *_dst, const void *_src, bool make_automatic) {
    ae_vector_copy(&dst->scaledbndu, &src->scaledbndu, make_automatic);
    dst->epsx = src->epsx;
    dst->maxits = src->maxits;
-   dst->hessiantype = src->hessiantype;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->fi, &src->fi, make_automatic);
    ae_matrix_copy(&dst->j, &src->j, make_automatic);
@@ -36058,7 +38336,7 @@ Spawn:
             }
          // Send information to OptGuard monitor
             smoothnessmonitorfinalizelinesearch(smonitor);
-            smoothnessmonitorstartlinesearch(smonitor, &state->auloptimizer.x, &state->fi, &state->j);
+            smoothnessmonitorstartlinesearch(smonitor, &state->auloptimizer.x, &state->fi, &state->j, state->repinneriterationscount, state->repouteriterationscount);
          // Forward termination request if needed
             if (state->userterminationneeded) {
                minlbfgsrequesttermination(&state->auloptimizer);
@@ -41385,7 +43663,7 @@ Spawn:
       ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
       state->fn = state->fc;
       state->mcstage = 0;
-      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
+      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn, state->repiterationscount, -1);
       while (mcsrch(n, &state->xn, state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage)) {
       // Copy XN to X, perform on-the-fly correction w.r.t box
       // constraints (projection onto feasible set).
@@ -41644,7 +43922,7 @@ Spawn:
          ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
          state->fn = state->fc;
          state->mcstage = 0;
-         smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
+         smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn, state->repiterationscount, -1);
          while (mcsrch(n, &state->xn, state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage)) {
          // Copy XN to X, perform on-the-fly correction w.r.t box
          // constraints (projection onto feasible set).

@@ -24068,6 +24068,171 @@ bool testmatinv() {
 }
 
 // === optserv testing unit ===
+// This function checks BFGS Hessian
+static bool testoptservunit_testhess() {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t memlen;
+   ae_int_t updcnt;
+   ae_int_t htype;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t k0;
+   ae_int_t k1;
+   double mxa;
+   double gamma;
+   double sbs;
+   double tol;
+   bool initialized;
+   bool isupper;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewMatrix(a, 0, 0, DT_REAL);
+   NewMatrix(s, 0, 0, DT_REAL);
+   NewMatrix(y, 0, 0, DT_REAL);
+   NewMatrix(b, 0, 0, DT_REAL);
+   NewMatrix(h, 0, 0, DT_REAL);
+   NewMatrix(c, 0, 0, DT_REAL);
+   NewVector(bsk, 0, DT_REAL);
+   NewVector(sk, 0, DT_REAL);
+   NewVector(yk, 0, DT_REAL);
+   NewVector(d, 0, DT_REAL);
+   NewVector(x0, 0, DT_REAL);
+   NewVector(x1, 0, DT_REAL);
+   NewVector(g0, 0, DT_REAL);
+   NewVector(g1, 0, DT_REAL);
+   NewObj(hqrndstate, rs);
+   NewObj(xbfgshessian, hess);
+   tol = 0.001;
+   hqrndrandomize(&rs);
+   for (n = 1; n <= 12; n++) {
+      for (memlen = 0; memlen <= 12; memlen++) {
+         for (updcnt = 0; updcnt <= 12; updcnt++) {
+            for (htype = 0; htype <= 3; htype++) {
+            // Skip unsupported combinations of parameters
+               if (htype != 0 && htype != 3) {
+                  continue;
+               }
+               if (htype == 0 && memlen != updcnt) {
+                  continue;
+               }
+               if (htype == 3 && memlen > n) {
+                  continue;
+               }
+            // Generate random N*N SPD matrix A.
+               spdmatrixrndcond(n, 1000.0, &a);
+               mxa = 1.0;
+               for (i = 0; i < n; i++) {
+                  a.xyR[i][i] += pow(2.0, hqrndnormal(&rs));
+                  mxa = rmax2(mxa, fabs(a.xyR[i][i]));
+               }
+            // Generate random S and Y updates
+               if (updcnt > 0) {
+                  hqrndnormalm(&rs, updcnt, n, &s);
+                  ae_matrix_set_length(&y, updcnt, n);
+                  rmatrixgemm(updcnt, n, n, 1.0, &s, 0, 0, 0, &a, 0, 0, 0, 0.0, &y, 0, 0);
+               } else {
+                  ae_matrix_set_length(&s, 0, 0);
+                  ae_matrix_set_length(&y, 0, 0);
+               }
+            // Generate reference matrices B (direct Hessian) and H (inverse Hessian).
+            // First, we compute Gamma - initial scaling matrix - which depends on the
+            // specific algorithm being used. Then we apply all BFGS operations in a
+            // queue to B and H.
+               gamma = 0.0;
+               k0 = -999;
+               k1 = -999;
+               if (htype == 0) {
+                  gamma = 1.0;
+                  k0 = 0;
+                  k1 = updcnt - 1;
+               }
+               if (htype == 3) {
+                  gamma = 1.0;
+                  if (updcnt > 0 && memlen > 0) {
+                     gamma = rdotrr(n, &s, updcnt - 1, &y, updcnt - 1) / rdotrr(n, &y, updcnt - 1, &y, updcnt - 1);
+                  }
+                  k0 = imax2(updcnt - memlen, 0);
+                  k1 = updcnt - 1;
+               }
+               ae_assert(gamma > 0.0, "OPTSERV.TEST: integrity check 8353 failed");
+               rsetallocm(n, n, 0.0, &b);
+               rsetallocm(n, n, 0.0, &h);
+               for (i = 0; i < n; i++) {
+                  b.xyR[i][i] = 1.0 / gamma;
+                  h.xyR[i][i] = gamma;
+               }
+               for (k = k0; k <= k1; k++) {
+                  allocv(n, &sk);
+                  allocv(n, &yk);
+                  allocv(n, &bsk);
+                  rcopyrv(n, &s, k, &sk);
+                  rcopyrv(n, &y, k, &yk);
+                  rgemv(n, n, 1.0, &b, 0, &sk, 0.0, &bsk);
+                  sbs = rdotv(n, &sk, &bsk);
+                  rger(n, n, 1.0 / rdotv(n, &sk, &yk), &yk, &yk, &b);
+                  rger(n, n, -1.0 / sbs, &bsk, &bsk, &b);
+               }
+            // Initialize Hessian and feed data into it.
+            // Randomly request Hessian at the middle of process in order to test its
+            // invalidation when new data arrive.
+               initialized = false;
+               if (htype == 0) {
+                  hessianinitbfgs(&hess, n, 0, machineepsilon);
+                  initialized = true;
+               }
+               if (htype == 3) {
+                  hessianinitlowrank(&hess, n, memlen, machineepsilon);
+                  initialized = true;
+               }
+               ae_assert(initialized, "OPTSERVTEST: unexpected H, code 43r3");
+               rsetallocv(n, 0.0, &x0);
+               rsetallocv(n, 0.0, &g0);
+               hqrndnormalv(&rs, n, &x1);
+               allocv(n, &g1);
+               rgemv(n, n, 1.0, &a, 0, &x1, 0.0, &g1);
+               for (k = 0; k < updcnt; k++) {
+                  rcopyv(n, &x1, &x0);
+                  rcopyv(n, &g1, &g0);
+                  raddrv(n, 1.0, &s, k, &x1);
+                  rgemv(n, n, 1.0, &a, 0, &x1, 0.0, &g1);
+                  hessianupdate(&hess, &x0, &g0, &x1, &g1);
+                  if (hqrndnormal(&rs) > 0.0) {
+                     hessiangetdiagonal(&hess, &d);
+                  }
+                  if (hqrndnormal(&rs) > 0.0) {
+                     hessiangetmatrix(&hess, hqrndnormal(&rs) > 0.0, &c);
+                  }
+               }
+            // Randomly ffload diagonal of Hessian and Hessian itself, compare with reference value
+               if (htype == 0 || htype == 3) {
+                  if (hqrndnormal(&rs) > 0.0) {
+                     ae_vector_set_length(&d, 0);
+                     hessiangetdiagonal(&hess, &d);
+                     for (i = 0; i < n; i++) {
+                        Ok = Ok && NearAtR(d.xR[i], b.xyR[i][i], tol * mxa);
+                     }
+                  }
+                  if (hqrndnormal(&rs) > 0.0) {
+                     ae_matrix_set_length(&c, 0, 0);
+                     isupper = hqrndnormal(&rs) > 0.0;
+                     hessiangetmatrix(&hess, isupper, &c);
+                     for (i = 0; i < n; i++) {
+                        for (j = isupper ? i : 0; isupper ? j < n : j <= i; j++) {
+                           Ok = Ok && NearAtR(c.xyR[i][j], b.xyR[i][j], tol * mxa);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 // This function checks preconditioning functions
 static bool testoptservunit_testprec() {
    ae_frame _frame_block;
@@ -24335,14 +24500,18 @@ static bool testoptservunit_testprec() {
 
 bool testoptserv() {
    bool precOk;
+   bool hessOk;
    bool Ok;
    precOk = true;
+   hessOk = true;
    precOk = precOk && testoptservunit_testprec();
+   hessOk = hessOk && testoptservunit_testhess();
 // The final report.
-   Ok = precOk;
+   Ok = precOk && hessOk;
    if (!Ok || !silent) {
       printf("OptServ Test\n");
       printf("* Preconditioners:                        %s\n", precOk ? "Ok" : "Failed");
+      printf("* (L)BFGS Hessian:                        %s\n", hessOk ? "Ok" : "Failed");
       printf("Test %s\n", Ok ? "Passed" : "Failed");
    }
    return Ok;
@@ -37552,6 +37721,7 @@ static bool testminqpunit_ipmtests() {
    NewObj(hqrndstate, rs);
    NewMatrix(maina, 0, 0, DT_REAL);
    NewMatrix(fulla, 0, 0, DT_REAL);
+   NewObj(sparsematrix, sparsea);
    NewVector(s, 0, DT_REAL);
    NewVector(xorigin, 0, DT_REAL);
    NewVector(xf, 0, DT_REAL);
@@ -42043,6 +42213,9 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
       ae_vector_set_length(au, *m);
       for (i = 0; i < n; i++) {
          c->xR[i] = hqrndnormal(rs);
+         if (hqrnduniformr(rs) < 0.5) {
+            c->xR[i] = 0.0;
+         }
          bndl->xR[i] = pow(q, hqrndnormal(rs)) - pow(q, hqrndnormal(rs));
          bndu->xR[i] = bndl->xR[i] + pow(q, hqrndnormal(rs));
          v = 0.01 + 0.98 * hqrnduniformr(rs);
@@ -42077,6 +42250,9 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
       ae_vector_set_length(au, *m);
       for (i = 0; i < n; i++) {
          c->xR[i] = hqrndnormal(rs);
+         if (hqrnduniformr(rs) < 0.5) {
+            c->xR[i] = 0.0;
+         }
          bndl->xR[i] = pow(q, hqrndnormal(rs)) - pow(q, hqrndnormal(rs));
          bndu->xR[i] = bndl->xR[i] + pow(q, hqrndnormal(rs));
          v = 0.01 + 0.98 * hqrnduniformr(rs);
@@ -42548,7 +42724,6 @@ static bool testminlpunit_singlecalltests() {
    ae_int_t i;
    ae_int_t j;
    ae_int_t m;
-   ae_int_t n0;
    double v0;
    double v1;
    double primtol;
@@ -42561,7 +42736,6 @@ static bool testminlpunit_singlecalltests() {
    double errp;
    double errd;
    double errs;
-   double alpha;
    ae_int_t solvertype;
    bool Ok = true;
    ae_frame_make(&_frame_block);
@@ -42586,7 +42760,7 @@ static bool testminlpunit_singlecalltests() {
    primtol = 0.001;
    dualtol = 0.001;
    slacktol = 0.001;
-   etol = 0.00000001;
+   etol = 0.000001;
    ftol = 0.001;
    hqrndrandomize(&rs);
 // Try different feasible problems
@@ -42736,86 +42910,6 @@ static bool testminlpunit_singlecalltests() {
          Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0));
          Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0));
          Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0));
-      }
-   }
-   for (n = 2; n <= 50; n++) {
-      for (pass = 1; pass <= 30; pass++) {
-         solvertype = hqrnduniformi(&rs, testminlpunit_solverscount); //(@) Was not present in the original: solvertype was left dangling from the previous set of loops.
-      // Special test for simplex solver.
-      //
-      // Generate carefully crafted primal infeasible - the problem is ALMOST feasible.
-      // So, we expect simplex solver to stop at the best point possible. We also test
-      // that X and Y are correctly unscaled on return.
-         ae_assert(n >= 2, "LPTEST: integrity check failed");
-         n0 = n / 2;
-         ae_assert(n0 < n, "LPTEST: integrity check failed");
-         alpha = 0.0001;
-         ae_vector_set_length(&x0, 0);
-         ae_vector_set_length(&c, n);
-         ae_vector_set_length(&s, n);
-         ae_vector_set_length(&bndl, n);
-         ae_vector_set_length(&bndu, n);
-         for (i = 0; i < n; i++) {
-            if (i < n0) {
-               c.xR[i] = -pow(2.0, 2.0 * hqrndmiduniformr(&rs));
-            } else {
-               c.xR[i] = hqrnduniformr(&rs) - 0.5;
-            }
-            bndl.xR[i] = -pow(2.0, hqrndnormal(&rs));
-            bndu.xR[i] = 1.0;
-            s.xR[i] = pow(2.0, hqrndmiduniformr(&rs));
-         }
-         m = 1 + hqrnduniformi(&rs, n);
-         ae_matrix_set_length(&a, m, n);
-         ae_vector_set_length(&al, m);
-         ae_vector_set_length(&au, m);
-         for (i = 0; i < m - 1; i++) {
-            for (j = 0; j < n0; j++) {
-               a.xyR[i][j] = 0.0;
-            }
-            v0 = 0.0;
-            for (j = n0; j < n; j++) {
-               a.xyR[i][j] = hqrndnormal(&rs);
-               v0 += 0.5 * a.xyR[i][j];
-            }
-            al.xR[i] = v0 - pow(2.0, hqrndnormal(&rs));
-            au.xR[i] = v0 + pow(2.0, hqrndnormal(&rs));
-         }
-         v0 = 0.0;
-         for (i = 0; i < n; i++) {
-            if (i < n0) {
-               a.xyR[m - 1][i] = pow(2.0, hqrndnormal(&rs));
-            } else {
-               a.xyR[m - 1][i] = 0.0;
-            }
-            v0 += a.xyR[m - 1][i];
-         }
-         al.xR[m - 1] = v0 + alpha;
-         au.xR[m - 1] = al.xR[m - 1];
-         minlpcreate(n, &state0);
-         minlpsetalgodss(&state0, 0.0);
-         minlpsetcost(&state0, &c);
-         if (hqrndnormal(&rs) > 0.0) {
-            minlpsetscale(&state0, &s);
-         }
-         minlpsetbc(&state0, &bndl, &bndu);
-         minlpsetlc2dense(&state0, &a, &al, &au, m);
-         minlpoptimize(&state0);
-         minlpresults(&state0, &x0, &rep0);
-         Ok = Ok && (rep0.terminationtype == -3 || rep0.terminationtype == -2);
-         Ok = Ok && x0.cnt == n && isfinitevector(&x0, n);
-         if (!Ok) {
-            ae_frame_leave();
-            return Ok;
-         }
-         for (i = 0; i < n0; i++) {
-            Ok = Ok && x0.xR[i] >= 1.0;
-         }
-         testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         Ok = Ok && SmallAtR(errd, 0.001);
-         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0));
-         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0));
-         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
       }
    }
 // Check SetBCAll() and SetBCi()

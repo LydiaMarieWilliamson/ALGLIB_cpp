@@ -555,6 +555,9 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	∙	TestC.cpp: Update the tsort testing unit.
 42	Update LinAlg.{cpp,h} to 3.20.0.
 	Update of the call of spsymmanalyze(), from LinAlg.*, in Optimization.cpp.
+42	Update Optimization.{cpp,h} to 3.20.0
+	Update TestC.cpp: optserv, minqp, minlp, mlptrain testing units.
+	Update Manual.htm accordingly.
 </pre>
 </p>
 <p>
@@ -731,6 +734,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 42	7519 1.0x 12049 1.0x 11115 1.0x 9539 1.0x 1681933586 (64404512) 75 // Upgrade of TestC.cpp (alglibbasics, main) for Ap.{cpp,h} to 3.20.0.
 42	7692 1.0x 11906 0.9x 11498 1.0x 9373 1.0x 1681935896 (64404e18) 79 // Upgrade of TestC.cpp (tsort) for AlgLibInternal.{cpp,h} to 3.20.0.
 42	7752 1.0x 11629 1.0x 11909 1.0x 9761 1.0x 1681937187 (64405323) 76 // Upgrade of LinAlg.{cpp,h} to 3.20.0.
+42	7752 1.0x 12347 1.0x 12199 1.0x 8547 1.0x 1682091340 (6442ad4c) 81 // Upgrade of Optimization.{cpp,h} to 3.20.0.
 </pre>
 </p>
 <p>
@@ -786,17 +790,17 @@ Issues:
 Performance:
 * RGEMM-SEQ-16   (MFLOPS)   7752
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  11629
+* RGEMM-SEQ-32   (MFLOPS)  12347
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11909
+* RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9761
+* RGEMM-SEQ-1024 (MFLOPS)   8547
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1681937187 (64405323)
+Seed: 1682091340 (6442ad4c)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -896,7 +900,7 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 76 seconds
+Done in 81 seconds
 </pre>
 </p>
 </div>

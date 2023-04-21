@@ -37303,7 +37303,7 @@ ALGORITHM INFORMATION:
 Inputs:
     State   -   optimizer
     Eps     -   stopping condition, Eps &ge; 0:
-                * should be small number about 1E-7 or 1E-8.
+                * should be small number about 1E-6 or 1E-8.
                 * zero value means that solver automatically selects good
                   value (can be different in different ALGLIB versions)
                 * default value is zero
@@ -42512,6 +42512,8 @@ In both cases following fields are returned:
   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
+* inneriter, outeriter - inner and outer iteration indexes (can be -1 if no
+  iteration information was specified)
 
 You can plot function values stored in stp[]  and  f[]  arrays  and  study
 behavior of your function by your own eyes, just  to  be  sure  that  test
@@ -42531,6 +42533,8 @@ ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
    ae_int_t cnt;
    ae_int_t stpidxa;
    ae_int_t stpidxb;
+   ae_int_t inneriter;
+   ae_int_t outeriter;
 };
 </pre>
 <a name=struct_optguardnonc1test0report></a><h6 class=pageheader>optguardnonc1test0report Class</h6>
@@ -42572,6 +42576,8 @@ In both cases following fields are returned:
   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
+* inneriter, outeriter - inner and outer iteration indexes (can be -1 if no
+  iteration information was specified)
 
 You can plot function values stored in stp[]  and  f[]  arrays  and  study
 behavior of your function by your own eyes, just  to  be  sure  that  test
@@ -42591,6 +42597,8 @@ ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
    ae_int_t cnt;
    ae_int_t stpidxa;
    ae_int_t stpidxb;
+   ae_int_t inneriter;
+   ae_int_t outeriter;
 };
 </pre>
 <a name=struct_optguardnonc1test1report></a><h6 class=pageheader>optguardnonc1test1report Class</h6>
@@ -42643,6 +42651,8 @@ In both cases following fields are returned:
   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
+* inneriter, outeriter - inner and outer iteration indexes (can be -1 if  no
+  iteration information was specified)
 
 You can plot function values stored in stp[]  and  g[]  arrays  and  study
 behavior of your function by your own eyes, just  to  be  sure  that  test
@@ -42663,6 +42673,8 @@ ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
    ae_int_t cnt;
    ae_int_t stpidxa;
    ae_int_t stpidxb;
+   ae_int_t inneriter;
+   ae_int_t outeriter;
 };
 </pre>
 <a name=struct_optguardreport></a><h6 class=pageheader>optguardreport Class</h6>
