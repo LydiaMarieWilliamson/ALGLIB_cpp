@@ -635,6 +635,45 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 </pre>
 </p>
 <p>
+The following are the sequence of updates used to update version of AlgLib++ 3.17.0 to 3.18.0,
+while simultaneously converting version 3.18.0 of ALGLIB to AlgLib++ and merge the result into the update.
+As of version 3.18.0, there is now a separate branch that is tied directly to the distribution version of ALGLIB.
+Further revisions may be pending to re-base the original ALGLIB++ branch directly on earlier versions of ALGLIB.
+</p>
+<pre class=narration>
+Recoding alglib.3.17 ⇒ ALGLIB_cpp
+─────────────────────────────────
+2022-03-12 19:56: Everything, except {LinAlg,Solvers,Optimization}.{cpp,h},TestC.cpp,{Manual,Notes}.htm,README.
+2022-04-27 14:21: {LinAlg,Optimization,Solvers}.h,Solvers.cpp.
+2022-04-27 14:41: LinAlg.cpp.
+2022-04-28 20:42: Optimization.cpp.
+2022-05-02 17:10: {Manual,Notes}.htm.
+2022-05-02 17:12: README.
+2022-05-09 01:37: TestC.cpp.
+
+Reconciling ALGLIB_cpp ⇐ alglib.3.18
+────────────────────────────────────
+2022-02-24 18:41: {Gpl2,Gpl3}.txt,{DataAnalysis,FastTransforms,SpecialFunctions}.h,Test{Y,Z}.cpp.
+2022-03-07 04:01: Ap.cpp.
+2022-03-07 04:04: Kernels{Avx2,Fma,Sse2}.{cpp,h}.
+2022-03-07 04:19: Ap.h.
+2022-03-10 16:12: Makefile.
+2022-03-12 20:31: TestI.cpp.
+2022-03-12 20:46: TestX.cpp.
+2022-03-16 18:20: AlgLibInternal.{cpp,h}.
+2022-04-02 17:27: AlgLibMisc.{cpp,h}.
+2022-04-18 16:39: Statistics.h.
+2022-04-21 14:19: DiffEquations.{cpp,h}.
+2022-04-21 14:20: Integration.h.
+2022-04-21 14:21: Interpolation.h.
+2022-04-28 19:24: DataAnalysis.cpp.
+2022-04-28 19:25: {FastTransforms,Integration}.cpp.
+2022-04-28 20:10: Interpolation.cpp.
+2022-04-30 13:21: {SpecialFunctions,Statistics}.cpp.
+2022-05-09 15:36: {LinAlg,Optimization,Solvers}.{cpp,h},TestC.cpp,Manual.htm.
+2022-07-08 19:30: Notes.htm,README.
+</pre>
+<p>
 <a name=supp_History4 class=sheader></a><h3>A6.4. The Most Recent Test Run</h3>
 <pre class=narration>
 echo "TestI: API Interface"
