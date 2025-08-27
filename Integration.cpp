@@ -52,19 +52,17 @@ namespace alglib_impl {
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 // API: void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(d, 0, DT_REAL);
-   NewVector(e, 0, DT_REAL);
-   NewMatrix(z, 0, 0, DT_REAL);
+   NewRVector(d, 0);
+   NewRVector(e, 0);
+   NewRMatrix(z, 0, 0);
    if (n < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // Initialize
@@ -74,8 +72,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
       d.xR[i - 1] = alpha->xR[i - 1];
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
    }
@@ -83,8 +80,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
 // EVD
    if (!smatrixtdevd(&d, &e, n, 3, &z)) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Generate
    ae_vector_set_length(x, n);
@@ -93,7 +89,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
       x->xR[i - 1] = d.xR[i - 1];
       w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Computation of nodes and weights for a Gauss-Lobatto quadrature formula
@@ -133,7 +129,6 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 // API: void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
-   ae_frame _frame_block;
    ae_int_t i;
    double pim1a;
    double pia;
@@ -148,19 +143,18 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    double b2;
    double alph;
    double bet;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(alpha);
    DupVector(beta);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(d, 0, DT_REAL);
-   NewVector(e, 0, DT_REAL);
-   NewMatrix(z, 0, 0, DT_REAL);
+   NewRVector(d, 0);
+   NewRVector(e, 0);
+   NewRMatrix(z, 0, 0);
    if (n <= 2) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // Initialize, D[1:N+1], E[1:N]
@@ -173,8 +167,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    for (i = 1; i <= n; i++) {
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
    }
@@ -214,16 +207,14 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    }
    if (bet < 0.0) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    d.xR[n + 1] = alph;
    e.xR[n] = sqrt(bet);
 // EVD
    if (!smatrixtdevd(&d, &e, n + 2, 3, &z)) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Generate
    ae_vector_set_length(x, n + 2);
@@ -232,7 +223,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
       x->xR[i - 1] = d.xR[i - 1];
       w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Computation of nodes and weights for a Gauss-Radau quadrature formula
@@ -271,24 +262,22 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 // API: void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a, ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
-   ae_frame _frame_block;
    ae_int_t i;
    double polim1;
    double poli;
    double t;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(alpha);
    DupVector(beta);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(d, 0, DT_REAL);
-   NewVector(e, 0, DT_REAL);
-   NewMatrix(z, 0, 0, DT_REAL);
+   NewRVector(d, 0);
+   NewRVector(e, 0);
+   NewRMatrix(z, 0, 0);
    if (n < 2) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // Initialize, D[1:N], E[1:N]
@@ -299,8 +288,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
       d.xR[i - 1] = alpha->xR[i - 1];
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
    }
@@ -317,8 +305,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
 // EVD
    if (!smatrixtdevd(&d, &e, n + 1, 3, &z)) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Generate
    ae_vector_set_length(x, n + 1);
@@ -327,7 +314,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
       x->xR[i - 1] = d.xR[i - 1];
       w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
@@ -351,18 +338,16 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(alpha, 0, DT_REAL);
-   NewVector(beta, 0, DT_REAL);
+   NewRVector(alpha, 0);
+   NewRVector(beta, 0);
    if (n < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&alpha, n);
    ae_vector_set_length(&beta, n);
@@ -385,7 +370,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w)
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
@@ -412,23 +397,21 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w)
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *w) {
-   ae_frame _frame_block;
    double alpha2;
    double beta2;
    double apb;
    double t;
    ae_int_t i;
    double s;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(a, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
+   NewRVector(a, 0);
+   NewRVector(b, 0);
    if (n < 1 || alpha <= -1.0 || beta <= -1.0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&a, n);
    ae_vector_set_length(&b, n);
@@ -437,8 +420,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    t = (apb + 1.0) * log(2.0) + lngamma(alpha + 1.0, &s) + lngamma(beta + 1.0, &s) - lngamma(apb + 2.0, &s);
    if (t > log(maxrealnumber)) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    b.xR[0] = exp(t);
    if (n > 1) {
@@ -463,7 +445,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
@@ -489,20 +471,18 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *x, RVector *w) {
-   ae_frame _frame_block;
    double t;
    ae_int_t i;
    double s;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(a, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
+   NewRVector(a, 0);
+   NewRVector(b, 0);
    if (n < 1 || alpha <= -1.0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&a, n);
    ae_vector_set_length(&b, n);
@@ -510,8 +490,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    t = lngamma(alpha + 1.0, &s);
    if (t >= log(maxrealnumber)) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    b.xR[0] = exp(t);
    if (n > 1) {
@@ -532,7 +511,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
@@ -555,18 +534,16 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(a, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
+   NewRVector(a, 0);
+   NewRVector(b, 0);
    if (n < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&a, n);
    ae_vector_set_length(&b, n);
@@ -588,7 +565,7 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w) 
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -689,7 +666,6 @@ namespace alglib_impl {
 // ALGLIB: Copyright 08.05.2009 by Sergey Bochkanov
 // API: void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t wlen;
@@ -698,28 +674,26 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    ae_int_t m;
    ae_int_t l;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(alpha);
    DupVector(beta);
    *info = 0;
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   NewVector(ta, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
-   NewVector(s, 0, DT_REAL);
-   NewVector(xgtmp, 0, DT_REAL);
-   NewVector(wgtmp, 0, DT_REAL);
+   NewRVector(ta, 0);
+   NewRVector(t, 0);
+   NewRVector(s, 0);
+   NewRVector(xgtmp, 0);
+   NewRVector(wgtmp, 0);
    if (!(n % 2) || n < 3) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i <= (3 * (n / 2) + 1) / 2; i++) {
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    *info = 1;
@@ -729,8 +703,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
 // Calculate Gauss nodes/weights, save them for later processing
    gqgeneraterec(alpha, beta, mu0, n, info, &xgtmp, &wgtmp);
    if (*info < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Resize:
 // * A from 0..floor(3*n/2) to 0..2*n
@@ -802,8 +775,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       *info = -5;
    }
    if (*info < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < 2 * n; i++) {
       if (x->xR[i] >= x->xR[i + 1]) {
@@ -811,8 +783,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       }
    }
    if (*info < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(wgauss, 2 * n + 1);
    for (i = 0; i <= 2 * n; i++) {
@@ -821,7 +792,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    for (i = 0; i < n; i++) {
       wgauss->xR[2 * i + 1] = wgtmp.xR[i];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
@@ -848,23 +819,21 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
-   ae_frame _frame_block;
    ae_int_t alen;
    ae_int_t blen;
    double mu0;
    ae_int_t k;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   NewVector(alpha, 0, DT_REAL);
-   NewVector(beta, 0, DT_REAL);
+   NewRVector(alpha, 0);
+   NewRVector(beta, 0);
    if (!(n % 2) || n < 3) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    mu0 = 2.0;
    alen = 3 * n / 2 + 1;
@@ -890,7 +859,7 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
@@ -912,16 +881,15 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps);
 void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, double *eps) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t ng;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
    *eps = 0.0;
-   NewVector(p1, 0, DT_INT);
-   NewVector(p2, 0, DT_INT);
+   NewZVector(p1, 0);
+   NewZVector(p2, 0);
 // these initializers are not really necessary,
 // but without them compiler complains about uninitialized locals
    ng = 0;
@@ -1257,7 +1225,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
       swapr(&wkronrod->xR[i], &wkronrod->xR[p2.xZ[i]]);
       swapr(&wgauss->xR[i], &wgauss->xR[p2.xZ[i]]);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
@@ -1332,7 +1300,6 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
-   ae_frame _frame_block;
    ae_int_t clen;
    double alpha2;
    double beta2;
@@ -1340,22 +1307,20 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    double t;
    ae_int_t i;
    double s;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   NewVector(a, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
+   NewRVector(a, 0);
+   NewRVector(b, 0);
    if (n % 2 != 1 || n < 3) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (alpha <= -1.0 || beta <= -1.0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    clen = (3 * (n / 2) + 1) / 2 + 1;
    ae_vector_set_length(&a, clen);
@@ -1368,8 +1333,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    t = (apb + 1.0) * log(2.0) + lngamma(alpha + 1.0, &s) + lngamma(beta + 1.0, &s) - lngamma(apb + 2.0, &s);
    if (t > log(maxrealnumber)) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    b.xR[0] = exp(t);
    if (clen > 1) {
@@ -1394,7 +1358,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -1608,10 +1572,9 @@ static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidt
 }
 
 static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewMatrix(tmp, 0, 0, DT_REAL);
+   EnFrame();
+   NewRMatrix(tmp, 0, 0);
    ae_matrix_set_length(&tmp, *heapsize, heapwidth);
    for (i = 0; i < *heapsize; i++) {
       ae_v_move(tmp.xyR[i], 1, heap->xyR[i], 1, heapwidth);
@@ -1621,7 +1584,7 @@ static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newhe
       ae_v_move(heap->xyR[i], 1, tmp.xyR[i], 1, heapwidth);
    }
    *heapsize = newheapsize;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal AutoGK subroutine

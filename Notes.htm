@@ -473,7 +473,8 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
 <a name=supp_Commercial class=sheader></a><h2>A5. ALGLIB Commercial and Free Versions: Notes</h2>
 <font size=2>[
 <a href=#supp_Commercial1>ALGLIB Commercial and Free Notifications</a> |
-<a href=#supp_Commercial2>ALGLIB Commercial Support by Routine</a>
+<a href=#supp_Commercial2>ALGLIB Commercial Support by Routine</a> |
+<a href=#supp_Commercial3>ALGLIB Trace-Related Support - Comments</a>
 ]</font>
 </p>
 <p>
@@ -589,6 +590,87 @@ The routines are listed by subpackage module:
 <li><b>B</b>: covm, covm2, pearsoncorrm, pearsoncorrm2, spearmancorrm, spearmancorrm2</li>
 </ul></li>
 </ul>
+</p>
+<p>
+<a name=supp_Commercial3 class=sheader></a><h3>A5.3. ALGLIB Trace-Related Support - Comments</h3>
+The following is an amalgamation of the descriptions originally present in ALGLIB,
+for the trace-related functionality that has been removed from ALGLIB++.
+They occured first in comments associated with the following routines.
+<pre class=narration>
+ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
+void minlpsetalgoipm(minlpstate state, const xparams _params = xdefault);
+void minlpsetalgodss(minlpstate state, double eps, const xparams _params = xdefault);
+void minlpsetalgoipm(minlpstate state, double eps, const xparams _params = xdefault);
+
+ALGLIB: Copyright 02.04.2018 by Sergey Bochkanov
+void minnlcsetalgoslp(minnlcstate state, const xparams _params = xdefault);
+
+ALGLIB: Copyright 02.12.2019 by Sergey Bochkanov
+void minnlcsetalgosqp(minnlcstate state, const xparams _params = xdefault);
+
+ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
+void minnssetalgoags(minnsstate state, double radius, double penalty, const xparams _params = xdefault);
+
+ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
+void minqpsetalgodenseipm(minqpstate state, double eps, const xparams _params = xdefault);
+void minqpsetalgosparseipm(minqpstate state, double eps, const xparams _params = xdefault);
+</pre>
+associated with the DSS, IPM, SLP, SQP and AGS solvers used for the routines in Optimization.{cpp,h}.
+The descriptions were written from a common template that contains specializations depending on the type of solver, denoted below by «X»,
+with the range of solvers associated with each specialization listed below, alongside (e.g. «X»: AGS for an AGS-specific segment).
+<pre class=narration>
+━━━━ TRACING «X» SOLVER («X» ∈ { DSS, IPM, SLP, SQP, AGS }) ━━━━
+«X» solver supports advanced tracing capabilities.
+You can trace algorithm output by specifying following trace symbols (case-insensitive) by means of trace_file() call:
+∙ '«X»'			«X»: DSS, IPM, SLP, SQP, AGS
+			for basic trace of algorithm steps and decisions.
+			Only short scalars (function values and deltas) are printed.
+			N-dimensional quantities like search directions are NOT printed.
+			«X»: SLP, SQP, AGS
+			It also prints OptGuard integrity checker report when nonsmoothness of target/constraints is suspected.
+∙ '«X».DETAILED'	«X»: DSS, IPM, SLP, SQP, AGS
+			for output of points being visited and search directions
+			This symbol also implicitly defines '«X»'.
+			You can control output format by additionally specifying:
+			∙ nothing	to output in 6-digit exponential format
+			∙ 'PREC.E15'	to output in 15-digit exponential format
+			∙ 'PREC.F6'	to output in 6-digit fixed-point format
+∙ '«X».DETAILED.SAMPLE'	«X»: AGS
+			for output of points being visited, search directions and gradient sample.
+			May take a LOT of space, do not use it on problems with more that several tens of vars.
+			This symbol also implicitly defines 'AGS' and 'AGS.DETAILED'.
+∙ '«X».PROBING'		«X»: SLP, SQP
+			to let algorithm insert additional function evaluations before line search
+			in order to build human-readable chart of the raw Lagrangian
+			(~40 additional function evaluations is performed for each line search).
+			«X»: SLP
+			This symbol also implicitly defines 'SLP'.
+			Definition of this symbol also automatically activates OptGuard smoothness monitor.
+			«X»: SQP
+			This symbol also implicitly defines 'SQP' and activates OptGuard integrity checker
+			which detects continuity and smoothness violations.
+			An OptGuard log is printed at the end of the file.
+∙ 'OPTGUARD'		«X»: SLP
+			for report of smoothness/continuity violations in target
+			and/or constraints.
+			This kind of reporting is included in 'SLP', but it comes with lots of additional info.
+			If you need just smoothness monitoring, specify this setting.
+			NOTE:
+			∙	this tag merely directs OptGuard output to log file.
+				Even if you specify it, you still have to configure OptGuard
+				by calling minnlcoptguard*() family of functions.
+
+By default trace is disabled and adds no overhead to the optimization process.
+However, specifying any of the symbols adds some formatting and output-related overhead.
+Specifying '«X».PROBING' adds even larger overhead due to additional function evaluations being performed.
+
+You may specify multiple symbols by separating them with commas:
+	│ trace_file("DSS,PREC.F6", "path/to/trace.log")
+	│ trace_file("IPM,PREC.F6", "path/to/trace.log")
+	│ trace_file("SLP,SLP.PROBING,PREC.F6", "path/to/trace.log")
+	│ trace_file("SQP,SQP.PROBING,PREC.F6", "path/to/trace.log")
+	│ trace_file("AGS,PREC.F6", "path/to/trace.log")
+</pre>
 </p>
 <p>
 <a name=supp_History class=sheader></a><h2>A6. ALGLIB &rArr; ALGLIB++ Revision Sequence</h2>

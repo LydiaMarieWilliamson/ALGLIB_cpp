@@ -4,8 +4,11 @@
 	time-frequency and time-scale routines onto FastTransforms; outlined in a separate file, DSP.txt.
 ∙	Add in new multi-threading framework.
 	―	Or use C++ co-routines.
+	―	Use std::function to provide a more uniform interface for call-backs used in the iterators.
+		e.g. std::function<int(int, int)> add = [](int a, int b) { return a + b; }
 ∙	Add in a scripting language front end.
 	―	A likely candidate: a front end language similar to MatLab, possibly also integrating SciLab.
+	―	Maybe add Armadillo functionality.
 ∙	Implement the other, older, ALGLIB
 		J.M. Shearer, M.A. Wolfe
 		"ALGLIB, a simple symbol-manipulation package",
@@ -22,10 +25,13 @@
 		―	Replace all the *_copy()'s by copy and move constructors.
 		―	Nativize New{Block,Vector,Matrix,Obj,Serializer} using "new" or by declarations.
 		―	Add in "delete" where necessary.
-		―	Eliminate ae_frame_make(), ae_frame_leave() and ae_frame().
+		―	Nativize the explicit stack frame.
+			Eliminate ae_frame_make(), ae_frame_leave(), ae_frame() and the associated macros EnFrame() and DeFrame().
 	―	Eliminate the alglib namespace and fold the alglib_impl namespace into it.
 	―	Possibly using "constexpr" to fold double C++ declarations:
 			T f(⋯X⋯) { ⋯S⋯ }
 			const T f(⋯X⋯) const { ⋯S⋯ }
 		into
 			constexpr T f(⋯X⋯) { ⋯S⋯ }
+∙	Add the functionality of Eigen to LinAlg
+∙	Add CNN's, RNN's, Transformers to DataAnalysis

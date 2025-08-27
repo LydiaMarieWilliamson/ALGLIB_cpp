@@ -249,7 +249,6 @@ void sampleadev(RVector *x, ae_int_t n, double *adev) {
 // API: void samplemedian(const real_1d_array &x, const ae_int_t n, double &median);
 // API: void samplemedian(const real_1d_array &x, double &median);
 void samplemedian(RVector *x, ae_int_t n, double *median) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t ir;
    ae_int_t j;
@@ -257,7 +256,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
    ae_int_t midp;
    ae_int_t k;
    double a;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(x);
    *median = 0.0;
    ae_assert(n >= 0, "SampleMedian: N < 0");
@@ -266,18 +265,15 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
 // Some degenerate cases
    *median = 0.0;
    if (n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 1) {
       *median = x->xR[0];
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 2) {
       *median = 0.5 * (x->xR[0] + x->xR[1]);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Common case, N >= 3.
 // Choose X[(N-1)/2]
@@ -331,8 +327,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
 // If N is odd, return result
    if (n % 2 == 1) {
       *median = x->xR[k];
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    a = x->xR[n - 1];
    for (i = k + 1; i < n; i++) {
@@ -341,7 +336,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
       }
    }
    *median = 0.5 * (x->xR[k] + a);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Percentile calculation.
@@ -359,13 +354,12 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
 // API: void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v);
 // API: void samplepercentile(const real_1d_array &x, const double p, double &v);
 void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
-   ae_frame _frame_block;
    ae_int_t i1;
    double t;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(x);
    *v = 0.0;
-   NewVector(rbuf, 0, DT_REAL);
+   NewRVector(rbuf, 0);
    ae_assert(n >= 0, "SamplePercentile: N < 0");
    ae_assert(x->cnt >= n, "SamplePercentile: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "SamplePercentile: X is not finite vector");
@@ -374,19 +368,17 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
    tagsortfast(x, &rbuf, n);
    if (p == 0.0) {
       *v = x->xR[0];
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (p == 1.0) {
       *v = x->xR[n - 1];
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    t = p * (n - 1);
    i1 = ifloor(t);
    t -= ifloor(t);
    *v = x->xR[i1] * (1.0 - t) + x->xR[i1 + 1] * t;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Basecase code for RankData(), performs actual work on subset of data using
@@ -446,10 +438,9 @@ static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost) {
-   ae_frame _frame_block;
    double problemcost;
    ae_int_t im;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(apbuffers, buf0);
    RefObj(apbuffers, buf1);
    ae_assert(i1 >= i0, "RankDataRec: internal error");
@@ -461,16 +452,15 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
       im = (i1 + i0) / 2;
       basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost);
       basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Retrieve buffers from pool, call serial code, return buffers to pool
-   ae_shared_pool_retrieve(pool, &_buf0);
-   ae_shared_pool_retrieve(pool, &_buf1);
+   PoolGet(pool, buf0);
+   PoolGet(pool, buf1);
    basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1);
-   ae_shared_pool_recycle(pool, &_buf0);
-   ae_shared_pool_recycle(pool, &_buf1);
-   ae_frame_leave();
+   PoolPut(pool, buf0);
+   PoolPut(pool, buf1);
+   DeFrame();
 }
 
 // This function replaces data in XY by their ranks:
@@ -492,9 +482,8 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
 // API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
 // API: void rankdata(const real_2d_array &xy);
 void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
-   ae_frame _frame_block;
    ae_int_t basecasecost;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
@@ -514,13 +503,12 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    basecasecost = 10000;
    if (npoints * nfeatures * logbase2(nfeatures) < basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
+   PoolSet(&pool, apbuffers, buf0);
    basestat_rankdatarec(xy, 0, npoints, nfeatures, false, &pool, basecasecost);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function replaces data in XY by their CENTERED ranks:
@@ -544,9 +532,8 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 // API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
 // API: void rankdatacentered(const real_2d_array &xy);
 void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
-   ae_frame _frame_block;
    ae_int_t basecasecost;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
@@ -566,13 +553,12 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    basecasecost = 10000;
    if (npoints * nfeatures * logbase2(nfeatures) < basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
+   PoolSet(&pool, apbuffers, buf0);
    basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 2-sample covariance
@@ -750,9 +736,8 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
 // API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 // API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y);
 double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(x);
    DupVector(y);
    NewObj(apbuffers, buf);
@@ -764,14 +749,12 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
 // Special case
    if (n <= 1) {
       result = 0.0;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    rankx(x, n, false, &buf);
    rankx(y, n, false, &buf);
    result = pearsoncorr2(x, y, n);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Obsolete function, we recommend to use PearsonCorr2().
@@ -811,16 +794,15 @@ double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n) {
 // API: void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void covm(const real_2d_array &x, real_2d_array &c);
 void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(x);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL);
-   NewVector(x0, 0, DT_REAL);
-   NewVector(same, 0, DT_BOOL);
+   NewRVector(t, 0);
+   NewRVector(x0, 0);
+   NewBVector(same, 0);
    ae_assert(n >= 0, "CovM: N < 0");
    ae_assert(m >= 1, "CovM: M < 1");
    ae_assert(x->rows >= n, "CovM: Rows(X) < N!");
@@ -834,8 +816,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Calculate means,
 // check for constant columns
@@ -870,7 +851,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    }
    rmatrixsyrk(m, n, 1.0 / (n - 1), x, 0, 0, 1, 0.0, c, 0, 0, true);
    rmatrixenforcesymmetricity(c, m, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Pearson product-moment correlation matrix
@@ -892,13 +873,12 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 // API: void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void pearsoncorrm(const real_2d_array &x, real_2d_array &c);
 void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL);
+   NewRVector(t, 0);
    ae_assert(n >= 0, "PearsonCorrM: N < 0");
    ae_assert(m >= 1, "PearsonCorrM: M < 1");
    ae_assert(x->rows >= n, "PearsonCorrM: Rows(X) < N!");
@@ -919,7 +899,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
          c->xyR[i][j] *= v * t.xR[j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Spearman's rank correlation matrix
@@ -941,18 +921,17 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 // API: void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void spearmancorrm(const real_2d_array &x, real_2d_array &c);
 void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
    double vv;
    double x0;
    bool b;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(c);
    NewObj(apbuffers, buf);
-   NewMatrix(xc, 0, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
+   NewRMatrix(xc, 0, 0);
+   NewRVector(t, 0);
    ae_assert(n >= 0, "SpearmanCorrM: N < 0");
    ae_assert(m >= 1, "SpearmanCorrM: M < 1");
    ae_assert(x->rows >= n, "SpearmanCorrM: Rows(X) < N!");
@@ -966,8 +945,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Allocate
    ae_vector_set_length(&t, imax2(n, m));
@@ -1024,7 +1002,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    }
 // force symmetricity
    rmatrixenforcesymmetricity(c, m, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Cross-covariance matrix
@@ -1052,19 +1030,18 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(x);
    DupMatrix(y);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL);
-   NewVector(x0, 0, DT_REAL);
-   NewVector(y0, 0, DT_REAL);
-   NewVector(samex, 0, DT_BOOL);
-   NewVector(samey, 0, DT_BOOL);
+   NewRVector(t, 0);
+   NewRVector(x0, 0);
+   NewRVector(y0, 0);
+   NewBVector(samex, 0);
+   NewBVector(samey, 0);
    ae_assert(n >= 0, "CovM2: N < 0");
    ae_assert(m1 >= 1, "CovM2: M1 < 1");
    ae_assert(m2 >= 1, "CovM2: M2 < 1");
@@ -1082,8 +1059,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Allocate
    ae_vector_set_length(&t, imax2(m1, m2));
@@ -1140,7 +1116,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
    }
 // calculate cross-covariance matrix
    rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Pearson product-moment cross-correlation matrix
@@ -1168,21 +1144,20 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(x);
    DupMatrix(y);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL);
-   NewVector(x0, 0, DT_REAL);
-   NewVector(y0, 0, DT_REAL);
-   NewVector(sx, 0, DT_REAL);
-   NewVector(sy, 0, DT_REAL);
-   NewVector(samex, 0, DT_BOOL);
-   NewVector(samey, 0, DT_BOOL);
+   NewRVector(t, 0);
+   NewRVector(x0, 0);
+   NewRVector(y0, 0);
+   NewRVector(sx, 0);
+   NewRVector(sy, 0);
+   NewBVector(samex, 0);
+   NewBVector(samey, 0);
    ae_assert(n >= 0, "PearsonCorrM2: N < 0");
    ae_assert(m1 >= 1, "PearsonCorrM2: M1 < 1");
    ae_assert(m2 >= 1, "PearsonCorrM2: M2 < 1");
@@ -1200,8 +1175,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Allocate
    ae_vector_set_length(&t, imax2(m1, m2));
@@ -1292,7 +1266,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
          c->xyR[i][j] *= v * sy.xR[j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Spearman's rank cross-correlation matrix
@@ -1320,7 +1294,6 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 // API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -1329,13 +1302,13 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    bool b;
    double x0;
    double y0;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL);
-   NewVector(sx, 0, DT_REAL);
-   NewVector(sy, 0, DT_REAL);
-   NewMatrix(xc, 0, 0, DT_REAL);
-   NewMatrix(yc, 0, 0, DT_REAL);
+   NewRVector(t, 0);
+   NewRVector(sx, 0);
+   NewRVector(sy, 0);
+   NewRMatrix(xc, 0, 0);
+   NewRMatrix(yc, 0, 0);
    NewObj(apbuffers, buf);
    ae_assert(n >= 0, "SpearmanCorrM2: N < 0");
    ae_assert(m1 >= 1, "SpearmanCorrM2: M1 < 1");
@@ -1354,8 +1327,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Allocate
    ae_vector_set_length(&t, imax2(imax2(m1, m2), n));
@@ -1450,7 +1422,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
          c->xyR[i][j] *= v * sy.xR[j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -1634,8 +1606,8 @@ double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
 }
 #if !defined AE_NO_EXCEPTIONS
 double cov2(const real_1d_array &x, const real_1d_array &y) {
-   if (x.length() != y.length()) ThrowError("Error while calling 'cov2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
+   if (n != y.length()) ThrowError("Error while calling 'cov2': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(0.0)
    double D = alglib_impl::cov2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
@@ -1653,8 +1625,8 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int
 }
 #if !defined AE_NO_EXCEPTIONS
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
-   if (x.length() != y.length()) ThrowError("Error while calling 'pearsoncorr2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
+   if (n != y.length()) ThrowError("Error while calling 'pearsoncorr2': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(0.0)
    double D = alglib_impl::pearsoncorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
@@ -1672,8 +1644,8 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_in
 }
 #if !defined AE_NO_EXCEPTIONS
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
-   if (x.length() != y.length()) ThrowError("Error while calling 'spearmancorr2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
+   if (n != y.length()) ThrowError("Error while calling 'spearmancorr2': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(0.0)
    double D = alglib_impl::spearmancorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
@@ -1757,8 +1729,8 @@ void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, con
 }
 #if !defined AE_NO_EXCEPTIONS
 void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
-   if (x.rows() != y.rows()) ThrowError("Error while calling 'covm2': looks like one of arguments has wrong size");
    ae_int_t n = x.rows();
+   if (n != y.rows()) ThrowError("Error while calling 'covm2': looks like one of arguments has wrong size");
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
    alglib_impl::ae_state_init();
@@ -1776,8 +1748,8 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_
 }
 #if !defined AE_NO_EXCEPTIONS
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
-   if (x.rows() != y.rows()) ThrowError("Error while calling 'pearsoncorrm2': looks like one of arguments has wrong size");
    ae_int_t n = x.rows();
+   if (n != y.rows()) ThrowError("Error while calling 'pearsoncorrm2': looks like one of arguments has wrong size");
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
    alglib_impl::ae_state_init();
@@ -1795,8 +1767,8 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int
 }
 #if !defined AE_NO_EXCEPTIONS
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
-   if (x.rows() != y.rows()) ThrowError("Error while calling 'spearmancorrm2': looks like one of arguments has wrong size");
    ae_int_t n = x.rows();
+   if (n != y.rows()) ThrowError("Error while calling 'spearmancorrm2': looks like one of arguments has wrong size");
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
    alglib_impl::ae_state_init();
@@ -2836,18 +2808,17 @@ static double jarquebera_jbtbl1401(double s) {
 }
 
 static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
-   ae_frame _frame_block;
    double x = s;
-   ae_frame_make(&_frame_block);
-   NewVector(vx, 0, DT_REAL);
-   NewVector(vy, 0, DT_REAL);
-   NewMatrix(ctbl, 0, 0, DT_REAL);
+   EnFrame();
+   NewRVector(vx, 0);
+   NewRVector(vy, 0);
+   NewRMatrix(ctbl, 0, 0);
    double result;
 // N = 5, 6, ..., 20, 30, 50, 65, 100, 130, 200, 301, 501, 701, 1401 are tabulated.
 // In-between values up to 1400 are interpolated using an interpolating polynomial of the second degree.
 // Anything under 5 or beyond 1400 is tabulated by an asymptotic expansion.
    if (n <= 20) switch (n) {
-      default: ae_frame_leave(); return 1.0;
+      default: DeFrame(1.0);
       case 5: result = jarquebera_jbtbl5(x); break;
       case 6: result = jarquebera_jbtbl6(x); break;
       case 7: result = jarquebera_jbtbl7(x); break;
@@ -2899,8 +2870,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
       if (result > 0.0) result = 0.0;
    }
    result = exp(result);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Jarque-Bera test
@@ -3723,7 +3693,6 @@ static double wsr_wsigma(double s, ae_int_t n) {
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 // API: void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail);
 void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -3735,20 +3704,19 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    double s;
    double sigma;
    double mu;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(x);
    *bothtails = 0.0;
    *lefttail = 0.0;
    *righttail = 0.0;
-   NewVector(r, 0, DT_REAL);
-   NewVector(c, 0, DT_INT);
+   NewRVector(r, 0);
+   NewZVector(c, 0);
 // Prepare
    if (n < 5) {
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ns = 0;
    for (i = 0; i < n; i++) {
@@ -3762,8 +3730,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&r, ns);
    ae_vector_set_length(&c, ns);
@@ -3851,7 +3818,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    *lefttail = rmax2(p, 0.0001);
    *righttail = rmax2(mp, 0.0001);
    *bothtails = 2.0 * rmin2(*lefttail, *righttail);
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -7333,7 +7300,6 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -7347,20 +7313,19 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    double sigma;
    double mu;
    ae_int_t tiecount;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *bothtails = 0.0;
    *lefttail = 0.0;
    *righttail = 0.0;
-   NewVector(r, 0, DT_REAL);
-   NewVector(c, 0, DT_INT);
-   NewVector(tiesize, 0, DT_INT);
+   NewRVector(r, 0);
+   NewZVector(c, 0);
+   NewZVector(tiesize, 0);
 // Prepare
    if (n <= 4 || m <= 4) {
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ns = n + m;
    ae_vector_set_length(&r, ns);
@@ -7462,7 +7427,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    *lefttail = rboundval(rmax2(mp, 0.0001), 0.0001, 0.2500);
    *righttail = rboundval(rmax2(p, 0.0001), 0.0001, 0.2500);
    *bothtails = 2.0 * rmin2(*lefttail, *righttail);
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 

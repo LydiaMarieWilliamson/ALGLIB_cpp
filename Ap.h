@@ -240,6 +240,8 @@ void ae_state_set_flags(ae_uint64_t flags);
 
 void ae_frame_make(ae_frame *Fr);
 void ae_frame_leave();
+#define EnFrame()	ae_frame _frame_block; ae_frame_make(&_frame_block)
+#define DeFrame(X)	ae_frame_leave(); return X
 
 void ae_state_init();
 void ae_state_clear();
@@ -321,8 +323,6 @@ void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
 #define NewBlock(B, N)			ae_dyn_block B; memset(&B, 0, sizeof B), ae_db_init(&B, N, true)
 
-ae_int_t ae_sizeof(ae_datatype datatype);
-
 struct ae_vector {
 // The number of elements in the vector; cnt >= 0.
    ae_int_t cnt;
@@ -349,9 +349,6 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize);
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize);
 void ae_vector_free(ae_vector *dst, bool make_automatic);
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
-#define NewVector(V, N, Type)		ae_vector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, Type, true)
-#define DupVector(V)			ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, true), V = &_##V
-#define SetVector(P)			ae_vector_free(P, true)
 
 struct ae_matrix {
    ae_int_t cols;
@@ -376,43 +373,23 @@ void ae_matrix_copy(ae_matrix *dst, const ae_matrix *src, bool make_automatic);
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols);
 void ae_matrix_free(ae_matrix *dst, bool make_automatic);
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
-#define NewMatrix(M, Ys, Xs, Type)	ae_matrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, Type, true)
-#define DupMatrix(M)			ae_matrix _##M; memset(&_##M, 0, sizeof _##M), ae_matrix_copy(&_##M, M, true), M = &_##M
-#define SetMatrix(P)			ae_matrix_free(P, true)
 
 // Used for better documenting function parameters.
 // TODO: Remake ae_vector and ae_matrix as template types.
 typedef ae_vector BVector, ZVector, RVector, CVector;
 typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
-
-typedef void (*ae_init_op)(void *, bool);
-typedef void (*ae_copy_op)(void *, const void *, bool);
-typedef void (*ae_free_op)(void *, bool);
-
-struct ae_smart_ptr {
-// Pointers respectively to the subscriber and the object; all changes in ptr are translated to the subscriber.
-   void **subscriber, *ptr;
-// True if the smart pointer owns ptr.
-   bool is_owner;
-// True if ptr points to a dynamic object, whose clearing requires calling both .free() and ae_free().
-   bool is_dynamic;
-// The size of the object, if the pointer is owned, otherwise 0: used when we pass the object to ae_obj_array.
-   size_t size_of_object;
-// The copy constructor for the pointer.
-   ae_copy_op copy;
-// The deallocation function for the pointer; clears all dynamically allocated memory.
-   ae_free_op free;
-// The frame entry; used to ensure automatic deallocation of the smart pointer in case of an exception/exit.
-   ae_dyn_block frame_entry;
-};
-void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
-void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, size_t obj_size, ae_copy_op copy, ae_free_op free);
-void ae_smart_ptr_release(ae_smart_ptr *dst);
-#define NewObj(Type, P)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, true)
-#define RefObj(Type, P)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, true)
-#define RepObj(Type, P)	P = (Type *)ae_malloc(sizeof *P), memset(P, 0, sizeof *P), Type##_init(P, false), ae_smart_ptr_assign(&_##P, P, true, true, sizeof *P, Type##_copy, Type##_free)/* Use P as a temporary before assigning its value to _P.*/
-#define SetObj(Type, P)	Type##_free(P, true)
+#define NewBVector(V, N)	BVector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, DT_BOOL, true)
+#define NewZVector(V, N)	ZVector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, DT_INT, true)
+#define NewRVector(V, N)	RVector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, DT_REAL, true)
+#define NewCVector(V, N)	CVector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, DT_COMPLEX, true)
+#define DupVector(V)		ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, true), V = &_##V
+#define SetVector(P)		ae_vector_free(P, true)
+#define NewBMatrix(M, Ys, Xs)	BMatrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, DT_BOOL, true)
+#define NewZMatrix(M, Ys, Xs)	ZMatrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, DT_INT, true)
+#define NewRMatrix(M, Ys, Xs)	RMatrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, DT_REAL, true)
+#define NewCMatrix(M, Ys, Xs)	CMatrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, DT_COMPLEX, true)
+#define DupMatrix(M)		ae_matrix _##M; memset(&_##M, 0, sizeof _##M), ae_matrix_copy(&_##M, M, true), M = &_##M
+#define SetMatrix(P)		ae_matrix_free(P, true)
 
 // The X-interface.
 // The effective type for the last_action field.
@@ -532,6 +509,35 @@ void ae_acquire_lock(ae_lock *lock);
 void ae_release_lock(ae_lock *lock);
 void ae_free_lock(ae_lock *lock);
 
+typedef void (*ae_init_op)(void *, bool);
+typedef void (*ae_copy_op)(void *, const void *, bool);
+typedef void (*ae_free_op)(void *, bool);
+
+struct ae_smart_ptr {
+// Pointers respectively to the subscriber and the object; all changes in ptr are translated to the subscriber.
+   void **subscriber, *ptr;
+// True if the smart pointer owns ptr.
+   bool is_owner;
+// True if ptr points to a dynamic object, whose clearing requires calling both .free() and ae_free().
+   bool is_dynamic;
+// The size of the object, if the pointer is owned, otherwise 0: used when we pass the object to ae_obj_array.
+   size_t size_of_object;
+// The copy constructor for the pointer.
+   ae_copy_op copy;
+// The deallocation function for the pointer; clears all dynamically allocated memory.
+   ae_free_op free;
+// The frame entry; used to ensure automatic deallocation of the smart pointer in case of an exception/exit.
+   ae_dyn_block frame_entry;
+};
+void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
+void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, size_t obj_size, ae_copy_op copy, ae_free_op free);
+void ae_smart_ptr_release(ae_smart_ptr *dst);
+#define NewObj(Type, P)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, true)
+#define RefObj(Type, P)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, true)
+#define RepObj(Type, P)	P = (Type *)ae_malloc(sizeof *P), memset(P, 0, sizeof *P), Type##_init(P, false), ae_smart_ptr_assign(&_##P, P, true, true, sizeof *P, Type##_copy, Type##_free)/* Use P as a temporary before assigning its value to _P.*/
+#define SetObj(Type, P)	Type##_free(P, true)
+
 // Shared pool: the data structure used to provide thread-safe access to a pool of temporary variables.
 struct ae_shared_pool_entry {
    void *volatile obj, *volatile next_entry;
@@ -574,6 +580,14 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic);
 void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_reset(ae_shared_pool *pool);
+#define PoolLet(Pool, P)	alglib_impl::ae_shared_pool_first_recycled((Pool), &_##P)
+#define PoolYet(Pool, P)	alglib_impl::ae_shared_pool_next_recycled((Pool), &_##P)
+#define PoolGet(Pool, P)	alglib_impl::ae_shared_pool_retrieve((Pool), &_##P)
+#define PoolPut(Pool, P)	alglib_impl::ae_shared_pool_recycle((Pool), &_##P)
+#define PoolSet(Pool, Type, P)	alglib_impl::ae_shared_pool_set_seed((Pool), &(P), sizeof (P), Type##_init, Type##_copy, Type##_free)
+#define PoolIsSet(Pool)		alglib_impl::ae_shared_pool_is_initialized(Pool)
+#define PoolUnSet(Pool)		alglib_impl::ae_shared_pool_clear_recycled((Pool), true)
+#define PoolReSet(Pool)		alglib_impl::ae_shared_pool_reset((Pool))
 
 struct ae_obj_array {
 // The number of elements.
@@ -1124,10 +1138,10 @@ void vmul(complex *A, ae_int_t N, complex Alpha);
 struct ae_vector_wrapper {
 // A new zero-sized vector of the given datatype.
    ae_vector_wrapper(alglib_impl::ae_datatype datatype);
-// A new object externally attached to e_ptr, with run-time type-checking.
+// A new object externally attached to a non-NULL e_ptr.
 // NOTE:
-// *	An exception is thrown if datatype != e_ptr->datatype.
-   ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype);
+// *	An exception is thrown if e_ptr == NULL.
+   ae_vector_wrapper(alglib_impl::ae_vector *e_ptr);
 // A copy of the object rhs (can be a reference to one of the derived classes), with run-time type-checking.
 // NOTE:
 // *	An exception is thrown if datatype != rhs.datatype.
@@ -1190,7 +1204,7 @@ protected:
 
 struct boolean_1d_array: public ae_vector_wrapper {
    boolean_1d_array();
-   boolean_1d_array(alglib_impl::ae_vector *p);
+   boolean_1d_array(alglib_impl::BVector *p);
    boolean_1d_array(const boolean_1d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    boolean_1d_array(const char *s);
@@ -1208,7 +1222,7 @@ struct boolean_1d_array: public ae_vector_wrapper {
 
 struct integer_1d_array: public ae_vector_wrapper {
    integer_1d_array();
-   integer_1d_array(alglib_impl::ae_vector *p);
+   integer_1d_array(alglib_impl::ZVector *p);
    integer_1d_array(const integer_1d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    integer_1d_array(const char *s);
@@ -1226,7 +1240,7 @@ struct integer_1d_array: public ae_vector_wrapper {
 
 struct real_1d_array: public ae_vector_wrapper {
    real_1d_array();
-   real_1d_array(alglib_impl::ae_vector *p);
+   real_1d_array(alglib_impl::RVector *p);
    real_1d_array(const real_1d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    real_1d_array(const char *s);
@@ -1250,7 +1264,7 @@ struct real_1d_array: public ae_vector_wrapper {
 
 struct complex_1d_array: public ae_vector_wrapper {
    complex_1d_array();
-   complex_1d_array(alglib_impl::ae_vector *p);
+   complex_1d_array(alglib_impl::CVector *p);
    complex_1d_array(const complex_1d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    complex_1d_array(const char *s);
@@ -1269,10 +1283,10 @@ struct complex_1d_array: public ae_vector_wrapper {
 struct ae_matrix_wrapper {
 // A new zero-sized matrix of the given datatype.
    ae_matrix_wrapper(alglib_impl::ae_datatype datatype);
-// A new object externally attached to e_ptr, with run-time type-checking.
+// A new object externally attached to a non-NULL e_ptr.
 // NOTE:
-// *	An exception is thrown if datatype != e_ptr->datatype.
-   ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype);
+// *	An exception is thrown if e_ptr == NULL.
+   ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr);
 // A copy of the object rhs (can be a reference to one of the derived classes), with run-time type-checking.
 // NOTE:
 // *	An exception is thrown if datatype != rhs.datatype.
@@ -1344,7 +1358,7 @@ protected:
 
 struct boolean_2d_array: public ae_matrix_wrapper {
    boolean_2d_array();
-   boolean_2d_array(alglib_impl::ae_matrix *p);
+   boolean_2d_array(alglib_impl::BMatrix *p);
    boolean_2d_array(const boolean_2d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    boolean_2d_array(const char *s);
@@ -1360,7 +1374,7 @@ struct boolean_2d_array: public ae_matrix_wrapper {
 
 struct integer_2d_array: public ae_matrix_wrapper {
    integer_2d_array();
-   integer_2d_array(alglib_impl::ae_matrix *p);
+   integer_2d_array(alglib_impl::ZMatrix *p);
    integer_2d_array(const integer_2d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    integer_2d_array(const char *s);
@@ -1376,7 +1390,7 @@ struct integer_2d_array: public ae_matrix_wrapper {
 
 struct real_2d_array: public ae_matrix_wrapper {
    real_2d_array();
-   real_2d_array(alglib_impl::ae_matrix *p);
+   real_2d_array(alglib_impl::RMatrix *p);
    real_2d_array(const real_2d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    real_2d_array(const char *s);
@@ -1399,7 +1413,7 @@ struct real_2d_array: public ae_matrix_wrapper {
 
 struct complex_2d_array: public ae_matrix_wrapper {
    complex_2d_array();
-   complex_2d_array(alglib_impl::ae_matrix *p);
+   complex_2d_array(alglib_impl::CMatrix *p);
    complex_2d_array(const complex_2d_array &rhs);
 #if !defined AE_NO_EXCEPTIONS
    complex_2d_array(const char *s);

@@ -505,7 +505,10 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	∙	(Belated) normalizaiton of layout (e.g. if (A) { ⋯ break; } if (B) ⋯ ⇒ if (A) { ⋯ break; } else if (B) ⋯.
 	∙	Layout of comments and documentation fixed up.
 	∙	Routines local in Kernel*.cpp declared as static.
-	∙	TestC.cpp: linreg testing - separated out general linear regression tests subset.
+	∙	TestC.cpp:
+		―	linreg testing - separated out general linear regression tests subset.
+		―	testmlptrainunit_testmlp{zeroweights,cverror}(): issparse lifted to boolean.
+		―	testmlptrainunit_testmlptrainens{regr,cls}(): issparse and withtrainer lifted to boolean.
 42	Integration of structural and layout changes made in 3.20.0.
 	∙	Adding and Renaming/redeclaring "Class" constructors/destructors:
 		―	ae_init_op: inherited from ae_constructor in ALGLIB 3.20.0.
@@ -567,6 +570,31 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 	∙	Follow-up revisions made to Interpolation.{cpp,h}:
 		―	usedebugcounters locked in as "false" and removed from struct rbf3fastevaluator and rbfv3_fastevaluatorinit().
 		―	dbg{panel,field}2panelcnt, dbgpanelscnt, dbgfarfieldspeedup removed from struct rbf3fastevaluator.
+	∙	Manual.htm: Added notes about the trace functionality from ALGLIB that was removed.
+43	∙	Simplify the {vector,matrix} wrapper copy constructor routines.
+		―	Remove the ae_type parameter from the ae_{vector,matrix}_wrapper copy constructor routines
+		―	Ditto for the copy constructors that copy from alglib_impl::ae_{vector,matrix} ... and remove the comments about "run time type checking"
+			... and apply this to the copy constructor calls in the derived types, annotating {B,Z,R,C} to {Vector,Matrix} instead ... this is in preparation for templatizing.
+		―	Fix the irregularities in the copy constructor for ae_{vector,matrix} to {vector,matrix} wrapper (one checked on NULL, the other didn't).
+	∙	Make ae_sizeof local to Ap.cpp and remove the declaration from Ap.h.
+	∙	Replace NewVector and NewMatrix by versions specialized to {B,Z,R,C}{Vector,Matrix}.
+	∙	Redo ftcomplexfftplanrec: amalgamate the flags "issub" and "istop" into a "level" parameter.
+		―	istop ⇔ level ≡ 0,
+		―	issub ⇔ level &lt; 2.
+	∙	Redo the ae_smart_pointer structure by closely aligning *subscriber to ptr.
+	∙	Redo the ThrowErrors in the alglib namespace sections:
+		―	Simplify the parameter-checking in the wrapper API routines, by removing redundant calls to .length(), .rows(), .cols().
+		―	Put the checks *after* the variable assignments and simplify their occurrences in the ae_assert statements.
+	∙	Encapsulate Smart Pointers and Shared Pools (or just eliminate them by putting all the shared objects into the class objects):
+		To remove the abstraction leak (the _P variables) and as a first step toward nativizing it to C++.
+		―	Ap.{cpp,h}: Move the Smart Pointers down to just over Shared Pool.
+		―	Ap.h: Encapsulate the Shared Pool operations via macros:
+			PoolLet(), PoolYet(), PoolGet(), PoolPut(), PoolSet(), PoolIsSet(), PoolUnSet(), PoolReSet().
+		―	TestC.cpp: Re-declare (poolrec2 *seedrec) as (poolrec2 &amp;seedrec) in testalglibbasicunit_createpoolandrecords() to avoid breaking the abstraction.
+	∙	Encapsulate the Frame operations via macros, wherever they are coterminous with the containing function:
+		convert frame entry and exits, respectively, into EnFrame() and DeFrame().
+	∙	Update to the rest of 3.19.0:
+		―	Add comment in Notes.htm under section 5 on the trace support and a mention, next to the mention of COMMERCIAL, in Manual.htm.
 </pre>
 </p>
 <p>
@@ -746,6 +774,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 42	7752 1.0x 12347 1.0x 12199 1.0x 8547 1.0x 1682091340 (6442ad4c) 81 // Upgrade of Optimization.{cpp,h} to 3.20.0.
 42	7634 1.0x 11629 1.0x 11909 1.0x 8725 1.0x 1682094006 (6442b7b6) 81 // Upgrade of Interpolation.{cpp,h} to 3.20.0. TestC spline2d (Missing Cells) failed.
 42	8000 1.0x 12347 1.0x 12199 1.0x 9429 1.0x 1682095979 (6442bf6b) 79 // Finished 3.20.0 update. TestC spline2d "failure" fixed (it was false negative, not a failure).
+43	7576 1.0x 11495 1.0x 11240 1.0x 9919 1.0x 1756247873 (68ae3741) 78 // Infrastructure Upgrades beginning.
 </pre>
 </p>
 <p>
@@ -799,19 +828,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8000
+* RGEMM-SEQ-16   (MFLOPS)   7576
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12347
+* RGEMM-SEQ-32   (MFLOPS)  11495
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
+* RGEMM-SEQ-64   (MFLOPS)  11240
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9429
+* RGEMM-SEQ-1024 (MFLOPS)   9919
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1682095979 (6442bf6b)
+Seed: 1756247873 (68ae3741)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -911,7 +940,7 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 79 seconds
+Done in 78 seconds
 </pre>
 </p>
 </div>

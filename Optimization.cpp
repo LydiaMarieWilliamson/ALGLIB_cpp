@@ -1254,7 +1254,6 @@ static double optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nma
 //     True in case X is feasible, False - if it is infeasible.
 // ALGLIB: Copyright 20.01.2012 by Sergey Bochkanov
 bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bndu, BVector *havebndu, ae_int_t nmain, ae_int_t nslack, RMatrix *ce, ae_int_t k, double epsi, ae_int_t *qpits, ae_int_t *gpaits) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t idx0;
@@ -1291,26 +1290,26 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    ae_int_t maxarmijoruns;
    double infeasibilityincreasetolerance;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(ce);
    *qpits = 0;
    *gpaits = 0;
-   NewVector(permx, 0, DT_REAL);
-   NewVector(xn, 0, DT_REAL);
-   NewVector(xa, 0, DT_REAL);
-   NewVector(newtonstep, 0, DT_REAL);
-   NewVector(g, 0, DT_REAL);
-   NewVector(pg, 0, DT_REAL);
-   NewVector(tau, 0, DT_REAL);
-   NewVector(s, 0, DT_REAL);
-   NewVector(activeconstraints, 0, DT_REAL);
-   NewVector(tmpk, 0, DT_REAL);
-   NewVector(colnorms, 0, DT_REAL);
-   NewVector(p1, 0, DT_INT);
-   NewVector(p2, 0, DT_INT);
+   NewRVector(permx, 0);
+   NewRVector(xn, 0);
+   NewRVector(xa, 0);
+   NewRVector(newtonstep, 0);
+   NewRVector(g, 0);
+   NewRVector(pg, 0);
+   NewRVector(tau, 0);
+   NewRVector(s, 0);
+   NewRVector(activeconstraints, 0);
+   NewRVector(tmpk, 0);
+   NewRVector(colnorms, 0);
+   NewZVector(p1, 0);
+   NewZVector(p2, 0);
    NewObj(apbuffers, buf);
-   NewMatrix(permce, 0, 0, DT_REAL);
-   NewMatrix(q, 0, 0, DT_REAL);
+   NewRMatrix(permce, 0, 0);
+   NewRMatrix(q, 0, 0);
    maxitswithintolerance = 3;
    maxbadits = 3;
    maxarmijoruns = 5;
@@ -1320,14 +1319,12 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
 // NOTE: after this block we assume that boundary constraints are consistent.
    if (!enforceboundaryconstraints(x, bndl, havebndl, bndu, havebndu, nmain, nslack)) {
       result = false;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (k == 0) {
    // No linear constraints, we can exit right now
       result = true;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Scale rows of CE in such way that max(CE[i,0..nmain+nslack-1]) == 1 for any i = 0..k-1
    for (i = 0; i < k; i++) {
@@ -1730,8 +1727,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
          pgnorm = sqrt(pgnorm);
          if (pgnorm == 0.0) {
             result = feaserr <= epsi;
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
       // calculate planned step length
          vn = ae_v_dotproduct(g.xR, 1, pg.xR, 1, nmain + nslack);
@@ -1746,8 +1742,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
          calculatestepbound(x, &pg, -1.0, bndl, havebndl, bndu, havebndu, nmain, nslack, &vartofreeze, &valtofreeze, &maxsteplen);
          if (vartofreeze >= 0 && maxsteplen == 0.0) {
             result = false;
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          if (vartofreeze >= 0) {
             v = rmin2(stp, maxsteplen);
@@ -1791,8 +1786,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       }
       itscount++;
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // This function checks that input derivatives are right. First it scales
@@ -13530,11 +13524,10 @@ void minbleicrestartfrom(minbleicstate *state, RVector *x) {
 
 // Internal initialization subroutine
 static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffstep, minbleicstate *state) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   EnFrame();
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
 // Initialize
    state->teststep = 0.0;
    state->smoothnessguardlevel = 0;
@@ -13576,7 +13569,7 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
    minbleicsetstpmax(state, 0.0);
    minbleicsetprecdefault(state);
    minbleicrestartfrom(state, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // BOUND CONSTRAINED OPTIMIZATION
@@ -13643,16 +13636,15 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
 // API: void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state);
 // API: void minbleiccreate(const real_1d_array &x, minbleicstate &state);
 void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(minbleicstate, state);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
    ae_assert(n >= 1, "MinBLEICCreate: N < 1");
    ae_assert(x->cnt >= n, "MinBLEICCreate: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBLEICCreate: X contains infinite or NaN values!");
    minbleic_minbleicinitinternal(n, x, 0.0, state);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // The subroutine is finite difference variant of MinBLEICCreate().  It  uses
@@ -13696,18 +13688,17 @@ void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state) {
 // API: void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state);
 // API: void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state);
 void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *state) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(minbleicstate, state);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
    ae_assert(n >= 1, "MinBLEICCreateF: N < 1");
    ae_assert(x->cnt >= n, "MinBLEICCreateF: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBLEICCreateF: X contains infinite or NaN values!");
    ae_assert(isfinite(diffstep), "MinBLEICCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinBLEICCreateF: DiffStep is non-positive!");
    minbleic_minbleicinitinternal(n, x, diffstep, state);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This subroutine updates estimate of the good step length given:
@@ -15010,8 +15001,8 @@ void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const int
 }
 #if !defined AE_NO_EXCEPTIONS
 void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct) {
-   if (c.rows() != ct.length()) ThrowError("Error while calling 'minbleicsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
+   if (k != ct.length()) ThrowError("Error while calling 'minbleicsetlc': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minbleicsetlc(ConstT(minbleicstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k);
@@ -20063,7 +20054,6 @@ void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu) {
 // ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
 // API: void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek);
 void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect, ae_int_t sparsek, RMatrix *densec, ZVector *densect, ae_int_t densek) {
-   ae_frame _frame_block;
    ae_int_t n;
    ae_int_t i;
    ae_int_t j;
@@ -20072,16 +20062,16 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
    ae_int_t t0;
    ae_int_t t1;
    ae_int_t nnz;
-   ae_frame_make(&_frame_block);
-   NewVector(srcidx, 0, DT_INT);
-   NewVector(dstidx, 0, DT_INT);
-   NewVector(s, 0, DT_REAL);
-   NewVector(rs, 0, DT_INT);
-   NewVector(eoffs, 0, DT_INT);
-   NewVector(roffs, 0, DT_INT);
-   NewVector(v2, 0, DT_REAL);
-   NewVector(eidx, 0, DT_INT);
-   NewVector(eval, 0, DT_REAL);
+   EnFrame();
+   NewZVector(srcidx, 0);
+   NewZVector(dstidx, 0);
+   NewRVector(s, 0);
+   NewZVector(rs, 0);
+   NewZVector(eoffs, 0);
+   NewZVector(roffs, 0);
+   NewRVector(v2, 0);
+   NewZVector(eidx, 0);
+   NewRVector(eval, 0);
    n = state->n;
 // First, check for errors in the inputs
    ae_assert(densek >= 0, "MinQPSetLCMixed: K < 0");
@@ -20189,7 +20179,7 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
          state->cu.xR[sparsek + i] = densec->xyR[i][n];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function provides legacy API for specification of mixed  dense/sparse
@@ -20243,12 +20233,11 @@ void minqpsetlcmixedlegacy(minqpstate *state, RMatrix *densec, ZVector *densect,
 // ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
 // API: void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k);
 void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t k) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   NewMatrix(dummyc, 0, 0, DT_REAL);
-   NewVector(dummyct, 0, DT_INT);
+   EnFrame();
+   NewRMatrix(dummyc, 0, 0);
+   NewZVector(dummyct, 0);
    minqpsetlcmixed(state, c, ct, k, &dummyc, &dummyct, 0);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function sets dense linear constraints for QP optimizer.
@@ -20285,12 +20274,11 @@ void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t 
 // API: void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 // API: void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct);
 void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(sparsematrix, dummyc);
-   NewVector(dummyct, 0, DT_INT);
+   NewZVector(dummyct, 0);
    minqpsetlcmixed(state, &dummyc, &dummyct, 0, c, ct, k);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function  sets  two-sided linear  constraints  AL <= A*x <= AU  with
@@ -21515,8 +21503,8 @@ void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1
 }
 #if !defined AE_NO_EXCEPTIONS
 void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct) {
-   if (c.rows() != ct.length()) ThrowError("Error while calling 'minqpsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
+   if (k != ct.length()) ThrowError("Error while calling 'minqpsetlc': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minqpsetlc(ConstT(minqpstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k);
@@ -21539,8 +21527,8 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
 }
 #if !defined AE_NO_EXCEPTIONS
 void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au) {
-   if (a.rows() != al.length() || a.rows() != au.length()) ThrowError("Error while calling 'minqpsetlc2dense': looks like one of arguments has wrong size");
    ae_int_t k = a.rows();
+   if (k != al.length() || k != au.length()) ThrowError("Error while calling 'minqpsetlc2dense': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minqpsetlc2dense(ConstT(minqpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k);
@@ -23963,8 +23951,8 @@ void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1
 }
 #if !defined AE_NO_EXCEPTIONS
 void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct) {
-   if (c.rows() != ct.length()) ThrowError("Error while calling 'minlmsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
+   if (k != ct.length()) ThrowError("Error while calling 'minlmsetlc': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minlmsetlc(ConstT(minlmstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k);
@@ -24497,18 +24485,16 @@ void mincgsetprecscale(mincgstate *state) {
 // by MinCGSetPrecVarPart.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix *v, ae_int_t vcnt) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t n;
    double t;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_REAL);
+   EnFrame();
+   NewRMatrix(b, 0, 0);
    if (vcnt == 0) {
       mincgsetprecdiagfast(state, d1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    n = state->n;
    ae_matrix_set_length(&b, vcnt, vcnt);
@@ -24534,8 +24520,7 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix
    }
    if (!spdmatrixcholeskyrec(&b, 0, vcnt, true, &state->work0)) {
       state->vcnt = 0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < vcnt; i++) {
       ae_v_move(state->vcorr.xyR[i], 1, v->xyR[i], 1, n);
@@ -24546,7 +24531,7 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix
       t = 1.0 / b.xyR[i][i];
       ae_v_muld(state->vcorr.xyR[i], 1, n, t);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function updates variable part (diagonal matrix D2)
@@ -29099,7 +29084,6 @@ void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu,
 // NOTE: this routine does not reallocate arrays if NNew <= NOld and/or KNew <= KOld.
 // ALGLIB: Copyright 01.07.2022 by Sergey Bochkanov
 void presolvelp(RVector *raws, RVector *rawc, RVector *rawbndl, RVector *rawbndu, ae_int_t n, sparsematrix *rawsparsea, RVector *rawal, RVector *rawau, ae_int_t m, presolveinfo *presolved) {
-   ae_frame _frame_block;
    bool somethingchanged;
    ae_int_t i;
    ae_int_t j;
@@ -29117,38 +29101,35 @@ void presolvelp(RVector *raws, RVector *rawc, RVector *rawbndl, RVector *rawbndu
    ae_int_t dbgfreecolumnsingletons;
    double eps;
    ae_int_t presolverounds;
-   ae_frame_make(&_frame_block);
-   NewVector(isdroppedcol, 0, DT_BOOL);
-   NewVector(isdroppedrow, 0, DT_BOOL);
+   EnFrame();
+   NewBVector(isdroppedcol, 0);
+   NewBVector(isdroppedrow, 0);
    NewObj(sparsematrix, normsparsea);
    NewObj(sparsematrix, normsparseat);
    NewObj(dynamiccrs, a);
    NewObj(dynamiccrs, at);
-   NewVector(c, 0, DT_REAL);
-   NewVector(bndl, 0, DT_REAL);
-   NewVector(bndu, 0, DT_REAL);
-   NewVector(al, 0, DT_REAL);
-   NewVector(au, 0, DT_REAL);
+   NewRVector(c, 0);
+   NewRVector(bndl, 0);
+   NewRVector(bndu, 0);
+   NewRVector(al, 0);
+   NewRVector(au, 0);
    ae_assert(m == 0 || sparseiscrs(rawsparsea), "PRESOLVER: A is non-CRS sparse matrix");
 // Quick exit for M == 0
    if (m == 0) {
       presolvenonescaleuser(raws, rawc, rawbndl, rawbndu, n, rawsparsea, rawal, rawau, m, presolved);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Initial check for constraint feasibility
    for (i = 0; i < n; i++) {
       if (isfinite(rawbndl->xR[i]) && isfinite(rawbndu->xR[i]) && rawbndl->xR[i] > rawbndu->xR[i]) {
          presolved->problemstatus = -3;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    for (i = 0; i < m; i++) {
       if (isfinite(rawal->xR[i]) && isfinite(rawau->xR[i]) && rawal->xR[i] > rawau->xR[i]) {
          presolved->problemstatus = -3;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
 // Trace counters
@@ -29191,24 +29172,19 @@ void presolvelp(RVector *raws, RVector *rawc, RVector *rawbndl, RVector *rawbndu
    // * fixed variables removal
    // * singleton rows to box constraints
       if (!lpqppresolve_dropemptycol(&c, &bndl, &bndu, &isdroppedcol, &presolved->lagrangefromresidual, n, &a, &at, &al, &au, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgemptycol)) {
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       if (!lpqppresolve_dropclearlynonbindingrows(n, &isdroppedrow, &a, &at, &al, &au, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgemptyrow, &dbgnonbindingrows)) {
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       if (!lpqppresolve_singletonrowtobc(&bndl, &bndu, &isdroppedcol, n, &a, &at, &al, &au, &isdroppedrow, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgsingletonrow)) {
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       if (!lpqppresolve_fixvariables(&c, &bndl, &bndu, &isdroppedcol, n, &a, &at, &al, &au, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgfixed)) {
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       if (!lpqppresolve_singletoncols(&c, &bndl, &bndu, &isdroppedcol, n, &a, &at, &al, &au, &isdroppedrow, m, eps, &presolved->buf, &presolved->trfstack, &presolved->problemstatus, &somethingchanged, &dbgslackvars, &dbgimplicitslacks, &dbgfreecolumnsingletons)) {
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       presolverounds++;
    }
@@ -29302,7 +29278,7 @@ void presolvelp(RVector *raws, RVector *rawc, RVector *rawbndl, RVector *rawbndu
          presolved->unpackstatperm.xZ[presolved->packstatperm.xZ[i]] = i;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Backward transformation which extracts original solution from that of  the
@@ -30440,7 +30416,6 @@ static void reviseddualsimplex_basisfreshtrf(dualsimplexbasis *s, sparsematrix *
 //       stored in XA[]. XB[] array is not referenced.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings) {
-   ae_frame _frame_block;
    ae_int_t nn;
    ae_int_t m;
    ae_int_t ii;
@@ -30452,8 +30427,8 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
    double xj;
    ae_int_t bndt;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(dummy, 0, DT_REAL);
+   EnFrame();
+   NewRVector(dummy, 0);
    nn = s->ns;
    m = s->m;
    ae_assert(s->state >= reviseddualsimplex_ssvalidxn, "InitialDualFeasibilityCorrection: XN is invalid");
@@ -30526,8 +30501,7 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
    }
 // Update state validity/age
    s->state = reviseddualsimplex_ssvalid;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // This function performs shifting using current algorithm  as  specified  by
@@ -32441,13 +32415,12 @@ static void reviseddualsimplex_setxydstats(dualsimplexstate *state, dualsimplexs
 // declared as accessible by external code.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimplexsettings *settings) {
-   ae_frame _frame_block;
    ae_int_t nx;
    ae_int_t m;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(hqrndstate, rs);
    nx = state->primary.ns + state->primary.m;
    m = state->primary.m;
@@ -32455,8 +32428,7 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    if (m == 0) {
    // Solve
       reviseddualsimplex_solveboxonly(state);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Most basic check for correctness of box and/or linear constraints
    for (j = 0; j < nx; j++) {
@@ -32464,8 +32436,7 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
       // Set error flag and generate some point to return
          state->repterminationtype = -3;
          reviseddualsimplex_setzeroxystats(state);
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
 // Initialization:
@@ -32495,16 +32466,14 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    // Primal unbounded, dual infeasible
       ae_assert(state->repterminationtype == -4, "DSS: integrity check for InvokePhase1() result failed");
       reviseddualsimplex_setxydstats(state, &state->primary, &state->basis, &state->xydsbuf, &state->repx, &state->replagbc, &state->replaglc, &state->repstats);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    reviseddualsimplex_solvesubproblemdual(state, &state->primary, false, settings, &state->repterminationtype);
    if (state->repterminationtype <= 0) {
    // Primal infeasible
       ae_assert(state->repterminationtype == -3, "DSS: integrity check for SolveSubproblemDual() result failed");
       reviseddualsimplex_setxydstats(state, &state->primary, &state->basis, &state->xydsbuf, &state->repx, &state->replagbc, &state->replaglc, &state->repstats);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Remove perturbation from the cost vector,
 // then use primal simplex to enforce dual feasibility
@@ -32520,8 +32489,7 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    // Dual infeasible, primal unbounded
       ae_assert(state->repterminationtype == -4, "DSS: integrity check for SolveSubproblemPrimal() result failed");
       reviseddualsimplex_setxydstats(state, &state->phase3, &state->basis, &state->xydsbuf, &state->repx, &state->replagbc, &state->replaglc, &state->repstats);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < nx; i++) {
       state->primary.xa.xR[i] = state->phase3.xa.xR[i];
@@ -32535,7 +32503,7 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
 // Primal and dual feasible, problem solved
    state->repterminationtype = 1;
    reviseddualsimplex_setxydstats(state, &state->primary, &state->basis, &state->xydsbuf, &state->repx, &state->replagbc, &state->replaglc, &state->repstats);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function clears internal performance counters of the basis
@@ -33684,13 +33652,12 @@ void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu) {
 // API: void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 // API: void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au);
 void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, ae_int_t k) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t n;
    ae_int_t nz;
-   ae_frame_make(&_frame_block);
-   NewVector(nrs, 0, DT_INT);
+   EnFrame();
+   NewZVector(nrs, 0);
    n = state->n;
    ae_assert(k >= 0, "MinLPSetLC2Dense: K < 0");
    ae_assert(k == 0 || a->cols >= n, "MinLPSetLC2Dense: Cols(A) < N");
@@ -33703,8 +33670,7 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
    ae_vector_set_length(&nrs, k);
    state->m = k;
    if (state->m == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < k; i++) {
       ae_assert(isfinite(al->xR[i]) || isneginf(al->xR[i]), "MinLPSetLC2Dense: AL contains NAN or +INF");
@@ -33730,7 +33696,7 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
       state->al.xR[i] = al->xR[i];
       state->au.xR[i] = au->xR[i];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function  sets  two-sided linear  constraints  AL <= A*x <= AU  with
@@ -33811,12 +33777,11 @@ void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 // API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k);
 // API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct);
 void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k) {
-   ae_frame _frame_block;
    ae_int_t n;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(al, 0, DT_REAL);
-   NewVector(au, 0, DT_REAL);
+   EnFrame();
+   NewRVector(al, 0);
+   NewRVector(au, 0);
    n = state->n;
    ae_assert(k >= 0, "MinLPSetLC: K < 0");
    ae_assert(k == 0 || a->cols > n, "MinLPSetLC: Cols(A) <= N");
@@ -33826,8 +33791,7 @@ void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k) {
 // Handle zero K
    if (k == 0) {
       state->m = 0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Convert constraints to two-sided storage format, call another function
    ae_vector_set_length(&al, k);
@@ -33847,7 +33811,7 @@ void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k) {
       au.xR[i] = a->xyR[i][n];
    }
    minlpsetlc2dense(state, a, &al, &au, k);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Clear report fields prior to the optimization.
@@ -34105,15 +34069,14 @@ void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au) {
 // API: void minlpoptimize(const minlpstate &state);
 void minlpoptimize(minlpstate *state) {
    const ae_int_t alllogicalsbasis = 0;
-   ae_frame _frame_block;
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(dualsimplexsettings, settings);
-   NewVector(dummy1, 0, DT_REAL);
-   NewMatrix(dummy, 0, 0, DT_REAL);
+   NewRVector(dummy1, 0);
+   NewRMatrix(dummy, 0, 0);
    NewObj(dualsimplexbasis, dummybasis);
    n = state->n;
    m = state->m;
@@ -34151,8 +34114,7 @@ void minlpoptimize(minlpstate *state) {
          state->repdualerror = rmax2(state->repdualerror, fabs(state->c.xR[i]));
       }
       state->repslackerror = 0.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(state->presolver.problemstatus == 0, "MINLP: integrity check 4432 failed");
 // Call current solver
@@ -34236,12 +34198,11 @@ void minlpoptimize(minlpstate *state) {
             state->repslackerror = rmax2(state->repslackerror, rmax2(state->au.xR[i] - v, 0.0) * rmax2(state->laglc.xR[i], 0.0));
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Integrity check failed - unknown solver
    ae_assert(false, "MinLPOptimize: integrity check failed - unknown solver");
-   ae_frame_leave();
+   DeFrame();
 }
 
 // LP results
@@ -34549,8 +34510,8 @@ void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const rea
 }
 #if !defined AE_NO_EXCEPTIONS
 void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au) {
-   if (a.rows() != al.length() || a.rows() != au.length()) ThrowError("Error while calling 'minlpsetlc2dense': looks like one of arguments has wrong size");
    ae_int_t k = a.rows();
+   if (k != al.length() || k != au.length()) ThrowError("Error while calling 'minlpsetlc2dense': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minlpsetlc2dense(ConstT(minlpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k);
@@ -34573,8 +34534,8 @@ void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1
 }
 #if !defined AE_NO_EXCEPTIONS
 void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct) {
-   if (a.rows() != ct.length()) ThrowError("Error while calling 'minlpsetlc': looks like one of arguments has wrong size");
    ae_int_t k = a.rows();
+   if (k != ct.length()) ThrowError("Error while calling 'minlpsetlc': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minlpsetlc(ConstT(minlpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, ct), k);
@@ -37513,11 +37474,10 @@ void minnlcrestartfrom(minnlcstate *state, RVector *x) {
 // Sets default NLC solver with default criteria.
 static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, minnlcstate *state) {
    const ae_int_t lbfgsfactor = 10;
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   EnFrame();
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
 // Default params
    state->stabilizingpoint = -2.0;
    state->initialinequalitymultiplier = 1.0;
@@ -37557,7 +37517,7 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
    minnlcsetstpmax(state, 0.0);
    minlbfgscreate(n, imin2(lbfgsfactor, n), x, &state->auloptimizer);
    minnlcrestartfrom(state, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // NONLINEARLY CONSTRAINED OPTIMIZATION
@@ -39546,8 +39506,8 @@ void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer
 }
 #if !defined AE_NO_EXCEPTIONS
 void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct) {
-   if (c.rows() != ct.length()) ThrowError("Error while calling 'minnlcsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
+   if (k != ct.length()) ThrowError("Error while calling 'minnlcsetlc': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minnlcsetlc(ConstT(minnlcstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k);
@@ -40198,11 +40158,10 @@ void minnsrestartfrom(minnsstate *state, RVector *x) {
 // Internal initialization subroutine.
 // Sets default NLC solver with default criteria.
 static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, minnsstate *state) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   EnFrame();
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
    state->agsinitstp = 0.2;
    state->agsstattold = sqrt(machineepsilon);
    state->agsshortstpabs = 1.0E-10;
@@ -40248,7 +40207,7 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    minnssetxrep(state, false);
    minnssetalgoags(state, 0.1, 1000.0);
    minnsrestartfrom(state, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // NONSMOOTH NONCONVEX OPTIMIZATION
@@ -41901,8 +41860,8 @@ void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1
 }
 #if !defined AE_NO_EXCEPTIONS
 void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct) {
-   if (c.rows() != ct.length()) ThrowError("Error while calling 'minnssetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
+   if (k != ct.length()) ThrowError("Error while calling 'minnssetlc': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minnssetlc(ConstT(minnsstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k);
@@ -42920,8 +42879,8 @@ void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array 
 }
 #if !defined AE_NO_EXCEPTIONS
 void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state) {
-   if (x.length() != bndl.length() || x.length() != bndu.length()) ThrowError("Error while calling 'minasacreate': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
+   if (n != bndl.length() || n != bndu.length()) ThrowError("Error while calling 'minasacreate': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minasacreate(n, ConstT(ae_vector, x), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), ConstT(minasastate, state));
@@ -43227,11 +43186,10 @@ void minbcrestartfrom(minbcstate *state, RVector *x) {
 
 // Internal initialization subroutine.
 static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, minbcstate *state) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   EnFrame();
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
 // Initialize
    state->teststep = 0.0;
    state->smoothnessguardlevel = 0;
@@ -43271,7 +43229,7 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
    minbcsetstpmax(state, 0.0);
    minbcsetprecdefault(state);
    minbcrestartfrom(state, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // BOX CONSTRAINED OPTIMIZATION
@@ -43331,16 +43289,15 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
 // API: void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state);
 // API: void minbccreate(const real_1d_array &x, minbcstate &state);
 void minbccreate(ae_int_t n, RVector *x, minbcstate *state) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(minbcstate, state);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
    ae_assert(n >= 1, "MinBCCreate: N < 1");
    ae_assert(x->cnt >= n, "MinBCCreate: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBCCreate: X contains infinite or NaN values!");
    minbc_minbcinitinternal(n, x, 0.0, state);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // The subroutine is finite difference variant of MinBCCreate().  It  uses
@@ -43384,18 +43341,17 @@ void minbccreate(ae_int_t n, RVector *x, minbcstate *state) {
 // API: void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state);
 // API: void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state);
 void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(minbcstate, state);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewVector(ct, 0, DT_INT);
+   NewRMatrix(c, 0, 0);
+   NewZVector(ct, 0);
    ae_assert(n >= 1, "MinBCCreateF: N < 1");
    ae_assert(x->cnt >= n, "MinBCCreateF: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBCCreateF: X contains infinite or NaN values!");
    ae_assert(isfinite(diffstep), "MinBCCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinBCCreateF: DiffStep is non-positive!");
    minbc_minbcinitinternal(n, x, diffstep, state);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This subroutine updates estimate of the good step length given:

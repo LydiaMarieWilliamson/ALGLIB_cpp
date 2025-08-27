@@ -44,19 +44,17 @@ namespace alglib_impl {
 // API: void fftc1d(complex_1d_array &a, const ae_int_t n);
 // API: void fftc1d(complex_1d_array &a);
 void fftc1d(CVector *a, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(fasttransformplan, plan);
-   NewVector(buf, 0, DT_REAL);
+   NewRVector(buf, 0);
    ae_assert(n > 0, "fftc1d: incorrect N!");
    ae_assert(a->cnt >= n, "fftc1d: Length(A) < N!");
    ae_assert(isfinitecvector(a, n), "fftc1d: A contains infinite or NAN values!");
 // Special case: N == 1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // convert input array to the more convenient format
    ae_vector_set_length(&buf, 2 * n);
@@ -75,7 +73,7 @@ void fftc1d(CVector *a, ae_int_t n) {
    for (i = 0; i < n; i++) {
       a->xC[i] = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional complex inverse FFT.
@@ -136,16 +134,15 @@ void fftc1dinv(CVector *a, ae_int_t n) {
 // API: void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f);
 // API: void fftr1d(const real_1d_array &a, complex_1d_array &f);
 void fftr1d(RVector *a, ae_int_t n, CVector *f) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
    ae_int_t idx;
    complex hn;
    complex hmnc;
    complex v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(f);
-   NewVector(buf, 0, DT_REAL);
+   NewRVector(buf, 0);
    NewObj(fasttransformplan, plan);
    ae_assert(n > 0, "fftr1d: incorrect N!");
    ae_assert(a->cnt >= n, "fftr1d: Length(A) < N!");
@@ -158,15 +155,13 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
    if (n == 1) {
       ae_vector_set_length(f, 1);
       f->xC[0] = complex_from_d(a->xR[0]);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 2) {
       ae_vector_set_length(f, 2);
       f->xC[0] = complex_from_d(a->xR[0] + a->xR[1]);
       f->xC[1] = complex_from_d(a->xR[0] - a->xR[1]);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Choose between odd-size and even-size FFTs
    if (n % 2 == 0) {
@@ -198,7 +193,7 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
       }
       fftc1d(f, n);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional real inverse FFT.
@@ -234,12 +229,11 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
 // API: void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a);
 // API: void fftr1dinv(const complex_1d_array &f, real_1d_array &a);
 void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(a);
-   NewVector(h, 0, DT_REAL);
-   NewVector(fh, 0, DT_COMPLEX);
+   NewRVector(h, 0);
+   NewCVector(fh, 0);
    ae_assert(n > 0, "fftr1dinv: incorrect N!");
    ae_int_t Nq = n / 2, Nr = n % 2;
    ae_assert(f->cnt > Nq, "fftr1dinv: Length(F) < floor(N/2)+1!");
@@ -256,8 +250,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
    if (n == 1) {
       ae_vector_set_length(a, 1);
       a->xR[0] = f->xC[0].x;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // inverse real FFT is reduced to the inverse real FHT,
 // which is reduced to the forward real FHT,
@@ -281,7 +274,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
    for (i = 0; i < n; i++) {
       a->xR[i] = (fh.xC[i].x - fh.xC[i].y) / n;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine. Never call it directly!
@@ -455,23 +448,21 @@ namespace alglib_impl {
 // ALGLIB: Copyright 04.06.2009 by Sergey Bochkanov
 // API: void fhtr1d(real_1d_array &a, const ae_int_t n);
 void fhtr1d(RVector *a, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(fa, 0, DT_COMPLEX);
+   EnFrame();
+   NewCVector(fa, 0);
    ae_assert(n > 0, "fhtr1d: incorrect N!");
 // Special case: N == 1, FHT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Reduce FHt to real FFT
    fftr1d(a, n, &fa);
    for (i = 0; i < n; i++) {
       a->xR[i] = fa.xC[i].x - fa.xC[i].y;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional inverse FHT.
@@ -545,7 +536,6 @@ namespace alglib_impl {
 //     R   -   convolution: A*B. array[0..N+M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector *r) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t p;
@@ -565,12 +555,12 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    double flopcand;
    double flopbest;
    ae_int_t algbest;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
-   NewVector(bbuf, 0, DT_COMPLEX);
+   NewCVector(bbuf, 0);
    NewObj(fasttransformplan, plan);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
+   NewRVector(buf, 0);
+   NewRVector(buf2, 0);
    ae_assert(n > 0 && m > 0, "convc1dx: incorrect N or M!");
    ae_assert(n <= m, "convc1dx: N <= M assumption is false!");
 // Auto-select
@@ -623,8 +613,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       }
       alg = algbest;
       convc1dx(a, m, b, n, circular, alg, q, r);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // straightforward formula for
 // circular and non-circular convolutions.
@@ -636,8 +625,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          ae_vector_set_length(r, m);
          v = b->xC[0];
          ae_v_cmovec(r->xC, 1, a->xC, 1, "N", m, v);
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    // use straightforward formula
       if (circular) {
@@ -669,8 +657,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             ae_v_caddc(&r->xC[i], 1, a->xC, 1, "N", m, v);
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // general FFT-based code for
 // circular and non-circular convolutions.
@@ -775,8 +762,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // overlap-add method for
 // circular and non-circular convolutions.
@@ -851,10 +837,9 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          }
          i += p;
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional complex convolution.
@@ -919,17 +904,16 @@ void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
    complex c1;
    complex c2;
    complex c3;
    double t;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
+   NewRVector(buf, 0);
+   NewRVector(buf2, 0);
    NewObj(fasttransformplan, plan);
    ae_assert(n > 0 && m > 0 && n <= m, "convc1dinv: incorrect N or M!");
    p = ftbasefindsmooth(m);
@@ -967,7 +951,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
    for (i = 0; i <= m - n; i++) {
       r->xC[i] = complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional circular complex convolution.
@@ -996,13 +980,12 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c);
 void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c) {
-   ae_frame _frame_block;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(c);
-   NewVector(buf, 0, DT_COMPLEX);
+   NewCVector(buf, 0);
    ae_assert(n > 0 && m > 0, "convc1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
 // so S will be longer (at least - not shorter) than B.
@@ -1019,11 +1002,10 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c)
          i1 += m;
       }
       convc1dcircular(s, m, &buf, m, c);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    convc1dx(s, m, r, n, true, -1, 0, c);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional circular complex deconvolution (inverse of ConvC1DCircular()).
@@ -1050,7 +1032,6 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c)
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t i1;
    ae_int_t i2;
@@ -1059,11 +1040,11 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    complex c2;
    complex c3;
    double t;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewVector(cbuf, 0, DT_COMPLEX);
+   NewRVector(buf, 0);
+   NewRVector(buf2, 0);
+   NewCVector(cbuf, 0);
    NewObj(fasttransformplan, plan);
    ae_assert(n > 0 && m > 0, "convc1dcircularinv: incorrect N or M!");
 // normalize task: make M >= N,
@@ -1081,8 +1062,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
          i1 += m;
       }
       convc1dcircularinv(a, m, &cbuf, m, r);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Task is normalized
    ftcomplexfftplan(m, 1, &plan);
@@ -1115,7 +1095,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    for (i = 0; i < m; i++) {
       r->xC[i] = complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional real convolution.
@@ -1140,7 +1120,6 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
 //     R   -   convolution: A*B. array[0..N+M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector *r) {
-   ae_frame _frame_block;
    double v;
    ae_int_t i;
    ae_int_t j;
@@ -1159,12 +1138,12 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    double flopcand;
    double flopbest;
    ae_int_t algbest;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
    NewObj(fasttransformplan, plan);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewVector(buf3, 0, DT_REAL);
+   NewRVector(buf, 0);
+   NewRVector(buf2, 0);
+   NewRVector(buf3, 0);
    ae_assert(n > 0 && m > 0, "convr1dx: incorrect N or M!");
    ae_assert(n <= m, "convr1dx: N <= M assumption is false!");
 // handle special cases
@@ -1221,8 +1200,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
       alg = algbest;
       convr1dx(a, m, b, n, circular, alg, q, r);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // straightforward formula for
 // circular and non-circular convolutions.
@@ -1234,8 +1212,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          ae_vector_set_length(r, m);
          v = b->xR[0];
          ae_v_moved(r->xR, 1, a->xR, 1, m, v);
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    // use straightforward formula
       if (circular) {
@@ -1267,8 +1244,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
             ae_v_addd(&r->xR[i], 1, a->xR, 1, m, v);
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // general FFT-based code for
 // circular and non-circular convolutions.
@@ -1358,8 +1334,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
             ae_v_move(r->xR, 1, buf.xR, 1, m + n - 1);
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // overlap-add method
    if (alg == 2) {
@@ -1421,10 +1396,9 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          }
          i += p;
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional real convolution.
@@ -1482,17 +1456,16 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
    complex c1;
    complex c2;
    complex c3;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewVector(buf3, 0, DT_REAL);
+   NewRVector(buf, 0);
+   NewRVector(buf2, 0);
+   NewRVector(buf3, 0);
    NewObj(fasttransformplan, plan);
    ae_assert(n > 0 && m > 0 && n <= m, "convr1dinv: incorrect N or M!");
    p = ftbasefindsmootheven(m);
@@ -1522,7 +1495,7 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
    fftr1dinvinternaleven(&buf, p, &buf3, &plan);
    ae_vector_set_length(r, m - n + 1);
    ae_v_move(r->xR, 1, buf.xR, 1, m - n + 1);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional circular real convolution.
@@ -1545,13 +1518,12 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c);
 void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c) {
-   ae_frame _frame_block;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(c);
-   NewVector(buf, 0, DT_REAL);
+   NewRVector(buf, 0);
    ae_assert(n > 0 && m > 0, "convr1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
 // so S will be longer (at least - not shorter) than B.
@@ -1568,12 +1540,11 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c)
          i1 += m;
       }
       convr1dcircular(s, m, &buf, m, c);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // reduce to usual convolution
    convr1dx(s, m, r, n, true, -1, 0, c);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional complex deconvolution (inverse of ConvC1D()).
@@ -1600,7 +1571,6 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c)
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t i1;
    ae_int_t i2;
@@ -1608,13 +1578,13 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    complex c1;
    complex c2;
    complex c3;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewVector(buf3, 0, DT_REAL);
-   NewVector(cbuf, 0, DT_COMPLEX);
-   NewVector(cbuf2, 0, DT_COMPLEX);
+   NewRVector(buf, 0);
+   NewRVector(buf2, 0);
+   NewRVector(buf3, 0);
+   NewCVector(cbuf, 0);
+   NewCVector(cbuf2, 0);
    NewObj(fasttransformplan, plan);
    ae_assert(n > 0 && m > 0, "convr1dcircularinv: incorrect N or M!");
 // normalize task: make M >= N,
@@ -1632,8 +1602,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
          i1 += m;
       }
       convr1dcircularinv(a, m, &buf, m, r);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Task is normalized
    ae_int_t Mq = m / 2, Mr = m % 2;
@@ -1676,7 +1645,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       }
       fftr1dinv(&cbuf, m, r);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -1775,12 +1744,11 @@ namespace alglib_impl {
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r);
 void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector *r) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
-   NewVector(p, 0, DT_COMPLEX);
-   NewVector(b, 0, DT_COMPLEX);
+   NewCVector(p, 0);
+   NewCVector(b, 0);
    ae_assert(n > 0 && m > 0, "corrc1d: incorrect N or M!");
    ae_vector_set_length(&p, m);
    for (i = 0; i < m; i++) {
@@ -1792,7 +1760,7 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
    if (m + n - 2 >= n) {
       ae_v_cmove(&r->xC[n], 1, b.xC, 1, "N", m - 1);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional circular complex cross-correlation.
@@ -1819,15 +1787,14 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c);
 void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, CVector *c) {
-   ae_frame _frame_block;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t i;
    ae_int_t j2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(c);
-   NewVector(p, 0, DT_COMPLEX);
-   NewVector(b, 0, DT_COMPLEX);
+   NewCVector(p, 0);
+   NewCVector(b, 0);
    ae_assert(n > 0 && m > 0, "corrc1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
 // so Pattern will be longer (at least - not shorter) than Signal.
@@ -1844,8 +1811,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
          i1 += m;
       }
       corrc1dcircular(signal, m, &b, m, c);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Task is normalized
    ae_vector_set_length(&p, n);
@@ -1858,7 +1824,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
    if (1 < n) {
       ae_v_cmove(&c->xC[m - n + 1], 1, b.xC, 1, "N", n - 1);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional real cross-correlation.
@@ -1895,12 +1861,11 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r);
 void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector *r) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(r);
-   NewVector(p, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
+   NewRVector(p, 0);
+   NewRVector(b, 0);
    ae_assert(n > 0 && m > 0, "corrr1d: incorrect N or M!");
    ae_vector_set_length(&p, m);
    for (i = 0; i < m; i++) {
@@ -1912,7 +1877,7 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
    if (m + n - 2 >= n) {
       ae_v_move(&r->xR[n], 1, b.xR, 1, m - 1);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // 1-dimensional circular real cross-correlation.
@@ -1939,15 +1904,14 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c);
 void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, RVector *c) {
-   ae_frame _frame_block;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t i;
    ae_int_t j2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(c);
-   NewVector(p, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
+   NewRVector(p, 0);
+   NewRVector(b, 0);
    ae_assert(n > 0 && m > 0, "corrr1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
 // so Pattern will be longer (at least - not shorter) than Signal.
@@ -1964,8 +1928,7 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
          i1 += m;
       }
       corrr1dcircular(signal, m, &b, m, c);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Task is normalized
    ae_vector_set_length(&p, n);
@@ -1978,7 +1941,7 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
    if (1 < n) {
       ae_v_move(&c->xR[m - n + 1], 1, b.xR, 1, n - 1);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 

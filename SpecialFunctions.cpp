@@ -2967,20 +2967,19 @@ namespace alglib_impl {
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph);
 void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph) {
-   ae_frame _frame_block;
    double ai;
    double b;
    double phi;
    double t;
    double twon;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *sn = 0.0;
    *cn = 0.0;
    *dn = 0.0;
    *ph = 0.0;
-   NewVector(a, 0, DT_REAL);
-   NewVector(c, 0, DT_REAL);
+   NewRVector(a, 0);
+   NewRVector(c, 0);
    ae_assert(m >= 0.0 && m <= 1.0, "Domain error in JacobianEllipticFunctions: m < 0 or m > 1");
    ae_vector_set_length(&a, 9);
    ae_vector_set_length(&c, 9);
@@ -2992,8 +2991,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       *cn = b + ai * t;
       *ph = u - ai;
       *dn = 1.0 - 0.5 * m * t * t;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (m >= 0.9999999999) {
       ai = 0.25 * (1.0 - m);
@@ -3006,8 +3004,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       ai *= t * phi;
       *cn = phi - ai * (twon - u);
       *dn = phi + ai * (twon + u);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    a.xR[0] = 1.0;
    b = sqrt(1.0 - m);
@@ -3039,7 +3036,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    *cn = t;
    *dn = t / cos(phi - b);
    *ph = phi;
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 

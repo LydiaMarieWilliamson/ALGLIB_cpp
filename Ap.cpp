@@ -817,7 +817,7 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
 }
 
 // The size of datatype or zero for dynamic types like strings or multiple precision types.
-ae_int_t ae_sizeof(ae_datatype datatype) {
+static ae_int_t ae_sizeof(ae_datatype datatype) {
    switch (datatype) {
    // case DT_BYTE: // The same as DT_BOOL.
       case DT_BOOL: return (ae_int_t)sizeof(bool);
@@ -1032,84 +1032,6 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
    mat2->stride = stride;
    mat2->datatype = datatype;
    mat2->xX = p_ptr;
-}
-
-// Make dst into a new smart pointer.
-// dst is assumed to be uninitialized, but preallocated, by aliasing subscriber (which may be NULL) with dst->ptr.
-// After initialization, dst stores the NULL pointer.
-// make_automatic indicates whether or not dst is to be added to the dynamic block list.
-// Upon allocation failure, call ae_break().
-void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic) {
-//(@) TopFr != NULL check and zero-check removed.
-   dst->subscriber = subscriber;
-   dst->ptr = NULL;
-   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
-   dst->is_owner = false;
-   dst->is_dynamic = false;
-   dst->size_of_object = 0;
-   dst->copy = NULL;
-   dst->free = NULL;
-   dst->frame_entry.deallocator = ae_smart_ptr_free;
-   dst->frame_entry.ptr = dst;
-   if (make_automatic) ae_db_attach(&dst->frame_entry);
-}
-
-// Free the smart pointer _dst so that it contains the NULL reference.
-// The change is propagated to its subscriber, if _dst was created with a non-NULL subscriber.
-void ae_smart_ptr_free(void *_dst) {
-   ae_smart_ptr *dst = (ae_smart_ptr *)_dst;
-   if (dst->is_owner && dst->ptr != NULL) {
-      dst->free(dst->ptr, false);
-      if (dst->is_dynamic) ae_free(dst->ptr);
-   }
-   dst->is_owner = false;
-   dst->is_dynamic = false;
-   dst->ptr = NULL;
-   dst->size_of_object = 0;
-   dst->copy = NULL;
-   dst->free = NULL;
-   if (dst->subscriber != NULL) *dst->subscriber = NULL;
-}
-
-// Assign pointer new_ptr to smart pointer dst.
-// Any non-NULL value already contained in and owned by dst is freed beforehand.
-// The change is propagated to its subscriber, if dst was created with a non-NULL subscriber.
-// is_owner indicates whether dst is to own new_ptr.
-// obj_size is the in-memory size of the object. Ignored for is_owner == false.
-// copy is the function used to copy it; can not be NULL for new_ptr != NULL.
-// free is the function used to free it; can be NULL for is_owner == false.
-// is_dynamic indicates whether dst is to be dynamic,
-// so that clearing dst would require BOTH calling ae_free() on it AND free() on the memory occupied by dst.
-// You can specify NULL new_ptr, in which case is_owner, free() and is_dynamic are all ignored.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, size_t obj_size, ae_copy_op copy, ae_free_op free) {
-   ae_assert(new_ptr == NULL || !is_owner || copy != NULL, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but copy constructor is NULL");
-   ae_assert(new_ptr == NULL || !is_owner || free != NULL, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but destructor is NULL");
-   ae_assert(new_ptr == NULL || !is_owner || obj_size > 0, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but object size is zero");
-   if (dst->is_owner && dst->ptr != NULL) {
-      dst->free(dst->ptr, false);
-      if (dst->is_dynamic) ae_free(dst->ptr);
-   }
-   bool not_null = new_ptr != NULL;
-   dst->ptr = new_ptr;
-   dst->is_owner = not_null && is_owner;
-   dst->is_dynamic = not_null && is_dynamic;
-   dst->size_of_object = not_null && is_owner ? obj_size : 0;
-   dst->copy = not_null ? copy : NULL;
-   dst->free = not_null ? free : NULL;
-   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
-}
-
-// Release the pointer owned by the smart pointer dst by NULLing all internal fields
-// and passing any ownership it has to the caller, instead of applying the destructor function to the internal pointer.
-// The change is propagated to its subscriber, if the smart pointer was created with subscriber != NULL.
-void ae_smart_ptr_release(ae_smart_ptr *dst) {
-   dst->is_owner = false;
-   dst->is_dynamic = false;
-   dst->ptr = NULL;
-   dst->size_of_object = 0;
-   dst->copy = NULL;
-   dst->free = NULL;
-   if (dst->subscriber != NULL) *dst->subscriber = NULL;
 }
 
 // Copy x_vector src into ae_vector dst.
@@ -1815,6 +1737,84 @@ void ae_free_lock(ae_lock *lock) {
    _lock *p = (_lock *)lock->lock_ptr;
    if (p != NULL) _ae_free_lock(p);
    ae_db_free(&lock->db);
+}
+
+// Make dst into a new smart pointer.
+// dst is assumed to be uninitialized, but preallocated, by aliasing subscriber (which may be NULL) with dst->ptr.
+// After initialization, dst stores the NULL pointer.
+// make_automatic indicates whether or not dst is to be added to the dynamic block list.
+// Upon allocation failure, call ae_break().
+void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic) {
+//(@) TopFr != NULL check and zero-check removed.
+   dst->subscriber = subscriber;
+   dst->ptr = NULL;
+   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
+   dst->is_owner = false;
+   dst->is_dynamic = false;
+   dst->size_of_object = 0;
+   dst->copy = NULL;
+   dst->free = NULL;
+   dst->frame_entry.deallocator = ae_smart_ptr_free;
+   dst->frame_entry.ptr = dst;
+   if (make_automatic) ae_db_attach(&dst->frame_entry);
+}
+
+// Free the smart pointer _dst so that it contains the NULL reference.
+// The change is propagated to its subscriber, if _dst was created with a non-NULL subscriber.
+void ae_smart_ptr_free(void *_dst) {
+   ae_smart_ptr *dst = (ae_smart_ptr *)_dst;
+   if (dst->is_owner && dst->ptr != NULL) {
+      dst->free(dst->ptr, false);
+      if (dst->is_dynamic) ae_free(dst->ptr);
+   }
+   dst->is_owner = false;
+   dst->is_dynamic = false;
+   dst->ptr = NULL;
+   dst->size_of_object = 0;
+   dst->copy = NULL;
+   dst->free = NULL;
+   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
+}
+
+// Assign pointer new_ptr to smart pointer dst.
+// Any non-NULL value already contained in and owned by dst is freed beforehand.
+// The change is propagated to its subscriber, if dst was created with a non-NULL subscriber.
+// is_owner indicates whether dst is to own new_ptr.
+// obj_size is the in-memory size of the object. Ignored for is_owner == false.
+// copy is the function used to copy it; can not be NULL for new_ptr != NULL.
+// free is the function used to free it; can be NULL for is_owner == false.
+// is_dynamic indicates whether dst is to be dynamic,
+// so that clearing dst would require BOTH calling ae_free() on it AND free() on the memory occupied by dst.
+// You can specify NULL new_ptr, in which case is_owner, free() and is_dynamic are all ignored.
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, size_t obj_size, ae_copy_op copy, ae_free_op free) {
+   ae_assert(new_ptr == NULL || !is_owner || copy != NULL, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but copy constructor is NULL");
+   ae_assert(new_ptr == NULL || !is_owner || free != NULL, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but destructor is NULL");
+   ae_assert(new_ptr == NULL || !is_owner || obj_size > 0, "ae_smart_ptr_assign: new_ptr != NULL, is_owner, but object size is zero");
+   if (dst->is_owner && dst->ptr != NULL) {
+      dst->free(dst->ptr, false);
+      if (dst->is_dynamic) ae_free(dst->ptr);
+   }
+   bool not_null = new_ptr != NULL;
+   dst->ptr = new_ptr;
+   dst->is_owner = not_null && is_owner;
+   dst->is_dynamic = not_null && is_dynamic;
+   dst->size_of_object = not_null && is_owner ? obj_size : 0;
+   dst->copy = not_null ? copy : NULL;
+   dst->free = not_null ? free : NULL;
+   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
+}
+
+// Release the pointer owned by the smart pointer dst by NULLing all internal fields
+// and passing any ownership it has to the caller, instead of applying the destructor function to the internal pointer.
+// The change is propagated to its subscriber, if the smart pointer was created with subscriber != NULL.
+void ae_smart_ptr_release(ae_smart_ptr *dst) {
+   dst->is_owner = false;
+   dst->is_dynamic = false;
+   dst->ptr = NULL;
+   dst->size_of_object = 0;
+   dst->copy = NULL;
+   dst->free = NULL;
+   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
 }
 
 // A reduced form ae_shared_pool_free() suitable for use as the deallocation function on a frame.
@@ -6430,9 +6430,9 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state_clear();
 }
 
-ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype) {
-   if (e_ptr == NULL || e_ptr->datatype != datatype) {
-      const char *msg = "ae_vector_wrapper::ae_vector_wrapper: datatype check failed";
+ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr) {
+   if (e_ptr == NULL) {
+      const char *msg = "ae_vector_wrapper::ae_vector_wrapper: copying an empty vector";
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
@@ -6518,7 +6518,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
 #endif
 
 boolean_1d_array::boolean_1d_array(): ae_vector_wrapper(alglib_impl::DT_BOOL) { }
-boolean_1d_array::boolean_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_BOOL) { }
+boolean_1d_array::boolean_1d_array(alglib_impl::BVector *p): ae_vector_wrapper(p) { }
 boolean_1d_array::boolean_1d_array(const boolean_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_BOOL) { }
 #if !defined AE_NO_EXCEPTIONS
 boolean_1d_array::boolean_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_BOOL) { }
@@ -6544,7 +6544,7 @@ const bool *boolean_1d_array::getcontent() const { return This->xB; }
 bool *boolean_1d_array::getcontent() { return This->xB; }
 
 integer_1d_array::integer_1d_array(): ae_vector_wrapper(alglib_impl::DT_INT) { }
-integer_1d_array::integer_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_INT) { }
+integer_1d_array::integer_1d_array(alglib_impl::ZVector *p): ae_vector_wrapper(p) { }
 integer_1d_array::integer_1d_array(const integer_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_INT) { }
 #if !defined AE_NO_EXCEPTIONS
 integer_1d_array::integer_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_INT) { }
@@ -6570,7 +6570,7 @@ const ae_int_t *integer_1d_array::getcontent() const { return This->xZ; }
 ae_int_t *integer_1d_array::getcontent() { return This->xZ; }
 
 real_1d_array::real_1d_array(): ae_vector_wrapper(alglib_impl::DT_REAL) { }
-real_1d_array::real_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_REAL) { }
+real_1d_array::real_1d_array(alglib_impl::RVector *p): ae_vector_wrapper(p) { }
 real_1d_array::real_1d_array(const real_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_REAL) { }
 #if !defined AE_NO_EXCEPTIONS
 real_1d_array::real_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_REAL) { }
@@ -6618,7 +6618,7 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
 }
 
 complex_1d_array::complex_1d_array(): ae_vector_wrapper(alglib_impl::DT_COMPLEX) { }
-complex_1d_array::complex_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_COMPLEX) { }
+complex_1d_array::complex_1d_array(alglib_impl::CVector *p): ae_vector_wrapper(p) { }
 complex_1d_array::complex_1d_array(const complex_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
 #if !defined AE_NO_EXCEPTIONS
 complex_1d_array::complex_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) { }
@@ -6656,9 +6656,9 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state_clear();
 }
 
-ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype) {
-   if (e_ptr->datatype != datatype) {
-      const char *msg = "ae_matrix_wrapper::ae_matrix_wrapper: datatype check failed";
+ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr) {
+   if (e_ptr == NULL) {
+      const char *msg = "ae_matrix_wrapper::ae_matrix_wrapper: copying an empty matrix";
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
@@ -6752,7 +6752,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
 #endif
 
 boolean_2d_array::boolean_2d_array(): ae_matrix_wrapper(alglib_impl::DT_BOOL) { }
-boolean_2d_array::boolean_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_BOOL) { }
+boolean_2d_array::boolean_2d_array(alglib_impl::BMatrix *p): ae_matrix_wrapper(p) { }
 boolean_2d_array::boolean_2d_array(const boolean_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_BOOL) { }
 #if !defined AE_NO_EXCEPTIONS
 boolean_2d_array::boolean_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_BOOL) { }
@@ -6783,7 +6783,7 @@ void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pC
 }
 
 integer_2d_array::integer_2d_array(): ae_matrix_wrapper(alglib_impl::DT_INT) { }
-integer_2d_array::integer_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_INT) { }
+integer_2d_array::integer_2d_array(alglib_impl::ZMatrix *p): ae_matrix_wrapper(p) { }
 integer_2d_array::integer_2d_array(const integer_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_INT) { }
 #if !defined AE_NO_EXCEPTIONS
 integer_2d_array::integer_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_INT) { }
@@ -6814,7 +6814,7 @@ void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t
 }
 
 real_2d_array::real_2d_array(): ae_matrix_wrapper(alglib_impl::DT_REAL) { }
-real_2d_array::real_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_REAL) { }
+real_2d_array::real_2d_array(alglib_impl::RMatrix *p): ae_matrix_wrapper(p) { }
 real_2d_array::real_2d_array(const real_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_REAL) { }
 #if !defined AE_NO_EXCEPTIONS
 real_2d_array::real_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_REAL) { }
@@ -6868,7 +6868,7 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
 }
 
 complex_2d_array::complex_2d_array(): ae_matrix_wrapper(alglib_impl::DT_COMPLEX) { }
-complex_2d_array::complex_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_COMPLEX) { }
+complex_2d_array::complex_2d_array(alglib_impl::CMatrix *p): ae_matrix_wrapper(p) { }
 complex_2d_array::complex_2d_array(const complex_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
 #if !defined AE_NO_EXCEPTIONS
 complex_2d_array::complex_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) { }

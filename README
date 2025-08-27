@@ -20,6 +20,12 @@ Further details on integrating ALGLIB++ into applications may be found in the AL
 
 ALGLIB++ is based on ALGLIB and tracks its upgrades which were, themselves, automatically translated from an internal codebase written in AlgoPascal.
 The most recent upgrades are the following:
+∙	ALGLIB 4.05.0 (source code generated 2025-06-09)
+∙	ALGLIB 4.04.0 (source code generated 2024-12-21)
+∙	ALGLIB 4.03.0 (source code generated 2024-09-26)
+∙	ALGLIB 4.02.0 (source code generated 2024-05-31)
+∙	ALGLIB 4.01.0 (source code generated 2023-12-27)
+∙	ALGLIB 4.00.0 (source code generated 2023-05-21)
 ∙	ALGLIB 3.20.0 (source code generated 2022-12-19)
 ∙	ALGLIB 3.19.0 (source code generated 2022-06-07)
 ∙	ALGLIB 3.18.0 (source code generated 2021-10-25)
@@ -55,3 +61,8 @@ ALGLIB++ undergoes a process of automated upgrade/reengineering/refactoring/test
 It does not use version numbers but, instead, is marked by the timestamp of the most recent test.
 The latest updates of the testing and development sequence are listed in section A6 of the ALGLIB++ Supplementary Sections (Notes.htm).
 The timestamp of the current revision is 1682095979 (6442bf6b).
+
+The synchronization, for now, has been locked at version 3.20.0, which was the final version before version 4.00,
+pending the inclusion of the multi-threading code, and nativization of the ALGLIB infrastructure.
+In addition, the repository is going to be rebased to include all of the earlier version 3 editions,
+and to also do a clean re-sequencing of the chain of revisions from ALGLIB to ALGLIB++.

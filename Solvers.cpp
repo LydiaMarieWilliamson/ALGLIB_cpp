@@ -55,7 +55,6 @@ namespace alglib_impl {
 // ALGLIB: Copyright 24.02.2014 by Sergey Bochkanov
 // API: void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep);
 void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    bool status;
@@ -63,15 +62,15 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_int_t ne;
    complex v;
    complex vv;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(a);
    SetVector(x);
    SetObj(polynomialsolverreport, rep);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewMatrix(vl, 0, 0, DT_REAL);
-   NewMatrix(vr, 0, 0, DT_REAL);
-   NewVector(wr, 0, DT_REAL);
-   NewVector(wi, 0, DT_REAL);
+   NewRMatrix(c, 0, 0);
+   NewRMatrix(vl, 0, 0);
+   NewRMatrix(vr, 0, 0);
+   NewRVector(wr, 0);
+   NewRVector(wi, 0);
    ae_assert(n > 0, "PolynomialSolve: N <= 0");
    ae_assert(a->cnt > n, "PolynomialSolve: Length(A) <= N");
    ae_assert(isfinitevector(a, n + 1), "PolynomialSolve: A contains infitite numbers");
@@ -125,7 +124,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
       }
       rep->maxerr = rmax2(rep->maxerr, abscomplex(v));
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void polynomialsolverreport_init(void *_p, bool make_automatic) {
@@ -326,7 +325,6 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
 // Internal LU solver
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -337,27 +335,25 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    double mxb;
    bool smallerr;
    bool terminatenexttime;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewVector(xc, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
-   NewVector(bc, 0, DT_REAL);
-   NewVector(xa, 0, DT_REAL);
-   NewVector(xb, 0, DT_REAL);
-   NewVector(tx, 0, DT_REAL);
+   NewRVector(xc, 0);
+   NewRVector(y, 0);
+   NewRVector(bc, 0);
+   NewRVector(xa, 0);
+   NewRVector(xb, 0);
+   NewRVector(tx, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       if (p->xZ[i] >= n || p->xZ[i] < i) {
          *info = -1;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    ae_matrix_set_length(x, n, m);
@@ -379,8 +375,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // First stage of solution: rough solution with TRSM()
@@ -430,13 +425,12 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal LU solver
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -446,28 +440,26 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    double verr;
    bool smallerr;
    bool terminatenexttime;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewVector(xc, 0, DT_COMPLEX);
-   NewVector(y, 0, DT_COMPLEX);
-   NewVector(bc, 0, DT_COMPLEX);
-   NewVector(xa, 0, DT_COMPLEX);
-   NewVector(xb, 0, DT_COMPLEX);
-   NewVector(tx, 0, DT_COMPLEX);
-   NewVector(tmpbuf, 0, DT_REAL);
+   NewCVector(xc, 0);
+   NewCVector(y, 0);
+   NewCVector(bc, 0);
+   NewCVector(xa, 0);
+   NewCVector(xb, 0);
+   NewCVector(tx, 0);
+   NewRVector(tmpbuf, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       if (p->xZ[i] >= n || p->xZ[i] < i) {
          *info = -1;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    ae_matrix_set_length(x, n, m);
@@ -490,8 +482,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // First phase: solve with TRSM()
@@ -551,7 +542,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    // Post-scale result.
       ae_v_cmove(&x->xyC[0][k], x->stride, xc.xC, 1, "N", n);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal Cholesky solver
@@ -601,24 +592,22 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
 // Internal Cholesky solver
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewVector(xc, 0, DT_COMPLEX);
-   NewVector(y, 0, DT_COMPLEX);
-   NewVector(bc, 0, DT_COMPLEX);
-   NewVector(xa, 0, DT_COMPLEX);
-   NewVector(xb, 0, DT_COMPLEX);
-   NewVector(tx, 0, DT_COMPLEX);
+   NewCVector(xc, 0);
+   NewCVector(y, 0);
+   NewCVector(bc, 0);
+   NewCVector(xa, 0);
+   NewCVector(xb, 0);
+   NewCVector(tx, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(x, n, m);
    ae_vector_set_length(&y, n);
@@ -639,8 +628,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // solve
@@ -656,7 +644,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
       cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, x, 0, 0);
       cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 2, x, 0, 0);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver.
@@ -715,20 +703,18 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(da, 0, 0, DT_REAL);
-   NewMatrix(emptya, 0, 0, DT_REAL);
-   NewVector(p, 0, DT_INT);
+   NewRMatrix(da, 0, 0);
+   NewRMatrix(emptya, 0, 0);
+   NewZVector(p, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&da, n, n);
 // 1. factorize matrix
@@ -742,7 +728,7 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
    } else {
       directdensesolvers_rmatrixlusolveinternal(&da, &p, n, &emptya, false, b, m, info, rep, x);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver.
@@ -783,19 +769,17 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
 void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
-   NewVector(p, 0, DT_INT);
+   NewZVector(p, 0);
 // Check for exact degeneracy
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    rmatrixlu(a, n, n, &p);
    for (i = 0; i < n; i++) {
@@ -806,8 +790,7 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
             }
          }
          *info = -3;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
 // Solve with TRSM()
@@ -821,7 +804,7 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    rmatrixlefttrsm(n, m, a, 0, 0, false, true, 0, b, 0, 0);
    rmatrixlefttrsm(n, m, a, 0, 0, true, false, 0, b, 0, 0);
    *info = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*x == b with N*N real matrix A and N*1 real vectorx  x  and
@@ -870,24 +853,22 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_REAL);
-   NewMatrix(xm, 0, 0, DT_REAL);
+   NewRMatrix(bm, 0, 0);
+   NewRMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    rmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver.
@@ -921,17 +902,15 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 // API: void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
 void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
-   NewVector(p, 0, DT_INT);
+   NewZVector(p, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    rmatrixlu(a, n, n, &p);
    for (i = 0; i < n; i++) {
@@ -940,13 +919,12 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info) {
             b->xR[j] = 0.0;
          }
          *info = -3;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    directdensesolvers_rbasiclusolve(a, &p, n, b);
    *info = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver.
@@ -1003,21 +981,19 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info) {
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(emptya, 0, 0, DT_REAL);
+   NewRMatrix(emptya, 0, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // solve
    directdensesolvers_rmatrixlusolveinternal(lua, p, n, &emptya, false, b, m, info, rep, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver.
@@ -1135,24 +1111,22 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_REAL);
-   NewMatrix(xm, 0, 0, DT_REAL);
+   NewRMatrix(bm, 0, 0);
+   NewRMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    rmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver.
@@ -1285,24 +1259,22 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_REAL);
-   NewMatrix(xm, 0, 0, DT_REAL);
+   NewRMatrix(bm, 0, 0);
+   NewRMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    rmatrixmixedsolvem(a, lua, p, n, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Complex dense solver for A*X == B with N*N  complex  matrix  A,  N*M  complex
@@ -1359,20 +1331,18 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(da, 0, 0, DT_COMPLEX);
-   NewMatrix(emptya, 0, 0, DT_COMPLEX);
-   NewVector(p, 0, DT_INT);
+   NewCMatrix(da, 0, 0);
+   NewCMatrix(emptya, 0, 0);
+   NewZVector(p, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&da, n, n);
 // factorize, solve
@@ -1385,7 +1355,7 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
    } else {
       directdensesolvers_cmatrixlusolveinternal(&da, &p, n, &emptya, false, b, m, info, rep, x);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Complex dense solver for A*X == B with N*N  complex  matrix  A,  N*M  complex
@@ -1415,19 +1385,17 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 // API: void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
-   NewVector(p, 0, DT_INT);
+   NewZVector(p, 0);
 // Check for exact degeneracy
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    cmatrixlu(a, n, n, &p);
    for (i = 0; i < n; i++) {
@@ -1438,8 +1406,7 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
             }
          }
          *info = -3;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
 // Solve with TRSM()
@@ -1453,7 +1420,7 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
    cmatrixlefttrsm(n, m, a, 0, 0, false, true, 0, b, 0, 0);
    cmatrixlefttrsm(n, m, a, 0, 0, true, false, 0, b, 0, 0);
    *info = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Complex dense solver for A*x == B with N*N complex matrix A and  N*1  complex
@@ -1501,24 +1468,22 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_COMPLEX);
-   NewMatrix(xm, 0, 0, DT_COMPLEX);
+   NewCMatrix(bm, 0, 0);
+   NewCMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    cmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Complex dense solver for A*x == B with N*N complex matrix A and  N*1  complex
@@ -1545,17 +1510,15 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info);
 void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
-   NewVector(p, 0, DT_INT);
+   NewZVector(p, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    cmatrixlu(a, n, n, &p);
    for (i = 0; i < n; i++) {
@@ -1564,13 +1527,12 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info) {
             b->xC[j] = complex_from_d(0.0);
          }
          *info = -3;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    directdensesolvers_cbasiclusolve(a, &p, n, b);
    *info = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N complex A given by its  LU  decomposition,
@@ -1622,21 +1584,19 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info) {
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(emptya, 0, 0, DT_COMPLEX);
+   NewCMatrix(emptya, 0, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // solve
    directdensesolvers_cmatrixlusolveinternal(lua, p, n, &emptya, false, b, m, info, rep, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N complex A given by its  LU  decomposition,
@@ -1749,24 +1709,22 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_COMPLEX);
-   NewMatrix(xm, 0, 0, DT_COMPLEX);
+   NewCMatrix(bm, 0, 0);
+   NewCMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    cmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Complex dense linear solver for A*x == b with N*N complex A given by  its  LU
@@ -1894,24 +1852,22 @@ void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatri
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_COMPLEX);
-   NewMatrix(xm, 0, 0, DT_COMPLEX);
+   NewCMatrix(bm, 0, 0);
+   NewCMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    cmatrixmixedsolvem(a, lua, p, n, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N symmetric positive definite matrix A,  and
@@ -1965,21 +1921,19 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
    ae_int_t j2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(da, 0, 0, DT_REAL);
+   NewRMatrix(da, 0, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&da, n, n);
 // factorize
@@ -2004,12 +1958,11 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
    directdensesolvers_spdmatrixcholeskysolveinternal(&da, n, isupper, a, true, b, m, info, rep, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N symmetric positive definite matrix A,  and
@@ -2038,17 +1991,15 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 // API: void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
 void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
    *info = 1;
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (!spdmatrixcholesky(a, n, isupper)) {
       for (i = 0; i < n; i++) {
@@ -2057,8 +2008,7 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
          }
       }
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (isupper) {
       rmatrixlefttrsm(n, m, a, 0, 0, true, false, 1, b, 0, 0);
@@ -2067,7 +2017,7 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
       rmatrixlefttrsm(n, m, a, 0, 0, false, false, 0, b, 0, 0);
       rmatrixlefttrsm(n, m, a, 0, 0, false, false, 1, b, 0, 0);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense linear solver for A*x == b with N*N real  symmetric  positive  definite
@@ -2121,24 +2071,22 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_REAL);
-   NewMatrix(xm, 0, 0, DT_REAL);
+   NewRMatrix(bm, 0, 0);
+   NewRMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    spdmatrixsolvem(a, n, isupper, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense linear solver for A*x == b with N*N real  symmetric  positive  definite
@@ -2167,27 +2115,24 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 // API: void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info);
 void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
    *info = 1;
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (!spdmatrixcholesky(a, n, isupper)) {
       for (i = 0; i < n; i++) {
          b->xR[i] = 0.0;
       }
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    directdensesolvers_spdbasiccholeskysolve(a, n, isupper, b);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N symmetric positive definite matrix A given
@@ -2245,21 +2190,19 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(emptya, 0, 0, DT_REAL);
+   NewRMatrix(emptya, 0, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // solve
    directdensesolvers_spdmatrixcholeskysolveinternal(cha, n, isupper, &emptya, false, b, m, info, rep, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N symmetric positive definite matrix A given
@@ -2373,24 +2316,22 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_REAL);
-   NewMatrix(xm, 0, 0, DT_REAL);
+   NewRMatrix(bm, 0, 0);
+   NewRMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    spdmatrixcholeskysolvem(cha, n, isupper, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*x == b with N*N symmetric positive definite matrix A given
@@ -2485,21 +2426,19 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector 
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
    ae_int_t j2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(da, 0, 0, DT_COMPLEX);
+   NewCMatrix(da, 0, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&da, n, n);
 // factorize matrix, solve
@@ -2523,12 +2462,11 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
    directdensesolvers_hpdmatrixcholeskysolveinternal(&da, n, isupper, a, true, b, m, info, rep, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B, with N*N Hermitian positive definite matrix A  and
@@ -2558,17 +2496,15 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 // API: void hpdmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
    *info = 1;
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (!hpdmatrixcholesky(a, n, isupper)) {
       for (i = 0; i < n; i++) {
@@ -2577,8 +2513,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
          }
       }
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (isupper) {
       cmatrixlefttrsm(n, m, a, 0, 0, true, false, 2, b, 0, 0);
@@ -2587,7 +2522,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
       cmatrixlefttrsm(n, m, a, 0, 0, false, false, 0, b, 0, 0);
       cmatrixlefttrsm(n, m, a, 0, 0, false, false, 2, b, 0, 0);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*x == b, with N*N Hermitian positive definite matrix A, and
@@ -2634,24 +2569,22 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_COMPLEX);
-   NewMatrix(xm, 0, 0, DT_COMPLEX);
+   NewCMatrix(bm, 0, 0);
+   NewCMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    hpdmatrixsolvem(a, n, isupper, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*x == b, with N*N Hermitian positive definite matrix A, and
@@ -2682,27 +2615,24 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 // API: void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info);
 void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *info = 0;
    *info = 1;
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (!hpdmatrixcholesky(a, n, isupper)) {
       for (i = 0; i < n; i++) {
          b->xC[i] = complex_from_d(0.0);
       }
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    directdensesolvers_hpdbasiccholeskysolve(a, n, isupper, b);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N Hermitian positive definite matrix A given
@@ -2760,23 +2690,21 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetMatrix(x);
-   NewMatrix(emptya, 0, 0, DT_COMPLEX);
+   NewCMatrix(emptya, 0, 0);
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // 1. scale matrix, max(|U[i,j]|)
 // 2. factorize scaled matrix
 // 3. solve
    directdensesolvers_hpdmatrixcholeskysolveinternal(cha, n, isupper, &emptya, false, b, m, info, rep, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*X == B with N*N Hermitian positive definite matrix A given
@@ -2889,24 +2817,22 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverreport, rep);
    SetVector(x);
-   NewMatrix(bm, 0, 0, DT_COMPLEX);
-   NewMatrix(xm, 0, 0, DT_COMPLEX);
+   NewCMatrix(bm, 0, 0);
+   NewCMatrix(xm, 0, 0);
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    hpdmatrixcholeskysolvem(cha, n, isupper, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Dense solver for A*x == b with N*N Hermitian positive definite matrix A given
@@ -3000,7 +2926,6 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
 // API: void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t ncols, const real_1d_array &b, const double threshold, ae_int_t &info, densesolverlsreport &rep, real_1d_array &x);
 void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, double threshold, ae_int_t *info, densesolverlsreport *rep, RVector *x) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t nsv;
@@ -3013,25 +2938,24 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    ae_int_t nrfs;
    bool terminatenexttime;
    bool smallerr;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(densesolverlsreport, rep);
    SetVector(x);
-   NewVector(sv, 0, DT_REAL);
-   NewMatrix(u, 0, 0, DT_REAL);
-   NewMatrix(vt, 0, 0, DT_REAL);
-   NewVector(rp, 0, DT_REAL);
-   NewVector(utb, 0, DT_REAL);
-   NewVector(sutb, 0, DT_REAL);
-   NewVector(tmp, 0, DT_REAL);
-   NewVector(ta, 0, DT_REAL);
-   NewVector(tx, 0, DT_REAL);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(w, 0, DT_REAL);
+   NewRVector(sv, 0);
+   NewRMatrix(u, 0, 0);
+   NewRMatrix(vt, 0, 0);
+   NewRVector(rp, 0);
+   NewRVector(utb, 0);
+   NewRVector(sutb, 0);
+   NewRVector(tmp, 0);
+   NewRVector(ta, 0);
+   NewRVector(tx, 0);
+   NewRVector(buf, 0);
+   NewRVector(w, 0);
    if (nrows <= 0 || ncols <= 0 || threshold < 0.0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (threshold == 0.0) {
       threshold = 1000.0 * machineepsilon;
@@ -3062,8 +2986,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
          }
       }
       rep->r2 = 0.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    nsv = imin2(ncols, nrows);
    if (nsv == ncols) {
@@ -3158,7 +3081,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
          ae_v_move(&rep->cx.xyR[0][i], rep->cx.stride, vt.xyR[kernelidx + i], 1, ncols);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void densesolverreport_init(void *_p, bool make_automatic) {
@@ -3493,10 +3416,9 @@ void initsparsesolverreport(sparsesolverreport *rep) {
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 // API: void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(x);
    SetObj(sparsesolverreport, rep);
    NewObj(sparsematrix, a2);
@@ -3514,8 +3436,7 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
       for (i = 0; i < n; i++) {
          x->xR[i] = 0.0;
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       x->xR[i] = b->xR[i];
@@ -3528,7 +3449,7 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
       sparsetrsv(&a2, isupper, false, 1, x);
    }
    rep->terminationtype = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Sparse linear solver for A*x == b with N*N  sparse  real  symmetric  positive
@@ -3554,14 +3475,13 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 // API: void sparsespdsolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(x);
    SetObj(sparsesolverreport, rep);
    NewObj(sparsematrix, a2);
-   NewVector(p, 0, DT_INT);
+   NewZVector(p, 0);
    n = sparsegetnrows(a);
    ae_assert(n > 0, "SparseSPDSolve: N <= 0");
    ae_assert(sparsegetnrows(a) == n, "SparseSPDSolve: rows(A) != N");
@@ -3573,8 +3493,7 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
    if (!sparsecholeskyp(&a2, isupper, &p)) {
       rep->terminationtype = -3;
       rsetallocv(n, 0.0, x);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    rcopyallocv(n, b, x);
    for (i = 0; i < n; i++) swapr(&x->xR[i], &x->xR[p.xZ[i]]);
@@ -3587,7 +3506,7 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
    }
    for (i = n - 1; i >= 0; i--) swapr(&x->xR[i], &x->xR[p.xZ[i]]);
    rep->terminationtype = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Sparse linear solver for A*x == b with N*N real  symmetric  positive definite
@@ -3668,15 +3587,14 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 // API: void sparsesolve(const sparsematrix &a, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(x);
    SetObj(sparsesolverreport, rep);
    NewObj(sparsematrix, a2);
-   NewVector(pivp, 0, DT_INT);
-   NewVector(pivq, 0, DT_INT);
+   NewZVector(pivp, 0);
+   NewZVector(pivq, 0);
    n = sparsegetnrows(a);
    ae_assert(n > 0, "SparseSolve: N <= 0");
    ae_assert(sparsegetnrows(a) == n, "SparseSolve: rows(A) != N");
@@ -3691,8 +3609,7 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
       for (i = 0; i < n; i++) {
          x->xR[i] = 0.0;
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       x->xR[i] = b->xR[i];
@@ -3706,7 +3623,7 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
       swapr(&x->xR[i], &x->xR[pivq.xZ[i]]);
    }
    rep->terminationtype = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Sparse linear solver for A*x == b with general (nonsymmetric) N*N sparse real
@@ -4496,9 +4413,8 @@ void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, bool 
 // ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
 // API: void sparsesolvesymmetricgmres(const sparsematrix &a, const bool isupper, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep);
 void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep) {
-   ae_frame _frame_block;
    ae_int_t n;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(x);
    SetObj(sparsesolverreport, rep);
    NewObj(sparsematrix, convbuf);
@@ -4519,8 +4435,7 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
    if (!sparseiscrs(a)) {
       sparsecopytocrsbuf(a, &convbuf);
       sparsesolvesymmetricgmres(&convbuf, isupper, b, k, epsf, maxits, x, rep);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Solve using temporary solver object
    sparsesolvercreate(n, &solver);
@@ -4528,7 +4443,7 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
    sparsesolversetcond(&solver, epsf, maxits);
    sparsesolversolvesymmetric(&solver, a, isupper, b);
    sparsesolverresults(&solver, x, rep);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Procedure for the solution of A*x == b with sparse nonsymmetric A
@@ -4625,9 +4540,8 @@ void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b) {
 // ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
 // API: void sparsesolvegmres(const sparsematrix &a, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep);
 void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep) {
-   ae_frame _frame_block;
    ae_int_t n;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(x);
    SetObj(sparsesolverreport, rep);
    NewObj(sparsematrix, convbuf);
@@ -4648,8 +4562,7 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
    if (!sparseiscrs(a)) {
       sparsecopytocrsbuf(a, &convbuf);
       sparsesolvegmres(&convbuf, b, k, epsf, maxits, x, rep);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Solve using temporary solver object
    sparsesolvercreate(n, &solver);
@@ -4657,7 +4570,7 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
    sparsesolversetcond(&solver, epsf, maxits);
    sparsesolversolve(&solver, a, b);
    sparsesolverresults(&solver, x, rep);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This subroutine submits request for termination of the running solver.  It

@@ -559,10 +559,9 @@ void xdebugb1not(BVector *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugb1appendcopy(boolean_1d_array &a);
 void xdebugb1appendcopy(BVector *a) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_BOOL);
+   EnFrame();
+   NewBVector(b, 0);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
       b.xB[i] = a->xB[i];
@@ -571,7 +570,7 @@ void xdebugb1appendcopy(BVector *a) {
    for (i = 0; i < a->cnt; i++) {
       a->xB[i] = b.xB[i % b.cnt];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate N-element array with even-numbered elements set to True.
@@ -616,10 +615,9 @@ void xdebugi1neg(ZVector *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugi1appendcopy(integer_1d_array &a);
 void xdebugi1appendcopy(ZVector *a) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_INT);
+   EnFrame();
+   NewZVector(b, 0);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
       b.xZ[i] = a->xZ[i];
@@ -628,7 +626,7 @@ void xdebugi1appendcopy(ZVector *a) {
    for (i = 0; i < a->cnt; i++) {
       a->xZ[i] = b.xZ[i % b.cnt];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate N-element array with even-numbered A[I] set to I, and odd-numbered
@@ -679,10 +677,9 @@ void xdebugr1neg(RVector *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugr1appendcopy(real_1d_array &a);
 void xdebugr1appendcopy(RVector *a) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_REAL);
+   EnFrame();
+   NewRVector(b, 0);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
       b.xR[i] = a->xR[i];
@@ -691,7 +688,7 @@ void xdebugr1appendcopy(RVector *a) {
    for (i = 0; i < a->cnt; i++) {
       a->xR[i] = b.xR[i % b.cnt];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate N-element array with even-numbered A[I] set to I*0.25,
@@ -742,10 +739,9 @@ void xdebugc1neg(CVector *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugc1appendcopy(complex_1d_array &a);
 void xdebugc1appendcopy(CVector *a) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_COMPLEX);
+   EnFrame();
+   NewCVector(b, 0);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
       b.xC[i] = a->xC[i];
@@ -754,7 +750,7 @@ void xdebugc1appendcopy(CVector *a) {
    for (i = 0; i < a->cnt; i++) {
       a->xC[i] = b.xC[i % b.cnt];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate N-element array with even-numbered A[K] set to (x,y) = (K*0.25, K*0.125)
@@ -813,11 +809,10 @@ void xdebugb2not(BMatrix *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugb2transpose(boolean_2d_array &a);
 void xdebugb2transpose(BMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_BOOL);
+   EnFrame();
+   NewBMatrix(b, 0, 0);
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
@@ -830,7 +825,7 @@ void xdebugb2transpose(BMatrix *a) {
          a->xyB[j][i] = b.xyB[i][j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate MxN matrix with elements set to "sin(3*I+5*J) > 0"
@@ -884,11 +879,10 @@ void xdebugi2neg(ZMatrix *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugi2transpose(integer_2d_array &a);
 void xdebugi2transpose(ZMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_INT);
+   EnFrame();
+   NewZMatrix(b, 0, 0);
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
@@ -901,7 +895,7 @@ void xdebugi2transpose(ZMatrix *a) {
          a->xyZ[j][i] = b.xyZ[i][j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate MxN matrix with elements set to "sign(sin(3*I+5*J))"
@@ -955,11 +949,10 @@ void xdebugr2neg(RMatrix *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugr2transpose(real_2d_array &a);
 void xdebugr2transpose(RMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_REAL);
+   EnFrame();
+   NewRMatrix(b, 0, 0);
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
@@ -972,7 +965,7 @@ void xdebugr2transpose(RMatrix *a) {
          a->xyR[j][i] = b.xyR[i][j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate MxN matrix with elements set to "sin(3*I+5*J)"
@@ -1026,11 +1019,10 @@ void xdebugc2neg(CMatrix *a) {
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugc2transpose(complex_2d_array &a);
 void xdebugc2transpose(CMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_COMPLEX);
+   EnFrame();
+   NewCMatrix(b, 0, 0);
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
@@ -1043,7 +1035,7 @@ void xdebugc2transpose(CMatrix *a) {
          a->xyC[j][i] = b.xyC[i][j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate MxN matrix with elements set to "sin(3*I+5*J),cos(3*I+5*J)"
@@ -1752,11 +1744,10 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 // API: void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
 // API: void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
 void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(kdtree, kdt);
-   NewVector(tags, 0, DT_INT);
+   NewZVector(tags, 0);
    ae_assert(n >= 0, "KDTreeBuild: N < 0");
    ae_assert(nx >= 1, "KDTreeBuild: NX < 1");
    ae_assert(ny >= 0, "KDTreeBuild: NY < 0");
@@ -1771,7 +1762,7 @@ void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t nor
       }
    }
    kdtreebuildtagged(xy, &tags, n, nx, ny, normtype, kdt);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function   checks  consistency  of  request  buffer  structure  with
@@ -3445,8 +3436,8 @@ void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, co
 }
 #if !defined AE_NO_EXCEPTIONS
 void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
-   if (xy.rows() != tags.length()) ThrowError("Error while calling 'kdtreebuildtagged': looks like one of arguments has wrong size");
    ae_int_t n = xy.rows();
+   if (n != tags.length()) ThrowError("Error while calling 'kdtreebuildtagged': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::kdtreebuildtagged(ConstT(ae_matrix, xy), ConstT(ae_vector, tags), n, nx, ny, normtype, ConstT(kdtree, kdt));

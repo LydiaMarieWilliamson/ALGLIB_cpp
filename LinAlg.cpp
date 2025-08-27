@@ -2850,24 +2850,22 @@ static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau);
 void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t rowscount;
    ae_int_t i;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tau);
-   NewVector(work, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
-   NewVector(taubuf, 0, DT_REAL);
-   NewMatrix(tmpa, 0, 0, DT_REAL);
-   NewMatrix(tmpt, 0, 0, DT_REAL);
-   NewMatrix(tmpr, 0, 0, DT_REAL);
+   NewRVector(work, 0);
+   NewRVector(t, 0);
+   NewRVector(taubuf, 0);
+   NewRMatrix(tmpa, 0, 0);
+   NewRMatrix(tmpt, 0, 0);
+   NewRMatrix(tmpr, 0, 0);
    if (m <= 0 || n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    minmn = imin2(m, n);
    ts = matrixtilesizeb();
@@ -2923,7 +2921,7 @@ void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
    // Advance
       blockstart += blocksize;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // QR decomposition of a rectangular complex matrix of size MxN
@@ -2947,24 +2945,22 @@ void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
 //      September 30, 1994
 // API: void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau);
 void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t rowscount;
    ae_int_t i;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tau);
-   NewVector(work, 0, DT_COMPLEX);
-   NewVector(t, 0, DT_COMPLEX);
-   NewVector(taubuf, 0, DT_COMPLEX);
-   NewMatrix(tmpa, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpt, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpr, 0, 0, DT_COMPLEX);
+   NewCVector(work, 0);
+   NewCVector(t, 0);
+   NewCVector(taubuf, 0);
+   NewCMatrix(tmpa, 0, 0);
+   NewCMatrix(tmpt, 0, 0);
+   NewCMatrix(tmpr, 0, 0);
    if (m <= 0 || n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ts = matrixtilesizeb() / 2;
    minmn = imin2(m, n);
@@ -3020,7 +3016,7 @@ void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
    // Advance
       blockstart += blocksize;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // LQ decomposition of a rectangular matrix of size MxN
@@ -3055,24 +3051,22 @@ void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau);
 void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t columnscount;
    ae_int_t i;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tau);
-   NewVector(work, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
-   NewVector(taubuf, 0, DT_REAL);
-   NewMatrix(tmpa, 0, 0, DT_REAL);
-   NewMatrix(tmpt, 0, 0, DT_REAL);
-   NewMatrix(tmpr, 0, 0, DT_REAL);
+   NewRVector(work, 0);
+   NewRVector(t, 0);
+   NewRVector(taubuf, 0);
+   NewRMatrix(tmpa, 0, 0);
+   NewRMatrix(tmpt, 0, 0);
+   NewRMatrix(tmpr, 0, 0);
    if (m <= 0 || n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    minmn = imin2(m, n);
    ts = matrixtilesizeb();
@@ -3127,7 +3121,7 @@ void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
    // Advance
       blockstart += blocksize;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // LQ decomposition of a rectangular complex matrix of size MxN
@@ -3151,24 +3145,22 @@ void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
 //      September 30, 1994
 // API: void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau);
 void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t columnscount;
    ae_int_t i;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tau);
-   NewVector(work, 0, DT_COMPLEX);
-   NewVector(t, 0, DT_COMPLEX);
-   NewVector(taubuf, 0, DT_COMPLEX);
-   NewMatrix(tmpa, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpt, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpr, 0, 0, DT_COMPLEX);
+   NewCVector(work, 0);
+   NewCVector(t, 0);
+   NewCVector(taubuf, 0);
+   NewCMatrix(tmpa, 0, 0);
+   NewCMatrix(tmpt, 0, 0);
+   NewCMatrix(tmpr, 0, 0);
    if (m <= 0 || n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ts = matrixtilesizeb() / 2;
    minmn = imin2(m, n);
@@ -3223,7 +3215,7 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
    // Advance
       blockstart += blocksize;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Partial unpacking of matrix Q from the QR decomposition of a matrix A
@@ -3244,7 +3236,6 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qcolumns, RMatrix *q) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t refcnt;
    ae_int_t blockstart;
@@ -3253,18 +3244,17 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    ae_int_t i;
    ae_int_t j;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(q);
-   NewVector(work, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
-   NewVector(taubuf, 0, DT_REAL);
-   NewMatrix(tmpa, 0, 0, DT_REAL);
-   NewMatrix(tmpt, 0, 0, DT_REAL);
-   NewMatrix(tmpr, 0, 0, DT_REAL);
+   NewRVector(work, 0);
+   NewRVector(t, 0);
+   NewRVector(taubuf, 0);
+   NewRMatrix(tmpa, 0, 0);
+   NewRMatrix(tmpt, 0, 0);
+   NewRMatrix(tmpr, 0, 0);
    ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns > M!");
    if (m <= 0 || n <= 0 || qcolumns <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // init
    ts = matrixtilesizeb();
@@ -3322,7 +3312,7 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
       blockstart -= ts;
       blocksize = ts;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Partial unpacking of matrix Q from QR decomposition of a complex matrix A.
@@ -3343,7 +3333,6 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q);
 void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qcolumns, CMatrix *q) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t refcnt;
    ae_int_t blockstart;
@@ -3352,18 +3341,17 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
    ae_int_t i;
    ae_int_t j;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(q);
-   NewVector(work, 0, DT_COMPLEX);
-   NewVector(t, 0, DT_COMPLEX);
-   NewVector(taubuf, 0, DT_COMPLEX);
-   NewMatrix(tmpa, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpt, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpr, 0, 0, DT_COMPLEX);
+   NewCVector(work, 0);
+   NewCVector(t, 0);
+   NewCVector(taubuf, 0);
+   NewCMatrix(tmpa, 0, 0);
+   NewCMatrix(tmpt, 0, 0);
+   NewCMatrix(tmpr, 0, 0);
    ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns > M!");
    if (m <= 0 || n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // init
    ts = matrixtilesizeb() / 2;
@@ -3424,7 +3412,7 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
       blockstart -= ts;
       blocksize = ts;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking of matrix R from the QR decomposition of a matrix A
@@ -3509,7 +3497,6 @@ void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r) {
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q);
 void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qrows, RMatrix *q) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t refcnt;
    ae_int_t blockstart;
@@ -3518,18 +3505,17 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    ae_int_t i;
    ae_int_t j;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(q);
-   NewVector(work, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
-   NewVector(taubuf, 0, DT_REAL);
-   NewMatrix(tmpa, 0, 0, DT_REAL);
-   NewMatrix(tmpt, 0, 0, DT_REAL);
-   NewMatrix(tmpr, 0, 0, DT_REAL);
+   NewRVector(work, 0);
+   NewRVector(t, 0);
+   NewRVector(taubuf, 0);
+   NewRMatrix(tmpa, 0, 0);
+   NewRMatrix(tmpt, 0, 0);
+   NewRMatrix(tmpr, 0, 0);
    ae_assert(qrows <= n, "RMatrixLQUnpackQ: QRows > N!");
    if (m <= 0 || n <= 0 || qrows <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // init
    ts = matrixtilesizeb();
@@ -3587,7 +3573,7 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
       blockstart -= ts;
       blocksize = ts;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Partial unpacking of matrix Q from LQ decomposition of a complex matrix A.
@@ -3608,7 +3594,6 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q);
 void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qrows, CMatrix *q) {
-   ae_frame _frame_block;
    ae_int_t minmn;
    ae_int_t refcnt;
    ae_int_t blockstart;
@@ -3617,17 +3602,16 @@ void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
    ae_int_t i;
    ae_int_t j;
    ae_int_t ts;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(q);
-   NewVector(work, 0, DT_COMPLEX);
-   NewVector(t, 0, DT_COMPLEX);
-   NewVector(taubuf, 0, DT_COMPLEX);
-   NewMatrix(tmpa, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpt, 0, 0, DT_COMPLEX);
-   NewMatrix(tmpr, 0, 0, DT_COMPLEX);
+   NewCVector(work, 0);
+   NewCVector(t, 0);
+   NewCVector(taubuf, 0);
+   NewCMatrix(tmpa, 0, 0);
+   NewCMatrix(tmpt, 0, 0);
+   NewCMatrix(tmpr, 0, 0);
    if (m <= 0 || n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Init
    ts = matrixtilesizeb() / 2;
@@ -3688,7 +3672,7 @@ void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
       blockstart -= ts;
       blocksize = ts;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking of matrix L from the LQ decomposition of a matrix A
@@ -3812,19 +3796,17 @@ void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l) {
 //      pseudocode, 2007-2010.
 // API: void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup);
 void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup) {
-   ae_frame _frame_block;
    ae_int_t maxmn;
    ae_int_t i;
    double ltau;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tauq);
    SetVector(taup);
-   NewVector(work, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
+   NewRVector(work, 0);
+   NewRVector(t, 0);
 // Prepare
    if (n <= 0 || m <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    maxmn = imax2(m, n);
    ae_vector_set_length(&work, maxmn + 1);
@@ -3849,8 +3831,7 @@ void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup)
 // NOTE: buffers Work[] and T[] are used for temporary storage of diagonals;
 // because they are present in A[], we do not use them.
    if (rmatrixbdmkl(a, m, n, &work, &t, tauq, taup)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB code
    if (m >= n) {
@@ -3904,7 +3885,7 @@ void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup)
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Multiplication by matrix Q which reduces matrix A to  bidiagonal form.
@@ -3934,25 +3915,22 @@ void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup)
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t istep;
    ae_int_t mx;
-   ae_frame_make(&_frame_block);
-   NewVector(v, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
-   NewVector(dummy, 0, DT_REAL);
+   EnFrame();
+   NewRVector(v, 0);
+   NewRVector(work, 0);
+   NewRVector(dummy, 0);
    if (m <= 0 || n <= 0 || zrows <= 0 || zcolumns <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert((fromtheright ? zcolumns : zrows) == m, "RMatrixBDMultiplyByQ: incorrect Z size!");
 // Try to use MKL code
    if (rmatrixbdmultiplybymkl(qp, m, n, tauq, &dummy, z, zrows, zcolumns, true, fromtheright, dotranspose)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // init
    mx = imax2(m, n);
@@ -4021,7 +3999,7 @@ void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RM
          } while (i != i2 + istep);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking matrix Q which reduces a matrix to bidiagonal form.
@@ -4093,19 +4071,17 @@ void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t mx;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t istep;
-   ae_frame_make(&_frame_block);
-   NewVector(v, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
-   NewVector(dummy, 0, DT_REAL);
+   EnFrame();
+   NewRVector(v, 0);
+   NewRVector(work, 0);
+   NewRVector(dummy, 0);
    if (m <= 0 || n <= 0 || zrows <= 0 || zcolumns <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert((fromtheright ? zcolumns : zrows) == n, "RMatrixBDMultiplyByP: incorrect Z size!");
 // init
@@ -4175,7 +4151,7 @@ void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RM
          i += istep;
       } while (i != i2 + istep);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking matrix P which reduces matrix A to bidiagonal form.
@@ -4301,18 +4277,16 @@ void rmatrixbdunpackdiagonals(RMatrix *b, ae_int_t m, ae_int_t n, bool *isupper,
 //      October 31, 1992
 // API: void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau);
 void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau) {
-   ae_frame _frame_block;
    ae_int_t i;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tau);
-   NewVector(t, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewRVector(t, 0);
+   NewRVector(work, 0);
    ae_assert(n >= 0, "RMatrixHessenberg: incorrect N!");
 // Quick return if possible
    if (n <= 1) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Allocate place
    ae_vector_set_length(tau, n - 1);
@@ -4320,8 +4294,7 @@ void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau) {
    ae_vector_set_length(&work, n);
 // MKL version
    if (rmatrixhessenbergmkl(a, n, tau)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version
    for (i = 0; i < n - 1; i++) {
@@ -4336,7 +4309,7 @@ void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau) {
    // Apply H(i) to A(i+1:ihi,i+1:n) from the left
       applyreflectionfromtheleft(a, v, &t, i + 1, n - 1, i + 1, n - 1, &work);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking matrix Q which reduces matrix A to upper Hessenberg form
@@ -4353,16 +4326,14 @@ void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau) {
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q);
 void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(q);
-   NewVector(v, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewRVector(v, 0);
+   NewRVector(work, 0);
    if (n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // init
    ae_matrix_set_length(q, n, n);
@@ -4379,8 +4350,7 @@ void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) 
    }
 // MKL version
    if (rmatrixhessenbergunpackqmkl(a, n, tau, q)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version: unpack Q
    for (i = 0; i < n - 1; i++) {
@@ -4389,7 +4359,7 @@ void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) 
       v.xR[1] = 1.0;
       applyreflectionfromtheright(q, tau->xR[i], &v, 0, n - 1, i + 1, n - 1, &work);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking matrix H (the result of matrix A reduction to upper Hessenberg form)
@@ -4403,16 +4373,14 @@ void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) 
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h);
 void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(h);
-   NewVector(v, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewRVector(v, 0);
+   NewRVector(work, 0);
    if (n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(h, n, n);
    for (i = 0; i < n; i++) {
@@ -4422,7 +4390,7 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
       j = imax2(0, i - 1);
       ae_v_move(&h->xyR[i][j], 1, &a->xyR[i][j], 1, n - j);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Reduction of a symmetric matrix which is given by its higher or lower
@@ -4493,21 +4461,19 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
 //      October 31, 1992
 // API: void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_array &tau, real_1d_array &d, real_1d_array &e);
 void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, RVector *e) {
-   ae_frame _frame_block;
    ae_int_t i;
    double alpha;
    double taui;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tau);
    SetVector(d);
    SetVector(e);
-   NewVector(t, 0, DT_REAL);
-   NewVector(t2, 0, DT_REAL);
-   NewVector(t3, 0, DT_REAL);
+   NewRVector(t, 0);
+   NewRVector(t2, 0);
+   NewRVector(t3, 0);
    if (n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&t, n + 1);
    ae_vector_set_length(&t2, n + 1);
@@ -4521,8 +4487,7 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
    }
 // Try to use MKL
    if (smatrixtdmkl(a, n, isupper, tau, d, e)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version
    if (isupper) {
@@ -4593,7 +4558,7 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
       }
       d->xR[n - 1] = a->xyR[n - 1][n - 1];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Reduction of a Hermitian matrix which is given  by  its  higher  or  lower
@@ -4664,22 +4629,20 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
 //      October 31, 1992
 // API: void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, complex_1d_array &tau, real_1d_array &d, real_1d_array &e);
 void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, RVector *e) {
-   ae_frame _frame_block;
    ae_int_t i;
    complex alpha;
    complex taui;
    complex v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(tau);
    SetVector(d);
    SetVector(e);
-   NewVector(t, 0, DT_COMPLEX);
-   NewVector(t2, 0, DT_COMPLEX);
-   NewVector(t3, 0, DT_COMPLEX);
+   NewCVector(t, 0);
+   NewCVector(t2, 0);
+   NewCVector(t3, 0);
 // Init and test
    if (n <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       ae_assert(a->xyC[i][i].y == 0.0, "Assertion failed");
@@ -4694,8 +4657,7 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
    ae_vector_set_length(&t3, n);
 // MKL version
    if (hmatrixtdmkl(a, n, isupper, tau, d, e)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version
    if (isupper) {
@@ -4772,7 +4734,7 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
       }
       d->xR[n - 1] = a->xyC[n - 1][n - 1].x;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking matrix Q which reduces symmetric matrix to a tridiagonal
@@ -4790,16 +4752,14 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q);
 void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(q);
-   NewVector(v, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewRVector(v, 0);
+   NewRVector(work, 0);
    if (n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // init
    ae_matrix_set_length(q, n, n);
@@ -4816,8 +4776,7 @@ void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatri
    }
 // MKL version
    if (smatrixtdunpackqmkl(a, n, isupper, tau, q)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version: unpack Q
    if (isupper) {
@@ -4835,7 +4794,7 @@ void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatri
          applyreflectionfromtheleft(q, tau->xR[i], &v, i + 1, n - 1, 0, n - 1, &work);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacking matrix Q which reduces a Hermitian matrix to a real  tridiagonal
@@ -4853,16 +4812,14 @@ void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatri
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q);
 void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatrix *q) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(q);
-   NewVector(v, 0, DT_COMPLEX);
-   NewVector(work, 0, DT_COMPLEX);
+   NewCVector(v, 0);
+   NewCVector(work, 0);
    if (n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // init
    ae_matrix_set_length(q, n, n);
@@ -4870,8 +4827,7 @@ void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatri
    ae_vector_set_length(&work, n);
 // MKL version
    if (hmatrixtdunpackqmkl(a, n, isupper, tau, q)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version
    for (i = 0; i < n; i++) {
@@ -4898,7 +4854,7 @@ void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatri
          complexapplyreflectionfromtheleft(q, tau->xC[i], &v, i + 1, n - 1, 0, n - 1, &work);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -5095,16 +5051,15 @@ namespace alglib_impl {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n) {
-   ae_frame _frame_block;
    double tau;
    double lambdav;
    ae_int_t s;
    ae_int_t i;
    double u1;
    double u2;
-   ae_frame_make(&_frame_block);
-   NewVector(w, 0, DT_REAL);
-   NewVector(v, 0, DT_REAL);
+   EnFrame();
+   NewRVector(w, 0);
+   NewRVector(v, 0);
    NewObj(hqrndstate, state);
    ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (n == 1) {
@@ -5113,8 +5068,7 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n) {
       for (i = 0; i < m; i++) {
          a->xyR[i][0] *= tau;
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case.
 // First pass.
@@ -5145,7 +5099,7 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n) {
       tau = 2.0 * hqrnduniformi(&state, 2) - 1.0;
       ae_v_muld(&a->xyR[0][i], a->stride, m, tau);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Multiplication of MxN complex matrix by NxN random Haar distributed
@@ -5160,14 +5114,13 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
-   ae_frame _frame_block;
    complex lambdav;
    complex tau;
    ae_int_t s;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(w, 0, DT_COMPLEX);
-   NewVector(v, 0, DT_COMPLEX);
+   EnFrame();
+   NewCVector(w, 0);
+   NewCVector(v, 0);
    NewObj(hqrndstate, state);
    ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (n == 1) {
@@ -5177,8 +5130,7 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
       for (i = 0; i < m; i++) {
          a->xyC[i][0] = ae_c_mul(a->xyC[i][0], tau);
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case.
 // First pass.
@@ -5204,7 +5156,7 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
       hqrndunit2(&state, &tau.x, &tau.y);
       ae_v_cmulc(&a->xyC[0][i], a->stride, m, tau);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Multiplication of MxN matrix by MxM random Haar distributed orthogonal matrix
@@ -5218,7 +5170,6 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
-   ae_frame _frame_block;
    double tau;
    double lambdav;
    ae_int_t s;
@@ -5226,9 +5177,9 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
    ae_int_t j;
    double u1;
    double u2;
-   ae_frame_make(&_frame_block);
-   NewVector(w, 0, DT_REAL);
-   NewVector(v, 0, DT_REAL);
+   EnFrame();
+   NewRVector(w, 0);
+   NewRVector(v, 0);
    NewObj(hqrndstate, state);
    ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (m == 1) {
@@ -5237,8 +5188,7 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
       for (j = 0; j < n; j++) {
          a->xyR[0][j] *= tau;
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case.
 // First pass.
@@ -5269,7 +5219,7 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
       tau = 2.0 * hqrnduniformi(&state, 2) - 1.0;
       ae_v_muld(a->xyR[i], 1, n, tau);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Multiplication of MxN complex matrix by MxM random Haar distributed
@@ -5284,15 +5234,14 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n) {
-   ae_frame _frame_block;
    complex tau;
    complex lambdav;
    ae_int_t s;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewVector(w, 0, DT_COMPLEX);
-   NewVector(v, 0, DT_COMPLEX);
+   EnFrame();
+   NewCVector(w, 0);
+   NewCVector(v, 0);
    NewObj(hqrndstate, state);
    ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (m == 1) {
@@ -5302,8 +5251,7 @@ void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n) {
       for (j = 0; j < n; j++) {
          a->xyC[0][j] = ae_c_mul(a->xyC[0][j], tau);
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case.
 // First pass.
@@ -5329,7 +5277,7 @@ void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n) {
       hqrndunit2(&state, &tau.x, &tau.y);
       ae_v_cmulc(a->xyC[i], 1, n, tau);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generation of a random uniformly distributed (Haar) orthogonal matrix
@@ -5419,12 +5367,11 @@ void cmatrixrndorthogonal(ae_int_t n, CMatrix *a) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double l1;
    double l2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(a);
    NewObj(hqrndstate, rs);
    ae_assert(n >= 1 && c >= 1.0, "RMatrixRndCond: N < 1 or C < 1!");
@@ -5432,8 +5379,7 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
    if (n == 1) {
    // special case
       a->xyR[0][0] = 2.0 * randominteger(2) - 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    hqrndrandomize(&rs);
    l1 = 0.0;
@@ -5450,7 +5396,7 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
    a->xyR[n - 1][n - 1] = exp(l2);
    rmatrixrndorthogonalfromtheleft(a, n, n);
    rmatrixrndorthogonalfromtheright(a, n, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generation of random NxN complex matrix with given condition number C and
@@ -5465,13 +5411,12 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double l1;
    double l2;
    complex v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(a);
    NewObj(hqrndstate, state);
    ae_assert(n >= 1 && c >= 1.0, "CMatrixRndCond: N < 1 or C < 1!");
@@ -5481,8 +5426,7 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
       hqrndrandomize(&state);
       hqrndunit2(&state, &v.x, &v.y);
       a->xyC[0][0] = v;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    hqrndrandomize(&state);
    l1 = 0.0;
@@ -5499,7 +5443,7 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    a->xyC[n - 1][n - 1] = complex_from_d(exp(l2));
    cmatrixrndorthogonalfromtheleft(a, n, n);
    cmatrixrndorthogonalfromtheright(a, n, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Symmetric multiplication of NxN matrix by random Haar distributed
@@ -5514,16 +5458,15 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void smatrixrndmultiply(real_2d_array &a, const ae_int_t n);
 void smatrixrndmultiply(RMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    double tau;
    double lambdav;
    ae_int_t s;
    ae_int_t i;
    double u1;
    double u2;
-   ae_frame_make(&_frame_block);
-   NewVector(w, 0, DT_REAL);
-   NewVector(v, 0, DT_REAL);
+   EnFrame();
+   NewRVector(w, 0);
+   NewRVector(v, 0);
    NewObj(hqrndstate, state);
 // General case.
    ae_vector_set_length(&w, n);
@@ -5559,7 +5502,7 @@ void smatrixrndmultiply(RMatrix *a, ae_int_t n) {
    for (i = 0; i < n - 1; i++) {
       ae_v_move(&a->xyR[i + 1][i], a->stride, &a->xyR[i][i + 1], 1, n - i - 1);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Hermitian multiplication of NxN matrix by random Haar distributed
@@ -5574,14 +5517,13 @@ void smatrixrndmultiply(RMatrix *a, ae_int_t n) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n);
 void hmatrixrndmultiply(CMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    complex tau;
    complex lambdav;
    ae_int_t s;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(w, 0, DT_COMPLEX);
-   NewVector(v, 0, DT_COMPLEX);
+   EnFrame();
+   NewCVector(w, 0);
+   NewCVector(v, 0);
    NewObj(hqrndstate, state);
 // General case.
    ae_vector_set_length(&w, n);
@@ -5619,7 +5561,7 @@ void hmatrixrndmultiply(CMatrix *a, ae_int_t n) {
          a->xyC[i][s].y = -a->xyC[i][s].y;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generation of random NxN symmetric matrix with given condition number  and
@@ -5634,12 +5576,11 @@ void hmatrixrndmultiply(CMatrix *a, ae_int_t n) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double l1;
    double l2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(a);
    NewObj(hqrndstate, rs);
    ae_assert(n >= 1 && c >= 1.0, "SMatrixRndCond: N < 1 or C < 1!");
@@ -5647,8 +5588,7 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
    if (n == 1) {
    // special case
       a->xyR[0][0] = 2.0 * randominteger(2) - 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Prepare matrix
    hqrndrandomize(&rs);
@@ -5666,7 +5606,7 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
    a->xyR[n - 1][n - 1] = exp(l2);
 // Multiply
    smatrixrndmultiply(a, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generation of random NxN Hermitian matrix with given condition number  and
@@ -5681,12 +5621,11 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double l1;
    double l2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(a);
    NewObj(hqrndstate, rs);
    ae_assert(n >= 1 && c >= 1.0, "HMatrixRndCond: N < 1 or C < 1!");
@@ -5694,8 +5633,7 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    if (n == 1) {
    // special case
       a->xyC[0][0] = complex_from_i(2 * randominteger(2) - 1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Prepare matrix
    hqrndrandomize(&rs);
@@ -5717,7 +5655,7 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    for (i = 0; i < n; i++) {
       a->xyC[i][i].y = 0.0;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generation of random NxN symmetric positive definite matrix with given
@@ -5732,24 +5670,21 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double l1;
    double l2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(a);
    NewObj(hqrndstate, rs);
 // Special cases
    if (n <= 0 || c < 1.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
       a->xyR[0][0] = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Prepare matrix
    hqrndrandomize(&rs);
@@ -5767,7 +5702,7 @@ void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
    a->xyR[n - 1][n - 1] = exp(l2);
 // Multiply
    smatrixrndmultiply(a, n);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generation of random NxN Hermitian positive definite matrix with given
@@ -5782,24 +5717,21 @@ void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double l1;
    double l2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(a);
    NewObj(hqrndstate, rs);
 // Special cases
    if (n <= 0 || c < 1.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
       a->xyC[0][0] = complex_from_i(1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Prepare matrix
    hqrndrandomize(&rs);
@@ -5821,7 +5753,7 @@ void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    for (i = 0; i < n; i++) {
       a->xyC[i][i].y = 0.0;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -6481,14 +6413,12 @@ void sparseswap(sparsematrix *s0, sparsematrix *s1) {
 // This is hash function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize) {
-   ae_frame _frame_block;
    ae_int_t result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(hqrndstate, r);
    hqrndseed(i, j, &r);
    result = hqrnduniformi(&r, tabsize);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // This function rewrites existing (non-zero) element. It  returns  True   if
@@ -6602,13 +6532,12 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparseresizematrix(const sparsematrix &s);
 void sparseresizematrix(sparsematrix *s) {
-   ae_frame _frame_block;
    ae_int_t k;
    ae_int_t k1;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(tvals, 0, DT_REAL);
-   NewVector(tidx, 0, DT_INT);
+   EnFrame();
+   NewRVector(tvals, 0);
+   NewZVector(tidx, 0);
    ae_assert(s->matrixtype == 0, "SparseResizeMatrix: incorrect matrix type");
 // Initialization for length and number of non-null elementd
    k = s->tablesize;
@@ -6634,7 +6563,7 @@ void sparseresizematrix(sparsematrix *s) {
          sparseset(s, tidx.xZ[2 * i], tidx.xZ[2 * i + 1], tvals.xR[i]);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function modifies S[i,j] - element of the sparse matrix.
@@ -9358,7 +9287,6 @@ void sparsetransposesks(sparsematrix *s) {
 // ALGLIB Project: Copyright 30.01.2018 by Sergey Bochkanov
 // API: void sparsetransposecrs(const sparsematrix &s);
 void sparsetransposecrs(sparsematrix *s) {
-   ae_frame _frame_block;
    ae_int_t oldn;
    ae_int_t oldm;
    ae_int_t newn;
@@ -9367,11 +9295,11 @@ void sparsetransposecrs(sparsematrix *s) {
    ae_int_t j;
    ae_int_t k;
    ae_int_t nonne;
-   ae_frame_make(&_frame_block);
-   NewVector(oldvals, 0, DT_REAL);
-   NewVector(oldidx, 0, DT_INT);
-   NewVector(oldridx, 0, DT_INT);
-   NewVector(counts, 0, DT_INT);
+   EnFrame();
+   NewRVector(oldvals, 0);
+   NewZVector(oldidx, 0);
+   NewZVector(oldridx, 0);
+   NewZVector(counts, 0);
    ae_assert(s->matrixtype == 1, "SparseTransposeCRS: only CRS matrices are supported");
    ae_swap_vectors(&s->vals, &oldvals);
    ae_swap_vectors(&s->idx, &oldidx);
@@ -9423,7 +9351,7 @@ void sparsetransposecrs(sparsematrix *s) {
    }
 // Initialization 'S.UIdx' and 'S.DIdx'
    sparseinitduidx(s);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function performs copying with transposition of CRS matrix  (buffered
@@ -9530,24 +9458,22 @@ void sparsecopytransposecrs(sparsematrix *s0, sparsematrix *s1) {
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparseconverttohash(const sparsematrix &s);
 void sparseconverttohash(sparsematrix *s) {
-   ae_frame _frame_block;
    ae_int_t n;
    ae_int_t m;
    ae_int_t offs0;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
-   NewVector(tidx, 0, DT_INT);
-   NewVector(tridx, 0, DT_INT);
-   NewVector(tdidx, 0, DT_INT);
-   NewVector(tuidx, 0, DT_INT);
-   NewVector(tvals, 0, DT_REAL);
+   EnFrame();
+   NewZVector(tidx, 0);
+   NewZVector(tridx, 0);
+   NewZVector(tdidx, 0);
+   NewZVector(tuidx, 0);
+   NewRVector(tvals, 0);
    ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseConvertToHash: invalid matrix type");
    if (s->matrixtype == 0) {
    // Already in Hash mode
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (s->matrixtype == 1) {
    // From CRS to Hash
@@ -9563,8 +9489,7 @@ void sparseconverttohash(sparsematrix *s) {
             sparseset(s, i, tidx.xZ[j], tvals.xR[j]);
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (s->matrixtype == 2) {
    // From SKS to Hash
@@ -9590,11 +9515,10 @@ void sparseconverttohash(sparsematrix *s) {
             sparseset(s, i - k + j, i, tvals.xR[offs0 + j]);
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(false, "SparseConvertToHash: invalid matrix type");
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function converts matrix to CRS format.
@@ -9618,7 +9542,6 @@ void sparseconverttohash(sparsematrix *s) {
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparseconverttocrs(const sparsematrix &s);
 void sparseconverttocrs(sparsematrix *s) {
-   ae_frame _frame_block;
    ae_int_t m;
    ae_int_t i;
    ae_int_t j;
@@ -9626,11 +9549,11 @@ void sparseconverttocrs(sparsematrix *s) {
    ae_int_t k;
    ae_int_t offs0;
    ae_int_t offs1;
-   ae_frame_make(&_frame_block);
-   NewVector(tvals, 0, DT_REAL);
-   NewVector(tidx, 0, DT_INT);
-   NewVector(temp, 0, DT_INT);
-   NewVector(tridx, 0, DT_INT);
+   EnFrame();
+   NewRVector(tvals, 0);
+   NewZVector(tidx, 0);
+   NewZVector(temp, 0);
+   NewZVector(tridx, 0);
    m = s->m;
    if (s->matrixtype == 0) {
    // From Hash-table to CRS.
@@ -9680,13 +9603,11 @@ void sparseconverttocrs(sparsematrix *s) {
       }
    // Initialization 'S.UIdx' and 'S.DIdx'
       sparseinitduidx(s);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (s->matrixtype == 1) {
    // Already CRS
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (s->matrixtype == 2) {
       ae_assert(s->m == s->n, "SparseConvertToCRS: non-square SKS matrices are not supported");
@@ -9752,11 +9673,10 @@ void sparseconverttocrs(sparsematrix *s) {
       }
    // Initialization 'S.UIdx' and 'S.DIdx'
       sparseinitduidx(s);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(false, "SparseConvertToCRS: invalid matrix type");
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function performs in-place conversion to SKS format.
@@ -9777,7 +9697,6 @@ void sparseconverttocrs(sparsematrix *s) {
 // ALGLIB Project: Copyright 15.01.2014 by Sergey Bochkanov
 // API: void sparseconverttosks(const sparsematrix &s);
 void sparseconverttosks(sparsematrix *s) {
-   ae_frame _frame_block;
    ae_int_t n;
    ae_int_t t0;
    ae_int_t t1;
@@ -9785,18 +9704,17 @@ void sparseconverttosks(sparsematrix *s) {
    ae_int_t j;
    ae_int_t k;
    double v;
-   ae_frame_make(&_frame_block);
-   NewVector(tridx, 0, DT_INT);
-   NewVector(tdidx, 0, DT_INT);
-   NewVector(tuidx, 0, DT_INT);
-   NewVector(tvals, 0, DT_REAL);
+   EnFrame();
+   NewZVector(tridx, 0);
+   NewZVector(tdidx, 0);
+   NewZVector(tuidx, 0);
+   NewRVector(tvals, 0);
    ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseConvertToSKS: invalid matrix type");
    ae_assert(s->m == s->n, "SparseConvertToSKS: rectangular matrices are not supported");
    n = s->n;
    if (s->matrixtype == 2) {
    // Already in SKS mode
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Generate internal copy of SKS matrix
    vectorsetlengthatleast(&tdidx, n + 1);
@@ -9846,7 +9764,7 @@ void sparseconverttosks(sparsematrix *s) {
    ae_swap_vectors(&s->uidx, &tuidx);
    ae_swap_vectors(&s->ridx, &tridx);
    ae_swap_vectors(&s->vals, &tvals);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function  performs  in-place  conversion  to  desired sparse storage
@@ -9974,7 +9892,6 @@ void sparsecopytohash(sparsematrix *s0, sparsematrix *s1) {
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
-   ae_frame _frame_block;
    ae_int_t nonne;
    ae_int_t i;
    ae_int_t j;
@@ -9982,8 +9899,8 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
    ae_int_t offs0;
    ae_int_t offs1;
    ae_int_t m;
-   ae_frame_make(&_frame_block);
-   NewVector(temp, 0, DT_INT);
+   EnFrame();
+   NewZVector(temp, 0);
    ae_assert(s0->matrixtype == 0 || s0->matrixtype == 1 || s0->matrixtype == 2, "SparseCopyToCRSBuf: invalid matrix type");
    m = s0->m;
    if (s0->matrixtype == 0) {
@@ -10032,14 +9949,12 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
       }
    // Initialization 'S.UIdx' and 'S.DIdx'
       sparseinitduidx(s1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (s0->matrixtype == 1) {
    // Already CRS, just copy
       sparsecopybuf(s0, s1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (s0->matrixtype == 2) {
       ae_assert(s0->m == s0->n, "SparseCopyToCRS: non-square SKS matrices are not supported");
@@ -10100,11 +10015,10 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
       }
    // Initialization 'S.UIdx' and 'S.DIdx'
       sparseinitduidx(s1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(false, "SparseCopyToCRSBuf: unexpected matrix type");
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function  performs  out-of-place  conversion  to  CRS format.  S0 is
@@ -11876,7 +11790,6 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
 }
 
 void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t i1;
    ae_int_t i2;
@@ -11906,19 +11819,19 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
    bool failflag;
    ae_int_t p1;
    double vt;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(wr);
    SetVector(wi);
    *info = 0;
-   NewVector(work, 0, DT_REAL);
-   NewMatrix(s, 0, 0, DT_REAL);
-   NewVector(v, 0, DT_REAL);
-   NewVector(vv, 0, DT_REAL);
-   NewVector(workc1, 0, DT_REAL);
-   NewVector(works1, 0, DT_REAL);
-   NewVector(workv3, 0, DT_REAL);
-   NewVector(tmpwr, 0, DT_REAL);
-   NewVector(tmpwi, 0, DT_REAL);
+   NewRVector(work, 0);
+   NewRMatrix(s, 0, 0);
+   NewRVector(v, 0);
+   NewRVector(vv, 0);
+   NewRVector(workc1, 0);
+   NewRVector(works1, 0);
+   NewRVector(workv3, 0);
+   NewRVector(tmpwr, 0);
+   NewRVector(tmpwi, 0);
 // Set the order of the multi-shift QR algorithm to be used.
 // If you want to tune algorithm, change this values
    ns = 12;
@@ -11961,14 +11874,12 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
    }
 // Quick return if possible
    if (n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 1) {
       wr->xR[1] = h->xyR[1][1];
       wi->xR[1] = 0.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Set rows and columns 1 to N to zero below the first
 // subdiagonal.
@@ -11999,8 +11910,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    unfl = minrealnumber;
    ulp = 2.0 * machineepsilon;
@@ -12192,21 +12102,20 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
       itn -= its;
       i = l - 1;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(wr);
    SetVector(wi);
    *info = 0;
-   NewMatrix(h1, 0, 0, DT_REAL);
-   NewMatrix(z1, 0, 0, DT_REAL);
-   NewVector(wr1, 0, DT_REAL);
-   NewVector(wi1, 0, DT_REAL);
+   NewRMatrix(h1, 0, 0);
+   NewRMatrix(z1, 0, 0);
+   NewRVector(wr1, 0);
+   NewRVector(wi1, 0);
 // Allocate space
    ae_vector_set_length(wr, n);
    ae_vector_set_length(wi, n);
@@ -12215,8 +12124,7 @@ void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded,
    }
 // MKL version
    if (rmatrixinternalschurdecompositionmkl(h, n, tneeded, zneeded, wr, wi, z, info)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version
    ae_matrix_set_length(&h1, n + 1, n + 1);
@@ -12253,7 +12161,7 @@ void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded,
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Subroutine performing  the  Schur  decomposition  of  a  matrix  in  upper
@@ -12297,17 +12205,15 @@ void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded,
 //
 // Algorithm implemented on the basis of subroutine DHSEQR (LAPACK 3.0 library).
 bool upperhessenbergschurdecomposition(RMatrix *h, ae_int_t n, RMatrix *s) {
-   ae_frame _frame_block;
    ae_int_t info;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(s);
-   NewVector(wi, 0, DT_REAL);
-   NewVector(wr, 0, DT_REAL);
+   NewRVector(wi, 0);
+   NewRVector(wr, 0);
    internalschurdecomposition(h, n, 1, 2, &wr, &wi, s, &info);
    result = info == 0;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 } // end of namespace alglib_impl
 
@@ -12733,7 +12639,6 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
 //      Courant Institute, Argonne National Lab, and Rice University
 //      June 30, 1999
 static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info) {
-   ae_frame _frame_block;
    bool allv;
    bool bothv;
    bool leftv;
@@ -12774,24 +12679,24 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
    ae_int_t k3;
    ae_int_t k4;
    double vt;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(vselect);
    *m = 0;
    *info = 0;
-   NewMatrix(x, 0, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
-   NewVector(temp, 0, DT_REAL);
-   NewMatrix(temp11, 0, 0, DT_REAL);
-   NewMatrix(temp22, 0, 0, DT_REAL);
-   NewMatrix(temp11b, 0, 0, DT_REAL);
-   NewMatrix(temp21b, 0, 0, DT_REAL);
-   NewMatrix(temp12b, 0, 0, DT_REAL);
-   NewMatrix(temp22b, 0, 0, DT_REAL);
-   NewVector(rswap4, 0, DT_BOOL);
-   NewVector(zswap4, 0, DT_BOOL);
-   NewMatrix(ipivot44, 0, 0, DT_INT);
-   NewVector(civ4, 0, DT_REAL);
-   NewVector(crv4, 0, DT_REAL);
+   NewRMatrix(x, 0, 0);
+   NewRVector(work, 0);
+   NewRVector(temp, 0);
+   NewRMatrix(temp11, 0, 0);
+   NewRMatrix(temp22, 0, 0);
+   NewRMatrix(temp11b, 0, 0);
+   NewRMatrix(temp21b, 0, 0);
+   NewRMatrix(temp12b, 0, 0);
+   NewRMatrix(temp22b, 0, 0);
+   NewBVector(rswap4, 0);
+   NewBVector(zswap4, 0);
+   NewZMatrix(ipivot44, 0, 0);
+   NewRVector(civ4, 0);
+   NewRVector(crv4, 0);
    ae_matrix_set_length(&x, 3, 3);
    ae_matrix_set_length(&temp11, 2, 2);
    ae_matrix_set_length(&temp11b, 2, 2);
@@ -12824,18 +12729,15 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
    *info = 0;
    if (n < 0) {
       *info = -2;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (!rightv && !leftv) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (!allv && !over && !somev) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Set M to the number of columns required to store the selected
 // eigenvectors, standardize the array SELECT if necessary, and
@@ -12872,8 +12774,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
    }
 // Quick return if possible.
    if (n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Set the constants to control overflow.
    unfl = minrealnumber;
@@ -13504,7 +13405,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine
@@ -13514,17 +13415,16 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
 //      Courant Institute, Argonne National Lab, and Rice University
 //      June 30, 1999
 static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(vselect);
    *m = 0;
    *info = 0;
-   NewMatrix(t1, 0, 0, DT_REAL);
-   NewMatrix(vl1, 0, 0, DT_REAL);
-   NewMatrix(vr1, 0, 0, DT_REAL);
-   NewVector(vselect1, 0, DT_BOOL);
+   NewRMatrix(t1, 0, 0);
+   NewRMatrix(vl1, 0, 0);
+   NewRMatrix(vr1, 0, 0);
+   NewBVector(vselect1, 0);
 // Allocate VL/VR, if needed
    if (howmny == 2 || howmny == 3) {
       if (side == 1 || side == 3) {
@@ -13536,8 +13436,7 @@ static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_i
    }
 // Try to use MKL kernel
    if (rmatrixinternaltrevcmkl(t, n, side, howmny, vl, vr, m, info)) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // ALGLIB version
    ae_matrix_set_length(&t1, n + 1, n + 1);
@@ -13585,7 +13484,7 @@ static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_i
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // DLAE2  computes the eigenvalues of a 2-by-2 symmetric matrix
@@ -13785,7 +13684,6 @@ static double evd_tdevdextsign(double a, double b) {
 }
 
 static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z) {
-   ae_frame _frame_block;
    ae_int_t maxit;
    ae_int_t i;
    ae_int_t ii;
@@ -13829,32 +13727,29 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
    ae_int_t zrows;
    bool wastranspose;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(e);
-   NewVector(work1, 0, DT_REAL);
-   NewVector(work2, 0, DT_REAL);
-   NewVector(workc, 0, DT_REAL);
-   NewVector(works, 0, DT_REAL);
-   NewVector(wtemp, 0, DT_REAL);
+   NewRVector(work1, 0);
+   NewRVector(work2, 0);
+   NewRVector(workc, 0);
+   NewRVector(works, 0);
+   NewRVector(wtemp, 0);
    ae_assert(zneeded >= 0 && zneeded <= 3, "TridiagonalEVD: Incorrent ZNeeded");
 // Quick return if possible
    if (zneeded < 0 || zneeded > 3) {
       result = false;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = true;
    if (n == 0) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (n == 1) {
       if (zneeded == 2 || zneeded == 3) {
          ae_matrix_set_length(z, 2, 2);
          z->xyR[1][1] = 1.0;
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    maxit = 30;
 // Initialize arrays
@@ -14220,23 +14115,20 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
          if (wastranspose) {
             inplacetranspose(z, 1, n, 1, n, &wtemp);
          }
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    }
 // Order eigenvalues and eigenvectors.
    if (zneeded == 0) {
    // Sort
       if (n == 1) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       if (n == 2) {
          if (d->xR[1] > d->xR[2]) {
             swapr(&d->xR[1], &d->xR[2]);
          }
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       i = 2;
       do {
@@ -14306,8 +14198,7 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
          inplacetranspose(z, 1, n, 1, n, &wtemp);
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_int_t mmax, ae_int_t minp, double abstol, double reltol, double pivmin, RVector *d, RVector *e, RVector *e2, ZVector *nval, RMatrix *ab, RVector *c, ae_int_t *mout, ZMatrix *nab, RVector *work, ZVector *iwork, ae_int_t *info) {
@@ -14492,7 +14383,6 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
 }
 
 static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n, ae_int_t irange, ae_int_t iorder, double vl, double vu, ae_int_t il, ae_int_t iu, double abstol, RVector *w, ae_int_t *m, ae_int_t *nsplit, ZVector *iblock, ZVector *isplit, ae_int_t *errorcode) {
-   ae_frame _frame_block;
    double fudge;
    double relfac;
    bool ncnvrg;
@@ -14537,7 +14427,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    double t;
    ae_int_t tmpi;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(d);
    DupVector(e);
    SetVector(w);
@@ -14546,27 +14436,26 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    SetVector(iblock);
    SetVector(isplit);
    *errorcode = 0;
-   NewVector(idumma, 0, DT_INT);
-   NewVector(work, 0, DT_REAL);
-   NewVector(iwork, 0, DT_INT);
-   NewVector(ia1s2, 0, DT_INT);
-   NewVector(ra1s2, 0, DT_REAL);
-   NewMatrix(ra1s2x2, 0, 0, DT_REAL);
-   NewMatrix(ia1s2x2, 0, 0, DT_INT);
-   NewVector(ra1siin, 0, DT_REAL);
-   NewVector(ra2siin, 0, DT_REAL);
-   NewVector(ra3siin, 0, DT_REAL);
-   NewVector(ra4siin, 0, DT_REAL);
-   NewMatrix(ra1siinx2, 0, 0, DT_REAL);
-   NewMatrix(ia1siinx2, 0, 0, DT_INT);
-   NewVector(iworkspace, 0, DT_INT);
-   NewVector(rworkspace, 0, DT_REAL);
+   NewZVector(idumma, 0);
+   NewRVector(work, 0);
+   NewZVector(iwork, 0);
+   NewZVector(ia1s2, 0);
+   NewRVector(ra1s2, 0);
+   NewRMatrix(ra1s2x2, 0, 0);
+   NewZMatrix(ia1s2x2, 0, 0);
+   NewRVector(ra1siin, 0);
+   NewRVector(ra2siin, 0);
+   NewRVector(ra3siin, 0);
+   NewRVector(ra4siin, 0);
+   NewRMatrix(ra1siinx2, 0, 0);
+   NewZMatrix(ia1siinx2, 0, 0);
+   NewZVector(iworkspace, 0);
+   NewRVector(rworkspace, 0);
 // Quick return if possible
    *m = 0;
    if (n == 0) {
       result = true;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Get machine constants
 // NB is the minimum vector length for vector bisection, or 0
@@ -14620,8 +14509,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       *errorcode = -9;
    }
    if (*errorcode != 0) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Initialize error flags
    ncnvrg = false;
@@ -14642,8 +14530,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          *m = 1;
       }
       result = true;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Scaling
    t = fabs(d->xR[n]);
@@ -14769,8 +14656,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       if (nwl < 0 || nwl >= n || nwu < 1 || nwu > n) {
          *errorcode = 4;
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    } else {
    // RANGE == 'A' or 'V' -- Set ATOLI
@@ -15044,8 +14930,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       *errorcode += 2;
    }
    result = *errorcode == 0;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 static void evd_tdininternaldlagtf(ae_int_t n, RVector *a, double lambdav, RVector *b, RVector *c, double tol, RVector *d, ZVector *iin, ae_int_t *info) {
@@ -15214,7 +15099,6 @@ static void evd_tdininternaldlagts(ae_int_t n, RVector *a, RVector *b, RVector *
 }
 
 static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, RVector *w, ZVector *iblock, ZVector *isplit, RMatrix *z, ZVector *ifail, ae_int_t *info) {
-   ae_frame _frame_block;
    ae_int_t maxits;
    ae_int_t extra;
    ae_int_t b1;
@@ -15247,18 +15131,18 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
    ae_int_t ti;
    ae_int_t i1;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(e);
    DupVector(w);
    SetMatrix(z);
    SetVector(ifail);
    *info = 0;
-   NewVector(work1, 0, DT_REAL);
-   NewVector(work2, 0, DT_REAL);
-   NewVector(work3, 0, DT_REAL);
-   NewVector(work4, 0, DT_REAL);
-   NewVector(work5, 0, DT_REAL);
-   NewVector(iwork, 0, DT_INT);
+   NewRVector(work1, 0);
+   NewRVector(work2, 0);
+   NewRVector(work3, 0);
+   NewRVector(work4, 0);
+   NewRVector(work5, 0);
+   NewZVector(iwork, 0);
    NewObj(hqrndstate, rs);
    hqrndseed(346436, 2434, &rs);
    maxits = 5;
@@ -15285,13 +15169,11 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
    }
    if (n < 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (m < 0 || m > n) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (j = 2; j <= m; j++) {
       if (iblock->xZ[j] < iblock->xZ[j - 1]) {
@@ -15304,18 +15186,15 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
       }
    }
    if (*info != 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Quick return if possible
    if (n == 0 || m == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 1) {
       z->xyR[1][1] = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Some preparations
    ti = n - 1;
@@ -15455,7 +15334,7 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
          xjm = xj;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Clears request fields (to be sure that we don't forget to clear anything)
@@ -15530,35 +15409,33 @@ static void evd_clearrfields(eigsubspacestate *state) {
 // The algorithm is based on the LAPACK 3.0 library.
 // API: bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr);
 bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *wi, RMatrix *vl, RMatrix *vr) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t info;
    ae_int_t m1;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    SetVector(wr);
    SetVector(wi);
    SetMatrix(vl);
    SetMatrix(vr);
-   NewMatrix(a1, 0, 0, DT_REAL);
-   NewMatrix(vl1, 0, 0, DT_REAL);
-   NewMatrix(vr1, 0, 0, DT_REAL);
-   NewMatrix(s1, 0, 0, DT_REAL);
-   NewMatrix(s, 0, 0, DT_REAL);
-   NewMatrix(dummy, 0, 0, DT_REAL);
-   NewVector(wr1, 0, DT_REAL);
-   NewVector(wi1, 0, DT_REAL);
-   NewVector(tau, 0, DT_REAL);
-   NewVector(sel1, 0, DT_BOOL);
+   NewRMatrix(a1, 0, 0);
+   NewRMatrix(vl1, 0, 0);
+   NewRMatrix(vr1, 0, 0);
+   NewRMatrix(s1, 0, 0);
+   NewRMatrix(s, 0, 0);
+   NewRMatrix(dummy, 0, 0);
+   NewRVector(wr1, 0);
+   NewRVector(wi1, 0);
+   NewRVector(tau, 0);
+   NewBVector(sel1, 0);
    ae_assert(vneeded >= 0 && vneeded <= 3, "RMatrixEVD: incorrect VNeeded!");
    if (vneeded == 0) {
    // Eigen values only
       rmatrixhessenberg(a, n, &tau);
       rmatrixinternalschurdecomposition(a, n, 0, 0, wr, wi, &dummy, &info);
       result = info == 0;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Eigen values and vectors
    rmatrixhessenberg(a, n, &tau);
@@ -15566,8 +15443,7 @@ bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *
    rmatrixinternalschurdecomposition(a, n, 1, 1, wr, wi, &s, &info);
    result = info == 0;
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (vneeded == 1 || vneeded == 3) {
       ae_matrix_set_length(vr, n, n);
@@ -15583,8 +15459,7 @@ bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *
    }
    evd_rmatrixinternaltrevc(a, n, vneeded, 1, &sel1, vl, vr, &m1, &info);
    result = info == 0;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Finding the eigenvalues and eigenvectors of a tridiagonal symmetric matrix
@@ -15636,16 +15511,15 @@ bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *
 //      September 30, 1994
 // API: bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z);
 bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(e);
-   NewVector(d1, 0, DT_REAL);
-   NewVector(e1, 0, DT_REAL);
-   NewVector(ex, 0, DT_REAL);
-   NewMatrix(z1, 0, 0, DT_REAL);
+   NewRVector(d1, 0);
+   NewRVector(e1, 0);
+   NewRVector(ex, 0);
+   NewRMatrix(z1, 0, 0);
    ae_assert(n >= 1, "SMatrixTDEVD: N <= 0");
    ae_assert(zneeded >= 0 && zneeded <= 3, "SMatrixTDEVD: incorrect ZNeeded");
    result = false;
@@ -15672,8 +15546,7 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
       ex.xR[i] = e->xR[i];
    }
    if (smatrixtdevdmkl(d, &ex, n, zneeded, z, &result)) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Prepare 1-based task
    ae_vector_set_length(&d1, n + 1);
@@ -15691,8 +15564,7 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
 // Solve 1-based task
    result = evd_tridiagonalevd(&d1, &e1, n, zneeded, &z1);
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Convert back to 0-based result
    ae_v_move(d->xR, 1, &d1.xR[1], 1, n);
@@ -15701,19 +15573,16 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
          for (i = 1; i <= n; i++) {
             ae_v_move(z->xyR[i - 1], 1, &z1.xyR[i][1], 1, n);
          }
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       if (zneeded == 3) {
          ae_matrix_set_length(z, 1, n);
          ae_v_move(z->xyR[0], 1, &z1.xyR[1][1], 1, n);
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       ae_assert(false, "SMatrixTDEVD: Incorrect ZNeeded!");
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Subroutine for finding the tridiagonal matrix eigenvalues/vectors in a
@@ -15767,7 +15636,6 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
 // ALGLIB: Copyright 31.03.2008 by Sergey Bochkanov
 // API: bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z);
 bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double a, double b, ae_int_t *m, RMatrix *z) {
-   ae_frame _frame_block;
    ae_int_t errorcode;
    ae_int_t nsplit;
    ae_int_t i;
@@ -15776,29 +15644,27 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
    ae_int_t cr;
    double v;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *m = 0;
-   NewVector(iblock, 0, DT_INT);
-   NewVector(isplit, 0, DT_INT);
-   NewVector(ifail, 0, DT_INT);
-   NewVector(d1, 0, DT_REAL);
-   NewVector(e1, 0, DT_REAL);
-   NewVector(w, 0, DT_REAL);
-   NewMatrix(z2, 0, 0, DT_REAL);
-   NewMatrix(z3, 0, 0, DT_REAL);
+   NewZVector(iblock, 0);
+   NewZVector(isplit, 0);
+   NewZVector(ifail, 0);
+   NewRVector(d1, 0);
+   NewRVector(e1, 0);
+   NewRVector(w, 0);
+   NewRMatrix(z2, 0, 0);
+   NewRMatrix(z3, 0, 0);
    ae_assert(zneeded >= 0 && zneeded <= 2, "SMatrixTDEVDR: incorrect ZNeeded!");
 // Special cases
    if (b <= a) {
       *m = 0;
       result = true;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (n <= 0) {
       *m = 0;
       result = true;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Copy D,E to D1, E1
    ae_vector_set_length(&d1, n + 1);
@@ -15812,13 +15678,11 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
       result = evd_internalbisectioneigenvalues(&d1, &e1, n, 2, 1, a, b, 0, 0, -1.0, &w, m, &nsplit, &iblock, &isplit, &errorcode);
       if (!result || *m == 0) {
          *m = 0;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       ae_vector_set_length(d, *m);
       ae_v_move(d->xR, 1, &w.xR[1], 1, *m);
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Eigen vectors are multiplied by Z
    if (zneeded == 1) {
@@ -15826,15 +15690,13 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
       result = evd_internalbisectioneigenvalues(&d1, &e1, n, 2, 2, a, b, 0, 0, -1.0, &w, m, &nsplit, &iblock, &isplit, &errorcode);
       if (!result || *m == 0) {
          *m = 0;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       evd_internaldstein(n, &d1, &e1, *m, &w, &iblock, &isplit, &z2, &ifail, &cr);
       if (cr != 0) {
          *m = 0;
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Sort eigen values and vectors
       for (i = 1; i <= *m; i++) {
@@ -15869,8 +15731,7 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
       for (i = 1; i <= *m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Eigen vectors are stored in Z
    if (zneeded == 2) {
@@ -15878,15 +15739,13 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
       result = evd_internalbisectioneigenvalues(&d1, &e1, n, 2, 2, a, b, 0, 0, -1.0, &w, m, &nsplit, &iblock, &isplit, &errorcode);
       if (!result || *m == 0) {
          *m = 0;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       evd_internaldstein(n, &d1, &e1, *m, &w, &iblock, &isplit, &z2, &ifail, &cr);
       if (cr != 0) {
          *m = 0;
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Sort eigen values and vectors
       for (i = 1; i <= *m; i++) {
@@ -15910,12 +15769,10 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
       for (i = 1; i <= *m; i++) {
          ae_v_move(&z->xyR[0][i - 1], z->stride, &z2.xyR[1][i], z2.stride, n);
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = false;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Subroutine for finding tridiagonal matrix eigenvalues/vectors with given
@@ -15967,7 +15824,6 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
 // ALGLIB: Copyright 25.12.2005 by Sergey Bochkanov
 // API: bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z);
 bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_t i1, ae_int_t i2, RMatrix *z) {
-   ae_frame _frame_block;
    ae_int_t errorcode;
    ae_int_t nsplit;
    ae_int_t i;
@@ -15977,15 +15833,15 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
    ae_int_t cr;
    double v;
    bool result;
-   ae_frame_make(&_frame_block);
-   NewVector(iblock, 0, DT_INT);
-   NewVector(isplit, 0, DT_INT);
-   NewVector(ifail, 0, DT_INT);
-   NewVector(w, 0, DT_REAL);
-   NewVector(d1, 0, DT_REAL);
-   NewVector(e1, 0, DT_REAL);
-   NewMatrix(z2, 0, 0, DT_REAL);
-   NewMatrix(z3, 0, 0, DT_REAL);
+   EnFrame();
+   NewZVector(iblock, 0);
+   NewZVector(isplit, 0);
+   NewZVector(ifail, 0);
+   NewRVector(w, 0);
+   NewRVector(d1, 0);
+   NewRVector(e1, 0);
+   NewRMatrix(z2, 0, 0);
+   NewRMatrix(z3, 0, 0);
    ae_assert(0 <= i1 && i1 <= i2 && i2 < n, "SMatrixTDEVDI: incorrect I1/I2!");
 // Copy D,E to D1, E1
    ae_vector_set_length(&d1, n + 1);
@@ -15998,39 +15854,33 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
    if (zneeded == 0) {
       result = evd_internalbisectioneigenvalues(&d1, &e1, n, 3, 1, 0.0, 0.0, i1 + 1, i2 + 1, -1.0, &w, &m, &nsplit, &iblock, &isplit, &errorcode);
       if (!result) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       if (m != i2 - i1 + 1) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       ae_vector_set_length(d, m);
       for (i = 1; i <= m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Eigen vectors are multiplied by Z
    if (zneeded == 1) {
    // Find eigen pairs
       result = evd_internalbisectioneigenvalues(&d1, &e1, n, 3, 2, 0.0, 0.0, i1 + 1, i2 + 1, -1.0, &w, &m, &nsplit, &iblock, &isplit, &errorcode);
       if (!result) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       if (m != i2 - i1 + 1) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       evd_internaldstein(n, &d1, &e1, m, &w, &iblock, &isplit, &z2, &ifail, &cr);
       if (cr != 0) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Sort eigen values and vectors
       for (i = 1; i <= m; i++) {
@@ -16065,27 +15915,23 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
       for (i = 1; i <= m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Eigen vectors are stored in Z
    if (zneeded == 2) {
    // Find eigen pairs
       result = evd_internalbisectioneigenvalues(&d1, &e1, n, 3, 2, 0.0, 0.0, i1 + 1, i2 + 1, -1.0, &w, &m, &nsplit, &iblock, &isplit, &errorcode);
       if (!result) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       if (m != i2 - i1 + 1) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       evd_internaldstein(n, &d1, &e1, m, &w, &iblock, &isplit, &z2, &ifail, &cr);
       if (cr != 0) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Sort eigen values and vectors
       for (i = 1; i <= m; i++) {
@@ -16110,12 +15956,10 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
       for (i = 1; i <= m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = false;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Finding the eigenvalues and eigenvectors of a symmetric matrix
@@ -16149,22 +15993,20 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
 // ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
 // API: bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z);
 bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, RMatrix *z) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    SetVector(d);
    SetMatrix(z);
-   NewVector(tau, 0, DT_REAL);
-   NewVector(e, 0, DT_REAL);
+   NewRVector(tau, 0);
+   NewRVector(e, 0);
    ae_assert(zneeded == 0 || zneeded == 1, "SMatrixEVD: incorrect ZNeeded");
    smatrixtd(a, n, isupper, &tau, d, &e);
    if (zneeded == 1) {
       smatrixtdunpackq(a, n, isupper, &tau, z);
    }
    result = smatrixtdevd(d, &e, n, zneeded, z);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Finding the eigenvalues and eigenvectors of a Hermitian matrix
@@ -16202,19 +16044,18 @@ bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
 // ALGLIB: Copyright 2005, 2007 March 23 by Sergey Bochkanov
 // API: bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z);
 bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, CMatrix *z) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    SetVector(d);
    SetMatrix(z);
-   NewVector(tau, 0, DT_COMPLEX);
-   NewVector(e, 0, DT_REAL);
-   NewMatrix(t, 0, 0, DT_REAL);
-   NewMatrix(qz, 0, 0, DT_REAL);
-   NewMatrix(q, 0, 0, DT_COMPLEX);
+   NewCVector(tau, 0);
+   NewRVector(e, 0);
+   NewRMatrix(t, 0, 0);
+   NewRMatrix(qz, 0, 0);
+   NewCMatrix(q, 0, 0);
    ae_assert(zneeded == 0 || zneeded == 1, "HermitianEVD: incorrect ZNeeded");
 // Reduce to tridiagonal form
    hmatrixtd(a, n, isupper, &tau, d, &e);
@@ -16254,8 +16095,7 @@ bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
          }
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Subroutine for finding the eigenvalues (and eigenvectors) of  a  symmetric
@@ -16296,23 +16136,21 @@ bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
 // ALGLIB: Copyright 07.01.2006 by Sergey Bochkanov
 // API: bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z);
 bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, RMatrix *z) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *m = 0;
    SetVector(w);
    SetMatrix(z);
-   NewVector(tau, 0, DT_REAL);
-   NewVector(e, 0, DT_REAL);
+   NewRVector(tau, 0);
+   NewRVector(e, 0);
    ae_assert(zneeded == 0 || zneeded == 1, "SMatrixTDEVDR: incorrect ZNeeded");
    smatrixtd(a, n, isupper, &tau, w, &e);
    if (zneeded == 1) {
       smatrixtdunpackq(a, n, isupper, &tau, z);
    }
    result = smatrixtdevdr(w, &e, n, zneeded, b1, b2, m, z);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Subroutine for finding the eigenvalues (and eigenvectors) of  a  Hermitian
@@ -16358,21 +16196,20 @@ bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
 // API: bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z);
 bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, CMatrix *z) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
    double v;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    *m = 0;
    SetVector(w);
    SetMatrix(z);
-   NewMatrix(q, 0, 0, DT_COMPLEX);
-   NewMatrix(t, 0, 0, DT_REAL);
-   NewVector(tau, 0, DT_COMPLEX);
-   NewVector(e, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewCMatrix(q, 0, 0);
+   NewRMatrix(t, 0, 0);
+   NewCVector(tau, 0);
+   NewRVector(e, 0);
+   NewRVector(work, 0);
    ae_assert(zneeded == 0 || zneeded == 1, "HermitianEigenValuesAndVectorsInInterval: incorrect ZNeeded");
 // Reduce to tridiagonal form
    hmatrixtd(a, n, isupper, &tau, w, &e);
@@ -16412,8 +16249,7 @@ bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
          }
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Subroutine for finding the eigenvalues and  eigenvectors  of  a  symmetric
@@ -16451,22 +16287,20 @@ bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 // ALGLIB: Copyright 07.01.2006 by Sergey Bochkanov
 // API: bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z);
 bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, RMatrix *z) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    SetVector(w);
    SetMatrix(z);
-   NewVector(tau, 0, DT_REAL);
-   NewVector(e, 0, DT_REAL);
+   NewRVector(tau, 0);
+   NewRVector(e, 0);
    ae_assert(zneeded == 0 || zneeded == 1, "SMatrixEVDI: incorrect ZNeeded");
    smatrixtd(a, n, isupper, &tau, w, &e);
    if (zneeded == 1) {
       smatrixtdunpackq(a, n, isupper, &tau, z);
    }
    result = smatrixtdevdi(w, &e, n, zneeded, i1, i2, z);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Subroutine for finding the eigenvalues and  eigenvectors  of  a  Hermitian
@@ -16510,21 +16344,20 @@ bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
 // API: bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z);
 bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, CMatrix *z) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
    double v;
    ae_int_t m;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    SetVector(w);
    SetMatrix(z);
-   NewMatrix(q, 0, 0, DT_COMPLEX);
-   NewMatrix(t, 0, 0, DT_REAL);
-   NewVector(tau, 0, DT_COMPLEX);
-   NewVector(e, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewCMatrix(q, 0, 0);
+   NewRMatrix(t, 0, 0);
+   NewCVector(tau, 0);
+   NewRVector(e, 0);
+   NewRVector(work, 0);
    ae_assert(zneeded == 0 || zneeded == 1, "HermitianEigenValuesAndVectorsByIndexes: incorrect ZNeeded");
 // Reduce to tridiagonal form
    hmatrixtd(a, n, isupper, &tau, w, &e);
@@ -16565,8 +16398,7 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
          }
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // This function sets stopping critera for the solver:
@@ -17106,18 +16938,17 @@ void eigsubspaceoocstop(eigsubspacestate *state, RVector *w, RMatrix *z, eigsubs
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 // API: void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 void eigsubspacesolvedenses(eigsubspacestate *state, RMatrix *a, bool isupper, RVector *w, RMatrix *z, eigsubspacereport *rep) {
-   ae_frame _frame_block;
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(w);
    SetMatrix(z);
    SetObj(eigsubspacereport, rep);
-   NewMatrix(acopy, 0, 0, DT_REAL);
+   NewRMatrix(acopy, 0, 0);
    ae_assert(!state->running, "EigSubspaceSolveDenseS: solver is still running");
    n = state->n;
 // Allocate copy of A, copy one triangle to another
@@ -17156,7 +16987,7 @@ void eigsubspacesolvedenses(eigsubspacestate *state, RMatrix *a, bool isupper, R
       }
    }
    rep->iterationscount = state->repiterationscount;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function runs eigensolver for dense NxN symmetric matrix A, given by
@@ -20554,13 +20385,12 @@ ae_int_t generateamdpermutationx(sparsematrix *a, BVector *eligible, ae_int_t n,
 //     InvPerm     -   array[N], maps permuted indexes I to original indexes
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, amdbuffer *buf) {
-   ae_frame _frame_block;
    ae_int_t r;
-   ae_frame_make(&_frame_block);
-   NewVector(dummy, 0, DT_BOOL);
+   EnFrame();
+   NewBVector(dummy, 0);
    r = generateamdpermutationx(a, &dummy, n, 0.0, perm, invperm, 0, buf);
    ae_assert(r == n, "GenerateAMDPermutation: integrity check failed, the matrix is only partially processed");
-   ae_frame_leave();
+   DeFrame();
 }
 
 void amdknset_init(void *_p, bool make_automatic) {
@@ -21325,7 +21155,6 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
 // Generic supernode update kernel
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static void spchol_updatesupernodegeneric(spcholanalysis *analysis, ae_int_t sidx, ae_int_t cols0, ae_int_t cols1, ae_int_t offss, ZVector *raw2smap, ae_int_t ladjidx, RVector *diagd) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -21348,8 +21177,8 @@ static void spchol_updatesupernodegeneric(spcholanalysis *analysis, ae_int_t sid
    ae_int_t offsk;
    double v;
    ae_int_t wrkrow;
-   ae_frame_make(&_frame_block);
-   NewVector(u2smap, 0, DT_INT);
+   EnFrame();
+   NewZVector(u2smap, 0);
    uidx = analysis->ladj.idx.xZ[ladjidx];
    offsd = analysis->supercolrange.xZ[uidx];
    offsu = analysis->rowoffsets.xZ[uidx];
@@ -21405,7 +21234,7 @@ static void spchol_updatesupernodegeneric(spcholanalysis *analysis, ae_int_t sid
       }
    }
    nipoolrecycle(&analysis->nintegerpool, &u2smap);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Update target supernode with data from its children. This operation  is  a
@@ -21633,7 +21462,6 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
 //                     Such design is thread-safe.
 // ALGLIB Routine: Copyright 09.07.2022 by Sergey Bochkanov
 static void spchol_spsymmprocessupdatesbatch(spcholanalysis *analysis, ae_int_t blkoffs, bool *failureflag) {
-   ae_frame _frame_block;
    ae_int_t seqidx;
    ae_int_t sequencescnt;
    ae_int_t sidx;
@@ -21647,8 +21475,8 @@ static void spchol_spsymmprocessupdatesbatch(spcholanalysis *analysis, ae_int_t 
    ae_int_t k1;
    ae_int_t i0;
    ae_int_t i1;
-   ae_frame_make(&_frame_block);
-   NewVector(raw2smap, 0, DT_INT);
+   EnFrame();
+   NewZVector(raw2smap, 0);
    nipoolretrieve(&analysis->nintegerpool, &raw2smap);
    sequencescnt = analysis->blkstruct.xZ[blkoffs + 1];
    blkoffs += spchol_batchheadersize;
@@ -21675,14 +21503,13 @@ static void spchol_spsymmprocessupdatesbatch(spcholanalysis *analysis, ae_int_t 
       if (i1 == analysis->ladj.rowend.xZ[sidx] && !spchol_factorizesupernode(analysis, sidx)) {
          nipoolrecycle(&analysis->nintegerpool, &raw2smap);
          *failureflag = true;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    // Next sequence
       blkoffs += spchol_sequenceentrysize;
    }
    nipoolrecycle(&analysis->nintegerpool, &raw2smap);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function processes updates group (a set of precomputed update batches
@@ -21875,16 +21702,15 @@ static void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, 
 //     InvPerm     -   array[N], maps permuted indexes I to original indexes
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static void spchol_generatedbgpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j0;
    ae_int_t j1;
    ae_int_t jj;
-   ae_frame_make(&_frame_block);
-   NewVector(d, 0, DT_REAL);
-   NewVector(tmpr, 0, DT_REAL);
-   NewVector(tmpperm, 0, DT_INT);
+   EnFrame();
+   NewRVector(d, 0);
+   NewRVector(tmpr, 0);
+   NewZVector(tmpperm, 0);
 // Initialize D by vertex degrees
    rsetallocv(n, 0.0, &d);
    for (i = 0; i < n; i++) {
@@ -21906,7 +21732,7 @@ static void spchol_generatedbgpermutation(sparsematrix *a, ae_int_t n, ZVector *
    for (i = 0; i < n; i++) {
       perm->xZ[invperm->xZ[i]] = i;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function builds elimination tree in the original column order
@@ -22503,7 +22329,6 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
 //     Node2Supernode- array[N] that maps node indexes to supernode indexes
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, sparsematrix *rawa, ZVector *node2supernode, ae_int_t n, ZVector *ttmp0, ZVector *ttmp1, BVector *tflagarray) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t rowidx;
@@ -22521,7 +22346,7 @@ static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, spars
    ae_int_t lastrow;
    ae_int_t theight;
    ae_int_t twidth;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    ae_assert(ttmp0->cnt > n, "AnalyzeSupernodalDependencies: input buffer tTmp0 is too short");
    ae_assert(ttmp1->cnt > n, "AnalyzeSupernodalDependencies: input buffer tTmp1 is too short");
    ae_assert(tflagarray->cnt > n, "AnalyzeSupernodalDependencies: input buffer tTmp0 is too short");
@@ -22602,7 +22427,7 @@ static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, spars
          analysis->ladj.sflop.xR[j] += analysis->ladj.sflop.xR[sidx];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function appends a set of updates for a block of supernodes stored in
@@ -22841,7 +22666,6 @@ static void spchol_scheduleupdatesforablockrec(spcholanalysis *analysis, ZVector
 //                     be parallelized; the rest can be and will be parallelized.
 // ALGLIB Project: Copyright 05.07.2022 by Sergey Bochkanov
 static void spchol_processbatchofheadsrec(spcholanalysis *analysis, ZVector *headsstack, ae_int_t stackbase, ae_int_t nheads, ZVector *blkstruct, ae_int_t *offs, double *totalflops, double *sequentialflops) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t blocksize;
@@ -22859,10 +22683,10 @@ static void spchol_processbatchofheadsrec(spcholanalysis *analysis, ZVector *hea
    double tmpsequentialflops;
    double sequentialblockflops;
    double sequentialchildrenflops;
-   ae_frame_make(&_frame_block);
-   NewVector(isfactorized, 0, DT_BOOL);
-   NewVector(rowbegin, 0, DT_INT);
-   NewVector(nflop, 0, DT_REAL);
+   EnFrame();
+   NewBVector(isfactorized, 0);
+   NewZVector(rowbegin, 0);
+   NewRVector(nflop, 0);
    igrowv(*offs + 1 + analysis->nsuper + 2, blkstruct);
 // Perform breadth-first traversal of children of supernodes stored in HeadsStack[],
 // extending the list by the newly traversed nodes. When we decide that it is feasible
@@ -22958,7 +22782,7 @@ static void spchol_processbatchofheadsrec(spcholanalysis *analysis, ZVector *hea
    }
 // Compute final sequential FLOPs
    *sequentialflops = sequentialblockflops + sequentialchildrenflops;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function creates block-tree structure from the supernodal elimination
@@ -22973,7 +22797,6 @@ static void spchol_processbatchofheadsrec(spcholanalysis *analysis, ZVector *hea
 //                     Analysis.UseParallelism is set
 // ALGLIB Project: Copyright 05.07.2022 by Sergey Bochkanov
 static void spchol_createblockstructure(spcholanalysis *analysis) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t nheads;
    ae_int_t nrootbatches;
@@ -22986,10 +22809,10 @@ static void spchol_createblockstructure(spcholanalysis *analysis) {
    double totalflops;
    double sequentialflops;
    double tmpsequentialflops;
-   ae_frame_make(&_frame_block);
-   NewVector(heads, 0, DT_INT);
-   NewVector(rootbatchsizes, 0, DT_INT);
-   NewVector(costs, 0, DT_REAL);
+   EnFrame();
+   NewZVector(heads, 0);
+   NewZVector(rootbatchsizes, 0);
+   NewRVector(costs, 0);
    offs = 0;
 // Retrieve temporary arrays from the pool
    nipoolretrieve(&analysis->nintegerpool, &heads);
@@ -23065,7 +22888,7 @@ static void spchol_createblockstructure(spcholanalysis *analysis) {
    nipoolrecycle(&analysis->nintegerpool, &heads);
    nipoolrecycle(&analysis->nintegerpool, &rootbatchsizes);
    nrpoolrecycle(&analysis->nrealpool, &costs);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function loads matrix into the supernodal storage.
@@ -23601,26 +23424,23 @@ static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsemat
 // Dense Cholesky driver for internal integrity checks
 // ALGLIB Routine: Copyright 22.08.2021 by Sergey Bochkanov
 static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double ajj;
    double v;
    double r;
    bool result;
-   ae_frame_make(&_frame_block);
-   NewVector(tmp, 0, DT_REAL);
+   EnFrame();
+   NewRVector(tmp, 0);
    ae_vector_set_length(&tmp, 2 * n);
    result = true;
    if (n < 0) {
       result = false;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Quick return if possible
    if (n == 0) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (isupper) {
    // Compute the Cholesky factorization A = U'*U.
@@ -23631,8 +23451,7 @@ static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, b
          if (ajj <= 0.0) {
             aaa->xyR[offs + j][offs + j] = ajj;
             result = false;
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          ajj = sqrt(ajj);
          aaa->xyR[offs + j][offs + j] = ajj;
@@ -23656,8 +23475,7 @@ static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, b
          if (ajj <= 0.0) {
             aaa->xyR[offs + j][offs + j] = ajj;
             result = false;
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          ajj = sqrt(ajj);
          aaa->xyR[offs + j][offs + j] = ajj;
@@ -23678,19 +23496,17 @@ static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, b
          }
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Debug checks for sparsity structure
 // ALGLIB Routine: Copyright 22.08.2021 by Sergey Bochkanov
 static void spchol_slowdebugchecks(sparsematrix *a, ZVector *fillinperm, ae_int_t n, ae_int_t tail, sparsematrix *referencetaila) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(sparsematrix, perma);
-   NewMatrix(densea, 0, 0, DT_REAL);
+   NewRMatrix(densea, 0, 0);
    sparsesymmpermtblbuf(a, false, fillinperm, &perma);
    ae_matrix_set_length(&densea, n, n);
    for (i = 0; i < n; i++) {
@@ -23715,7 +23531,7 @@ static void spchol_slowdebugchecks(sparsematrix *a, ZVector *fillinperm, ae_int_
          ae_assert(!(densea.xyR[i][j] != 0.0 && !sparseexists(referencetaila, i - (n - tail), j - (n - tail))), "SPSymmAnalyze: structure check 2 failed");
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Informational function, useful for debugging
@@ -24212,10 +24028,9 @@ void spsymmreloaddiagonal(spcholanalysis *analysis, RVector *d) {
 // the diagonal.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 bool spsymmfactorize(spcholanalysis *analysis) {
-   ae_frame _frame_block;
    ae_int_t n;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    bool b;
    ae_assert(analysis->tasktype == 0, "SPCholFactorize: Analysis type does not match current task");
    n = analysis->n;
@@ -24228,8 +24043,7 @@ bool spsymmfactorize(spcholanalysis *analysis) {
    b = false;
    spchol_spsymmfactorizeblockrec(analysis, &analysis->currowbegin, 0, true, &b);
    result = !b;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Extracts result of the last Cholesky/LDLT factorization performed  on  the
@@ -24818,14 +24632,13 @@ void spcholanalysis_free(void *_p, bool make_automatic) {
 // Depends on: MATGEN, SPTRF, SPCHOL
 namespace alglib_impl {
 void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double mx;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(pivots);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(tmp, 0);
 // Internal LU decomposition subroutine.
 // Never call it directly.
    ae_assert(m > 0, "RMatrixLUP: incorrect M!");
@@ -24853,18 +24666,17 @@ void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
          ae_v_muld(a->xyR[i], 1, imin2(i + 1, n), v);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void cmatrixlup(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double mx;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(pivots);
-   NewVector(tmp, 0, DT_COMPLEX);
+   NewCVector(tmp, 0);
 // Internal LU decomposition subroutine.
 // Never call it directly.
    ae_assert(m > 0, "CMatrixLUP: incorrect M!");
@@ -24892,18 +24704,17 @@ void cmatrixlup(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
          ae_v_cmuld(a->xyC[i], 1, imin2(i + 1, n), v);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double mx;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(pivots);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(tmp, 0);
 // Internal LU decomposition subroutine.
 // Never call it directly.
    ae_assert(m > 0, "RMatrixPLU: incorrect M!");
@@ -24931,18 +24742,17 @@ void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
          ae_v_muld(&a->xyR[i][i], 1, n - i, v);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double mx;
    complex v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(pivots);
-   NewVector(tmp, 0, DT_COMPLEX);
+   NewCVector(tmp, 0);
 // Internal LU decomposition subroutine.
 // Never call it directly.
    ae_assert(m > 0, "CMatrixPLU: incorrect M!");
@@ -24970,7 +24780,7 @@ void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
          ae_v_cmulc(&a->xyC[i][i], 1, n - i, v);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // LU decomposition of a general real matrix with row pivoting
@@ -25355,18 +25165,15 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 // API: bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper);
 bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
-   NewVector(tmp, 0, DT_REAL);
+   EnFrame();
+   NewRVector(tmp, 0);
    if (n < 1) {
       result = false;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = spdmatrixcholeskyrec(a, 0, n, isupper, &tmp);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Cache-oblivious Cholesky decomposition
@@ -25395,18 +25202,15 @@ bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper) {
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 // API: bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper);
 bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
-   NewVector(tmp, 0, DT_COMPLEX);
+   EnFrame();
+   NewCVector(tmp, 0);
    if (n < 1) {
       result = false;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = trfac_hpdmatrixcholeskyrec(a, 0, n, isupper, &tmp);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Update of Cholesky decomposition: rank-1 update to original A.  "Buffered"
@@ -25541,15 +25345,14 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 // API: void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u);
 void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *u) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   NewVector(bufr, 0, DT_REAL);
+   EnFrame();
+   NewRVector(bufr, 0);
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1: N <= 0");
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1: Rows(A) < N");
    ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateAdd1: Cols(A) < N");
    ae_assert(u->cnt >= n, "SPDMatrixCholeskyUpdateAdd1: Length(U) < N");
    spdmatrixcholeskyupdateadd1buf(a, n, isupper, u, &bufr);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Update of Cholesky  decomposition:  "fixing"  some  variables.  "Buffered"
@@ -25792,15 +25595,14 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 // API: void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix);
 void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *fix) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   NewVector(bufr, 0, DT_REAL);
+   EnFrame();
+   NewRVector(bufr, 0);
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateFix: N <= 0");
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFix: Rows(A) < N");
    ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateFix: Cols(A) < N");
    ae_assert(fix->cnt >= n, "SPDMatrixCholeskyUpdateFix: Length(Fix) < N");
    spdmatrixcholeskyupdatefixbuf(a, n, isupper, fix, &bufr);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Sparse LU decomposition with column pivoting for sparsity and row pivoting
@@ -25843,9 +25645,8 @@ void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *f
 // ALGLIB Routine: Copyright 03.09.2018 by Sergey Bochkanov
 // API: bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q);
 bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(p);
    SetVector(q);
    NewObj(sluv2buffer, buf2);
@@ -25853,8 +25654,7 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
    ae_assert(sparseiscrs(a), "SparseLU: A is not stored in CRS format");
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseLU: non-square A");
    result = sptrflu(a, pivottype, p, q, &buf2);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Sparse Cholesky decomposition for skyline matrix using in-place algorithm
@@ -26071,21 +25871,19 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
 // ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
 // API: bool sparsecholesky(const sparsematrix &a, const bool isupper);
 bool sparsecholesky(sparsematrix *a, bool isupper) {
-   ae_frame _frame_block;
    ae_int_t facttype;
    ae_int_t permtype;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(sparsedecompositionanalysis, analysis);
-   NewVector(priorities, 0, DT_INT);
-   NewVector(dummyd, 0, DT_REAL);
-   NewVector(dummyp, 0, DT_INT);
+   NewZVector(priorities, 0);
+   NewRVector(dummyd, 0);
+   NewZVector(dummyp, 0);
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholesky: A is not square");
 // Quick exit
    if (sparsegetnrows(a) == 0) {
       result = true;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Choose factorization and permutation: vanilla Cholesky and no permutation,
 // Priorities[] array is not set.
@@ -26095,17 +25893,14 @@ bool sparsecholesky(sparsematrix *a, bool isupper) {
    if (sparseiscrs(a) && !isupper) {
       result = spsymmanalyze(a, &priorities, 0.0, facttype, permtype, &analysis.analysis);
       if (!result) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       result = spsymmfactorize(&analysis.analysis);
       if (!result) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       spsymmextract(&analysis.analysis, a, &dummyd, &dummyp);
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // A bit more complex - we need conversion and/or transposition
    if (isupper) {
@@ -26116,13 +25911,11 @@ bool sparsecholesky(sparsematrix *a, bool isupper) {
    }
    result = spsymmanalyze(&analysis.wrka, &priorities, 0.0, facttype, permtype, &analysis.analysis);
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = spsymmfactorize(&analysis.analysis);
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    spsymmextract(&analysis.analysis, &analysis.wrka, &dummyd, &dummyp);
    if (isupper) {
@@ -26130,8 +25923,7 @@ bool sparsecholesky(sparsematrix *a, bool isupper) {
    } else {
       sparsecopybuf(&analysis.wrka, a);
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Sparse Cholesky decomposition for a matrix  stored  in  any sparse storage
@@ -26181,21 +25973,19 @@ bool sparsecholesky(sparsematrix *a, bool isupper) {
 // ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
 // API: bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p);
 bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
-   ae_frame _frame_block;
    ae_int_t facttype;
    ae_int_t permtype;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(p);
    NewObj(sparsedecompositionanalysis, analysis);
-   NewVector(dummyd, 0, DT_REAL);
-   NewVector(priorities, 0, DT_INT);
+   NewRVector(dummyd, 0);
+   NewZVector(priorities, 0);
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholeskyP: A is not square");
 // Quick exit
    if (sparsegetnrows(a) == 0) {
       result = true;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Choose factorization and permutation: vanilla Cholesky and best permutation available.
 // Priorities[] array is not set.
@@ -26205,17 +25995,14 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
    if (sparseiscrs(a) && !isupper) {
       result = spsymmanalyze(a, &priorities, 0.0, facttype, permtype, &analysis.analysis);
       if (!result) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       result = spsymmfactorize(&analysis.analysis);
       if (!result) {
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
       spsymmextract(&analysis.analysis, a, &dummyd, p);
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // A bit more complex - we need conversion and/or transposition
    if (isupper) {
@@ -26226,13 +26013,11 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
    }
    result = spsymmanalyze(&analysis.wrka, &priorities, 0.0, facttype, permtype, &analysis.analysis);
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = spsymmfactorize(&analysis.analysis);
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    spsymmextract(&analysis.analysis, &analysis.wrka, &dummyd, p);
    if (isupper) {
@@ -26240,8 +26025,7 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
    } else {
       sparsecopybuf(&analysis.wrka, a);
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Sparse Cholesky/LDLT decomposition: symbolic analysis phase.
@@ -26307,11 +26091,10 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 // API: bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis);
 bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_int_t permtype, sparsedecompositionanalysis *analysis) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(sparsedecompositionanalysis, analysis);
-   NewVector(priorities, 0, DT_INT);
+   NewZVector(priorities, 0);
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholeskyAnalyze: A is not square");
    ae_assert(facttype == 0 || facttype == 1, "SparseCholeskyAnalyze: unexpected FactType");
    ae_assert(permtype == 0 || permtype == 1 || permtype == 2 || permtype == 3 || permtype == -1 || permtype == -2 || permtype == -3, "SparseCholeskyAnalyze: unexpected PermType");
@@ -26346,8 +26129,7 @@ bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_
          result = spsymmanalyze(a, &priorities, 0.0, facttype, permtype, &analysis->analysis);
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Allows to control stability-improving  modification  strategy  for  sparse
@@ -26915,7 +26697,6 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
 
 // Internal working subroutine for bidiagonal decomposition
 static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *uu, ae_int_t ustart, ae_int_t nru, RMatrix *c, ae_int_t cstart, ae_int_t ncc, RMatrix *vt, ae_int_t vstart, ae_int_t ncvt) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t idir;
    ae_int_t isub;
@@ -26967,21 +26748,20 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    ae_int_t cend;
    ae_int_t vend;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(e);
-   NewVector(work0, 0, DT_REAL);
-   NewVector(work1, 0, DT_REAL);
-   NewVector(work2, 0, DT_REAL);
-   NewVector(work3, 0, DT_REAL);
-   NewVector(utemp, 0, DT_REAL);
-   NewVector(vttemp, 0, DT_REAL);
-   NewVector(ctemp, 0, DT_REAL);
-   NewVector(etemp, 0, DT_REAL);
-   NewMatrix(ut, 0, 0, DT_REAL);
+   NewRVector(work0, 0);
+   NewRVector(work1, 0);
+   NewRVector(work2, 0);
+   NewRVector(work3, 0);
+   NewRVector(utemp, 0);
+   NewRVector(vttemp, 0);
+   NewRVector(ctemp, 0);
+   NewRVector(etemp, 0);
+   NewRMatrix(ut, 0, 0);
    result = true;
    if (n == 0) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (n == 1) {
       if (d->xR[1] < 0.0) {
@@ -26990,8 +26770,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
             ae_v_muld(&vt->xyR[vstart][vstart], 1, ncvt, -1.0);
          }
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // these initializers are not really necessary,
 // but without them compiler complains about uninitialized locals
@@ -27097,8 +26876,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       }
       if (iter > maxit) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Find diagonal block of matrix to work on
       if (tol < 0.0 && SmallAtR(d->xR[m], thresh)) {
@@ -27485,8 +27263,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    if (nru > 0) {
       rmatrixtranspose(n, nru, &ut, ustart, ustart, uu, ustart, ustart);
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Singular value decomposition of a bidiagonal matrix (extended algorithm)
@@ -27573,14 +27350,13 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
 //      October 31, 1999.
 // API: bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt);
 bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt) {
-   ae_frame _frame_block;
    ae_int_t i;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(e);
-   NewVector(en, 0, DT_REAL);
-   NewVector(d1, 0, DT_REAL);
-   NewVector(e1, 0, DT_REAL);
+   NewRVector(en, 0);
+   NewRVector(d1, 0);
+   NewRVector(e1, 0);
    result = false;
 // Try to use MKL
    ae_vector_set_length(&en, n);
@@ -27589,8 +27365,7 @@ bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfract
    }
    en.xR[n - 1] = 0.0;
    if (rmatrixbdsvdmkl(d, &en, n, isupper, u, nru, c, ncc, vt, ncvt, &result)) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Use ALGLIB code
    ae_vector_set_length(&d1, n + 1);
@@ -27601,18 +27376,15 @@ bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfract
    }
    result = bdsvd_bidiagonalsvddecompositioninternal(&d1, &e1, n, isupper, isfractionalaccuracyrequired, u, 0, nru, c, 0, ncc, vt, 0, ncvt);
    ae_v_move(d->xR, 1, &d1.xR[1], 1, n);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 bool bidiagonalsvddecomposition(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt) {
-   ae_frame _frame_block;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(e);
    result = bdsvd_bidiagonalsvddecompositioninternal(d, e, n, isupper, isfractionalaccuracyrequired, u, 1, nru, c, 1, ncc, vt, 1, ncvt);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 } // end of namespace alglib_impl
 
@@ -27680,7 +27452,6 @@ namespace alglib_impl {
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 // API: bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt);
 bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t vtneeded, ae_int_t additionalmemory, RVector *w, RMatrix *u, RMatrix *vt) {
-   ae_frame _frame_block;
    bool isupper;
    ae_int_t minmn;
    ae_int_t ncu;
@@ -27690,21 +27461,20 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    ae_int_t i;
    ae_int_t j;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    SetVector(w);
    SetMatrix(u);
    SetMatrix(vt);
-   NewVector(tauq, 0, DT_REAL);
-   NewVector(taup, 0, DT_REAL);
-   NewVector(tau, 0, DT_REAL);
-   NewVector(e, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
-   NewMatrix(t2, 0, 0, DT_REAL);
+   NewRVector(tauq, 0);
+   NewRVector(taup, 0);
+   NewRVector(tau, 0);
+   NewRVector(e, 0);
+   NewRVector(work, 0);
+   NewRMatrix(t2, 0, 0);
    result = true;
    if (m == 0 || n == 0) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    ae_assert(uneeded >= 0 && uneeded <= 2, "SVDDecomposition: wrong parameters!");
    ae_assert(vtneeded >= 0 && vtneeded <= 2, "SVDDecomposition: wrong parameters!");
@@ -27751,8 +27521,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
          rmatrixbdunpackpt(a, n, n, &taup, nrvt, vt);
          rmatrixbdunpackdiagonals(a, n, n, &isupper, w, &e);
          result = rmatrixbdsvd(w, &e, n, isupper, false, u, 0, a, 0, vt, ncvt);
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       } else {
       // Left singular vectors (may be full matrix U) to be computed
          rmatrixqr(a, m, n, &tau);
@@ -27778,8 +27547,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
             result = rmatrixbdsvd(w, &e, n, isupper, false, u, 0, &t2, n, vt, ncvt);
             rmatrixgemm(m, n, n, 1.0, a, 0, 0, 0, &t2, 0, 0, 1, 0.0, u, 0, 0);
          }
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    }
 // N much larger than M
@@ -27800,8 +27568,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
          inplacetranspose(u, 0, nru - 1, 0, ncu - 1, &work);
          result = rmatrixbdsvd(w, &e, m, isupper, false, a, 0, u, nru, vt, 0);
          inplacetranspose(u, 0, nru - 1, 0, ncu - 1, &work);
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       } else {
       // Right singular vectors (may be full matrix VT) to be computed
          rmatrixlq(a, m, n, &tau);
@@ -27828,8 +27595,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
             rmatrixgemm(m, n, m, 1.0, &t2, 0, 0, 0, a, 0, 0, 0, 0.0, vt, 0, 0);
          }
          inplacetranspose(u, 0, nru - 1, 0, ncu - 1, &work);
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    }
 // M <= N
@@ -27843,8 +27609,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
       inplacetranspose(u, 0, nru - 1, 0, ncu - 1, &work);
       result = rmatrixbdsvd(w, &e, minmn, isupper, false, a, 0, u, nru, vt, ncvt);
       inplacetranspose(u, 0, nru - 1, 0, ncu - 1, &work);
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Simple bidiagonal reduction
    rmatrixbd(a, m, n, &tauq, &taup);
@@ -27861,8 +27626,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
       result = rmatrixbdsvd(w, &e, minmn, isupper, false, u, 0, &t2, m, vt, ncvt);
       copyandtranspose(&t2, 0, minmn - 1, 0, m - 1, u, 0, m - 1, 0, minmn - 1);
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 } // end of namespace alglib_impl
 
@@ -28138,7 +27902,6 @@ Pause:
 //      Courant Institute, Argonne National Lab, and Rice University
 //      February 29, 1992
 static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t kase;
@@ -28148,12 +27911,12 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
    double ainvnm;
    double maxgrowth;
    double s;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *rc = 0.0;
-   NewVector(ex, 0, DT_REAL);
-   NewVector(ev, 0, DT_REAL);
-   NewVector(iwork, 0, DT_INT);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(ex, 0);
+   NewRVector(ev, 0);
+   NewZVector(iwork, 0);
+   NewRVector(tmp, 0);
 // RC == 0 if something happens
    *rc = 0.0;
 // init
@@ -28193,13 +27956,11 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
 // Quick return if possible
 // We assume that ANORM != 0 after this block
    if (anorm == 0.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 1) {
       *rc = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
@@ -28212,14 +27973,12 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
       if (kase == kase1) {
       // multiply by inv(A)
          if (!rmatrixscaledtrsafesolve(a, s, n, &ex, isupper, 0, isunit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       } else {
       // multiply by inv(A')
          if (!rmatrixscaledtrsafesolve(a, s, n, &ex, isupper, 1, isunit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    // from 0-based array to 1-based
@@ -28235,7 +27994,7 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
          *rc = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Condition number estimation
@@ -28245,7 +28004,6 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
 //      Courant Institute, Argonne National Lab, and Rice University
 //      March 31, 1993
 static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc) {
-   ae_frame _frame_block;
    ae_int_t kase;
    ae_int_t kase1;
    double ainvnm;
@@ -28255,23 +28013,21 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
    ae_int_t j2;
    double s;
    double maxgrowth;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *rc = 0.0;
-   NewVector(ex, 0, DT_COMPLEX);
-   NewVector(cwork2, 0, DT_COMPLEX);
-   NewVector(cwork3, 0, DT_COMPLEX);
-   NewVector(cwork4, 0, DT_COMPLEX);
+   NewCVector(ex, 0);
+   NewCVector(cwork2, 0);
+   NewCVector(cwork3, 0);
+   NewCVector(cwork4, 0);
 // RC == 0 if something happens
    *rc = 0.0;
 // init
    if (n < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 0) {
       *rc = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&cwork2, n + 1);
 // prepare parameters for triangular solver
@@ -28302,8 +28058,7 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
    anorm *= s;
 // Quick return if possible
    if (anorm == 0.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
@@ -28321,14 +28076,12 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
       if (kase == kase1) {
       // multiply by inv(A)
          if (!cmatrixscaledtrsafesolve(a, s, n, &ex, isupper, 0, isunit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       } else {
       // multiply by inv(A')
          if (!cmatrixscaledtrsafesolve(a, s, n, &ex, isupper, 2, isunit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    // from 0-based to 1-based
@@ -28344,7 +28097,7 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
          *rc = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine for condition number estimation
@@ -28354,7 +28107,6 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
 //      Courant Institute, Argonne National Lab, and Rice University
 //      February 29, 1992
 static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool isupper, bool isnormprovided, double anorm, double *rc) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t kase;
@@ -28362,12 +28114,12 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
    double sa;
    double v;
    double maxgrowth;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *rc = 0.0;
-   NewVector(ex, 0, DT_REAL);
-   NewVector(ev, 0, DT_REAL);
-   NewVector(tmp, 0, DT_REAL);
-   NewVector(iwork, 0, DT_INT);
+   NewRVector(ex, 0);
+   NewRVector(ev, 0);
+   NewRVector(tmp, 0);
+   NewZVector(iwork, 0);
    ae_assert(n >= 1, "Assertion failed");
    ae_vector_set_length(&tmp, n);
 // RC == 0 if something happens
@@ -28434,13 +28186,11 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
    }
 // Quick return if possible
    if (anorm == 0.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 1) {
       *rc = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Estimate the 1-norm of inv(A).
    for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase); ) {
@@ -28450,24 +28200,20 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
       if (isupper) {
       // Multiply by inv(U').
          if (!rmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 1, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(U).
          if (!rmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 0, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       } else {
       // Multiply by inv(L).
          if (!rmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 0, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(L').
          if (!rmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 1, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
       for (i = n - 1; i >= 0; i--) {
@@ -28482,7 +28228,7 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
          *rc = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine for condition number estimation
@@ -28492,7 +28238,6 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
 //      Courant Institute, Argonne National Lab, and Rice University
 //      February 29, 1992
 static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool isupper, bool isnormprovided, double anorm, double *rc) {
-   ae_frame _frame_block;
    ae_int_t kase;
    double ainvnm;
    complex v;
@@ -28500,11 +28245,11 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
    ae_int_t j;
    double sa;
    double maxgrowth;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *rc = 0.0;
-   NewVector(ex, 0, DT_COMPLEX);
-   NewVector(ev, 0, DT_COMPLEX);
-   NewVector(tmp, 0, DT_COMPLEX);
+   NewCVector(ex, 0);
+   NewCVector(ev, 0);
+   NewCVector(tmp, 0);
    ae_assert(n >= 1, "Assertion failed");
    ae_vector_set_length(&tmp, n);
 // RC == 0 if something happens
@@ -28572,13 +28317,11 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
 // Quick return if possible
 // After this block we assume that ANORM != 0
    if (anorm == 0.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 1) {
       *rc = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
@@ -28589,24 +28332,20 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
       if (isupper) {
       // Multiply by inv(U').
          if (!cmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 2, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(U).
          if (!cmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 0, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       } else {
       // Multiply by inv(L).
          if (!cmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 0, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(L').
          if (!cmatrixscaledtrsafesolve(cha, sa, n, &ex, isupper, 2, false, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
       for (i = n - 1; i >= 0; i--) {
@@ -28621,7 +28360,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
          *rc = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine for condition number estimation
@@ -28631,7 +28370,6 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
 //      Courant Institute, Argonne National Lab, and Rice University
 //      February 29, 1992
 static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc) {
-   ae_frame _frame_block;
    double v;
    ae_int_t i;
    ae_int_t j;
@@ -28643,12 +28381,12 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    double sl;
    bool mupper;
    bool munit;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *rc = 0.0;
-   NewVector(ex, 0, DT_REAL);
-   NewVector(ev, 0, DT_REAL);
-   NewVector(iwork, 0, DT_INT);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(ex, 0);
+   NewRVector(ev, 0);
+   NewZVector(iwork, 0);
+   NewRVector(tmp, 0);
 // RC == 0 if something happens
    *rc = 0.0;
 // init
@@ -28726,13 +28464,11 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
 // Quick return if possible
 // We assume that ANORM != 0 after this block
    if (anorm == 0.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 1) {
       *rc = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
@@ -28745,24 +28481,20 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
       if (kase == kase1) {
       // Multiply by inv(L).
          if (!rmatrixscaledtrsafesolve(lua, sl, n, &ex, !mupper, 0, munit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(U).
          if (!rmatrixscaledtrsafesolve(lua, su, n, &ex, mupper, 0, !munit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       } else {
       // Multiply by inv(U').
          if (!rmatrixscaledtrsafesolve(lua, su, n, &ex, mupper, 1, !munit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(L').
          if (!rmatrixscaledtrsafesolve(lua, sl, n, &ex, !mupper, 1, munit, maxgrowth)) {
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    // from 0-based array to 1-based
@@ -28778,7 +28510,7 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
          *rc = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Condition number estimation
@@ -28788,7 +28520,6 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      March 31, 1993
 static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc) {
-   ae_frame _frame_block;
    ae_int_t kase;
    ae_int_t kase1;
    double ainvnm;
@@ -28798,21 +28529,19 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
    double su;
    double sl;
    double maxgrowth;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *rc = 0.0;
-   NewVector(ex, 0, DT_COMPLEX);
-   NewVector(cwork2, 0, DT_COMPLEX);
-   NewVector(cwork3, 0, DT_COMPLEX);
-   NewVector(cwork4, 0, DT_COMPLEX);
+   NewCVector(ex, 0);
+   NewCVector(cwork2, 0);
+   NewCVector(cwork3, 0);
+   NewCVector(cwork4, 0);
    *rc = 0.0;
    if (n < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (n == 0) {
       *rc = 1.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&cwork2, n + 1);
 // prepare parameters for triangular solver
@@ -28881,8 +28610,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
    anorm *= su * sl;
 // Quick return if possible
    if (anorm == 0.0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
@@ -28901,27 +28629,23 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
       // Multiply by inv(L).
          if (!cmatrixscaledtrsafesolve(lua, sl, n, &ex, false, 0, true, maxgrowth)) {
             *rc = 0.0;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(U).
          if (!cmatrixscaledtrsafesolve(lua, su, n, &ex, true, 0, false, maxgrowth)) {
             *rc = 0.0;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       } else {
       // Multiply by inv(U').
          if (!cmatrixscaledtrsafesolve(lua, su, n, &ex, true, 2, false, maxgrowth)) {
             *rc = 0.0;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       // Multiply by inv(L').
          if (!cmatrixscaledtrsafesolve(lua, sl, n, &ex, false, 2, true, maxgrowth)) {
             *rc = 0.0;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    // from 0-based to 1-based
@@ -28937,7 +28661,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
          *rc = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Estimate of a matrix condition number (1-norm)
@@ -28957,16 +28681,15 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
 //     0.0 is returned in such cases.
 // API: double rmatrixrcond1(const real_2d_array &a, const ae_int_t n);
 double rmatrixrcond1(RMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(pivots, 0, DT_INT);
-   NewVector(t, 0, DT_REAL);
+   NewZVector(pivots, 0);
+   NewRVector(t, 0);
    ae_assert(n >= 1, "RMatrixRCond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
@@ -28984,8 +28707,7 @@ double rmatrixrcond1(RMatrix *a, ae_int_t n) {
    rmatrixlu(a, n, n, &pivots);
    rcond_rmatrixrcondluinternal(a, n, true, true, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Estimate of a matrix condition number (1-norm)
@@ -29005,16 +28727,15 @@ double rmatrixrcond1(RMatrix *a, ae_int_t n) {
 //     0.0 is returned in such cases.
 // API: double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n);
 double cmatrixrcond1(CMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(pivots, 0, DT_INT);
-   NewVector(t, 0, DT_REAL);
+   NewZVector(pivots, 0);
+   NewRVector(t, 0);
    ae_assert(n >= 1, "CMatrixRCond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
@@ -29032,8 +28753,7 @@ double cmatrixrcond1(CMatrix *a, ae_int_t n) {
    cmatrixlu(a, n, n, &pivots);
    rcond_cmatrixrcondluinternal(a, n, true, true, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Estimate of a matrix condition number (infinity-norm).
@@ -29053,15 +28773,14 @@ double cmatrixrcond1(CMatrix *a, ae_int_t n) {
 //     0.0 is returned in such cases.
 // API: double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n);
 double rmatrixrcondinf(RMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(pivots, 0, DT_INT);
+   NewZVector(pivots, 0);
    ae_assert(n >= 1, "RMatrixRCondInf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
@@ -29074,8 +28793,7 @@ double rmatrixrcondinf(RMatrix *a, ae_int_t n) {
    rmatrixlu(a, n, n, &pivots);
    rcond_rmatrixrcondluinternal(a, n, false, true, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Estimate of a matrix condition number (infinity-norm).
@@ -29095,15 +28813,14 @@ double rmatrixrcondinf(RMatrix *a, ae_int_t n) {
 //     0.0 is returned in such cases.
 // API: double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n);
 double cmatrixrcondinf(CMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(pivots, 0, DT_INT);
+   NewZVector(pivots, 0);
    ae_assert(n >= 1, "CMatrixRCondInf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
@@ -29116,8 +28833,7 @@ double cmatrixrcondinf(CMatrix *a, ae_int_t n) {
    cmatrixlu(a, n, n, &pivots);
    rcond_cmatrixrcondluinternal(a, n, false, true, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Condition number estimate of a symmetric positive definite matrix.
@@ -29147,7 +28863,6 @@ double cmatrixrcondinf(CMatrix *a, ae_int_t n) {
 //     0.0 is returned in such cases.
 // API: double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper);
 double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
@@ -29155,9 +28870,9 @@ double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper) {
    double v;
    double nrm;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(t, 0, DT_REAL);
+   NewRVector(t, 0);
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
       t.xR[i] = 0.0;
@@ -29189,8 +28904,7 @@ double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper) {
    } else {
       result = -1.0;
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Condition number estimate of a Hermitian positive definite matrix.
@@ -29220,7 +28934,6 @@ double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper) {
 //     0.0 is returned in such cases.
 // API: double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper);
 double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
@@ -29228,9 +28941,9 @@ double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper) {
    double v;
    double nrm;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(t, 0, DT_REAL);
+   NewRVector(t, 0);
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
       t.xR[i] = 0.0;
@@ -29262,8 +28975,7 @@ double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper) {
    } else {
       result = -1.0;
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Triangular matrix: estimate of a condition number (1-norm)
@@ -29285,7 +28997,6 @@ double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper) {
 //     0.0 is returned in such cases.
 // API: double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -29293,9 +29004,9 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    ae_int_t j1;
    ae_int_t j2;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(pivots, 0, DT_INT);
-   NewVector(t, 0, DT_REAL);
+   EnFrame();
+   NewZVector(pivots, 0);
+   NewRVector(t, 0);
    ae_assert(n >= 1, "rmatrixtrrcond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
@@ -29324,8 +29035,7 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    }
    rcond_rmatrixrcondtrinternal(a, n, isupper, isunit, true, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Triangular matrix: estimate of a condition number (1-norm)
@@ -29347,7 +29057,6 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
 //     0.0 is returned in such cases.
 // API: double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -29355,9 +29064,9 @@ double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    ae_int_t j1;
    ae_int_t j2;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(pivots, 0, DT_INT);
-   NewVector(t, 0, DT_REAL);
+   EnFrame();
+   NewZVector(pivots, 0);
+   NewRVector(t, 0);
    ae_assert(n >= 1, "cmatrixtrrcond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
@@ -29386,8 +29095,7 @@ double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    }
    rcond_cmatrixrcondtrinternal(a, n, isupper, isunit, true, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Triangular matrix: estimate of a matrix condition number (infinity-norm).
@@ -29409,7 +29117,6 @@ double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
 //     0.0 is returned in such cases.
 // API: double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -29417,8 +29124,8 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    ae_int_t j1;
    ae_int_t j2;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(pivots, 0, DT_INT);
+   EnFrame();
+   NewZVector(pivots, 0);
    ae_assert(n >= 1, "rmatrixtrrcondinf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
@@ -29442,8 +29149,7 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    }
    rcond_rmatrixrcondtrinternal(a, n, isupper, isunit, false, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Triangular matrix: estimate of a matrix condition number (infinity-norm).
@@ -29465,7 +29171,6 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
 //     0.0 is returned in such cases.
 // API: double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -29473,8 +29178,8 @@ double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    ae_int_t j1;
    ae_int_t j2;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(pivots, 0, DT_INT);
+   EnFrame();
+   NewZVector(pivots, 0);
    ae_assert(n >= 1, "cmatrixtrrcondinf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
@@ -29498,8 +29203,7 @@ double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    }
    rcond_cmatrixrcondtrinternal(a, n, isupper, isunit, false, nrm, &v);
    result = v;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Estimate of the condition number of a matrix given by its LU decomposition (1-norm)
@@ -31233,7 +30937,6 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
 // NOTE: this function expects that matrix is strictly positive-definite.
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -31243,10 +30946,9 @@ static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int
    ae_int_t tsb;
    ae_int_t tscur;
    ae_int_t info2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    if (n < 1) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    tsa = matrixtilesizea();
    tsb = matrixtilesizeb();
@@ -31310,8 +31012,7 @@ static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Recursive code: triangular factor inversion merged with
 // UU' or L'L multiplication
@@ -31343,13 +31044,12 @@ static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int
    }
 // invert second diagonal block
    matinv_spdmatrixcholeskyinverserec(a, offs + n1, n2, isupper, tmp);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Recursive subroutine for HPD inversion.
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    complex v;
@@ -31359,10 +31059,9 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
    ae_int_t tsb;
    ae_int_t tscur;
    ae_int_t info;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    if (n < 1) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    tsa = matrixtilesizea() / 2;
    tsb = matrixtilesizeb();
@@ -31426,8 +31125,7 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Recursive code: triangular factor inversion merged with
 // UU' or L'L multiplication
@@ -31459,7 +31157,7 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
    }
 // invert second diagonal block
    matinv_hpdmatrixcholeskyinverserec(a, offs + n1, n2, isupper, tmp);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inversion of a matrix given by its LU decomposition.
@@ -31494,13 +31192,12 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
 // API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 // API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep);
 void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
-   NewVector(work, 0, DT_REAL);
+   NewRVector(work, 0);
    ae_assert(n > 0, "RMatrixLUInverse: N <= 0!");
    ae_assert(a->cols >= n, "RMatrixLUInverse: cols(A) < N!");
    ae_assert(a->rows >= n, "RMatrixLUInverse: rows(A) < N!");
@@ -31525,8 +31222,7 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Call cache-oblivious code
    ae_vector_set_length(&work, n);
@@ -31538,7 +31234,7 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
          swapr(&a->xyR[i][j], &a->xyR[i][pivots->xZ[j]]);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inversion of a matrix given by its LU decomposition.
@@ -31562,13 +31258,12 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 // API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 // API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep);
 void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
-   NewVector(work, 0, DT_COMPLEX);
+   NewCVector(work, 0);
    ae_assert(n > 0, "CMatrixLUInverse: N <= 0!");
    ae_assert(a->cols >= n, "CMatrixLUInverse: cols(A) < N!");
    ae_assert(a->rows >= n, "CMatrixLUInverse: rows(A) < N!");
@@ -31593,8 +31288,7 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Call cache-oblivious code
    ae_vector_set_length(&work, n);
@@ -31606,7 +31300,7 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
          swapc(&a->xyC[i][j], &a->xyC[i][pivots->xZ[j]]);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inversion of a general matrix.
@@ -31631,18 +31325,17 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 // API: void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 // API: void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
 void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
-   NewVector(pivots, 0, DT_INT);
+   NewZVector(pivots, 0);
    ae_assert(n > 0, "RMatrixInverse: N <= 0!");
    ae_assert(a->cols >= n, "RMatrixInverse: cols(A) < N!");
    ae_assert(a->rows >= n, "RMatrixInverse: rows(A) < N!");
    ae_assert(apservisfinitematrix(a, n, n), "RMatrixInverse: A contains infinite or NaN values!");
    rmatrixlu(a, n, n, &pivots);
    rmatrixluinverse(a, &pivots, n, info, rep);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inversion of a general matrix.
@@ -31663,18 +31356,17 @@ void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
 // API: void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 // API: void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
 void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
-   NewVector(pivots, 0, DT_INT);
+   NewZVector(pivots, 0);
    ae_assert(n > 0, "CMatrixInverse: N <= 0!");
    ae_assert(a->cols >= n, "CMatrixInverse: cols(A) < N!");
    ae_assert(a->rows >= n, "CMatrixInverse: rows(A) < N!");
    ae_assert(apservisfinitecmatrix(a, n, n), "CMatrixInverse: A contains infinite or NaN values!");
    cmatrixlu(a, n, n, &pivots);
    cmatrixluinverse(a, &pivots, n, info, rep);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inversion of a symmetric positive definite matrix which is given
@@ -31706,14 +31398,13 @@ void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
 // API: void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
 // API: void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
 void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    bool f;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(tmp, 0);
    NewObj(matinvreport, rep2);
    ae_assert(n > 0, "SPDMatrixCholeskyInverse: N <= 0!");
    ae_assert(a->cols >= n, "SPDMatrixCholeskyInverse: cols(A) < N!");
@@ -31744,13 +31435,12 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Inverse
    ae_vector_set_length(&tmp, n);
    matinv_spdmatrixcholeskyinverserec(a, 0, n, isupper, &tmp);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inversion of a Hermitian positive definite matrix which is given
@@ -31782,15 +31472,14 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 // API: void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
 // API: void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
 void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    bool f;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
    NewObj(matinvreport, rep2);
-   NewVector(tmp, 0, DT_COMPLEX);
+   NewCVector(tmp, 0);
    ae_assert(n > 0, "HPDMatrixCholeskyInverse: N <= 0!");
    ae_assert(a->cols >= n, "HPDMatrixCholeskyInverse: cols(A) < N!");
    ae_assert(a->rows >= n, "HPDMatrixCholeskyInverse: rows(A) < N!");
@@ -31820,13 +31509,12 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Inverse
    ae_vector_set_length(&tmp, n);
    matinv_hpdmatrixcholeskyinverserec(a, 0, n, isupper, &tmp);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inversion of a symmetric positive definite matrix.
@@ -31958,13 +31646,12 @@ void hpdmatrixinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
 // API: void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep);
 // API: void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep);
 void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(tmp, 0);
    ae_assert(n > 0, "RMatrixTRInverse: N <= 0!");
    ae_assert(a->cols >= n, "RMatrixTRInverse: cols(A) < N!");
    ae_assert(a->rows >= n, "RMatrixTRInverse: rows(A) < N!");
@@ -31981,14 +31668,13 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Invert
    ae_vector_set_length(&tmp, n);
    *info = 1;
    matinv_rmatrixtrinverserec(a, 0, n, isupper, isunit, &tmp, info);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Triangular matrix inverse (complex)
@@ -32028,13 +31714,12 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
 // API: void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep);
 // API: void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep);
 void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_t *info, matinvreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(matinvreport, rep);
-   NewVector(tmp, 0, DT_COMPLEX);
+   NewCVector(tmp, 0);
    ae_assert(n > 0, "CMatrixTRInverse: N <= 0!");
    ae_assert(a->cols >= n, "CMatrixTRInverse: cols(A) < N!");
    ae_assert(a->rows >= n, "CMatrixTRInverse: rows(A) < N!");
@@ -32051,14 +31736,13 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
       rep->r1 = 0.0;
       rep->rinf = 0.0;
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Invert
    ae_vector_set_length(&tmp, n);
    *info = 1;
    matinv_cmatrixtrinverserec(a, 0, n, isupper, isunit, &tmp, info);
-   ae_frame_leave();
+   DeFrame();
 }
 
 void matinvreport_init(void *_p, bool make_automatic) {
@@ -32089,8 +31773,8 @@ void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae
 }
 #if !defined AE_NO_EXCEPTIONS
 void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows() || a.cols() != pivots.length()) ThrowError("Error while calling 'rmatrixluinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows() || n != pivots.length()) ThrowError("Error while calling 'rmatrixluinverse': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::rmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep));
@@ -32106,8 +31790,8 @@ void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const
 }
 #if !defined AE_NO_EXCEPTIONS
 void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows() || a.cols() != pivots.length()) ThrowError("Error while calling 'cmatrixluinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows() || n != pivots.length()) ThrowError("Error while calling 'cmatrixluinverse': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::cmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep));
@@ -32123,8 +31807,8 @@ void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvre
 }
 #if !defined AE_NO_EXCEPTIONS
 void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'rmatrixinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'rmatrixinverse': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::rmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep));
@@ -32140,8 +31824,8 @@ void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matin
 }
 #if !defined AE_NO_EXCEPTIONS
 void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'cmatrixinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'cmatrixinverse': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::cmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep));
@@ -32157,8 +31841,8 @@ void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isu
 }
 #if !defined AE_NO_EXCEPTIONS
 void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'spdmatrixcholeskyinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'spdmatrixcholeskyinverse': looks like one of arguments has wrong size");
    bool isupper = false;
    alglib_impl::ae_state_init();
    TryCatch()
@@ -32175,8 +31859,8 @@ void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool 
 }
 #if !defined AE_NO_EXCEPTIONS
 void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'hpdmatrixcholeskyinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'hpdmatrixcholeskyinverse': looks like one of arguments has wrong size");
    bool isupper = false;
    alglib_impl::ae_state_init();
    TryCatch()
@@ -32193,9 +31877,9 @@ void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae
 }
 #if !defined AE_NO_EXCEPTIONS
 void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'spdmatrixinverse': looks like one of arguments has wrong size");
-   if (!alglib_impl::ae_is_symmetric(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not symmetric matrix");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'spdmatrixinverse': looks like one of arguments has wrong size");
+   if (!alglib_impl::ae_is_symmetric(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not symmetric matrix");
    bool isupper = false;
    alglib_impl::ae_state_init();
    TryCatch()
@@ -32213,9 +31897,9 @@ void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper,
 }
 #if !defined AE_NO_EXCEPTIONS
 void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'hpdmatrixinverse': looks like one of arguments has wrong size");
-   if (!alglib_impl::ae_is_hermitian(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not Hermitian matrix");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'hpdmatrixinverse': looks like one of arguments has wrong size");
+   if (!alglib_impl::ae_is_hermitian(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not Hermitian matrix");
    bool isupper = false;
    alglib_impl::ae_state_init();
    TryCatch()
@@ -32233,8 +31917,8 @@ void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, co
 }
 #if !defined AE_NO_EXCEPTIONS
 void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'rmatrixtrinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'rmatrixtrinverse': looks like one of arguments has wrong size");
    bool isunit = false;
    alglib_impl::ae_state_init();
    TryCatch()
@@ -32251,8 +31935,8 @@ void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper,
 }
 #if !defined AE_NO_EXCEPTIONS
 void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep) {
-   if (a.cols() != a.rows()) ThrowError("Error while calling 'cmatrixtrinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
+   if (n != a.rows()) ThrowError("Error while calling 'cmatrixtrinverse': looks like one of arguments has wrong size");
    bool isunit = false;
    alglib_impl::ae_state_init();
    TryCatch()
@@ -32282,13 +31966,12 @@ namespace alglib_impl {
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 // API: void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval);
 void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t updcolumn, double updval) {
-   ae_frame _frame_block;
    ae_int_t i;
    double lambdav;
    double vt;
-   ae_frame_make(&_frame_block);
-   NewVector(t1, 0, DT_REAL);
-   NewVector(t2, 0, DT_REAL);
+   EnFrame();
+   NewRVector(t1, 0);
+   NewRVector(t2, 0);
    ae_assert(updrow >= 0 && updrow < n, "RMatrixInvUpdateSimple: incorrect UpdRow!");
    ae_assert(updcolumn >= 0 && updcolumn < n, "RMatrixInvUpdateSimple: incorrect UpdColumn!");
    ae_vector_set_length(&t1, n);
@@ -32305,7 +31988,7 @@ void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t
       vt /= 1.0 + lambdav;
       ae_v_subd(inva->xyR[i], 1, t2.xR, 1, n, vt);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inverse matrix update by the Sherman-Morrison formula
@@ -32327,13 +32010,12 @@ void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 // API: void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u);
 void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVector *u) {
-   ae_frame _frame_block;
    ae_int_t i;
    double lambdav;
    double vt;
-   ae_frame_make(&_frame_block);
-   NewVector(t1, 0, DT_REAL);
-   NewVector(t2, 0, DT_REAL);
+   EnFrame();
+   NewRVector(t1, 0);
+   NewRVector(t2, 0);
    ae_vector_set_length(&t1, n);
    ae_vector_set_length(&t2, n);
 // T1 = InvA * U
@@ -32350,7 +32032,7 @@ void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVect
       vt = t1.xR[i] / (1.0 + lambdav);
       ae_v_subd(inva->xyR[i], 1, t2.xR, 1, n, vt);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inverse matrix update by the Sherman-Morrison formula
@@ -32372,14 +32054,13 @@ void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVect
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 // API: void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v);
 void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double lambdav;
    double vt;
-   ae_frame_make(&_frame_block);
-   NewVector(t1, 0, DT_REAL);
-   NewVector(t2, 0, DT_REAL);
+   EnFrame();
+   NewRVector(t1, 0);
+   NewRVector(t2, 0);
    ae_vector_set_length(&t1, n);
    ae_vector_set_length(&t2, n);
 // T1 = InvA * U
@@ -32396,7 +32077,7 @@ void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v)
       vt = t1.xR[i] / (1.0 + lambdav);
       ae_v_subd(inva->xyR[i], 1, t2.xR, 1, n, vt);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Inverse matrix update by the Sherman-Morrison formula
@@ -32418,14 +32099,13 @@ void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v)
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 // API: void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v);
 void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double lambdav;
    double vt;
-   ae_frame_make(&_frame_block);
-   NewVector(t1, 0, DT_REAL);
-   NewVector(t2, 0, DT_REAL);
+   EnFrame();
+   NewRVector(t1, 0);
+   NewRVector(t2, 0);
    ae_vector_set_length(&t1, n);
    ae_vector_set_length(&t2, n);
 // T1 = InvA * U
@@ -32445,7 +32125,7 @@ void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v) {
       vt = t1.xR[i] / (1.0 + lambdav);
       ae_v_subd(inva->xyR[i], 1, t2.xR, 1, n, vt);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -32521,22 +32201,20 @@ namespace alglib_impl {
 // Algorithm implemented on the basis of the DHSEQR subroutine (LAPACK 3.0 library).
 // API: bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s);
 bool rmatrixschur(RMatrix *a, ae_int_t n, RMatrix *s) {
-   ae_frame _frame_block;
    ae_int_t info;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(s);
-   NewVector(tau, 0, DT_REAL);
-   NewVector(wi, 0, DT_REAL);
-   NewVector(wr, 0, DT_REAL);
+   NewRVector(tau, 0);
+   NewRVector(wi, 0);
+   NewRVector(wr, 0);
 // Upper Hessenberg form of the 0-based matrix
    rmatrixhessenberg(a, n, &tau);
    rmatrixhessenbergunpackq(a, n, &tau, s);
 // Schur decomposition
    rmatrixinternalschurdecomposition(a, n, 1, 1, &wr, &wi, s, &info);
    result = info == 0;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 } // end of namespace alglib_impl
 
@@ -32603,19 +32281,18 @@ namespace alglib_impl {
 // ALGLIB: Copyright 01.28.2006 by Sergey Bochkanov
 // API: bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr);
 bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t problemtype, RMatrix *r, bool *isupperr) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
    ae_int_t info;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(r);
    *isupperr = false;
-   NewMatrix(t, 0, 0, DT_REAL);
-   NewVector(w1, 0, DT_REAL);
-   NewVector(w2, 0, DT_REAL);
-   NewVector(w3, 0, DT_REAL);
+   NewRMatrix(t, 0, 0);
+   NewRVector(w1, 0);
+   NewRVector(w2, 0);
+   NewRVector(w3, 0);
    NewObj(matinvreport, rep);
    ae_assert(n > 0, "SMatrixGEVDReduce: N <= 0!");
    ae_assert(problemtype == 1 || problemtype == 2 || problemtype == 3, "SMatrixGEVDReduce: incorrect ProblemType!");
@@ -32640,15 +32317,13 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
       }
       if (!spdmatrixcholesky(&t, n, false)) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Invert L in T
       rmatrixtrinverse(&t, n, false, false, &info, &rep);
       if (info <= 0) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Build L^(-1) * A * L^(-T) in R
       ae_vector_set_length(&w1, n + 1);
@@ -32683,8 +32358,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
       for (i = 0; i < n; i++) {
          ae_v_move(&r->xyR[i][i], 1, &t.xyR[i][i], t.stride, n - i);
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Problem 2:  A*B*x = lambda*x
 // or
@@ -32708,8 +32382,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
       }
       if (!spdmatrixcholesky(&t, n, true)) {
          result = false;
-         ae_frame_leave();
-         return result;
+         DeFrame(result);
       }
    // Build U * A * U' in R
       ae_vector_set_length(&w1, n + 1);
@@ -32742,8 +32415,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
          rmatrixtrinverse(&t, n, true, false, &info, &rep);
          if (info <= 0) {
             result = false;
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
       // Copy U^-1 from T to R
          *isupperr = true;
@@ -32768,8 +32440,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
          }
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Algorithm for solving the following generalized symmetric positive-definite
@@ -32820,7 +32491,6 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
 // ALGLIB: Copyright 01.28.2006 by Sergey Bochkanov
 // API: bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z);
 bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z) {
-   ae_frame _frame_block;
    bool isupperr;
    ae_int_t j1;
    ae_int_t j2;
@@ -32830,22 +32500,20 @@ bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupper
    ae_int_t j;
    double v;
    bool result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    SetVector(d);
    SetMatrix(z);
-   NewMatrix(r, 0, 0, DT_REAL);
-   NewMatrix(t, 0, 0, DT_REAL);
+   NewRMatrix(r, 0, 0);
+   NewRMatrix(t, 0, 0);
 // Reduce and solve
    result = smatrixgevdreduce(a, n, isuppera, b, isupperb, problemtype, &r, &isupperr);
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = smatrixevd(a, n, zneeded, isuppera, d, &t);
    if (!result) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Transform eigenvectors if needed
    if (zneeded != 0) {
@@ -32879,8 +32547,7 @@ bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupper
          j2 += j2inc;
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 } // end of namespace alglib_impl
 
@@ -32998,19 +32665,17 @@ complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n) {
 // API: double rmatrixdet(const real_2d_array &a, const ae_int_t n);
 // API: double rmatrixdet(const real_2d_array &a);
 double rmatrixdet(RMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(pivots, 0, DT_INT);
+   NewZVector(pivots, 0);
    ae_assert(n >= 1, "RMatrixDet: N < 1!");
    ae_assert(a->rows >= n, "RMatrixDet: rows(A) < N!");
    ae_assert(a->cols >= n, "RMatrixDet: cols(A) < N!");
    ae_assert(apservisfinitematrix(a, n, n), "RMatrixDet: A contains infinite or NaN values!");
    rmatrixlu(a, n, n, &pivots);
    result = rmatrixludet(a, &pivots, n);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Calculation of the determinant of a general matrix
@@ -33028,19 +32693,17 @@ double rmatrixdet(RMatrix *a, ae_int_t n) {
 // API: complex cmatrixdet(const complex_2d_array &a, const ae_int_t n);
 // API: complex cmatrixdet(const complex_2d_array &a);
 complex cmatrixdet(CMatrix *a, ae_int_t n) {
-   ae_frame _frame_block;
    complex result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
-   NewVector(pivots, 0, DT_INT);
+   NewZVector(pivots, 0);
    ae_assert(n >= 1, "CMatrixDet: N < 1!");
    ae_assert(a->rows >= n, "CMatrixDet: rows(A) < N!");
    ae_assert(a->cols >= n, "CMatrixDet: cols(A) < N!");
    ae_assert(apservisfinitecmatrix(a, n, n), "CMatrixDet: A contains infinite or NaN values!");
    cmatrixlu(a, n, n, &pivots);
    result = cmatrixludet(a, &pivots, n);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Determinant calculation of the matrix given by the Cholesky decomposition.
@@ -33108,10 +32771,9 @@ double spdmatrixcholeskydet(RMatrix *a, ae_int_t n) {
 // API: double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper);
 // API: double spdmatrixdet(const real_2d_array &a);
 double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper) {
-   ae_frame _frame_block;
    bool b;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(a);
    ae_assert(n >= 1, "SPDMatrixDet: N < 1!");
    ae_assert(a->rows >= n, "SPDMatrixDet: rows(A) < N!");
@@ -33120,8 +32782,7 @@ double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper) {
    b = spdmatrixcholesky(a, n, isupper);
    ae_assert(b, "SPDMatrixDet: A is not SPD!");
    result = spdmatrixcholeskydet(a, n);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 } // end of namespace alglib_impl
 
@@ -33135,8 +32796,8 @@ double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, cons
 }
 #if !defined AE_NO_EXCEPTIONS
 double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots) {
-   if (a.rows() != a.cols() || a.rows() != pivots.length()) ThrowError("Error while calling 'rmatrixludet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
+   if (n != a.cols() || n != pivots.length()) ThrowError("Error while calling 'rmatrixludet': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(0.0)
    double D = alglib_impl::rmatrixludet(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n);
@@ -33154,8 +32815,8 @@ complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, 
 }
 #if !defined AE_NO_EXCEPTIONS
 complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots) {
-   if (a.rows() != a.cols() || a.rows() != pivots.length()) ThrowError("Error while calling 'cmatrixludet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
+   if (n != a.cols() || n != pivots.length()) ThrowError("Error while calling 'cmatrixludet': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(complex(0.0))
    alglib_impl::complex C = alglib_impl::cmatrixludet(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n);
@@ -33173,8 +32834,8 @@ double rmatrixdet(const real_2d_array &a, const ae_int_t n) {
 }
 #if !defined AE_NO_EXCEPTIONS
 double rmatrixdet(const real_2d_array &a) {
-   if (a.rows() != a.cols()) ThrowError("Error while calling 'rmatrixdet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
+   if (n != a.cols()) ThrowError("Error while calling 'rmatrixdet': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(0.0)
    double D = alglib_impl::rmatrixdet(ConstT(ae_matrix, a), n);
@@ -33192,8 +32853,8 @@ complex cmatrixdet(const complex_2d_array &a, const ae_int_t n) {
 }
 #if !defined AE_NO_EXCEPTIONS
 complex cmatrixdet(const complex_2d_array &a) {
-   if (a.rows() != a.cols()) ThrowError("Error while calling 'cmatrixdet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
+   if (n != a.cols()) ThrowError("Error while calling 'cmatrixdet': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(complex(0.0))
    alglib_impl::complex C = alglib_impl::cmatrixdet(ConstT(ae_matrix, a), n);
@@ -33211,8 +32872,8 @@ double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n) {
 }
 #if !defined AE_NO_EXCEPTIONS
 double spdmatrixcholeskydet(const real_2d_array &a) {
-   if (a.rows() != a.cols()) ThrowError("Error while calling 'spdmatrixcholeskydet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
+   if (n != a.cols()) ThrowError("Error while calling 'spdmatrixcholeskydet': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch(0.0)
    double D = alglib_impl::spdmatrixcholeskydet(ConstT(ae_matrix, a), n);
@@ -33230,9 +32891,9 @@ double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper
 }
 #if !defined AE_NO_EXCEPTIONS
 double spdmatrixdet(const real_2d_array &a) {
-   if (a.rows() != a.cols()) ThrowError("Error while calling 'spdmatrixdet': looks like one of arguments has wrong size");
-   if (!alglib_impl::ae_is_symmetric(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not symmetric matrix");
    ae_int_t n = a.rows();
+   if (n != a.cols()) ThrowError("Error while calling 'spdmatrixdet': looks like one of arguments has wrong size");
+   if (!alglib_impl::ae_is_symmetric(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not symmetric matrix");
    bool isupper = false;
    alglib_impl::ae_state_init();
    TryCatch(0.0)

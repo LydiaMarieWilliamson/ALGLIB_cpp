@@ -1920,7 +1920,7 @@ int main() {
          alglib_impl::ae_frame_make(&_frame_block);
          NewObj(alglib_impl::ae_shared_pool, pool);
          NewObj(seedrec, seed);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
+         PoolSet(&pool, seedrec, seed);
          alglib_impl::ae_state_clear();
          issue528Ok = issue528Ok && alloc_cnt == alglib_impl::_alloc_counter;
       // case #1: seeding and retrieving, not recycling
@@ -1931,8 +1931,8 @@ int main() {
       // NewObj(alglib_impl::ae_shared_pool, pool); NewObj(seedrec, seed); // ... but without the declarations.
          memset(&pool, 0, sizeof pool), alglib_impl::ae_shared_pool_init(&pool, true);
          memset(&seed, 0, sizeof seed), seedrec_init(&seed, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
+         PoolSet(&pool, seedrec, seed);
+         PoolGet(&pool, p0);
          alglib_impl::ae_state_clear();
          issue528Ok = issue528Ok && alloc_cnt == alglib_impl::_alloc_counter;
       // case #2: seeding and retrieving twice to different pointers, recycling both
@@ -1945,11 +1945,11 @@ int main() {
       // NewObj(alglib_impl::ae_shared_pool, pool); NewObj(seedrec, seed); // ... but without the declarations.
          memset(&pool, 0, sizeof pool), alglib_impl::ae_shared_pool_init(&pool, true);
          memset(&seed, 0, sizeof seed), seedrec_init(&seed, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &_p1);
-         alglib_impl::ae_shared_pool_recycle(&pool, &_p0);
-         alglib_impl::ae_shared_pool_recycle(&pool, &_p1);
+         PoolSet(&pool, seedrec, seed);
+         PoolGet(&pool, p0);
+         PoolGet(&pool, p1);
+         PoolPut(&pool, p0);
+         PoolPut(&pool, p1);
          alglib_impl::ae_state_clear();
          issue528Ok = issue528Ok && alloc_cnt == alglib_impl::_alloc_counter;
       } catch(...) {
@@ -2042,9 +2042,9 @@ int main() {
          RefObj(void, p0);
          NewObj(alglib_impl::ae_shared_pool, pool);
          NewObj(seedrec, seed);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
+         PoolSet(&pool, seedrec, seed);
+         PoolGet(&pool, p0);
+         PoolGet(&pool, p0);
          alglib_impl::ae_state_clear();
          issue764Ok = issue764Ok && alloc_cnt == alglib_impl::_alloc_counter;
       } catch(...) {

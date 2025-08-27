@@ -249,15 +249,13 @@ void matrixsetlengthatleast(ae_matrix *x, ae_int_t m, ae_int_t n) {
 //    without reallocation
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void bvectorgrowto(BVector *x, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
-   ae_frame_make(&_frame_block);
-   NewVector(oldx, 0, DT_BOOL);
+   EnFrame();
+   NewBVector(oldx, 0);
 // Enough place
    if (x->cnt >= n) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Choose new size
    n = imax2(n, iround(1.8 * x->cnt + 1.0));
@@ -272,7 +270,7 @@ void bvectorgrowto(BVector *x, ae_int_t n) {
          x->xB[i] = false;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Grows X, i.e. changes its size in such a way that:
@@ -282,15 +280,13 @@ void bvectorgrowto(BVector *x, ae_int_t n) {
 //    without reallocation
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorgrowto(ZVector *x, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
-   ae_frame_make(&_frame_block);
-   NewVector(oldx, 0, DT_INT);
+   EnFrame();
+   NewZVector(oldx, 0);
 // Enough place
    if (x->cnt >= n) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Choose new size
    n = imax2(n, iround(1.8 * x->cnt + 1.0));
@@ -305,7 +301,7 @@ void ivectorgrowto(ZVector *x, ae_int_t n) {
          x->xZ[i] = 0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Grows X, i.e. changes its size in such a way that:
@@ -315,15 +311,13 @@ void ivectorgrowto(ZVector *x, ae_int_t n) {
 //    without reallocation
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rvectorgrowto(RVector *x, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
-   ae_frame_make(&_frame_block);
-   NewVector(oldx, 0, DT_REAL);
+   EnFrame();
+   NewRVector(oldx, 0);
 // Enough place
    if (x->cnt >= n) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Choose new size
    n = imax2(n, iround(1.8 * x->cnt + 1.0));
@@ -338,7 +332,7 @@ void rvectorgrowto(RVector *x, ae_int_t n) {
          x->xR[i] = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Grows X, i.e. appends cols in such a way that:
@@ -351,17 +345,15 @@ void rvectorgrowto(RVector *x, ae_int_t n) {
 //    MinRows can be 0 or negative value = ignored
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t n2;
    ae_int_t m;
-   ae_frame_make(&_frame_block);
-   NewMatrix(olda, 0, 0, DT_REAL);
+   EnFrame();
+   NewRMatrix(olda, 0, 0);
 // Enough place?
    if (a->cols >= n && a->rows >= minrows) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Sizes and metrics
    if (a->cols < n) {
@@ -377,7 +369,7 @@ void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows) {
          a->xyR[i][j] = olda.xyR[i][j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Grows X, i.e. appends rows in such a way that:
@@ -390,17 +382,15 @@ void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows) {
 //    MinCols can be 0 or negative value = ignored
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t n2;
    ae_int_t m;
-   ae_frame_make(&_frame_block);
-   NewMatrix(olda, 0, 0, DT_REAL);
+   EnFrame();
+   NewRMatrix(olda, 0, 0);
 // Enough place?
    if (a->rows >= n && a->cols >= mincols) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Sizes and metrics
    if (a->rows < n) {
@@ -416,7 +406,7 @@ void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
          a->xyR[i][j] = olda.xyR[i][j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Resizes X and:
@@ -424,11 +414,10 @@ void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorresize(ZVector *x, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
-   ae_frame_make(&_frame_block);
-   NewVector(oldx, 0, DT_INT);
+   EnFrame();
+   NewZVector(oldx, 0);
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, n);
@@ -439,7 +428,7 @@ void ivectorresize(ZVector *x, ae_int_t n) {
          x->xZ[i] = 0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Resizes X and:
@@ -447,11 +436,10 @@ void ivectorresize(ZVector *x, ae_int_t n) {
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rvectorresize(RVector *x, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
-   ae_frame_make(&_frame_block);
-   NewVector(oldx, 0, DT_REAL);
+   EnFrame();
+   NewRVector(oldx, 0);
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, n);
@@ -462,7 +450,7 @@ void rvectorresize(RVector *x, ae_int_t n) {
          x->xR[i] = 0.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Resizes X and:
@@ -470,13 +458,12 @@ void rvectorresize(RVector *x, ae_int_t n) {
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t m2;
    ae_int_t n2;
-   ae_frame_make(&_frame_block);
-   NewMatrix(oldx, 0, 0, DT_INT);
+   EnFrame();
+   NewZMatrix(oldx, 0, 0);
    m2 = x->rows;
    n2 = x->cols;
    ae_swap_matrices(x, &oldx);
@@ -490,7 +477,7 @@ void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n) {
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Resizes X and:
@@ -498,13 +485,12 @@ void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n) {
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t m2;
    ae_int_t n2;
-   ae_frame_make(&_frame_block);
-   NewMatrix(oldx, 0, 0, DT_REAL);
+   EnFrame();
+   NewRMatrix(oldx, 0, 0);
    m2 = x->rows;
    n2 = x->cols;
    ae_swap_matrices(x, &oldx);
@@ -518,7 +504,7 @@ void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n) {
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function checks that length(X) is at least N and first N values  from
@@ -1340,8 +1326,8 @@ void nbpoolinit(nbpool *pool, ae_int_t n) {
    if (pool->seedn.cnt != n) {
       ae_vector_set_length(&pool->seedn, n);
    }
-   ae_shared_pool_set_seed(&pool->sourcepool, &pool->seedn, sizeof(pool->seedn), BVector_init, BVector_copy, BVector_free);
-   ae_shared_pool_set_seed(&pool->temporarypool, &pool->seed0, sizeof(pool->seed0), BVector_init, BVector_copy, BVector_free);
+   PoolSet(&pool->sourcepool, BVector, pool->seedn);
+   PoolSet(&pool->temporarypool, BVector, pool->seed0);
 }
 
 // Thread-safe retrieval of array from the nbPool. If there are enough arrays
@@ -1355,23 +1341,21 @@ void nbpoolinit(nbpool *pool, ae_int_t n) {
 // Outputs:
 //     A           -   array[N], contents undefined
 void nbpoolretrieve(nbpool *pool, BVector *a) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(BVector, tmp);
    ae_assert(a->cnt == 0, "nbPoolRetrieve: A has non-zero length on entry");
    if (pool->n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_shared_pool_retrieve(&pool->sourcepool, &_tmp);
+   PoolGet(&pool->sourcepool, tmp);
    ae_swap_vectors(tmp, a);
-   ae_shared_pool_recycle(&pool->temporarypool, &_tmp);
+   PoolPut(&pool->temporarypool, tmp);
    pool->temporariescount++;
    if (pool->temporariescount > apserv_maxtemporariesinnpool) {
       pool->temporariescount = 0;
-      ae_shared_pool_clear_recycled(&pool->temporarypool, true);
+      PoolUnSet(&pool->temporarypool);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Thread-safe recycling of N-length array to the nbPool.
@@ -1384,22 +1368,20 @@ void nbpoolretrieve(nbpool *pool, BVector *a) {
 // Outputs:
 //     A           -   array[0], length is exactly zero on exit
 void nbpoolrecycle(nbpool *pool, BVector *a) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(BVector, tmp);
    ae_assert(a->cnt == pool->n, "nbPoolRecycle: A has length != N on entry");
    if (pool->n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_shared_pool_retrieve(&pool->temporarypool, &_tmp);
+   PoolGet(&pool->temporarypool, tmp);
    ae_swap_vectors(tmp, a);
-   ae_shared_pool_recycle(&pool->sourcepool, &_tmp);
+   PoolPut(&pool->sourcepool, tmp);
    pool->temporariescount--;
    if (pool->temporariescount < 0) {
       pool->temporariescount = 0;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Initialize niPool - prepare it to store N-length arrays, N >= 0.
@@ -1417,8 +1399,8 @@ void nipoolinit(nipool *pool, ae_int_t n) {
    if (pool->seedn.cnt != n) {
       ae_vector_set_length(&pool->seedn, n);
    }
-   ae_shared_pool_set_seed(&pool->sourcepool, &pool->seedn, sizeof(pool->seedn), ZVector_init, ZVector_copy, ZVector_free);
-   ae_shared_pool_set_seed(&pool->temporarypool, &pool->seed0, sizeof(pool->seed0), ZVector_init, ZVector_copy, ZVector_free);
+   PoolSet(&pool->sourcepool, ZVector, pool->seedn);
+   PoolSet(&pool->temporarypool, ZVector, pool->seed0);
 }
 
 // Thread-safe retrieval of array from the nrPool. If there are enough arrays
@@ -1432,23 +1414,21 @@ void nipoolinit(nipool *pool, ae_int_t n) {
 // Outputs:
 //     A           -   array[N], contents undefined
 void nipoolretrieve(nipool *pool, ZVector *a) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(ZVector, tmp);
    ae_assert(a->cnt == 0, "niPoolRetrieve: A has non-zero length on entry");
    if (pool->n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_shared_pool_retrieve(&pool->sourcepool, &_tmp);
+   PoolGet(&pool->sourcepool, tmp);
    ae_swap_vectors(tmp, a);
-   ae_shared_pool_recycle(&pool->temporarypool, &_tmp);
+   PoolPut(&pool->temporarypool, tmp);
    pool->temporariescount++;
    if (pool->temporariescount > apserv_maxtemporariesinnpool) {
       pool->temporariescount = 0;
-      ae_shared_pool_clear_recycled(&pool->temporarypool, true);
+      PoolUnSet(&pool->temporarypool);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Thread-safe recycling of N-length array to the niPool.
@@ -1461,22 +1441,20 @@ void nipoolretrieve(nipool *pool, ZVector *a) {
 // Outputs:
 //     A           -   array[0], length is exactly zero on exit
 void nipoolrecycle(nipool *pool, ZVector *a) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(ZVector, tmp);
    ae_assert(a->cnt == pool->n, "niPoolRecycle: A has length != N on entry");
    if (pool->n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_shared_pool_retrieve(&pool->temporarypool, &_tmp);
+   PoolGet(&pool->temporarypool, tmp);
    ae_swap_vectors(tmp, a);
-   ae_shared_pool_recycle(&pool->sourcepool, &_tmp);
+   PoolPut(&pool->sourcepool, tmp);
    pool->temporariescount--;
    if (pool->temporariescount < 0) {
       pool->temporariescount = 0;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Initialize nrPool - prepare it to store N-length arrays, N >= 0.
@@ -1494,8 +1472,8 @@ void nrpoolinit(nrpool *pool, ae_int_t n) {
    if (pool->seedn.cnt != n) {
       ae_vector_set_length(&pool->seedn, n);
    }
-   ae_shared_pool_set_seed(&pool->sourcepool, &pool->seedn, sizeof(pool->seedn), RVector_init, RVector_copy, RVector_free);
-   ae_shared_pool_set_seed(&pool->temporarypool, &pool->seed0, sizeof(pool->seed0), RVector_init, RVector_copy, RVector_free);
+   PoolSet(&pool->sourcepool, RVector, pool->seedn);
+   PoolSet(&pool->temporarypool, RVector, pool->seed0);
 }
 
 // Thread-safe retrieval of array from the nrPool. If there are enough arrays
@@ -1509,23 +1487,21 @@ void nrpoolinit(nrpool *pool, ae_int_t n) {
 // Outputs:
 //     A           -   array[N], contents undefined
 void nrpoolretrieve(nrpool *pool, RVector *a) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(RVector, tmp);
    ae_assert(a->cnt == 0, "nrPoolRetrieve: A has non-zero length on entry");
    if (pool->n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_shared_pool_retrieve(&pool->sourcepool, &_tmp);
+   PoolGet(&pool->sourcepool, tmp);
    ae_swap_vectors(tmp, a);
-   ae_shared_pool_recycle(&pool->temporarypool, &_tmp);
+   PoolPut(&pool->temporarypool, tmp);
    pool->temporariescount++;
    if (pool->temporariescount > apserv_maxtemporariesinnpool) {
       pool->temporariescount = 0;
-      ae_shared_pool_clear_recycled(&pool->temporarypool, true);
+      PoolUnSet(&pool->temporarypool);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Thread-safe recycling of N-length array to the nrPool.
@@ -1538,22 +1514,20 @@ void nrpoolretrieve(nrpool *pool, RVector *a) {
 // Outputs:
 //     A           -   array[0], length is exactly zero on exit
 void nrpoolrecycle(nrpool *pool, RVector *a) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(RVector, tmp);
    ae_assert(a->cnt == pool->n, "nrPoolRecycle: A has length != N on entry");
    if (pool->n == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
-   ae_shared_pool_retrieve(&pool->temporarypool, &_tmp);
+   PoolGet(&pool->temporarypool, tmp);
    ae_swap_vectors(tmp, a);
-   ae_shared_pool_recycle(&pool->sourcepool, &_tmp);
+   PoolPut(&pool->sourcepool, tmp);
    pool->temporariescount--;
    if (pool->temporariescount < 0) {
       pool->temporariescount = 0;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function is used to calculate number of chunks (including partial,
@@ -3074,35 +3048,31 @@ void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 // Integer:
 void igrowv(ae_int_t newn, ZVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    if (x->cnt >= newn) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_int_t oldn = x->cnt;
    newn = imax2(newn, iround(1.8 * oldn + 1.0));
-   NewVector(oldx, 0, DT_INT);
+   NewZVector(oldx, 0);
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, newn);
    icopyv(oldn, &oldx, x);
-   ae_frame_leave();
+   DeFrame();
 }
 // Real:
 void rgrowv(ae_int_t newn, RVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    if (x->cnt >= newn) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_int_t oldn = x->cnt;
    newn = imax2(newn, iround(1.8 * oldn + 1.0));
-   NewVector(oldx, 0, DT_REAL);
+   NewRVector(oldx, 0);
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, newn);
    rcopyv(oldn, &oldx, x);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Matrix-vector product: y = alpha a' x + beta y.
@@ -5181,13 +5151,12 @@ void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf
 //     checked too.
 // ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
 void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(p1);
    SetVector(p2);
    NewObj(apbuffers, buf);
    tagsortbuf(a, n, p1, p2, &buf);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Heap operations: adds element to the heap
@@ -6860,14 +6829,13 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
 //      Courant Institute, Argonne National Lab, and Rice University
 //      June 30, 1992
 void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit) {
-   ae_frame _frame_block;
    bool normin;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *s = 0.0;
-   NewVector(cnorm, 0, DT_REAL);
-   NewMatrix(a1, 0, 0, DT_REAL);
-   NewVector(x1, 0, DT_REAL);
+   NewRVector(cnorm, 0);
+   NewRMatrix(a1, 0, 0);
+   NewRVector(x1, 0);
 // From 0-based to 1-based
    normin = false;
    ae_matrix_set_length(&a1, n + 1, n + 1);
@@ -6880,7 +6848,7 @@ void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isup
    safesolvetriangular(&a1, n, &x1, s, isupper, istrans, isunit, normin, &cnorm);
 // From 1-based to 0-based
    ae_v_move(x->xR, 1, &x1.xR[1], 1, n);
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -6935,7 +6903,6 @@ static bool safesolve_cbasicsolveandupdate(complex alpha, complex beta, double l
 // Real implementation of CMatrixScaledTRSafeSolve
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
 bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
-   ae_frame _frame_block;
    double lnmax;
    double nrmb;
    double nrmx;
@@ -6945,16 +6912,15 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
    double vr;
    complex cx;
    bool result;
-   ae_frame_make(&_frame_block);
-   NewVector(tmp, 0, DT_REAL);
+   EnFrame();
+   NewRVector(tmp, 0);
    ae_assert(n > 0, "rmatrixscaledtrsafesolve: incorrect n!");
    ae_assert(trans == 0 || trans == 1, "rmatrixscaledtrsafesolve: incorrect trans!");
    result = true;
    lnmax = log(maxrealnumber);
 // Quick return if possible
    if (n <= 0) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Load norms: right part and X
    nrmb = 0.0;
@@ -6984,13 +6950,11 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xR[i] = cx.x;
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (!isupper && trans == 0) {
    // L*x = b
@@ -7011,13 +6975,11 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xR[i] = cx.x;
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (isupper && trans == 1) {
    // U^T*x = b
@@ -7032,8 +6994,7 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xR[i] = cx.x;
       // update the rest of right part
@@ -7043,8 +7004,7 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
             ae_v_subd(&x->xR[i + 1], 1, &tmp.xR[i + 1], 1, n - i - 1, vr);
          }
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (!isupper && trans == 1) {
    // L^T*x = b
@@ -7059,8 +7019,7 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xR[i] = cx.x;
       // update the rest of right part
@@ -7070,12 +7029,10 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
             ae_v_subd(x->xR, 1, tmp.xR, 1, i, vr);
          }
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = false;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Internal subroutine for safe solution of
@@ -7092,7 +7049,6 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
 // as MaxGrowth is significantly less than MaxRealNumber/norm(b).
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
 bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
-   ae_frame _frame_block;
    double lnmax;
    double nrmb;
    double nrmx;
@@ -7101,16 +7057,15 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
    complex beta;
    complex vc;
    bool result;
-   ae_frame_make(&_frame_block);
-   NewVector(tmp, 0, DT_COMPLEX);
+   EnFrame();
+   NewCVector(tmp, 0);
    ae_assert(n > 0, "cmatrixscaledtrsafesolve: incorrect n!");
    ae_assert(trans == 0 || trans == 1 || trans == 2, "cmatrixscaledtrsafesolve: incorrect trans!");
    result = true;
    lnmax = log(maxrealnumber);
 // Quick return if possible
    if (n <= 0) {
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Load norms: right part and X
    nrmb = 0.0;
@@ -7140,13 +7095,11 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xC[i] = vc;
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (!isupper && trans == 0) {
    // L*x = b
@@ -7167,13 +7120,11 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xC[i] = vc;
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (isupper && trans == 1) {
    // U^T*x = b
@@ -7188,8 +7139,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xC[i] = vc;
       // update the rest of right part
@@ -7198,8 +7148,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
             ae_v_csubc(&x->xC[i + 1], 1, &tmp.xC[i + 1], 1, "N", n - i - 1, vc);
          }
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (!isupper && trans == 1) {
    // L^T*x = b
@@ -7214,8 +7163,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xC[i] = vc;
       // update the rest of right part
@@ -7224,8 +7172,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
             ae_v_csubc(x->xC, 1, tmp.xC, 1, "N", i, vc);
          }
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (isupper && trans == 2) {
    // U^H*x = b
@@ -7240,8 +7187,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xC[i] = vc;
       // update the rest of right part
@@ -7250,8 +7196,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
             ae_v_csubc(&x->xC[i + 1], 1, &tmp.xC[i + 1], 1, "N", n - i - 1, vc);
          }
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    if (!isupper && trans == 2) {
    // L^T*x = b
@@ -7266,8 +7211,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
-            ae_frame_leave();
-            return result;
+            DeFrame(result);
          }
          x->xC[i] = vc;
       // update the rest of right part
@@ -7276,12 +7220,10 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
             ae_v_csubc(x->xC, 1, tmp.xC, 1, "N", i, vc);
          }
       }
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    result = false;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 } // end of namespace alglib_impl
 
@@ -9220,8 +9162,7 @@ static void ftbase_ftradersfft(fasttransformplan *plan, double *ap, ae_int_t aof
 //     ap      - the transformed vector.
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, double *ap, ae_int_t aoffset, RVector *buf, ae_int_t repcnt) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(RVector, bufb);
    RefObj(RVector, bufc);
    ae_int_t **plantab = plan->entries.xyZ;
@@ -9272,11 +9213,11 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, dou
       // Bluestein's FFT:
          case ftbase_opbluesteinsfft:
             ae_assert(mun == 2, "ftbase_ftapplysubplan: mun != 2 for Bluestein's FFT");
-            ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufb);
-            ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufc);
+            PoolGet(&plan->bluesteinpool, bufb);
+            PoolGet(&plan->bluesteinpool, bufc);
             ftbase_ftbluesteinsfft(plan, ap, args, n, param0, param2, rowidx + param1, bufb, bufc);
-            ae_shared_pool_recycle(&plan->bluesteinpool, &_bufb);
-            ae_shared_pool_recycle(&plan->bluesteinpool, &_bufc);
+            PoolPut(&plan->bluesteinpool, bufb);
+            PoolPut(&plan->bluesteinpool, bufc);
             rowidx++;
          break;
       // Rader's FFT:
@@ -9304,7 +9245,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, dou
          default: ae_assert(false, "ftbase_ftapplysubplan: unexpected plan type");
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Apply a transformation plan to an input/output vector.
@@ -9374,8 +9315,7 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan);
 //	It allocates a temporary plan which is freed after leaving this function.
 // ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
 static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, double *zp) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(fasttransformplan, plan);
 // Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
    for (ae_int_t i = 0; i < 2 * m; i++) zp[i] = 0.0;
@@ -9388,7 +9328,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, double *zp)
    ftcomplexfftplan(m, 1, &plan);
    for (ae_int_t i = 0; i < 2 * m; i++) zp[2 * m + i] = zp[i];
    ftbase_ftapplysubplan(&plan, 0, zp + 2 * m, 0, &plan.buffer, 1);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Precompute the complex Rader's FFT and write the data to a vector.
@@ -9406,8 +9346,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, double *zp)
 // ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
 static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, double *zp) {
    const double twopi = 2.0 * pi;
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(fasttransformplan, plan);
 // Fill zp with Rader factors, perform an FFT.
    for (ae_int_t q = 0, kiq = 1; q < n - 1; q++, kiq = kiq * riq % n) {
@@ -9416,7 +9355,7 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
    }
    ftcomplexfftplan(n - 1, 1, &plan);
    ftbase_ftapplysubplan(&plan, 0, zp, 0, &plan.buffer, 1);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // A recurrent function called by ftcomplexfftplan() and other functions.
@@ -9424,9 +9363,10 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 // Inputs:
 //     N          - the FFT length (in complex numbers); N >= 1.
 //     K          - the number of repetitions; K >= 1.
-//     issub      - if true, the plan generator inserts OpStart/OpEnd in the plan header/footer.
-//     istop      - if true, the plan generator assumes that it is the topmost plan:
-//                  * it may use a global buffer for transpositions and there is no other plan which executes in parallel.
+//     level      - the plan generator level:
+//                  * level < 2: the plan generator inserts OpStart/OpEnd in the plan header/footer.
+//                  * level < 1: the plan generator assumes that it is the topmost plan.
+//                  * level < 1: it may use a global buffer for transpositions with no other plan executing in parallel.
 //     rowptr     - an index which points past the last entry generated so far.
 //     bluesteinn - the amount of storage (in real numbers) required for Bluestein buffer; stored as *bluesteinnp.
 //     precrptr   - a pointer to the unused part of the precomputed real buffer (plan->precr):
@@ -9441,18 +9381,16 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 // Outputs:
 //     rowptr     - the updated pointer: advanced by the number of entries generated by the function.
 //     bluesteinn - the updated amount: may be increased, but may never be decreased; returned as *bluesteinnp.
-// NOTE: in case istop is true, issub is also must be true.
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool istop, ae_int_t *rowptr, ae_int_t *bluesteinnp, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, ae_int_t level, ae_int_t *rowptr, ae_int_t *bluesteinnp, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan) {
+   EnFrame();
    ae_assert(n > 0, "ftbase_ftcomplexfftplanrec: n <= 0");
    ae_assert(k > 0, "ftbase_ftcomplexfftplanrec: k <= 0");
-   ae_assert(!istop || issub, "ftbase_ftcomplexfftplanrec: issub is inconsistent with istop");
    ae_int_t n1, n2;
    ftbase_ftfactorize(n, false, &n1, &n2);
    ZMatrix *gridp = &plan->entries;
-   if (istop && n > ftbase_recursivethreshold) { // Try to generate the "topmost" plan.
+   bool issub = level < 2;
+   if (level < 1 && n > ftbase_recursivethreshold) { // Try to generate the "topmost" plan.
       if (n1 * n2 == 0) { // Prime-factor DFT with Bluestein's FFT.
       // Determine the size of the Bluestein buffer.
          ae_int_t m = ftbasefindsmooth(2 * n - 1);
@@ -9462,7 +9400,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
          ftbase_ftpushentry(gridp, rowptr, ftbase_opbluesteinsfft, k, n, 2, m, 2, *precrptr, 0);
          ae_int_t row0 = *rowptr;
          ftbase_ftpushentry(gridp, rowptr, ftbase_opjmp, 0, 0, 0, 0);
-         ftbase_ftcomplexfftplanrec(m, 1, true, true, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(m, 1, 0, rowptr, bluesteinnp, precrptr, preciptr, plan);
          gridp->xyZ[row0][ftbase_colparam0] = *rowptr - row0;
          ftbase_ftpushentry(gridp, rowptr, ftbase_opend, k, n, 2, 0);
       // Fill the precomputed buffer.
@@ -9481,10 +9419,10 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
          ftbase_ftpushentry(gridp, rowptr, ftbase_opcomplextranspose, k, n, 2, n1);
          ftbase_ftpushentry(gridp, rowptr, ftbase_opend, k, n, 2, 0);
          ae_int_t row1 = *rowptr;
-         ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(n1, 1, 1, rowptr, bluesteinnp, precrptr, preciptr, plan);
          gridp->xyZ[row0][ftbase_colparam0] = row1 - row0;
          ae_int_t row3 = *rowptr;
-         ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(n2, 1, 1, rowptr, bluesteinnp, precrptr, preciptr, plan);
          gridp->xyZ[row2][ftbase_colparam0] = row3 - row2;
       }
    } else {
@@ -9506,7 +9444,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
             *precrptr += 2 * (n - 1);
             ae_int_t row0 = *rowptr;
             ftbase_ftpushentry(gridp, rowptr, ftbase_opjmp, 0, 0, 0, 0);
-            ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+            ftbase_ftcomplexfftplanrec(m, 1, 1, rowptr, bluesteinnp, precrptr, preciptr, plan);
             gridp->xyZ[row0][ftbase_colparam0] = *rowptr - row0;
             if (issub) ftbase_ftpushentry(gridp, rowptr, ftbase_opend, k, n, 2, 0);
          } else { // Prime-factor DFT with Bluestein's FFT.
@@ -9518,7 +9456,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
             *precrptr += 4 * m;
             ae_int_t row0 = *rowptr;
             ftbase_ftpushentry(gridp, rowptr, ftbase_opjmp, 0, 0, 0, 0);
-            ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+            ftbase_ftcomplexfftplanrec(m, 1, 1, rowptr, bluesteinnp, precrptr, preciptr, plan);
             gridp->xyZ[row0][ftbase_colparam0] = *rowptr - row0;
             if (issub) ftbase_ftpushentry(gridp, rowptr, ftbase_opend, k, n, 2, 0);
          }
@@ -9529,7 +9467,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
       // * a final transposition.
          if (issub) ftbase_ftpushentry(gridp, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n));
          ftbase_ftpushentry(gridp, rowptr, ftbase_opcomplexcodelettwfft, k, n1, 2 * n2, 0);
-         ftbase_ftcomplexfftplanrec(n2, k * n1, false, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(n2, k * n1, 2, rowptr, bluesteinnp, precrptr, preciptr, plan);
          ftbase_ftpushentry(gridp, rowptr, ftbase_opcomplextranspose, k, n, 2, n1);
          if (issub) ftbase_ftpushentry(gridp, rowptr, ftbase_opend, k, n, 2, 0);
       } else if (n <= ftbase_recursivethreshold) { // Small n DFT: general "flat" Cooley-Tukey FFT.
@@ -9537,10 +9475,10 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
       // (nested subplans are inserted directly into the body of the plan).
          if (issub) ftbase_ftpushentry(gridp, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n));
          ftbase_ftpushentry(gridp, rowptr, ftbase_opcomplextranspose, k, n, 2, n1);
-         ftbase_ftcomplexfftplanrec(n1, k * n2, false, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(n1, k * n2, 2, rowptr, bluesteinnp, precrptr, preciptr, plan);
          ftbase_ftpushentry(gridp, rowptr, ftbase_opcomplexfftfactors, k, n, 2, n1);
          ftbase_ftpushentry(gridp, rowptr, ftbase_opcomplextranspose, k, n, 2, n2);
-         ftbase_ftcomplexfftplanrec(n2, k * n1, false, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(n2, k * n1, 2, rowptr, bluesteinnp, precrptr, preciptr, plan);
          ftbase_ftpushentry(gridp, rowptr, ftbase_opcomplextranspose, k, n, 2, n1);
          if (issub) ftbase_ftpushentry(gridp, rowptr, ftbase_opend, k, n, 2, 0);
       } else { // Large n DFT: general "recursive" Cooley-Tukey DFT - nested subplans are separated from the plan body.
@@ -9557,14 +9495,14 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
          if (issub) ftbase_ftpushentry(gridp, rowptr, ftbase_opend, k, n, 2, 0);
       // Generate the sub-plans, linking them to their sup-plans.
          ae_int_t row1 = *rowptr;
-         ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(n1, 1, 1, rowptr, bluesteinnp, precrptr, preciptr, plan);
          gridp->xyZ[row0][ftbase_colparam0] = row1 - row0;
          ae_int_t row3 = *rowptr;
-         ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinnp, precrptr, preciptr, plan);
+         ftbase_ftcomplexfftplanrec(n2, 1, 1, rowptr, bluesteinnp, precrptr, preciptr, plan);
          gridp->xyZ[row2][ftbase_colparam0] = row3 - row2;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Generate an FFT plan for k length-n complex DFT's.
@@ -9575,8 +9513,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool 
 //     plan - the plan.
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(fasttransformplan, plan);
    NewObj(RVector, bluesteinbuf);
 // Verify the parameters.
@@ -9599,14 +9536,14 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
 // Generate the plan.
    ae_int_t row = 0, precr = 0, preci = 0, bluesteinsize = 1;
    ae_vector_set_length(&plan->buffer, 2 * n * k);
-   ftbase_ftcomplexfftplanrec(n, k, true, true, &row, &bluesteinsize, &precr, &preci, plan);
+   ftbase_ftcomplexfftplanrec(n, k, 0, &row, &bluesteinsize, &precr, &preci, plan);
    ae_vector_set_length(&bluesteinbuf, bluesteinsize);
-   ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof bluesteinbuf, RVector_init, RVector_copy, RVector_free);
+   PoolSet(&plan->bluesteinpool, RVector, bluesteinbuf);
 // Check that the actual amount of precomputed space used by the transformation plan
 // EXACTLY matches the amount of space allocated by us.
    ae_assert(precr == precrsize, "ftcomplexfftplan: internal error (precr != precrsize)");
    ae_assert(preci == precisize, "ftcomplexfftplan: internal error (preci != precisize)");
-   ae_frame_leave();
+   DeFrame();
 }
 
 void fasttransformplan_init(void *_p, bool make_automatic) {

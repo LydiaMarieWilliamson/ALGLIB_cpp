@@ -51,27 +51,25 @@ namespace alglib_impl {
 // ALGLIB: Copyright 25.08.2008 by Sergey Bochkanov
 // API: void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, real_1d_array &s2, real_2d_array &v);
 void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, RVector *s2, RMatrix *v) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double mean;
    double variance;
    double skewness;
    double kurtosis;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(s2);
    SetMatrix(v);
-   NewMatrix(a, 0, 0, DT_REAL);
-   NewMatrix(u, 0, 0, DT_REAL);
-   NewMatrix(vt, 0, 0, DT_REAL);
-   NewVector(m, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
+   NewRMatrix(a, 0, 0);
+   NewRMatrix(u, 0, 0);
+   NewRMatrix(vt, 0, 0);
+   NewRVector(m, 0);
+   NewRVector(t, 0);
 // Check input data
    if (npoints < 0 || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // Special case: NPoints == 0
@@ -90,8 +88,7 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Calculate means
    ae_vector_set_length(&m, nvars);
@@ -114,8 +111,7 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
    }
    if (!rmatrixsvd(&a, imax2(npoints, nvars), nvars, 0, 1, 2, s2, &u, &vt)) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (npoints != 1) {
       for (i = 0; i < nvars; i++) {
@@ -124,7 +120,7 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
    }
    ae_matrix_set_length(v, nvars, nvars);
    copyandtranspose(&vt, 0, nvars - 1, 0, nvars - 1, v, 0, nvars - 1, 0, nvars - 1);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Principal components analysis
@@ -169,17 +165,16 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
 // ALGLIB: Copyright 10.01.2017 by Sergey Bochkanov
 // API: void pcatruncatedsubspace(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v);
 void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t nneeded, double eps, ae_int_t maxits, RVector *s2, RMatrix *v) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double vv;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(s2);
    SetMatrix(v);
-   NewMatrix(a, 0, 0, DT_REAL);
-   NewMatrix(b, 0, 0, DT_REAL);
-   NewVector(means, 0, DT_REAL);
+   NewRMatrix(a, 0, 0);
+   NewRMatrix(b, 0, 0);
+   NewRVector(means, 0);
    NewObj(eigsubspacestate, solver);
    NewObj(eigsubspacereport, rep);
    ae_assert(npoints >= 0, "PCATruncatedSubspace: npoints < 0");
@@ -206,8 +201,7 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Center matrix
    ae_vector_set_length(&means, nvars);
@@ -239,7 +233,7 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
          s2->xR[i] /= npoints - 1;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Sparse truncated principal components analysis
@@ -291,19 +285,18 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
 // ALGLIB: Copyright 10.01.2017 by Sergey Bochkanov
 // API: void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v);
 void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t nneeded, double eps, ae_int_t maxits, RVector *s2, RMatrix *v) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double vv;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(s2);
    SetMatrix(v);
    NewObj(sparsematrix, xcrs);
-   NewVector(b1, 0, DT_REAL);
-   NewVector(c1, 0, DT_REAL);
-   NewVector(z1, 0, DT_REAL);
-   NewVector(means, 0, DT_REAL);
+   NewRVector(b1, 0);
+   NewRVector(c1, 0);
+   NewRVector(z1, 0);
+   NewRVector(means, 0);
    NewObj(eigsubspacestate, solver);
    NewObj(eigsubspacereport, rep);
    ae_assert(npoints >= 0, "PCATruncatedSubspaceSparse: npoints < 0");
@@ -332,15 +325,13 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // If input data are not in CRS format, perform conversion to CRS
    if (!sparseiscrs(x)) {
       sparsecopytocrs(x, &xcrs);
       pcatruncatedsubspacesparse(&xcrs, npoints, nvars, nneeded, eps, maxits, s2, v);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Initialize parameters, prepare buffers
    ae_vector_set_length(&b1, npoints);
@@ -387,7 +378,7 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
          s2->xR[i] /= npoints - 1;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -551,23 +542,21 @@ void dserrfinish(RVector *buf) {
 
 // ALGLIB: Copyright 19.05.2008 by Sergey Bochkanov
 void dsnormalize(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, RVector *means, RVector *sigmas) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double mean;
    double variance;
    double skewness;
    double kurtosis;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(means);
    SetVector(sigmas);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(tmp, 0);
 // Test parameters
    if (npoints <= 0 || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // Standartization
@@ -586,27 +575,25 @@ void dsnormalize(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, 
          xy->xyR[i][j] = (xy->xyR[i][j] - means->xR[j]) / sigmas->xR[j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // ALGLIB: Copyright 19.05.2008 by Sergey Bochkanov
 void dsnormalizec(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, RVector *means, RVector *sigmas) {
-   ae_frame _frame_block;
    ae_int_t j;
    double mean;
    double variance;
    double skewness;
    double kurtosis;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(means);
    SetVector(sigmas);
-   NewVector(tmp, 0, DT_REAL);
+   NewRVector(tmp, 0);
 // Test parameters
    if (npoints <= 0 || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    *info = 1;
 // Standartization
@@ -622,24 +609,22 @@ void dsnormalizec(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
          sigmas->xR[j] = 1.0;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // ALGLIB: Copyright 19.05.2008 by Sergey Bochkanov
 double dsgetmeanmindistance(RMatrix *xy, ae_int_t npoints, ae_int_t nvars) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(tmp, 0, DT_REAL);
-   NewVector(tmp2, 0, DT_REAL);
+   EnFrame();
+   NewRVector(tmp, 0);
+   NewRVector(tmp2, 0);
 // Test parameters
    if (npoints <= 0 || nvars < 1) {
       result = 0.0;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Process
    ae_vector_set_length(&tmp, npoints);
@@ -661,26 +646,23 @@ double dsgetmeanmindistance(RMatrix *xy, ae_int_t npoints, ae_int_t nvars) {
    for (i = 0; i < npoints; i++) {
       result += tmp.xR[i] / npoints;
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // ALGLIB: Copyright 19.05.2008 by Sergey Bochkanov
 void dstie(RVector *a, ae_int_t n, ZVector *ties, ae_int_t *tiecount, ZVector *p1, ZVector *p2) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(ties);
    *tiecount = 0;
    SetVector(p1);
    SetVector(p2);
-   NewVector(tmp, 0, DT_INT);
+   NewZVector(tmp, 0);
 // Special case
    if (n <= 0) {
       *tiecount = 0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Sort A
    tagsort(a, n, p1, p2);
@@ -701,22 +683,20 @@ void dstie(RVector *a, ae_int_t n, ZVector *ties, ae_int_t *tiecount, ZVector *p
       }
    }
    ties->xZ[*tiecount] = n;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
 void dstiefasti(RVector *a, ZVector *b, ae_int_t n, ZVector *ties, ae_int_t *tiecount, RVector *bufr, ZVector *bufi) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *tiecount = 0;
-   NewVector(tmp, 0, DT_INT);
+   NewZVector(tmp, 0);
 // Special case
    if (n <= 0) {
       *tiecount = 0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Sort A
    tagsortfasti(a, b, bufr, bufi, n);
@@ -731,7 +711,7 @@ void dstiefasti(RVector *a, ZVector *b, ae_int_t n, ZVector *ties, ae_int_t *tie
    }
    ties->xZ[k] = n;
    *tiecount = k;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal function
@@ -770,7 +750,6 @@ static double bdss_xlny(double x, double y) {
 // ALGLIB: Copyright 22.05.2008 by Sergey Bochkanov
 // API: void dsoptimalsplit2(const real_1d_array &a, const integer_1d_array &c, const ae_int_t n, ae_int_t &info, double &threshold, double &pal, double &pbl, double &par, double &pbr, double &cve);
 void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double *threshold, double *pal, double *pbl, double *par, double *pbr, double *cve) {
-   ae_frame _frame_block;
    ae_int_t i;
    double s;
    ae_int_t tiecount;
@@ -780,7 +759,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
    double pbk;
    double cvoptimal;
    double cv;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(a);
    DupVector(c);
    *info = 0;
@@ -790,20 +769,18 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
    *par = 0.0;
    *pbr = 0.0;
    *cve = 0.0;
-   NewVector(ties, 0, DT_INT);
-   NewVector(p1, 0, DT_INT);
-   NewVector(p2, 0, DT_INT);
+   NewZVector(ties, 0);
+   NewZVector(p1, 0);
+   NewZVector(p2, 0);
 // Test for errors in inputs
    if (n <= 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       if (c->xZ[i] != 0 && c->xZ[i] != 1) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    *info = 1;
@@ -820,8 +797,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 //       intermediate values are not allowed.
    if (tiecount == 1) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case, number of ties > 1
 //
@@ -898,7 +874,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
    s = *par + *pbr;
    *par /= s;
    *pbr /= s;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Optimal partition, internal subroutine. Fast version.
@@ -1068,7 +1044,6 @@ static void bdss_tiesubc(ZVector *c, ZVector *ties, ae_int_t ntie, ae_int_t nc, 
 // Automatic non-optimal discretization, internal subroutine.
 // ALGLIB: Copyright 22.05.2008 by Sergey Bochkanov
 void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae_int_t *info, RVector *thresholds, ae_int_t *ni, double *cve) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
@@ -1078,30 +1053,28 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
    ae_int_t bestk;
    double bestcve;
    double curcve;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(a);
    DupVector(c);
    *info = 0;
    SetVector(thresholds);
    *ni = 0;
    *cve = 0.0;
-   NewVector(ties, 0, DT_INT);
-   NewVector(p1, 0, DT_INT);
-   NewVector(p2, 0, DT_INT);
-   NewVector(cnt, 0, DT_INT);
-   NewVector(bestsizes, 0, DT_INT);
-   NewVector(cursizes, 0, DT_INT);
+   NewZVector(ties, 0);
+   NewZVector(p1, 0);
+   NewZVector(p2, 0);
+   NewZVector(cnt, 0);
+   NewZVector(bestsizes, 0);
+   NewZVector(cursizes, 0);
 // Test for errors in inputs
    if (n <= 0 || nc < 2 || kmax < 2) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       if (c->xZ[i] < 0 || c->xZ[i] >= nc) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    *info = 1;
@@ -1115,8 +1088,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
 // Special cases
    if (tiecount == 1) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case:
 // 0. allocate arrays
@@ -1220,13 +1192,12 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
       thresholds->xR[i - 1] = 0.5 * (a->xR[j - 1] + a->xR[j]);
       j += bestsizes.xZ[i];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Automatic optimal discretization, internal subroutine.
 // ALGLIB: Copyright 22.05.2008 by Sergey Bochkanov
 void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae_int_t *info, RVector *thresholds, ae_int_t *ni, double *cve) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t s;
@@ -1238,31 +1209,29 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
    ae_int_t k;
    ae_int_t koptimal;
    double cvoptimal;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupVector(a);
    DupVector(c);
    *info = 0;
    SetVector(thresholds);
    *ni = 0;
    *cve = 0.0;
-   NewVector(ties, 0, DT_INT);
-   NewVector(p1, 0, DT_INT);
-   NewVector(p2, 0, DT_INT);
-   NewVector(cnt, 0, DT_INT);
-   NewVector(cnt2, 0, DT_INT);
-   NewMatrix(cv, 0, 0, DT_REAL);
-   NewMatrix(splits, 0, 0, DT_INT);
+   NewZVector(ties, 0);
+   NewZVector(p1, 0);
+   NewZVector(p2, 0);
+   NewZVector(cnt, 0);
+   NewZVector(cnt2, 0);
+   NewRMatrix(cv, 0, 0);
+   NewZMatrix(splits, 0, 0);
 // Test for errors in inputs
    if (n <= 0 || nc < 2 || kmax < 2) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < n; i++) {
       if (c->xZ[i] < 0 || c->xZ[i] >= nc) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    *info = 1;
@@ -1276,8 +1245,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
 // Special cases
    if (tiecount == 1) {
       *info = -3;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case
 // Use dynamic programming to find best split in O(KMax*NC*TieCount^2) time
@@ -1380,7 +1348,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
          jl = splits.xyZ[k - 1][jr];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void cvreport_init(void *_p, bool make_automatic) {
@@ -1810,7 +1778,6 @@ static void mlpbase_randomizebackwardpass(multilayerperceptron *network, ae_int_
 // ALGLIB: Copyright 06.11.2007 by Sergey Bochkanov
 // API: void mlprandomize(const multilayerperceptron &network);
 void mlprandomize(multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
@@ -1831,7 +1798,7 @@ void mlprandomize(multilayerperceptron *network) {
    double ef2;
    double v;
    double wscale;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(hqrndstate, r);
    hqrndrandomize(&r);
    mlpproperties(network, &nin, &nout, &wcount);
@@ -1965,7 +1932,7 @@ void mlprandomize(multilayerperceptron *network) {
    for (i = 0; i < wcount; i++) {
       network->weights.xR[i] *= hqrndnormal(&r);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Randomization of neural network weights and standartisator
@@ -2009,7 +1976,6 @@ void mlprandomizefull(multilayerperceptron *network) {
 // Internal subroutine.
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVector *ltypes, ZVector *lconnfirst, ZVector *lconnlast, ae_int_t layerscount, bool isclsnet, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t ssize;
@@ -2018,11 +1984,11 @@ static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVec
    ae_int_t offs;
    ae_int_t nprocessed;
    ae_int_t wallocated;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(localtemp, 0, DT_INT);
-   NewVector(lnfirst, 0, DT_INT);
-   NewVector(lnsyn, 0, DT_INT);
+   NewZVector(localtemp, 0);
+   NewZVector(lnfirst, 0);
+   NewZVector(lnsyn, 0);
    NewObj(mlpbuffers, buf);
    NewObj(smlpgrad, sgrad);
 // Check
@@ -2141,14 +2107,14 @@ static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVec
    }
    mlprandomize(network);
 // Seed buffers
-   ae_shared_pool_set_seed(&network->buf, &buf, sizeof(buf), mlpbuffers_init, mlpbuffers_copy, mlpbuffers_free);
+   PoolSet(&network->buf, mlpbuffers, buf);
    ae_vector_set_length(&sgrad.g, wcount);
    sgrad.f = 0.0;
    for (i = 0; i < wcount; i++) {
       sgrad.g.xR[i] = 0.0;
    }
-   ae_shared_pool_set_seed(&network->gradbuf, &sgrad, sizeof(sgrad), smlpgrad_init, smlpgrad_copy, smlpgrad_free);
-   ae_frame_leave();
+   PoolSet(&network->gradbuf, smlpgrad, sgrad);
+   DeFrame();
 }
 
 // Creates  neural  network  with  NIn  inputs,  NOut outputs, without hidden
@@ -2157,15 +2123,14 @@ static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVec
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpcreate0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreate0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2179,7 +2144,7 @@ void mlpcreate0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, 0, 0, nout, false, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same  as  MLPCreate0,  but  with  one  hidden  layer  (NHid  neurons) with
@@ -2187,15 +2152,14 @@ void mlpcreate0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpcreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3 + 3;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2211,7 +2175,7 @@ void mlpcreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid, 0, nout, false, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same as MLPCreate0, but with two hidden layers (NHid1 and  NHid2  neurons)
@@ -2220,15 +2184,14 @@ void mlpcreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3 + 3 + 3;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2246,7 +2209,7 @@ void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mul
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid1, nhid2, nout, false, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Creates  neural  network  with  NIn  inputs,  NOut outputs, without hidden
@@ -2263,16 +2226,15 @@ void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mul
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpcreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
 void mlpcreateb0(ae_int_t nin, ae_int_t nout, double b, double d, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3;
    if (d >= 0.0) {
       d = 1.0;
@@ -2296,23 +2258,22 @@ void mlpcreateb0(ae_int_t nin, ae_int_t nout, double b, double d, multilayerperc
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same as MLPCreateB0 but with non-linear hidden layer.
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpcreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
 void mlpcreateb1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double b, double d, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3 + 3;
    if (d >= 0.0) {
       d = 1.0;
@@ -2338,23 +2299,22 @@ void mlpcreateb1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double b, double d,
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same as MLPCreateB0 but with two non-linear hidden layers.
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpcreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
 void mlpcreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, double b, double d, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3 + 3 + 3;
    if (d >= 0.0) {
       d = 1.0;
@@ -2382,7 +2342,7 @@ void mlpcreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Creates  neural  network  with  NIn  inputs,  NOut outputs, without hidden
@@ -2391,16 +2351,15 @@ void mlpcreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpcreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
 void mlpcreater0(ae_int_t nin, ae_int_t nout, double a, double b, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2419,23 +2378,22 @@ void mlpcreater0(ae_int_t nin, ae_int_t nout, double a, double b, multilayerperc
       network->columnmeans.xR[i] = 0.5 * (a + b);
       network->columnsigmas.xR[i] = 0.5 * (a - b);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same as MLPCreateR0, but with non-linear hidden layer.
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpcreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
 void mlpcreater1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double a, double b, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3 + 3;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2456,23 +2414,22 @@ void mlpcreater1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double a, double b,
       network->columnmeans.xR[i] = 0.5 * (a + b);
       network->columnsigmas.xR[i] = 0.5 * (a - b);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same as MLPCreateR0, but with two non-linear hidden layers.
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpcreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
 void mlpcreater2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, double a, double b, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    layerscount = 1 + 3 + 3 + 3;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2495,7 +2452,7 @@ void mlpcreater2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
       network->columnmeans.xR[i] = 0.5 * (a + b);
       network->columnsigmas.xR[i] = 0.5 * (a - b);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Creates classifier network with NIn  inputs  and  NOut  possible  classes.
@@ -2505,15 +2462,14 @@ void mlpcreater2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpcreatec0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreatec0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    ae_assert(nout >= 2, "MLPCreateC0: NOut < 2!");
    layerscount = 1 + 2 + 1;
 // Allocate arrays
@@ -2528,22 +2484,21 @@ void mlpcreatec0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, true, network);
    mlpbase_fillhighlevelinformation(network, nin, 0, 0, nout, true, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same as MLPCreateC0, but with one non-linear hidden layer.
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpcreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreatec1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    ae_assert(nout >= 2, "MLPCreateC1: NOut < 2!");
    layerscount = 1 + 3 + 2 + 1;
 // Allocate arrays
@@ -2560,22 +2515,21 @@ void mlpcreatec1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptro
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, true, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid, 0, nout, true, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Same as MLPCreateC0, but with two non-linear hidden layers.
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpcreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t layerscount;
    ae_int_t lastproc;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(lsizes, 0, DT_INT);
-   NewVector(ltypes, 0, DT_INT);
-   NewVector(lconnfirst, 0, DT_INT);
-   NewVector(lconnlast, 0, DT_INT);
+   NewZVector(lsizes, 0);
+   NewZVector(ltypes, 0);
+   NewZVector(lconnfirst, 0);
+   NewZVector(lconnlast, 0);
    ae_assert(nout >= 2, "MLPCreateC2: NOut < 2!");
    layerscount = 1 + 3 + 3 + 2 + 1;
 // Allocate arrays
@@ -2594,7 +2548,7 @@ void mlpcreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mu
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, true, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid1, nhid2, nout, true, true);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Neural network activation function
@@ -3696,7 +3650,6 @@ void mlpgradn(multilayerperceptron *network, RVector *x, RVector *desiredy, doub
 // THIS FUNCTION IS NOT INTENDED TO BE USED BY ALGLIB USERS!
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, ae_shared_pool *gradbuf) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
@@ -3708,7 +3661,7 @@ void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    double problemcost;
    ae_int_t len0;
    ae_int_t len1;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(mlpbuffers, buf2);
    RefObj(mlpbuffers, pbuf);
    RefObj(smlpgrad, sgrad);
@@ -3741,12 +3694,11 @@ void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
       len0 = splitlength(subset1 - subset0, mlpbase_microbatchsize), len1 = subset1 - subset0 - len0;
       mlpgradbatchx(network, densexy, sparsexy, datasetsize, datasettype, idx, subset0, subset0 + len0, subsettype, buf, gradbuf);
       mlpgradbatchx(network, densexy, sparsexy, datasetsize, datasettype, idx, subset0 + len0, subset1, subsettype, buf, gradbuf);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Chunked processing
-   ae_shared_pool_retrieve(gradbuf, &_sgrad);
-   ae_shared_pool_retrieve(buf, &_pbuf);
+   PoolGet(gradbuf, sgrad);
+   PoolGet(buf, pbuf);
    hpcpreparechunkedgradient(&network->weights, wcount, mlpntotal(network), nin, nout, pbuf);
    cstart = subset0;
    while (cstart < subset1) {
@@ -3774,9 +3726,9 @@ void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
       cstart += pbuf->chunksize;
    }
    hpcfinalizechunkedgradient(pbuf, &sgrad->g);
-   ae_shared_pool_recycle(buf, &_pbuf);
-   ae_shared_pool_recycle(gradbuf, &_sgrad);
-   ae_frame_leave();
+   PoolPut(buf, pbuf);
+   PoolPut(gradbuf, sgrad);
+   DeFrame();
 }
 
 // Batch gradient calculation for a set of inputs/outputs
@@ -3801,7 +3753,6 @@ void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
 void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t nin;
    ae_int_t nout;
@@ -3809,7 +3760,7 @@ void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, do
    ae_int_t subset0;
    ae_int_t subset1;
    ae_int_t subsettype;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize < 0");
@@ -3818,7 +3769,7 @@ void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, do
    subsettype = 0;
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
@@ -3829,13 +3780,13 @@ void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, do
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Batch gradient calculation for a set  of inputs/outputs  given  by  sparse
@@ -3862,7 +3813,6 @@ void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, do
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 // API: void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
 void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize, double *e, RVector *grad) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t nin;
    ae_int_t nout;
@@ -3870,7 +3820,7 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
    ae_int_t subset0;
    ae_int_t subset1;
    ae_int_t subsettype;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize < 0");
@@ -3880,7 +3830,7 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
    subsettype = 0;
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
@@ -3891,13 +3841,13 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Batch gradient calculation for a subset of dataset
@@ -3936,7 +3886,6 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 // API: void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
 void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize, double *e, RVector *grad) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t nin;
    ae_int_t nout;
@@ -3945,7 +3894,7 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
    ae_int_t subset0;
    ae_int_t subset1;
    ae_int_t subsettype;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(setsize >= 0, "MLPGradBatchSubset: SetSize < 0");
@@ -3966,7 +3915,7 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
    }
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
@@ -3977,13 +3926,13 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Batch gradient calculation for a set of inputs/outputs  for  a  subset  of
@@ -4027,7 +3976,6 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 // API: void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
 void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize, double *e, RVector *grad) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t nin;
    ae_int_t nout;
@@ -4036,7 +3984,7 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
    ae_int_t subset0;
    ae_int_t subset1;
    ae_int_t subsettype;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *e = 0.0;
    RefObj(smlpgrad, sgrad);
    ae_assert(setsize >= 0, "MLPGradBatchSparseSubset: SetSize < 0");
@@ -4058,7 +4006,7 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
    }
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
@@ -4069,13 +4017,13 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
+   for (PoolLet(&network->gradbuf, sgrad); sgrad != NULL; PoolYet(&network->gradbuf, sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Batch gradient calculation for a set of inputs/outputs
@@ -4099,17 +4047,16 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpgradnbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
 void mlpgradnbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *e = 0;
    RefObj(mlpbuffers, pbuf);
 // Alloc
    mlpproperties(network, &nin, &nout, &wcount);
-   ae_shared_pool_retrieve(&network->buf, &_pbuf);
+   PoolGet(&network->buf, pbuf);
    hpcpreparechunkedgradient(&network->weights, wcount, mlpntotal(network), nin, nout, pbuf);
    vectorsetlengthatleast(grad, wcount);
    for (i = 0; i < wcount; i++) {
@@ -4122,15 +4069,14 @@ void mlpgradnbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, d
       i += pbuf->chunksize;
    }
    hpcfinalizechunkedgradient(pbuf, grad);
-   ae_shared_pool_recycle(&network->buf, &_pbuf);
-   ae_frame_leave();
+   PoolPut(&network->buf, pbuf);
+   DeFrame();
 }
 
 // Internal subroutine for Hessian calculation.
 //
 // WARNING! Unspeakable math far beyong human capabilities :)
 static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, bool naturalerr, double *e, RVector *grad, RMatrix *h) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
@@ -4160,16 +4106,16 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
    double s2;
    double expi;
    double expj;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *e = 0;
-   NewVector(x, 0, DT_REAL);
-   NewVector(desiredy, 0, DT_REAL);
-   NewVector(gt, 0, DT_REAL);
-   NewVector(zeros, 0, DT_REAL);
-   NewMatrix(rx, 0, 0, DT_REAL);
-   NewMatrix(ry, 0, 0, DT_REAL);
-   NewMatrix(rdx, 0, 0, DT_REAL);
-   NewMatrix(rdy, 0, 0, DT_REAL);
+   NewRVector(x, 0);
+   NewRVector(desiredy, 0);
+   NewRVector(gt, 0);
+   NewRVector(zeros, 0);
+   NewRMatrix(rx, 0, 0);
+   NewRMatrix(ry, 0, 0);
+   NewRMatrix(rdx, 0, 0);
+   NewRMatrix(rdy, 0, 0);
    mlpproperties(network, &nin, &nout, &wcount);
    ntotal = network->structinfo.xZ[3];
    istart = network->structinfo.xZ[5];
@@ -4435,7 +4381,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Batch Hessian calculation (natural error function) using R-algorithm.
@@ -4818,10 +4764,9 @@ void mlpsetweight(multilayerperceptron *network, ae_int_t k0, ae_int_t i0, ae_in
 //     Network2 -   copy
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcopyshared(multilayerperceptron *network1, multilayerperceptron *network2) {
-   ae_frame _frame_block;
    ae_int_t wcount;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(mlpbuffers, buf);
    NewObj(smlpgrad, sgrad);
 // Copy scalar and array fields
@@ -4843,14 +4788,14 @@ void mlpcopyshared(multilayerperceptron *network1, multilayerperceptron *network
    copyintegerarray(&network1->integerbuf, &network2->integerbuf);
 // copy buffers
    wcount = mlpgetweightscount(network1);
-   ae_shared_pool_set_seed(&network2->buf, &buf, sizeof(buf), mlpbuffers_init, mlpbuffers_copy, mlpbuffers_free);
+   PoolSet(&network2->buf, mlpbuffers, buf);
    ae_vector_set_length(&sgrad.g, wcount);
    sgrad.f = 0.0;
    for (i = 0; i < wcount; i++) {
       sgrad.g.xR[i] = 0.0;
    }
-   ae_shared_pool_set_seed(&network2->gradbuf, &sgrad, sizeof(sgrad), smlpgrad_init, smlpgrad_copy, smlpgrad_free);
-   ae_frame_leave();
+   PoolSet(&network2->gradbuf, smlpgrad, sgrad);
+   DeFrame();
 }
 
 // Copying of neural network
@@ -5155,7 +5100,6 @@ void mlpunserializeold(RVector *ra, multilayerperceptron *network) {
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpinitpreprocessor(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
 void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t jmax;
@@ -5167,9 +5111,9 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
    ae_int_t offs;
    ae_int_t ntype;
    double s;
-   ae_frame_make(&_frame_block);
-   NewVector(means, 0, DT_REAL);
-   NewVector(sigmas, 0, DT_REAL);
+   EnFrame();
+   NewRVector(means, 0);
+   NewRVector(sigmas, 0);
    mlpproperties(network, &nin, &nout, &wcount);
    ntotal = network->structinfo.xZ[3];
    istart = network->structinfo.xZ[5];
@@ -5238,7 +5182,7 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine.
@@ -5253,7 +5197,6 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
 //     Network -   neural network with initialised preprocessor.
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize) {
-   ae_frame _frame_block;
    ae_int_t jmax;
    ae_int_t nin;
    ae_int_t nout;
@@ -5265,9 +5208,9 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
    double s;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewVector(means, 0, DT_REAL);
-   NewVector(sigmas, 0, DT_REAL);
+   EnFrame();
+   NewRVector(means, 0);
+   NewRVector(sigmas, 0);
    mlpproperties(network, &nin, &nout, &wcount);
    ntotal = network->structinfo.xZ[3];
    istart = network->structinfo.xZ[5];
@@ -5338,7 +5281,7 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine.
@@ -5368,7 +5311,6 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
 //       function.
 // ALGLIB: Copyright 23.08.2012 by Sergey Bochkanov
 void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize) {
-   ae_frame _frame_block;
    ae_int_t jmax;
    ae_int_t nin;
    ae_int_t nout;
@@ -5381,14 +5323,13 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
    ae_int_t npoints;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewVector(means, 0, DT_REAL);
-   NewVector(sigmas, 0, DT_REAL);
+   EnFrame();
+   NewRVector(means, 0);
+   NewRVector(sigmas, 0);
    ae_assert(setsize >= 0, "MLPInitPreprocessorSubset: SetSize < 0");
    if (subsetsize < 0) {
       mlpinitpreprocessor(network, xy, setsize);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(subsetsize <= idx->cnt, "MLPInitPreprocessorSubset: SubsetSize > Length(Idx)");
    npoints = setsize;
@@ -5464,7 +5405,7 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine.
@@ -5495,7 +5436,6 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
 //       MLPInitPreprocessorSparse function.
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize) {
-   ae_frame _frame_block;
    ae_int_t jmax;
    ae_int_t nin;
    ae_int_t nout;
@@ -5508,14 +5448,13 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
    ae_int_t npoints;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewVector(means, 0, DT_REAL);
-   NewVector(sigmas, 0, DT_REAL);
+   EnFrame();
+   NewRVector(means, 0);
+   NewRVector(sigmas, 0);
    ae_assert(setsize >= 0, "MLPInitPreprocessorSparseSubset: SetSize < 0");
    if (subsetsize < 0) {
       mlpinitpreprocessorsparse(network, xy, setsize);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(subsetsize <= idx->cnt, "MLPInitPreprocessorSparseSubset: SubsetSize > Length(Idx)");
    npoints = setsize;
@@ -5593,7 +5532,7 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
          }
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Calculation of all types of errors at once for a subset or  full  dataset,
@@ -5602,7 +5541,6 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
 // THIS INTERNAL FUNCTION IS NOT INTENDED TO BE USED BY ALGLIB USERS!
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
@@ -5615,7 +5553,7 @@ void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    ae_int_t len0;
    ae_int_t len1;
    double problemcost;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(mlpbuffers, pbuf);
    NewObj(modelerrors, rep0);
    NewObj(modelerrors, rep1);
@@ -5649,11 +5587,10 @@ void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
       rep->rmserror = sqrt((len0 * sqr(rep0.rmserror) + len1 * sqr(rep1.rmserror)) / (len0 + len1));
       rep->avgerror = (len0 * rep0.avgerror + len1 * rep1.avgerror) / (len0 + len1);
       rep->avgrelerror = (len0 * rep0.avgrelerror + len1 * rep1.avgrelerror) / (len0 + len1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Retrieve and prepare
-   ae_shared_pool_retrieve(buf, &_pbuf);
+   PoolGet(buf, pbuf);
    if (iscls) {
       rowsize = nin + 1;
       dserrallocate(nout, &pbuf->tmp0);
@@ -5709,8 +5646,8 @@ void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    rep->avgerror = pbuf->tmp0.xR[3];
    rep->avgrelerror = pbuf->tmp0.xR[4];
 // Recycle
-   ae_shared_pool_recycle(buf, &_pbuf);
-   ae_frame_leave();
+   PoolPut(buf, pbuf);
+   DeFrame();
 }
 
 // Error of the neural network on dataset.
@@ -6710,7 +6647,6 @@ void mlpserialize(ae_serializer *s, multilayerperceptron *network) {
 // API: void mlpunserialize(const std::string &s_in, multilayerperceptron &obj);
 // API: void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj);
 void mlpunserialize(ae_serializer *s, multilayerperceptron *network) {
-   ae_frame _frame_block;
    ae_int_t i0;
    ae_int_t i1;
    ae_int_t i;
@@ -6723,9 +6659,9 @@ void mlpunserialize(ae_serializer *s, multilayerperceptron *network) {
    ae_int_t nin;
    ae_int_t nout;
    bool issoftmax;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(multilayerperceptron, network);
-   NewVector(layersizes, 0, DT_INT);
+   NewZVector(layersizes, 0);
 // check correctness of header
    i0 = ae_serializer_unserialize_int(s);
    ae_assert(i0 == getmlpserializationcode(), "mlpunserialize: stream header corrupted");
@@ -6781,7 +6717,7 @@ void mlpunserialize(ae_serializer *s, multilayerperceptron *network) {
       v1 = ae_serializer_unserialize_double(s);
       mlpsetoutputscaling(network, j, v0, v1);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 void modelerrors_init(void *_p, bool make_automatic) {
@@ -7468,156 +7404,144 @@ void mlpecreatefromnetwork(multilayerperceptron *network, ae_int_t ensemblesize,
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreate0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreate0(ae_int_t nin, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreate0(nin, nout, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreate1, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreate1(nin, nhid, nout, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreate2, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreate2(nin, nhid1, nhid2, nout, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateB0, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreateb0(ae_int_t nin, ae_int_t nout, double b, double d, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreateb0(nin, nout, b, d, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateB1, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreateb1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double b, double d, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreateb1(nin, nhid, nout, b, d, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateB2, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, double b, double d, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreateb2(nin, nhid1, nhid2, nout, b, d, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateR0, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreater0(ae_int_t nin, ae_int_t nout, double a, double b, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreater0(nin, nout, a, b, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateR1, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreater1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double a, double b, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreater1(nin, nhid, nout, a, b, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateR2, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreater2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, double a, double b, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreater2(nin, nhid1, nhid2, nout, a, b, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateC0, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreatec0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreatec0(ae_int_t nin, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreatec0(nin, nout, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateC1, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreatec1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreatec1(nin, nhid, nout, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like MLPCreateC2, but for ensembles.
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 // API: void mlpecreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpensemble, ensemble);
    NewObj(multilayerperceptron, net);
    mlpcreatec2(nin, nhid1, nhid2, nout, &net);
    mlpecreatefromnetwork(&net, ensemblesize, ensemble);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Copying of MLPEnsemble structure
@@ -7745,14 +7669,13 @@ void mlpeprocessi(mlpensemble *ensemble, RVector *x, RVector *y) {
 // Calculation of all types of errors
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlpeallerrorsx(mlpensemble *ensemble, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t nin;
    ae_int_t nout;
    bool iscls;
    ae_int_t srcidx;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(mlpbuffers, pbuf);
    NewObj(modelerrors, rep0);
    NewObj(modelerrors, rep1);
@@ -7761,7 +7684,7 @@ void mlpeallerrorsx(mlpensemble *ensemble, RMatrix *densexy, sparsematrix *spars
    nout = mlpgetoutputscount(&ensemble->network);
    iscls = mlpissoftmax(&ensemble->network);
 // Retrieve buffer, prepare, process data, recycle buffer
-   ae_shared_pool_retrieve(buf, &_pbuf);
+   PoolGet(buf, pbuf);
    if (iscls) {
       dserrallocate(nout, &pbuf->tmp0);
    } else {
@@ -7811,27 +7734,26 @@ void mlpeallerrorsx(mlpensemble *ensemble, RMatrix *densexy, sparsematrix *spars
    rep->rmserror = pbuf->tmp0.xR[2];
    rep->avgerror = pbuf->tmp0.xR[3];
    rep->avgrelerror = pbuf->tmp0.xR[4];
-   ae_shared_pool_recycle(buf, &_pbuf);
-   ae_frame_leave();
+   PoolPut(buf, pbuf);
+   DeFrame();
 }
 
 // Calculation of all types of errors on dataset given by sparse matrix
 // ALGLIB: Copyright 10.09.2012 by Sergey Bochkanov
 void mlpeallerrorssparse(mlpensemble *ensemble, sparsematrix *xy, ae_int_t npoints, double *relcls, double *avgce, double *rms, double *avg, double *avgrel) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t nin;
    ae_int_t nout;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *relcls = 0.0;
    *avgce = 0.0;
    *rms = 0.0;
    *avg = 0.0;
    *avgrel = 0.0;
-   NewVector(buf, 0, DT_REAL);
-   NewVector(workx, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
-   NewVector(dy, 0, DT_REAL);
+   NewRVector(buf, 0);
+   NewRVector(workx, 0);
+   NewRVector(y, 0);
+   NewRVector(dy, 0);
    nin = mlpgetinputscount(&ensemble->network);
    nout = mlpgetoutputscount(&ensemble->network);
    if (mlpissoftmax(&ensemble->network)) {
@@ -7857,7 +7779,7 @@ void mlpeallerrorssparse(mlpensemble *ensemble, sparsematrix *xy, ae_int_t npoin
    *rms = buf.xR[2];
    *avg = buf.xR[3];
    *avgrel = buf.xR[4];
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Relative classification error on the test set
@@ -7874,14 +7796,12 @@ void mlpeallerrorssparse(mlpensemble *ensemble, sparsematrix *xy, ae_int_t npoin
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 // API: double mlperelclserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 double mlperelclserror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(modelerrors, rep);
    mlpeallerrorsx(ensemble, xy, &ensemble->network.dummysxy, npoints, 0, &ensemble->network.dummyidx, 0, npoints, 0, &ensemble->network.buf, &rep);
    result = rep.relclserror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average cross-entropy (in bits per element) on the test set
@@ -7897,14 +7817,12 @@ double mlperelclserror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 // API: double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 double mlpeavgce(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(modelerrors, rep);
    mlpeallerrorsx(ensemble, xy, &ensemble->network.dummysxy, npoints, 0, &ensemble->network.dummyidx, 0, npoints, 0, &ensemble->network.buf, &rep);
    result = rep.avgce;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // RMS error on the test set
@@ -7921,14 +7839,12 @@ double mlpeavgce(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 // API: double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 double mlpermserror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(modelerrors, rep);
    mlpeallerrorsx(ensemble, xy, &ensemble->network.dummysxy, npoints, 0, &ensemble->network.dummyidx, 0, npoints, 0, &ensemble->network.buf, &rep);
    result = rep.rmserror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average error on the test set
@@ -7944,14 +7860,12 @@ double mlpermserror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 // API: double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 double mlpeavgerror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(modelerrors, rep);
    mlpeallerrorsx(ensemble, xy, &ensemble->network.dummysxy, npoints, 0, &ensemble->network.dummyidx, 0, npoints, 0, &ensemble->network.buf, &rep);
    result = rep.avgerror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average relative error on the test set
@@ -7967,14 +7881,12 @@ double mlpeavgerror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 // API: double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 double mlpeavgrelerror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(modelerrors, rep);
    mlpeallerrorsx(ensemble, xy, &ensemble->network.dummysxy, npoints, 0, &ensemble->network.dummyidx, 0, npoints, 0, &ensemble->network.buf, &rep);
    result = rep.avgrelerror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Serializer: allocation
@@ -8309,11 +8221,10 @@ namespace alglib_impl {
 //     Buf         -   initialized structure
 // ALGLIB: Copyright 24.07.2015 by Sergey Bochkanov
 void kmeansinitbuf(kmeansbuffers *buf) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(apbuffers, updateseed);
-   ae_shared_pool_set_seed(&buf->updatepool, &updateseed, sizeof(updateseed), apbuffers_init, apbuffers_copy, apbuffers_free);
-   ae_frame_leave();
+   PoolSet(&buf->updatepool, apbuffers, updateseed);
+   DeFrame();
 }
 
 // This procedure recalculates distances from points to centers  and  assigns
@@ -8343,7 +8254,6 @@ void kmeansinitbuf(kmeansbuffers *buf) {
 // ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
 void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool) {
    const ae_int_t kmeansblocksize = 32, kmeansparalleldim = 8, kmeansparallelk = 4;
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t i0;
    ae_int_t i1;
@@ -8385,20 +8295,17 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
    ae_int_t offs11;
    ae_int_t vcnt;
    ae_int_t stride;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(apbuffers, buf);
 // Quick exit for special cases
    if (idx1 <= idx0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (cidx1 <= cidx0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (nvars <= 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Try to recursively divide/process dataset
 //
@@ -8409,8 +8316,7 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
       task0 = splitlength(idx1 - idx0, kmeansblocksize), task1 = idx1 - idx0 - task0;
       kmeansupdatedistances(xy, idx0, idx0 + task0, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
       kmeansupdatedistances(xy, idx0 + task0, idx1, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Dataset chunk is selected.
 //
@@ -8419,7 +8325,7 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
 // * for each chunk of dataset, iterate over centers, process them in KMeansBlockSize-ed chunks
 // * for each chunk of dataset/centerset, iterate over variables, process them in KMeansBlockSize-ed chunks
    ae_assert(kmeansblocksize % 2 == 0, "KMeansUpdateDistances: internal error");
-   ae_shared_pool_retrieve(bufferpool, &_buf);
+   PoolGet(bufferpool, buf);
    vectorsetlengthatleast(&buf->ra0, kmeansblocksize * kmeansblocksize);
    vectorsetlengthatleast(&buf->ra1, kmeansblocksize * kmeansblocksize);
    vectorsetlengthatleast(&buf->ra2, kmeansblocksize * kmeansblocksize);
@@ -8552,8 +8458,8 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
          xydist2->xR[i] = buf->ra3.xR[i - p0];
       }
    }
-   ae_shared_pool_recycle(bufferpool, &_buf);
-   ae_frame_leave();
+   PoolPut(bufferpool, buf);
+   DeFrame();
 }
 
 // This function selects initial centers according to specified initialization
@@ -8946,7 +8852,6 @@ static bool clustering_fixcenters(RMatrix *xy, ae_int_t npoints, ae_int_t nvars,
 //     Energy      -   merit function of clusterization
 // ALGLIB: Copyright 21.03.2009 by Sergey Bochkanov
 void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, ae_int_t initalgo, ae_int_t seed, ae_int_t maxits, ae_int_t restarts, bool kmeansdbgnoits, ae_int_t *info, ae_int_t *iterationscount, RMatrix *ccol, bool needccol, RMatrix *crow, bool needcrow, ZVector *xyc, double *energy, kmeansbuffers *buf) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t i1;
@@ -8958,7 +8863,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
    bool zerosizeclusters;
    ae_int_t pass;
    ae_int_t itcnt;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    *iterationscount = 0;
    SetMatrix(ccol);
@@ -8970,8 +8875,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
    if (npoints < k || nvars < 1 || k < 1 || restarts < 1) {
       *info = -1;
       *iterationscount = 0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // TODO: special case K == 1
 // TODO: special case K == NPoints
@@ -9053,8 +8957,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
             // and should not be counted).
                if (!clustering_fixcenters(xy, npoints, nvars, &buf->ct, k, &buf->initbuf, &buf->updatepool)) {
                   *info = -3;
-                  ae_frame_leave();
-                  return;
+                  DeFrame();
                }
                itcnt--;
                continue;
@@ -9109,7 +9012,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
    for (i = 0; i < npoints; i++) {
       xyc->xZ[i] = buf->xycbest.xZ[i];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function initializes clusterizer object. Newly initialized object  is
@@ -9655,8 +9558,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 // API: void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, real_2d_array &d);
 void clusterizergetdistances(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetMatrix(d);
    NewObj(apbuffers, buf);
    ae_assert(nfeatures >= 1, "ClusterizerGetDistances: NFeatures < 1");
@@ -9666,7 +9568,7 @@ void clusterizergetdistances(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, 
    ae_assert(xy->cols >= nfeatures, "ClusterizerGetDistances: Cols(XY) < NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "ClusterizerGetDistances: XY contains NAN/INF");
    clusterizergetdistancesbuf(&buf, xy, npoints, nfeatures, disttype, d);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function  performs  agglomerative  hierarchical  clustering    using
@@ -9684,7 +9586,6 @@ void clusterizergetdistances(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, 
 //                 structure for more information.
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d, ahcreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -9701,11 +9602,11 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
    ae_int_t n1;
    ae_int_t ni;
    double d01;
-   ae_frame_make(&_frame_block);
-   NewVector(cidx, 0, DT_INT);
-   NewVector(csizes, 0, DT_INT);
-   NewVector(nnidx, 0, DT_INT);
-   NewMatrix(cinfo, 0, 0, DT_INT);
+   EnFrame();
+   NewZVector(cidx, 0);
+   NewZVector(csizes, 0);
+   NewZVector(nnidx, 0);
+   NewZMatrix(cinfo, 0, 0);
    npoints = s->npoints;
 // Fill Rep.NPoints, quick exit when NPoints <= 1
    rep->npoints = npoints;
@@ -9716,8 +9617,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
       ae_matrix_set_length(&rep->pm, 0, 0);
       ae_vector_set_length(&rep->mergedist, 0);
       rep->terminationtype = 1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (npoints == 1) {
       ae_vector_set_length(&rep->p, 1);
@@ -9727,8 +9627,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
       ae_vector_set_length(&rep->mergedist, 0);
       rep->p.xZ[0] = 0;
       rep->terminationtype = 1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(&rep->z, npoints - 1, 2);
    ae_vector_set_length(&rep->mergedist, npoints - 1);
@@ -9949,7 +9848,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
          rep->pz.xyZ[i][1] = rep->p.xZ[rep->pz.xyZ[i][1]];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function performs agglomerative hierarchical clustering
@@ -10071,10 +9970,9 @@ void clusterizerrunahc(clusterizerstate *s, ahcreport *rep) {
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 // API: void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansreport &rep);
 void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(kmeansreport, rep);
-   NewMatrix(dummy, 0, 0, DT_REAL);
+   NewRMatrix(dummy, 0, 0);
    ae_assert(k >= 0, "ClusterizerRunKMeans: K < 0");
 // Incorrect distance type
    if (s->disttype != 2) {
@@ -10083,8 +9981,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
       rep->k = k;
       rep->iterationscount = 0;
       rep->energy = 0.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // K > NPoints or (K == 0 and NPoints > 0)
    if (k > s->npoints || k == 0 && s->npoints > 0) {
@@ -10093,8 +9990,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
       rep->k = k;
       rep->iterationscount = 0;
       rep->energy = 0.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // No points
    if (s->npoints == 0) {
@@ -10103,8 +9999,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
       rep->k = k;
       rep->iterationscount = 0;
       rep->energy = 0.0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Normal case:
 // 1 <= K <= NPoints, Euclidean distance
@@ -10114,7 +10009,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
    rep->npoints = s->npoints;
    rep->nfeatures = s->nfeatures;
    kmeansgenerateinternal(&s->xy, s->npoints, s->nfeatures, k, s->kmeansinitalgo, s->seed, s->kmeansmaxits, s->kmeansrestarts, s->kmeansdbgnoits, &rep->terminationtype, &rep->iterationscount, &dummy, false, &rep->c, true, &rep->cidx, &rep->energy, &s->kmeanstmp);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function takes as input clusterization report Rep,  desired  clusters
@@ -10158,20 +10053,19 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 // API: void clusterizergetkclusters(const ahcreport &rep, const ae_int_t k, integer_1d_array &cidx, integer_1d_array &cz);
 void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector *cz) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t mergeidx;
    ae_int_t i0;
    ae_int_t i1;
    ae_int_t t;
    ae_int_t npoints;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(cidx);
    SetVector(cz);
-   NewVector(presentclusters, 0, DT_BOOL);
-   NewVector(clusterindexes, 0, DT_INT);
-   NewVector(clustersizes, 0, DT_INT);
-   NewVector(tmpidx, 0, DT_INT);
+   NewBVector(presentclusters, 0);
+   NewZVector(clusterindexes, 0);
+   NewZVector(clustersizes, 0);
+   NewZVector(tmpidx, 0);
    npoints = rep->npoints;
    ae_assert(npoints >= 0, "ClusterizerGetKClusters: internal error in Rep integrity");
    ae_assert(k >= 0, "ClusterizerGetKClusters: K <= 0");
@@ -10180,16 +10074,14 @@ void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector 
    ae_assert(npoints == rep->npoints, "ClusterizerGetKClusters: NPoints != Rep.NPoints");
 // Quick exit
    if (npoints == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (npoints == 1) {
       ae_vector_set_length(cz, 1);
       ae_vector_set_length(cidx, 1);
       cz->xZ[0] = 0;
       cidx->xZ[0] = 0;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Replay merges, from top to bottom,
 // keep track of clusters being present at the moment
@@ -10242,7 +10134,7 @@ void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector 
    for (i = 0; i < npoints; i++) {
       cidx->xZ[i] = clusterindexes.xZ[tmpidx.xZ[rep->p.xZ[i]]];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This  function  accepts  AHC  report  Rep,  desired  minimum  intercluster
@@ -10664,8 +10556,8 @@ void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, 
 }
 #if !defined AE_NO_EXCEPTIONS
 void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const bool isupper) {
-   if (d.rows() != d.cols()) ThrowError("Error while calling 'clusterizersetdistances': looks like one of arguments has wrong size");
    ae_int_t npoints = d.rows();
+   if (npoints != d.cols()) ThrowError("Error while calling 'clusterizersetdistances': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::clusterizersetdistances(ConstT(clusterizerstate, s), ConstT(ae_matrix, d), npoints, isupper);
@@ -12082,7 +11974,6 @@ static void dforest_buildrandomtreerec(decisionforestbuilder *s, dfworkbuf *work
 // algorithm. Tree index is used to seed per-tree RNG.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0, ae_int_t treeidx1) {
-   ae_frame _frame_block;
    ae_int_t treeidx;
    ae_int_t i;
    ae_int_t j;
@@ -12093,7 +11984,7 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
    ae_int_t varstoselect;
    ae_int_t workingsetsize;
    double meanloss;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(hqrndstate, rs);
    RefObj(dfworkbuf, workbuf);
    RefObj(dfvotebuf, votebuf);
@@ -12104,8 +11995,7 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
       j = (treeidx1 - treeidx0) / 2;
       dforest_buildrandomtree(s, treeidx0, treeidx0 + j);
       dforest_buildrandomtree(s, treeidx0 + j, treeidx1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    } else {
       ae_assert(treeidx1 - treeidx0 == 1, "RDF: integrity check failed");
       treeidx = treeidx0;
@@ -12120,8 +12010,8 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
       hqrndseed(randominteger(30000), 1 + treeidx, &rs);
    }
 // Retrieve buffers.
-   ae_shared_pool_retrieve(&s->workpool, &_workbuf);
-   ae_shared_pool_retrieve(&s->votepool, &_votebuf);
+   PoolGet(&s->workpool, workbuf);
+   PoolGet(&s->votepool, votebuf);
 // Prepare everything for tree construction.
    ae_assert(workbuf->trnsize >= 1, "DForest: integrity check failed (34636)");
    ae_assert(workbuf->oobsize >= 0, "DForest: integrity check failed (45745)");
@@ -12180,19 +12070,19 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
    dforest_buildrandomtreerec(s, workbuf, workingsetsize, varstoselect, &workbuf->treebuf, votebuf, &rs, 0, workbuf->trnsize, 0, workbuf->oobsize, meanloss, meanloss, &treesize);
    workbuf->treebuf.xR[0] = treesize;
 // Store tree
-   ae_shared_pool_retrieve(&s->treefactory, &_treebuf);
+   PoolGet(&s->treefactory, treebuf);
    ae_vector_set_length(&treebuf->treebuf, treesize);
    for (i = 0; i < treesize; i++) {
       treebuf->treebuf.xR[i] = workbuf->treebuf.xR[i];
    }
    treebuf->treeidx = treeidx;
-   ae_shared_pool_recycle(&s->treepool, &_treebuf);
+   PoolPut(&s->treepool, treebuf);
 // Return other buffers to appropriate pools
-   ae_shared_pool_recycle(&s->workpool, &_workbuf);
-   ae_shared_pool_recycle(&s->votepool, &_votebuf);
+   PoolPut(&s->workpool, workbuf);
+   PoolPut(&s->votepool, votebuf);
 // Update progress indicator
    s->rdfprogress += npoints;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal subroutine for processing one decision tree stored in uncompressed
@@ -12229,7 +12119,6 @@ static void dforest_dfprocessinternaluncompressed(decisionforest *df, ae_int_t s
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_estimatepermutationimportances(decisionforestbuilder *s, decisionforest *df, ae_int_t ntrees, ae_shared_pool *permpool, ae_int_t idx0, ae_int_t idx1) {
    const ae_int_t permutationimportancebatchsize = 512;
-   ae_frame _frame_block;
    ae_int_t npoints;
    ae_int_t nvars;
    ae_int_t nclasses;
@@ -12244,7 +12133,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
    ae_int_t varidx;
    ae_int_t oobcounts;
    ae_int_t srcidx;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(dfpermimpbuf, permimpbuf);
    npoints = s->npoints;
    nvars = s->nvars;
@@ -12258,11 +12147,10 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
       j = (idx1 - idx0) / 2;
       dforest_estimatepermutationimportances(s, df, ntrees, permpool, idx0, idx0 + j);
       dforest_estimatepermutationimportances(s, df, ntrees, permpool, idx0 + j, idx1);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Retrieve buffer object from pool
-   ae_shared_pool_retrieve(permpool, &_permimpbuf);
+   PoolGet(permpool, permimpbuf);
 // Process range of points [idx0,idx1)
    nperm = nvars + 2;
    for (i = idx0; i < idx1; i++) {
@@ -12398,8 +12286,8 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
       s->rdfprogress += ntrees;
    }
 // Recycle buffer object with updated Losses[] field
-   ae_shared_pool_recycle(permpool, &_permimpbuf);
-   ae_frame_leave();
+   PoolPut(permpool, permimpbuf);
+   DeFrame();
 }
 
 // Estimates permutation variable importance ratings for a range of dataset
@@ -12410,7 +12298,6 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
 // internal structures when called with these arguments.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_t sessionseed, decisionforest *df, ae_int_t ntrees, dfreport *rep) {
-   ae_frame _frame_block;
    ae_int_t npoints;
    ae_int_t nvars;
    ae_int_t nclasses;
@@ -12419,12 +12306,12 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
    ae_int_t j;
    double nopermloss;
    double totalpermloss;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(dfvotebuf, vote);
-   NewVector(tmpr0, 0, DT_REAL);
-   NewVector(tmpr1, 0, DT_REAL);
-   NewVector(tmpi0, 0, DT_INT);
-   NewVector(losses, 0, DT_REAL);
+   NewRVector(tmpr0, 0);
+   NewRVector(tmpr1, 0);
+   NewZVector(tmpi0, 0);
+   NewRVector(losses, 0);
    NewObj(dfpermimpbuf, permseed);
    RefObj(dfpermimpbuf, permresult);
    NewObj(ae_shared_pool, permpool);
@@ -12434,13 +12321,12 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
    nclasses = s->nclasses;
 // No importance rating
    if (s->rdfimportance == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Gini importance
    if (s->rdfimportance == dforest_needtrngini || s->rdfimportance == dforest_needoobgini) {
    // Merge OOB Gini importances computed during tree generation
-      for (ae_shared_pool_first_recycled(&s->votepool, &_vote); vote != NULL; ae_shared_pool_next_recycled(&s->votepool, &_vote)) {
+      for (PoolLet(&s->votepool, vote); vote != NULL; PoolYet(&s->votepool, vote)) {
          for (i = 0; i < nvars; i++) {
             rep->varimportances.xR[i] += vote->giniimportances.xR[i] / ntrees;
          }
@@ -12455,8 +12341,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
          rep->topvars.xZ[j] = j;
       }
       tagsortfasti(&tmpr0, &rep->topvars, &tmpr1, &tmpi0, nvars);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Permutation importance
    if (s->rdfimportance == dforest_needpermutation) {
@@ -12496,7 +12381,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
       ae_vector_set_length(&permseed.targety, nclasses);
       ae_vector_set_length(&permseed.startnodes, nvars);
       ae_vector_set_length(&permseed.y, nclasses);
-      ae_shared_pool_set_seed(&permpool, &permseed, sizeof(permseed), dfpermimpbuf_init, dfpermimpbuf_copy, dfpermimpbuf_free);
+      PoolSet(&permpool, dfpermimpbuf, permseed);
    // Recursively split subset and process (using parallel capabilities, if possible)
       dforest_estimatepermutationimportances(s, df, ntrees, &permpool, 0, npoints);
    // Merge results
@@ -12504,7 +12389,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
       for (j = 0; j < nperm; j++) {
          losses.xR[j] = 1.0E-20;
       }
-      for (ae_shared_pool_first_recycled(&permpool, &_permresult); permresult != NULL; ae_shared_pool_next_recycled(&permpool, &_permresult)) {
+      for (PoolLet(&permpool, permresult); permresult != NULL; PoolYet(&permpool, permresult)) {
          for (j = 0; j < nperm; j++) {
             losses.xR[j] += permresult->losses.xR[j];
          }
@@ -12523,11 +12408,10 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
          rep->topvars.xZ[j] = j;
       }
       tagsortfasti(&tmpr0, &rep->topvars, &tmpr1, &tmpi0, nvars);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(false, "EstimateVariableImportance: unexpected importance type");
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Sets report fields to their default values
@@ -12556,7 +12440,6 @@ static void dforest_cleanreport(decisionforestbuilder *s, dfreport *rep) {
 // dataset
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s) {
-   ae_frame _frame_block;
    ae_int_t nvars;
    ae_int_t nclasses;
    ae_int_t npoints;
@@ -12566,7 +12449,7 @@ static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s) {
    double v;
    double v0;
    double v1;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(hqrndstate, rs);
    ae_assert(s->dstype == 0, "no sparsity");
    npoints = s->npoints;
@@ -12620,7 +12503,7 @@ static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s) {
          s->dsctotals.xZ[s->dsival.xZ[i]]++;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function merges together trees generated during training and outputs
@@ -12635,21 +12518,20 @@ static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s) {
 //     Rep         -   report
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t cursize;
    ae_int_t offs;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(dftreebuf, tree);
-   NewVector(treesizes, 0, DT_INT);
-   NewVector(treeoffsets, 0, DT_INT);
+   NewZVector(treesizes, 0);
+   NewZVector(treeoffsets, 0);
    df->forestformat = dforest_dfuncompressedv0;
    df->nvars = s->nvars;
    df->nclasses = s->nclasses;
    df->bufsize = 0;
    df->ntrees = 0;
 // Determine trees count
-   for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
+   for (PoolLet(&s->treepool, tree); tree != NULL; PoolYet(&s->treepool, tree)) {
       df->ntrees++;
    }
    ae_assert(df->ntrees > 0, "MergeTrees: integrity check failed, zero trees count");
@@ -12658,7 +12540,7 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
    for (i = 0; i < df->ntrees; i++) {
       treesizes.xZ[i] = -1;
    }
-   for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
+   for (PoolLet(&s->treepool, tree); tree != NULL; PoolYet(&s->treepool, tree)) {
       ae_assert(tree->treeidx >= 0 && tree->treeidx < df->ntrees, "MergeTrees: integrity check failed (wrong TreeIdx)");
       ae_assert(treesizes.xZ[tree->treeidx] < 0, "MergeTrees: integrity check failed (duplicate TreeIdx)");
       df->bufsize += iround(tree->treebuf.xR[0]);
@@ -12679,14 +12561,14 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
 //       output (necessary for variable importance estimation), that's
 //       why we need array of tree offsets
    ae_vector_set_length(&df->trees, df->bufsize);
-   for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
+   for (PoolLet(&s->treepool, tree); tree != NULL; PoolYet(&s->treepool, tree)) {
       cursize = iround(tree->treebuf.xR[0]);
       offs = treeoffsets.xZ[tree->treeidx];
       for (i = 0; i < cursize; i++) {
          df->trees.xR[offs + i] = tree->treebuf.xR[i];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function post-processes voting array and calculates TRN and OOB errors.
@@ -12701,7 +12583,6 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
 //     Rep         -   report fields corresponding to errors are updated
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntrees, dfvotebuf *buf, dfreport *rep) {
-   ae_frame _frame_block;
    ae_int_t nvars;
    ae_int_t nclasses;
    ae_int_t npoints;
@@ -12712,7 +12593,7 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
    double v;
    ae_int_t avgrelcnt;
    ae_int_t oobavgrelcnt;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(dfvotebuf, vote);
    npoints = s->npoints;
    nvars = s->nvars;
@@ -12734,7 +12615,7 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
       buf->oobcounts.xZ[i] = 0;
    }
 // Merge voting arrays
-   for (ae_shared_pool_first_recycled(&s->votepool, &_vote); vote != NULL; ae_shared_pool_next_recycled(&s->votepool, &_vote)) {
+   for (PoolLet(&s->votepool, vote); vote != NULL; PoolYet(&s->votepool, vote)) {
       for (i = 0; i < npoints * nclasses; i++) {
          buf->trntotals.xR[i] += vote->trntotals.xR[i] + vote->oobtotals.xR[i];
          buf->oobtotals.xR[i] += vote->oobtotals.xR[i];
@@ -12842,7 +12723,7 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
    rep->oobrmserror = sqrt(rep->oobrmserror / (npoints * nclasses));
    rep->oobavgerror /= npoints * nclasses;
    rep->oobavgrelerror /= coalesce(oobavgrelcnt, 1.0);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function returns exact number of bytes required to  store  compressed
@@ -13212,7 +13093,6 @@ static void dforest_compressrec(decisionforest *df, bool usemantissa8, ae_int_t 
 // Return value is a compression factor.
 // ALGLIB: Copyright 22.07.2019 by Sergey Bochkanov
 static double dforest_binarycompression(decisionforest *df, bool usemantissa8) {
-   ae_frame _frame_block;
    ae_int_t size8;
    ae_int_t size8i;
    ae_int_t offssrc;
@@ -13220,14 +13100,13 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8) {
    ae_int_t i;
    ae_int_t maxrawtreesize;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(dummyi, 0, DT_INT);
-   NewVector(compressedsizes, 0, DT_INT);
+   EnFrame();
+   NewZVector(dummyi, 0);
+   NewZVector(compressedsizes, 0);
 // Quick exit if already compressed
    if (df->forestformat == dforest_dfcompressedv0) {
       result = 1.0;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
 // Check that source format is supported
    ae_assert(df->forestformat == dforest_dfuncompressedv0, "BinaryCompression: unexpected forest format");
@@ -13262,8 +13141,7 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8) {
    df->forestformat = dforest_dfcompressedv0;
    df->usemantissa8 = usemantissa8;
    ae_vector_set_length(&df->trees, 0);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Internal subroutine for processing one decision tree stored in compressed
@@ -13375,7 +13253,6 @@ static void dforest_dfprocessinternalcompressed(decisionforest *df, ae_int_t off
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 // API: void dfbuilderbuildrandomforest(const decisionforestbuilder &s, const ae_int_t ntrees, decisionforest &df, dfreport &rep);
 void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decisionforest *df, dfreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t nvars;
@@ -13384,7 +13261,7 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
    ae_int_t trnsize;
    ae_int_t maxtreesize;
    ae_int_t sessionseed;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(decisionforest, df);
    SetObj(dfreport, rep);
    NewObj(dfworkbuf, workbufseed);
@@ -13414,8 +13291,7 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
       df->trees.xR[1] = -1.0;
       df->trees.xR[2] = 0.0;
       dfcreatebuffer(df, &df->buffer);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_assert(npoints > 0, "DFBuilderBuildRandomForest: integrity check failed");
 // Analyze dataset statistics, perform preprocessing
@@ -13464,10 +13340,10 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
       votebufseed.giniimportances.xR[i] = 0.0;
    }
    treebufseed.treeidx = -1;
-   ae_shared_pool_set_seed(&s->workpool, &workbufseed, sizeof(workbufseed), dfworkbuf_init, dfworkbuf_copy, dfworkbuf_free);
-   ae_shared_pool_set_seed(&s->votepool, &votebufseed, sizeof(votebufseed), dfvotebuf_init, dfvotebuf_copy, dfvotebuf_free);
-   ae_shared_pool_set_seed(&s->treepool, &treebufseed, sizeof(treebufseed), dftreebuf_init, dftreebuf_copy, dftreebuf_free);
-   ae_shared_pool_set_seed(&s->treefactory, &treebufseed, sizeof(treebufseed), dftreebuf_init, dftreebuf_copy, dftreebuf_free);
+   PoolSet(&s->workpool, dfworkbuf, workbufseed);
+   PoolSet(&s->votepool, dfvotebuf, votebufseed);
+   PoolSet(&s->treepool, dftreebuf, treebufseed);
+   PoolSet(&s->treefactory, dftreebuf, treebufseed);
 // Select session seed (individual trees are constructed using
 // combination of session and local seeds).
    sessionseed = s->rdfglobalseed;
@@ -13497,7 +13373,7 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
    dforest_estimatevariableimportance(s, sessionseed, df, ntrees, rep);
 // Update progress counter
    s->rdfprogress = s->rdftotal;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function performs binary compression of the decision forest.
@@ -13757,19 +13633,17 @@ void dftsprocess(decisionforest *df, decisionforestbuffer *buf, RVector *x, RVec
 
 // Classification error
 static ae_int_t dforest_dfclserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t tmpi;
    ae_int_t result;
-   ae_frame_make(&_frame_block);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
+   EnFrame();
+   NewRVector(x, 0);
+   NewRVector(y, 0);
    if (df->nclasses <= 1) {
       result = 0;
-      ae_frame_leave();
-      return result;
+      DeFrame(result);
    }
    ae_vector_set_length(&x, df->nvars);
    ae_vector_set_length(&y, df->nclasses);
@@ -13788,8 +13662,7 @@ static ae_int_t dforest_dfclserror(decisionforest *df, RMatrix *xy, ae_int_t npo
          result++;
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Relative classification error on the test set
@@ -13823,15 +13696,14 @@ double dfrelclserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 // API: double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 double dfavgce(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t tmpi;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
+   EnFrame();
+   NewRVector(x, 0);
+   NewRVector(y, 0);
    ae_vector_set_length(&x, df->nvars);
    ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
@@ -13855,8 +13727,7 @@ double dfavgce(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
       }
    }
    result /= npoints;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // RMS error on the test set
@@ -13874,15 +13745,14 @@ double dfavgce(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 // API: double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t tmpi;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
+   EnFrame();
+   NewRVector(x, 0);
+   NewRVector(y, 0);
    ae_vector_set_length(&x, df->nvars);
    ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
@@ -13911,8 +13781,7 @@ double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
       }
    }
    result = sqrt(result / (npoints * df->nclasses));
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average error on the test set
@@ -13929,14 +13798,13 @@ double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 // API: double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
+   EnFrame();
+   NewRVector(x, 0);
+   NewRVector(y, 0);
    ae_vector_set_length(&x, df->nvars);
    ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
@@ -13959,8 +13827,7 @@ double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
       }
    }
    result /= npoints * df->nclasses;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average relative error on the test set
@@ -13977,15 +13844,14 @@ double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 // API: double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    ae_int_t relcnt;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
+   EnFrame();
+   NewRVector(x, 0);
+   NewRVector(y, 0);
    ae_vector_set_length(&x, df->nvars);
    ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
@@ -14013,8 +13879,7 @@ double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
    if (relcnt > 0) {
       result /= relcnt;
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Copying of DecisionForest structure
@@ -14058,9 +13923,8 @@ void dfcopy(decisionforest *df1, decisionforest *df2) {
 }
 
 void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t samplesize, ae_int_t nfeatures, ae_int_t flags, ae_int_t *info, decisionforest *df, dfreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(decisionforest, df);
    SetObj(dfreport, rep);
@@ -14068,15 +13932,13 @@ void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t ncl
 // Test for inputs
    if (npoints < 1 || samplesize < 1 || samplesize > npoints || nvars < 1 || nclasses < 1 || ntrees < 1 || nfeatures < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (nclasses > 1) {
       for (i = 0; i < npoints; i++) {
          if (iround(xy->xyR[i][nvars]) < 0 || iround(xy->xyR[i][nvars]) >= nclasses) {
             *info = -2;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    }
@@ -14086,7 +13948,7 @@ void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t ncl
    dfbuildersetsubsampleratio(&builder, (double)samplesize / npoints);
    dfbuildersetrndvars(&builder, nfeatures);
    dfbuilderbuildrandomforest(&builder, ntrees, df, rep);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This subroutine builds random decision forest.
@@ -15057,7 +14919,6 @@ double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints) {
 
 // Internal linear regression subroutine
 static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -15068,34 +14929,32 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    double p;
    double epstol;
    ae_int_t offs;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(linearmodel, lm);
    SetObj(lrreport, ar);
-   NewMatrix(a, 0, 0, DT_REAL);
-   NewMatrix(u, 0, 0, DT_REAL);
-   NewMatrix(vt, 0, 0, DT_REAL);
-   NewMatrix(vm, 0, 0, DT_REAL);
-   NewMatrix(xym, 0, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
-   NewVector(sv, 0, DT_REAL);
-   NewVector(t, 0, DT_REAL);
-   NewVector(svi, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewRMatrix(a, 0, 0);
+   NewRMatrix(u, 0, 0);
+   NewRMatrix(vt, 0, 0);
+   NewRMatrix(vm, 0, 0);
+   NewRMatrix(xym, 0, 0);
+   NewRVector(b, 0);
+   NewRVector(sv, 0);
+   NewRVector(t, 0);
+   NewRVector(svi, 0);
+   NewRVector(work, 0);
    NewObj(lrreport, ar2);
    NewObj(linearmodel, tlm);
    epstol = 1000.0;
 // Check for errors in data
    if (npoints < nvars || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < npoints; i++) {
       if (s->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    *info = 1;
@@ -15133,8 +14992,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    ae_matrix_set_length(&vm, nvars, nvars);
    if (!rmatrixsvd(&a, npoints, nvars, 1, 1, 2, &sv, &u, &vt)) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (sv.xR[0] <= 0.0) {
    // Degenerate case: zero design matrix.
@@ -15158,8 +15016,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
             ar->c.xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (sv.xR[nvars - 1] <= epstol * machineepsilon * sv.xR[0]) {
    // Degenerate case, non-zero design matrix.
@@ -15182,8 +15039,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
          // Solve
             linreg_lrinternal(&xym, s, npoints, k, info, &tlm, &ar2);
             if (*info != 1) {
-               ae_frame_leave();
-               return;
+               DeFrame();
             }
          // Convert back to un-reduced format
             for (j = 0; j < nvars; j++) {
@@ -15211,13 +15067,11 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
             ae_vector_set_length(&work, nvars + 1);
             matrixmatrixmultiply(&ar2.c, 0, k - 1, 0, k - 1, false, &vt, 0, k - 1, 0, nvars - 1, false, 1.0, &vm, 0, k - 1, 0, nvars - 1, 0.0, &work);
             matrixmatrixmultiply(&vt, 0, k - 1, 0, nvars - 1, true, &vm, 0, k - 1, 0, nvars - 1, false, 1.0, &ar->c, 0, nvars - 1, 0, nvars - 1, 0.0, &work);
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
       *info = -255;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < nvars; i++) {
       if (sv.xR[i] > epstol * machineepsilon * sv.xR[0]) {
@@ -15330,8 +15184,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    // Something strange: ALL ui are degenerate.
    // Unexpected...
       *info = -255;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ar->rmserror = sqrt(ar->rmserror / npoints);
    ar->avgerror /= npoints;
@@ -15343,7 +15196,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    if (nacv != 0) {
       ar->cvavgrelerror /= nacv;
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Linear regression
@@ -15373,7 +15226,6 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
 // ALGLIB: Copyright 02.08.2008 by Sergey Bochkanov
 // API: void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -15382,19 +15234,18 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
    double variance;
    double skewness;
    double kurtosis;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(linearmodel, lm);
    SetObj(lrreport, ar);
-   NewMatrix(xyi, 0, 0, DT_REAL);
-   NewVector(x, 0, DT_REAL);
-   NewVector(means, 0, DT_REAL);
-   NewVector(sigmas, 0, DT_REAL);
+   NewRMatrix(xyi, 0, 0);
+   NewRVector(x, 0);
+   NewRVector(means, 0);
+   NewRVector(sigmas, 0);
 // Test parameters
    if (npoints <= nvars + 1 || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Copy data, add one more column (constant term)
    ae_matrix_set_length(&xyi, npoints, nvars + 2);
@@ -15422,8 +15273,7 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
 // Internal processing
    linreg_lrinternal(&xyi, s, npoints, nvars + 1, info, lm, ar);
    if (*info < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Un-standartization
    offs = iround(lm->w.xR[3]);
@@ -15440,7 +15290,7 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
       ae_v_muld(ar->c.xyR[j], 1, nvars + 1, v);
       ae_v_muld(&ar->c.xyR[0][j], ar->c.stride, nvars + 1, v);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Linear regression
@@ -15476,18 +15326,16 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
 // ALGLIB: Copyright 02.08.2008 by Sergey Bochkanov
 // API: void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar) {
-   ae_frame _frame_block;
    ae_int_t i;
    double sigma2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(linearmodel, lm);
    SetObj(lrreport, ar);
-   NewVector(s, 0, DT_REAL);
+   NewRVector(s, 0);
    if (npoints <= nvars + 1 || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&s, npoints);
    for (i = 0; i < npoints; i++) {
@@ -15495,14 +15343,13 @@ void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, line
    }
    lrbuilds(xy, &s, npoints, nvars, info, lm, ar);
    if (*info < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    sigma2 = sqr(ar->rmserror) * npoints / (npoints - nvars - 1);
    for (i = 0; i <= nvars; i++) {
       ae_v_muld(ar->c.xyR[i], 1, nvars + 1, sigma2);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like LRBuildS, but builds model
@@ -15513,7 +15360,6 @@ void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, line
 // ALGLIB: Copyright 30.10.2008 by Sergey Bochkanov
 // API: void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -15522,18 +15368,17 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
    double variance;
    double skewness;
    double kurtosis;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(linearmodel, lm);
    SetObj(lrreport, ar);
-   NewMatrix(xyi, 0, 0, DT_REAL);
-   NewVector(x, 0, DT_REAL);
-   NewVector(c, 0, DT_REAL);
+   NewRMatrix(xyi, 0, 0);
+   NewRVector(x, 0);
+   NewRVector(c, 0);
 // Test parameters
    if (npoints <= nvars + 1 || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Copy data, add one more column (constant term)
    ae_matrix_set_length(&xyi, npoints, nvars + 2);
@@ -15566,8 +15411,7 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
 // Internal processing
    linreg_lrinternal(&xyi, s, npoints, nvars + 1, info, lm, ar);
    if (*info < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Un-standartization
    offs = iround(lm->w.xR[3]);
@@ -15578,7 +15422,7 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
       ae_v_muld(ar->c.xyR[j], 1, nvars + 1, v);
       ae_v_muld(&ar->c.xyR[0][j], ar->c.stride, nvars + 1, v);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Like LRBuild but builds model
@@ -15589,18 +15433,16 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
 // ALGLIB: Copyright 30.10.2008 by Sergey Bochkanov
 // API: void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 void lrbuildz(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar) {
-   ae_frame _frame_block;
    ae_int_t i;
    double sigma2;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(linearmodel, lm);
    SetObj(lrreport, ar);
-   NewVector(s, 0, DT_REAL);
+   NewRVector(s, 0);
    if (npoints <= nvars + 1 || nvars < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&s, npoints);
    for (i = 0; i < npoints; i++) {
@@ -15608,14 +15450,13 @@ void lrbuildz(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, lin
    }
    lrbuildzs(xy, &s, npoints, nvars, info, lm, ar);
    if (*info < 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    sigma2 = sqr(ar->rmserror) * npoints / (npoints - nvars - 1);
    for (i = 0; i <= nvars; i++) {
       ae_v_muld(ar->c.xyR[i], 1, nvars + 1, sigma2);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacks coefficients of linear model.
@@ -15782,29 +15623,27 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
 }
 
 void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b) {
-   ae_frame _frame_block;
    ae_int_t i;
    double vara;
    double varb;
    double covab;
    double corrab;
    double p;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    *a = 0.0;
    *b = 0.0;
-   NewVector(s, 0, DT_REAL);
+   NewRVector(s, 0);
    if (n < 2) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_vector_set_length(&s, n);
    for (i = 0; i < n; i++) {
       s.xR[i] = 1.0;
    }
    lrlines(xy, &s, n, info, a, b, &vara, &varb, &covab, &corrab, &p);
-   ae_frame_leave();
+   DeFrame();
 }
 
 void linearmodel_init(void *_p, bool make_automatic) {
@@ -16135,7 +15974,6 @@ void filterema(RVector *x, ae_int_t n, double alpha) {
 // API: void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
 // API: void filterlrma(real_1d_array &x, const ae_int_t k);
 void filterlrma(RVector *x, ae_int_t n, ae_int_t k) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t m;
    ae_int_t info;
@@ -16146,9 +15984,9 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k) {
    double covab;
    double corrab;
    double p;
-   ae_frame_make(&_frame_block);
-   NewMatrix(xy, 0, 0, DT_REAL);
-   NewVector(s, 0, DT_REAL);
+   EnFrame();
+   NewRMatrix(xy, 0, 0);
+   NewRVector(s, 0);
    ae_assert(n >= 0, "FilterLRMA: N < 0");
    ae_assert(x->cnt >= n, "FilterLRMA: Length(X) < N");
    ae_assert(isfinitevector(x, n), "FilterLRMA: X contains INF or NAN");
@@ -16158,8 +15996,7 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k) {
 // * or K is 1 (only point itself is used) or 2 (model is too simple,
 //   we will always get identity transformation)
    if (n <= 1 || k <= 2) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case: K > 2, N > 1.
 // We do not process points with I < 2 because first two points (I == 0 and I == 1) will be
@@ -16177,7 +16014,7 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k) {
       ae_assert(info == 1, "FilterLRMA: internal error");
       x->xR[i] = a + b * (m - 1);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -18768,44 +18605,41 @@ namespace alglib_impl {
 // ALGLIB: Copyright 31.05.2008 by Sergey Bochkanov
 // API: void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w);
 void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RMatrix *w) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t m;
    double v;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetMatrix(w);
-   NewVector(c, 0, DT_INT);
-   NewVector(mu, 0, DT_REAL);
-   NewMatrix(muc, 0, 0, DT_REAL);
-   NewVector(nc, 0, DT_INT);
-   NewMatrix(sw, 0, 0, DT_REAL);
-   NewMatrix(st, 0, 0, DT_REAL);
-   NewMatrix(z, 0, 0, DT_REAL);
-   NewMatrix(z2, 0, 0, DT_REAL);
-   NewMatrix(tm, 0, 0, DT_REAL);
-   NewMatrix(sbroot, 0, 0, DT_REAL);
-   NewMatrix(a, 0, 0, DT_REAL);
-   NewMatrix(xyc, 0, 0, DT_REAL);
-   NewMatrix(xyproj, 0, 0, DT_REAL);
-   NewMatrix(wproj, 0, 0, DT_REAL);
-   NewVector(tf, 0, DT_REAL);
-   NewVector(d, 0, DT_REAL);
-   NewVector(d2, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewZVector(c, 0);
+   NewRVector(mu, 0);
+   NewRMatrix(muc, 0, 0);
+   NewZVector(nc, 0);
+   NewRMatrix(sw, 0, 0);
+   NewRMatrix(st, 0, 0);
+   NewRMatrix(z, 0, 0);
+   NewRMatrix(z2, 0, 0);
+   NewRMatrix(tm, 0, 0);
+   NewRMatrix(sbroot, 0, 0);
+   NewRMatrix(a, 0, 0);
+   NewRMatrix(xyc, 0, 0);
+   NewRMatrix(xyproj, 0, 0);
+   NewRMatrix(wproj, 0, 0);
+   NewRVector(tf, 0);
+   NewRVector(d, 0);
+   NewRVector(d2, 0);
+   NewRVector(work, 0);
 // Test data
    if (npoints < 0 || nvars < 1 || nclasses < 2) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < npoints; i++) {
       if (iround(xy->xyR[i][nvars]) < 0 || iround(xy->xyR[i][nvars]) >= nclasses) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    *info = 1;
@@ -18823,8 +18657,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Prepare temporaries
    ae_vector_set_length(&tf, nvars);
@@ -18899,8 +18732,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
 //      = (v'*v) / (v'*A*v)
    if (!smatrixevd(&st, nvars, 1, true, &d, &z)) {
       *info = -4;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    ae_matrix_set_length(w, nvars, nvars);
    if (d.xR[nvars - 1] <= 0.0 || d.xR[0] <= 1000.0 * machineepsilon * d.xR[nvars - 1]) {
@@ -18917,8 +18749,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
                }
             }
          }
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    // Special case: degenerate ST matrix, multicollinearity found.
    // Since we know ST eigenvalues/vectors we can translate task to
@@ -18945,8 +18776,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       }
       fisherldan(&xyproj, npoints, nvars - m, nclasses, info, &wproj);
       if (*info < 0) {
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       rmatrixgemm(nvars, nvars - m, nvars - m, 1.0, &z, 0, m, 0, &wproj, 0, 0, 0, 0.0, w, 0, 0);
       for (k = nvars - m; k < nvars; k++) {
@@ -18966,8 +18796,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       }
       if (!smatrixevd(&a, nvars, 1, true, &d2, &z2)) {
          *info = -4;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       for (i = 0; i < nvars; i++) {
          for (k = 0; k < nvars; k++) {
@@ -18991,7 +18820,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
          ae_v_muld(&w->xyR[0][k], w->stride, nvars, -1.0);
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Multiclass Fisher LDA
@@ -19023,17 +18852,16 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
 // ALGLIB: Copyright 31.05.2008 by Sergey Bochkanov
 // API: void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w);
 void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RVector *w) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetVector(w);
-   NewMatrix(w2, 0, 0, DT_REAL);
+   NewRMatrix(w2, 0, 0);
    fisherldan(xy, npoints, nvars, nclasses, info, &w2);
    if (*info > 0) {
       ae_vector_set_length(w, nvars);
       ae_v_move(w->xR, 1, w2.xyR[0], w2.stride, nvars);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
@@ -19755,11 +19583,10 @@ void mcpdsettikhonovregularizer(mcpdstate *s, double v) {
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 // API: void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp);
 void mcpdsetprior(mcpdstate *s, RMatrix *pp) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t n;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    DupMatrix(pp);
    n = s->n;
    ae_assert(pp->cols >= n, "MCPDSetPrior: Cols(PP) < N");
@@ -19771,7 +19598,7 @@ void mcpdsetprior(mcpdstate *s, RMatrix *pp) {
          s->priorp.xyR[i][j] = pp->xyR[i][j];
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function is used to change prediction weights
@@ -20208,8 +20035,8 @@ void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_arra
 }
 #if !defined AE_NO_EXCEPTIONS
 void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct) {
-   if (c.rows() != ct.length()) ThrowError("Error while calling 'mcpdsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
+   if (k != ct.length()) ThrowError("Error while calling 'mcpdsetlc': looks like one of arguments has wrong size");
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::mcpdsetlc(ConstT(mcpdstate, s), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k);
@@ -20575,7 +20402,6 @@ Pause:
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 // API: void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep);
 void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, logitmodel *lm, mnlreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -20595,32 +20421,30 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
    ae_int_t mcinfo;
    ae_int_t mcnfev;
    ae_int_t solverinfo;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(logitmodel, lm);
    SetObj(mnlreport, rep);
    NewObj(multilayerperceptron, network);
-   NewVector(g, 0, DT_REAL);
-   NewMatrix(h, 0, 0, DT_REAL);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
-   NewVector(wbase, 0, DT_REAL);
-   NewVector(wdir, 0, DT_REAL);
-   NewVector(work, 0, DT_REAL);
+   NewRVector(g, 0);
+   NewRMatrix(h, 0, 0);
+   NewRVector(x, 0);
+   NewRVector(y, 0);
+   NewRVector(wbase, 0);
+   NewRVector(wdir, 0);
+   NewRVector(work, 0);
    NewObj(logitmcstate, mcstate);
    NewObj(densesolverreport, solverrep);
    decay = 0.001;
 // Test for inputs
    if (npoints < nvars + 2 || nvars < 1 || nclasses < 2) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    for (i = 0; i < npoints; i++) {
       if (iround(xy->xyR[i][nvars]) < 0 || iround(xy->xyR[i][nvars]) >= nclasses) {
          *info = -2;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    }
    *info = 1;
@@ -20662,8 +20486,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
             }
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // General case.
 // Prepare task and network. Allocate space.
@@ -20761,7 +20584,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
    for (k = 0; k < nclasses - 1; k++) {
       lm->w.xR[offs + (nvars + 1) * k + nvars] = -lm->w.xR[offs + (nvars + 1) * k + nvars];
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Unpacks coefficients of logit model. Logit model have form:
@@ -20844,20 +20667,19 @@ void mnlcopy(logitmodel *lm1, logitmodel *lm2) {
 // Calculation of all types of errors
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 static void logit_mnlallerrors(logitmodel *lm, RMatrix *xy, ae_int_t npoints, double *relcls, double *avgce, double *rms, double *avg, double *avgrel) {
-   ae_frame _frame_block;
    ae_int_t nvars;
    ae_int_t nclasses;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *relcls = 0.0;
    *avgce = 0.0;
    *rms = 0.0;
    *avg = 0.0;
    *avgrel = 0.0;
-   NewVector(buf, 0, DT_REAL);
-   NewVector(workx, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
-   NewVector(dy, 0, DT_REAL);
+   NewRVector(buf, 0);
+   NewRVector(workx, 0);
+   NewRVector(y, 0);
+   NewRVector(dy, 0);
    ae_assert(iround(lm->w.xR[1]) == logit_logitvnum, "MNL unit: Incorrect MNL version!");
    nvars = iround(lm->w.xR[2]);
    nclasses = iround(lm->w.xR[3]);
@@ -20877,7 +20699,7 @@ static void logit_mnlallerrors(logitmodel *lm, RMatrix *xy, ae_int_t npoints, do
    *rms = buf.xR[2];
    *avg = buf.xR[3];
    *avgrel = buf.xR[4];
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Average cross-entropy (in bits per element) on the test set
@@ -20892,14 +20714,13 @@ static void logit_mnlallerrors(logitmodel *lm, RMatrix *xy, ae_int_t npoints, do
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 // API: double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    ae_int_t nvars;
    ae_int_t nclasses;
    ae_int_t i;
    double result;
-   ae_frame_make(&_frame_block);
-   NewVector(workx, 0, DT_REAL);
-   NewVector(worky, 0, DT_REAL);
+   EnFrame();
+   NewRVector(workx, 0);
+   NewRVector(worky, 0);
    ae_assert(lm->w.xR[1] == logit_logitvnum, "MNLClsError: unexpected model version");
    nvars = iround(lm->w.xR[2]);
    nclasses = iround(lm->w.xR[3]);
@@ -20918,24 +20739,22 @@ double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
       }
    }
    result /= npoints * log(2.0);
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Classification error on test set = MNLRelClsError*NPoints
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 // API: ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    ae_int_t nvars;
    ae_int_t nclasses;
    ae_int_t i;
    ae_int_t j;
    ae_int_t nmax;
    ae_int_t result;
-   ae_frame_make(&_frame_block);
-   NewVector(workx, 0, DT_REAL);
-   NewVector(worky, 0, DT_REAL);
+   EnFrame();
+   NewRVector(workx, 0);
+   NewRVector(worky, 0);
    ae_assert(lm->w.xR[1] == logit_logitvnum, "MNLClsError: unexpected model version");
    nvars = iround(lm->w.xR[2]);
    nclasses = iround(lm->w.xR[3]);
@@ -20958,8 +20777,7 @@ ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
          result++;
       }
    }
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Relative classification error on the test set
@@ -21499,18 +21317,17 @@ static void knn_processinternal(knnmodel *model, knnbuffer *buf) {
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep);
 void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep) {
-   ae_frame _frame_block;
    ae_int_t nvars;
    ae_int_t nout;
    ae_int_t ny;
    bool iscls;
    ae_int_t i;
    ae_int_t j;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(knnreport, rep);
    NewObj(knnbuffer, buf);
-   NewVector(desiredy, 0, DT_REAL);
-   NewVector(errbuf, 0, DT_REAL);
+   NewRVector(desiredy, 0);
+   NewRVector(errbuf, 0);
    nvars = model->nvars;
    nout = model->nout;
    iscls = model->iscls;
@@ -21528,8 +21345,7 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
    knn_clearreport(rep);
 // Quick exit if needed
    if (model->isdummy || npoints == 0) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Process using local buffer
    knncreatebuffer(model, &buf);
@@ -21564,7 +21380,7 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
    rep->rmserror = errbuf.xR[2];
    rep->avgerror = errbuf.xR[3];
    rep->avgrelerror = errbuf.xR[4];
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This subroutine builds KNN model  according  to  current  settings,  using
@@ -21594,18 +21410,17 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: void knnbuilderbuildknnmodel(const knnbuilder &s, const ae_int_t k, const double eps, knnmodel &model, knnreport &rep);
 void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *model, knnreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t nvars;
    ae_int_t nout;
    ae_int_t npoints;
    bool iscls;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(knnmodel, model);
    SetObj(knnreport, rep);
-   NewMatrix(xy, 0, 0, DT_REAL);
-   NewVector(tags, 0, DT_INT);
+   NewRMatrix(xy, 0, 0);
+   NewZVector(tags, 0);
    npoints = s->npoints;
    nvars = s->nvars;
    nout = s->nout;
@@ -21624,8 +21439,7 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
 // Quick exit for empty dataset
    if (s->dstype == -1) {
       model->isdummy = true;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Build kd-tree
    if (iscls) {
@@ -21655,7 +21469,7 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
    knncreatebuffer(model, &model->buffer);
 // Report
    knnallerrors(model, &xy, npoints, rep);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Changing search settings of KNN model.
@@ -21877,14 +21691,12 @@ void knnprocessi(knnmodel *model, RVector *x, RVector *y) {
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnrelclserror(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(knnreport, rep);
    knnallerrors(model, xy, npoints, &rep);
    result = rep.relclserror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average cross-entropy (in bits per element) on the test set
@@ -21908,14 +21720,12 @@ double knnrelclserror(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnavgce(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(knnreport, rep);
    knnallerrors(model, xy, npoints, &rep);
    result = rep.avgce;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // RMS error on the test set.
@@ -21937,14 +21747,12 @@ double knnavgce(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnrmserror(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(knnreport, rep);
    knnallerrors(model, xy, npoints, &rep);
    result = rep.rmserror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average error on the test set
@@ -21966,14 +21774,12 @@ double knnrmserror(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnavgerror(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(knnreport, rep);
    knnallerrors(model, xy, npoints, &rep);
    result = rep.avgerror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Average relative error on the test set
@@ -21995,14 +21801,12 @@ double knnavgerror(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnavgrelerror(knnmodel *model, RMatrix *xy, ae_int_t npoints) {
-   ae_frame _frame_block;
    double result;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(knnreport, rep);
    knnallerrors(model, xy, npoints, &rep);
    result = rep.avgrelerror;
-   ae_frame_leave();
-   return result;
+   DeFrame(result);
 }
 
 // Serializer: allocation
@@ -22430,7 +22234,6 @@ static const ae_int_t mlptrain_defaultlbfgsfactor = 6;
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 // API: void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
 void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
@@ -22451,23 +22254,23 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
    double ebest;
    ae_int_t invinfo;
    ae_int_t solverinfo;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(mlpreport, rep);
-   NewVector(g, 0, DT_REAL);
-   NewVector(d, 0, DT_REAL);
-   NewMatrix(h, 0, 0, DT_REAL);
-   NewMatrix(hmod, 0, 0, DT_REAL);
-   NewMatrix(z, 0, 0, DT_REAL);
+   NewRVector(g, 0);
+   NewRVector(d, 0);
+   NewRMatrix(h, 0, 0);
+   NewRMatrix(hmod, 0, 0);
+   NewRMatrix(z, 0, 0);
    NewObj(minlbfgsreport, internalrep);
    NewObj(minlbfgsstate, state);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
-   NewVector(wbase, 0, DT_REAL);
-   NewVector(wdir, 0, DT_REAL);
-   NewVector(wt, 0, DT_REAL);
-   NewVector(wx, 0, DT_REAL);
-   NewVector(wbest, 0, DT_REAL);
+   NewRVector(x, 0);
+   NewRVector(y, 0);
+   NewRVector(wbase, 0);
+   NewRVector(wdir, 0);
+   NewRVector(wt, 0);
+   NewRVector(wx, 0);
+   NewRVector(wbest, 0);
    NewObj(matinvreport, invrep);
    NewObj(densesolverreport, solverrep);
    mlpproperties(network, &nin, &nout, &wcount);
@@ -22477,15 +22280,13 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
 // Test for inputs
    if (npoints <= 0 || restarts < 1) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (mlpissoftmax(network)) {
       for (i = 0; i < npoints; i++) {
          if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    }
@@ -22588,8 +22389,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
          // if matrix can't be inverted then exit with errors
          // TODO: make WCount steps in direction suggested by HMod
             *info = -9;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
          ae_v_move(wbase.xR, 1, network->weights.xR, 1, wcount);
          for (i = 0; i < wcount; i++) {
@@ -22651,7 +22451,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
    }
 // copy WBest to output
    ae_v_move(network->weights.xR, 1, wbest.xR, 1, wcount);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Neural  network  training  using  L-BFGS  algorithm  with  regularization.
@@ -22689,7 +22489,6 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
 // ALGLIB: Copyright 09.12.2007 by Sergey Bochkanov
 // API: void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep);
 void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t pass;
    ae_int_t nin;
@@ -22698,31 +22497,28 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
    double e;
    double v;
    double ebest;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(mlpreport, rep);
-   NewVector(w, 0, DT_REAL);
-   NewVector(wbest, 0, DT_REAL);
+   NewRVector(w, 0);
+   NewRVector(wbest, 0);
    NewObj(minlbfgsreport, internalrep);
    NewObj(minlbfgsstate, state);
 // Test inputs, parse flags, read network geometry
    if (wstep == 0.0 && maxits == 0) {
       *info = -8;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (npoints <= 0 || restarts < 1 || wstep < 0.0 || maxits < 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    mlpproperties(network, &nin, &nout, &wcount);
    if (mlpissoftmax(network)) {
       for (i = 0; i < npoints; i++) {
          if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    }
@@ -22763,7 +22559,7 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
    }
 // The best network
    ae_v_move(network->weights.xR, 1, wbest.xR, 1, wcount);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Neural network training using early stopping (base algorithm - L-BFGS with
@@ -22814,7 +22610,6 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 // API: void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy, const ae_int_t trnsize, const real_2d_array &valxy, const ae_int_t valsize, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
 void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize, RMatrix *valxy, ae_int_t valsize, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t pass;
    ae_int_t nin;
@@ -22828,20 +22623,19 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
    ae_int_t itbest;
    double wstep;
    bool needrandomization;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(mlpreport, rep);
-   NewVector(w, 0, DT_REAL);
-   NewVector(wbest, 0, DT_REAL);
-   NewVector(wfinal, 0, DT_REAL);
+   NewRVector(w, 0);
+   NewRVector(wbest, 0);
+   NewRVector(wfinal, 0);
    NewObj(minlbfgsreport, internalrep);
    NewObj(minlbfgsstate, state);
    wstep = 0.001;
 // Test inputs, parse flags, read network geometry
    if (trnsize <= 0 || valsize <= 0 || restarts < 1 && restarts != -1 || decay < 0.0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (restarts == -1) {
       needrandomization = false;
@@ -22854,15 +22648,13 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
       for (i = 0; i < trnsize; i++) {
          if (iround(trnxy->xyR[i][nin]) < 0 || iround(trnxy->xyR[i][nin]) >= nout) {
             *info = -2;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
       for (i = 0; i < valsize; i++) {
          if (iround(valxy->xyR[i][nin]) < 0 || iround(valxy->xyR[i][nin]) >= nout) {
             *info = -2;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    }
@@ -22924,7 +22716,7 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
    }
 // The best network
    ae_v_move(network->weights.xR, 1, wfinal.xR, 1, wcount);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Subroutine prepares K-fold split of the training set.
@@ -22933,11 +22725,10 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
 //     "NClasses > 0" means that we have classification task.
 //     "NClasses < 0" means regression task with -NClasses real outputs.
 static void mlptrain_mlpkfoldsplit(RMatrix *xy, ae_int_t npoints, ae_int_t nclasses, ae_int_t foldscount, bool stratifiedsplits, ZVector *folds) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetVector(folds);
    NewObj(hqrndstate, rs);
 // test parameters
@@ -22959,12 +22750,11 @@ static void mlptrain_mlpkfoldsplit(RMatrix *xy, ae_int_t npoints, ae_int_t nclas
          folds->xZ[j] = k;
       }
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Internal cross-validation subroutine
 static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t foldscount, bool lmalgorithm, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep, mlpcvreport *cvrep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t fold;
    ae_int_t j;
@@ -22977,17 +22767,17 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
    ae_int_t tssize;
    ae_int_t cvssize;
    ae_int_t relcnt;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(mlpreport, rep);
    SetObj(mlpcvreport, cvrep);
    NewObj(multilayerperceptron, network);
-   NewMatrix(cvset, 0, 0, DT_REAL);
-   NewMatrix(testset, 0, 0, DT_REAL);
-   NewVector(folds, 0, DT_INT);
+   NewRMatrix(cvset, 0, 0);
+   NewRMatrix(testset, 0, 0);
+   NewZVector(folds, 0);
    NewObj(mlpreport, internalrep);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
+   NewRVector(x, 0);
+   NewRVector(y, 0);
 // Read network geometry, test parameters
    mlpproperties(n, &nin, &nout, &wcount);
    if (mlpissoftmax(n)) {
@@ -22999,8 +22789,7 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
    }
    if (npoints <= 0 || foldscount < 2 || foldscount > npoints) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    mlpcopy(n, &network);
 // K-fold out cross-validation.
@@ -23044,8 +22833,7 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
          cvrep->rmserror = 0.0;
          cvrep->avgerror = 0.0;
          cvrep->avgrelerror = 0.0;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
       rep->ngrad += internalrep.ngrad;
       rep->nhess += internalrep.nhess;
@@ -23096,19 +22884,18 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
       cvrep->avgrelerror /= relcnt;
    }
    *info = 1;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function initializes temporaries needed for training session.
 // ALGLIB: Copyright 01.07.2013 by Sergey Bochkanov
 static void mlptrain_initmlptrnsession(multilayerperceptron *networktrained, bool randomizenetwork, mlptrainer *trainer, smlptrnsession *session) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
    ae_int_t pcount;
-   ae_frame_make(&_frame_block);
-   NewVector(dummysubset, 0, DT_INT);
+   EnFrame();
+   NewZVector(dummysubset, 0);
 // Prepare network:
 // * copy input network to Session.Network
 // * re-initialize preprocessor and weights if RandomizeNetwork == True
@@ -23136,30 +22923,29 @@ static void mlptrain_initmlptrnsession(multilayerperceptron *networktrained, boo
 // Initialize session result
    mlpexporttunableparameters(&session->network, &session->bestparameters, &pcount);
    session->bestrmserror = maxrealnumber;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function initializes temporaries needed for training session.
 //
 static void mlptrain_initmlptrnsessions(multilayerperceptron *networktrained, bool randomizenetwork, mlptrainer *trainer, ae_shared_pool *sessions) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   NewVector(dummysubset, 0, DT_INT);
+   EnFrame();
+   NewZVector(dummysubset, 0);
    NewObj(smlptrnsession, t);
    RefObj(smlptrnsession, p);
-   if (ae_shared_pool_is_initialized(sessions)) {
+   if (PoolIsSet(sessions)) {
    // Pool was already initialized.
    // Clear sessions stored in the pool.
-      for (ae_shared_pool_first_recycled(sessions, &_p); p != NULL; ae_shared_pool_next_recycled(sessions, &_p)) {
+      for (PoolLet(sessions, p); p != NULL; PoolYet(sessions, p)) {
          ae_assert(mlpsamearchitecture(&p->network, networktrained), "InitMLPTrnSessions: internal consistency error");
          p->bestrmserror = maxrealnumber;
       }
    } else {
    // Prepare session and seed pool
       mlptrain_initmlptrnsession(networktrained, randomizenetwork, trainer, &t);
-      ae_shared_pool_set_seed(sessions, &t, sizeof(t), smlptrnsession_init, smlptrnsession_copy, smlptrnsession_free);
+      PoolSet(sessions, smlptrnsession, t);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function performs step-by-step training of the neural  network.  Here
@@ -23346,7 +23132,6 @@ Pause:
 //   ValSubsetSize.
 // ALGLIB: Copyright 13.08.2012 by Sergey Bochkanov
 static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_t algokind, ZVector *trnsubset, ae_int_t trnsubsetsize, ZVector *valsubset, ae_int_t valsubsetsize, multilayerperceptron *network, mlpreport *rep, bool isrootcall, ae_shared_pool *sessions) {
-   ae_frame _frame_block;
    double eval;
    double ebest;
    ae_int_t ngradbatch;
@@ -23364,7 +23149,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
    ae_int_t nr1;
    bool randomizenetwork;
    double bestrmserror;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(modelerrors, modrep);
    NewObj(mlpreport, rep0);
    NewObj(mlpreport, rep1);
@@ -23407,7 +23192,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       mlptrain_mlptrainnetworkx(s, nrestarts, algokind, trnsubset, trnsubsetsize, valsubset, valsubsetsize, network, rep, false, sessions);
    // Choose best network
       bestrmserror = maxrealnumber;
-      for (ae_shared_pool_first_recycled(sessions, &_psession); psession != NULL; ae_shared_pool_next_recycled(sessions, &_psession)) {
+      for (PoolLet(sessions, psession); psession != NULL; PoolYet(sessions, psession)) {
          if (psession->bestrmserror < bestrmserror) {
             mlpimporttunableparameters(network, &psession->bestparameters);
             bestrmserror = psession->bestrmserror;
@@ -23426,8 +23211,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       rep->avgerror = modrep.avgerror;
       rep->avgrelerror = modrep.avgrelerror;
    // Done
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Split problem, if we have more than 1 restart
    if (nrestarts >= 2) {
@@ -23441,8 +23225,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       rep->nhess = rep0.nhess + rep1.nhess;
       rep->ncholesky = rep0.ncholesky + rep1.ncholesky;
    // Done :)
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Execution with NRestarts == 1 or NRestarts == 0:
 // * NRestarts == 1 means that network is restarted from random position
@@ -23451,7 +23234,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
    rep->ngrad = 0;
    rep->nhess = 0;
    rep->ncholesky = 0;
-   ae_shared_pool_retrieve(sessions, &_psession);
+   PoolGet(sessions, psession);
    if ((s->datatype == 0 || s->datatype == 1) && s->npoints > 0 && trnsubsetsize != 0) {
    // Train network using combination of early stopping and step-size
    // and step-count based criteria. Network state with best value of
@@ -23508,8 +23291,8 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       psession->bestrmserror = modrep.rmserror;
    }
 // Move session back to pool
-   ae_shared_pool_recycle(sessions, &_psession);
-   ae_frame_leave();
+   PoolPut(sessions, psession);
+   DeFrame();
 }
 
 // Internal subroutine for parallelization function MLPFoldCV.
@@ -23531,13 +23314,12 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
 // NOTE: There are no checks on the parameters correctness.
 // ALGLIB: Copyright 25.09.2012 by Sergey Bochkanov
 static void mlptrain_mthreadcv(mlptrainer *s, ae_int_t rowsize, ae_int_t nrestarts, ZVector *folds, ae_int_t fold, ae_int_t dfold, RMatrix *cvy, ae_shared_pool *pooldatacv, ae_int_t wcount) {
-   ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(mlpparallelizationcv, datacv);
    if (fold == dfold - 1) {
    // Separate set
-      ae_shared_pool_retrieve(pooldatacv, &_datacv);
+      PoolGet(pooldatacv, datacv);
       datacv->subsetsize = 0;
       for (i = 0; i < s->npoints; i++) {
          if (folds->xZ[i] != fold) {
@@ -23561,7 +23343,7 @@ static void mlptrain_mthreadcv(mlptrainer *s, ae_int_t rowsize, ae_int_t nrestar
             ae_v_move(cvy->xyR[i], 1, datacv->y.xR, 1, s->nout);
          }
       }
-      ae_shared_pool_recycle(pooldatacv, &_datacv);
+      PoolPut(pooldatacv, datacv);
    } else {
       ae_assert(fold < dfold - 1, "MThreadCV: internal error(Fold > DFold-1).");
    // We expect that minimum number of iterations before convergence is 100.
@@ -23571,15 +23353,14 @@ static void mlptrain_mthreadcv(mlptrainer *s, ae_int_t rowsize, ae_int_t nrestar
       mlptrain_mthreadcv(s, rowsize, nrestarts, folds, fold, (fold + dfold) / 2, cvy, pooldatacv, wcount);
       mlptrain_mthreadcv(s, rowsize, nrestarts, folds, (fold + dfold) / 2, dfold, cvy, pooldatacv, wcount);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function initializes temporaries needed for ensemble training.
 //
 static void mlptrain_initmlpetrnsession(multilayerperceptron *individualnetwork, mlptrainer *trainer, mlpetrnsession *session) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   NewVector(dummysubset, 0, DT_INT);
+   EnFrame();
+   NewZVector(dummysubset, 0);
 // Prepare network:
 // * copy input network to Session.Network
 // * re-initialize preprocessor and weights if RandomizeNetwork == True
@@ -23587,20 +23368,19 @@ static void mlptrain_initmlpetrnsession(multilayerperceptron *individualnetwork,
    mlptrain_initmlptrnsessions(individualnetwork, true, trainer, &session->mlpsessions);
    vectorsetlengthatleast(&session->trnsubset, trainer->npoints);
    vectorsetlengthatleast(&session->valsubset, trainer->npoints);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function initializes temporaries needed for training session.
 //
 static void mlptrain_initmlpetrnsessions(multilayerperceptron *individualnetwork, mlptrainer *trainer, ae_shared_pool *sessions) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    NewObj(mlpetrnsession, t);
-   if (!ae_shared_pool_is_initialized(sessions)) {
+   if (!PoolIsSet(sessions)) {
       mlptrain_initmlpetrnsession(individualnetwork, trainer, &t);
-      ae_shared_pool_set_seed(sessions, &t, sizeof(t), mlpetrnsession_init, mlpetrnsession_copy, mlpetrnsession_free);
+      PoolSet(sessions, mlpetrnsession, t);
    }
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function trains neural network ensemble passed to this function using
@@ -23609,7 +23389,6 @@ static void mlptrain_initmlpetrnsessions(multilayerperceptron *individualnetwork
 // training rounds is performed in total).
 // ALGLIB: Copyright 22.08.2012 by Sergey Bochkanov
 static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_int_t idx0, ae_int_t idx1, ae_int_t nrestarts, ae_int_t trainingmethod, ae_int_t *ngrad, bool isrootcall, ae_shared_pool *esessions) {
-   ae_frame _frame_block;
    ae_int_t pcount;
    ae_int_t nin;
    ae_int_t nout;
@@ -23622,7 +23401,7 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
    ae_int_t k0;
    ae_int_t ngrad0;
    ae_int_t ngrad1;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    RefObj(mlpetrnsession, psession);
    NewObj(hqrndstate, rs);
    nin = mlpgetinputscount(&ensemble->network);
@@ -23647,8 +23426,7 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
             ensemble->columnsigmas.xR[i * pcount + j] = 1.0;
          }
       }
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Process root call
    if (isrootcall) {
@@ -23671,8 +23449,7 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
       }
    // Train in non-root mode and exit
       mlptrain_mlptrainensemblex(s, ensemble, idx0, idx1, nrestarts, trainingmethod, ngrad, false, esessions);
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Split problem
    if (idx1 - idx0 >= 2) {
@@ -23682,11 +23459,10 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
       mlptrain_mlptrainensemblex(s, ensemble, idx0, idx0 + k0, nrestarts, trainingmethod, &ngrad0, false, esessions);
       mlptrain_mlptrainensemblex(s, ensemble, idx0 + k0, idx1, nrestarts, trainingmethod, &ngrad1, false, esessions);
       *ngrad = ngrad0 + ngrad1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Retrieve and prepare session
-   ae_shared_pool_retrieve(esessions, &_psession);
+   PoolGet(esessions, psession);
 // Train
    hqrndrandomize(&rs);
    for (k = idx0; k < idx1; k++) {
@@ -23727,14 +23503,13 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
       ae_v_move(&ensemble->columnsigmas.xR[k * pcount], 1, psession->network.columnsigmas.xR, 1, pcount);
    }
 // Recycle session
-   ae_shared_pool_recycle(esessions, &_psession);
-   ae_frame_leave();
+   PoolPut(esessions, psession);
+   DeFrame();
 }
 
 // Internal bagging subroutine.
 // ALGLIB: Copyright 19.02.2009 by Sergey Bochkanov
 static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, bool lmalgorithm, ae_int_t *info, mlpreport *rep, mlpcvreport *ooberrors) {
-   ae_frame _frame_block;
    ae_int_t ccnt;
    ae_int_t pcnt;
    ae_int_t i;
@@ -23744,18 +23519,18 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(mlpreport, rep);
    SetObj(mlpcvreport, ooberrors);
-   NewMatrix(xys, 0, 0, DT_REAL);
-   NewVector(s, 0, DT_BOOL);
-   NewMatrix(oobbuf, 0, 0, DT_REAL);
-   NewVector(oobcntbuf, 0, DT_INT);
-   NewVector(x, 0, DT_REAL);
-   NewVector(y, 0, DT_REAL);
-   NewVector(dy, 0, DT_REAL);
-   NewVector(dsbuf, 0, DT_REAL);
+   NewRMatrix(xys, 0, 0);
+   NewBVector(s, 0);
+   NewRMatrix(oobbuf, 0, 0);
+   NewZVector(oobcntbuf, 0);
+   NewRVector(x, 0);
+   NewRVector(y, 0);
+   NewRVector(dy, 0);
+   NewRVector(dsbuf, 0);
    NewObj(mlpreport, tmprep);
    NewObj(hqrndstate, rs);
    nin = mlpgetinputscount(&ensemble->network);
@@ -23764,20 +23539,17 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
 // Test for inputs
    if (!lmalgorithm && wstep == 0.0 && maxits == 0) {
       *info = -8;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (npoints <= 0 || restarts < 1 || wstep < 0.0 || maxits < 0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (mlpissoftmax(&ensemble->network)) {
       for (i = 0; i < npoints; i++) {
          if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    }
@@ -23836,8 +23608,7 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
          mlptrainlbfgs(&ensemble->network, &xys, npoints, decay, restarts, wstep, maxits, info, &tmprep);
       }
       if (*info < 0) {
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    // save results
       rep->ngrad += tmprep.ngrad;
@@ -23880,7 +23651,7 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
    ooberrors->rmserror = dsbuf.xR[2];
    ooberrors->avgerror = dsbuf.xR[3];
    ooberrors->avgrelerror = dsbuf.xR[4];
-   ae_frame_leave();
+   DeFrame();
 }
 
 // Cross-validation estimate of generalization error.
@@ -23994,7 +23765,6 @@ void mlpkfoldcvlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, 
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 // API: void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep);
 void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, ae_int_t foldscount, mlpreport *rep) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
@@ -24004,15 +23774,15 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpreport, rep);
    NewObj(ae_shared_pool, pooldatacv);
    NewObj(mlpparallelizationcv, datacv);
    RefObj(mlpparallelizationcv, sdatacv);
-   NewMatrix(cvy, 0, 0, DT_REAL);
-   NewVector(folds, 0, DT_INT);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(dy, 0, DT_REAL);
+   NewRMatrix(cvy, 0, 0);
+   NewZVector(folds, 0);
+   NewRVector(buf, 0);
+   NewRVector(dy, 0);
    NewObj(hqrndstate, rs);
    if (!mlpissoftmax(network)) {
       ntype = 0;
@@ -24044,8 +23814,7 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
    rep->nhess = 0;
    rep->ncholesky = 0;
    if (s->npoints == 0 || s->npoints == 1) {
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
 // Read network geometry, test parameters
    if (s->rcpar) {
@@ -24078,11 +23847,11 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
    ae_vector_set_length(&datacv.xyrow, rowsize);
    ae_vector_set_length(&datacv.y, nout);
 // Create shared pool
-   ae_shared_pool_set_seed(&pooldatacv, &datacv, sizeof(datacv), mlpparallelizationcv_init, mlpparallelizationcv_copy, mlpparallelizationcv_free);
+   PoolSet(&pooldatacv, mlpparallelizationcv, datacv);
 // Parallelization
    mlptrain_mthreadcv(s, rowsize, nrestarts, &folds, 0, foldscount, &cvy, &pooldatacv, wcount);
 // Calculate value for NGrad
-   for (ae_shared_pool_first_recycled(&pooldatacv, &_sdatacv); sdatacv != NULL; ae_shared_pool_next_recycled(&pooldatacv, &_sdatacv)) {
+   for (PoolLet(&pooldatacv, sdatacv); sdatacv != NULL; PoolYet(&pooldatacv, sdatacv)) {
       rep->ngrad += sdatacv->ngrad;
    }
 // Connect of results and calculate cross-validation error
@@ -24107,7 +23876,7 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
    rep->rmserror = buf.xR[2];
    rep->avgerror = buf.xR[3];
    rep->avgrelerror = buf.xR[4];
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function sets "current dataset" of the trainer object to  one  passed
@@ -24405,13 +24174,12 @@ void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s) {
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 // API: void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep);
 void mlptrainnetwork(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, mlpreport *rep) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
    ae_int_t ntype;
    ae_int_t ttype;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpreport, rep);
    NewObj(ae_shared_pool, trnpool);
    ae_assert(s->npoints >= 0, "MLPTrainNetwork: parameter S is not initialized or is spoiled(S.NPoints < 0)");
@@ -24432,7 +24200,7 @@ void mlptrainnetwork(mlptrainer *s, multilayerperceptron *network, ae_int_t nres
    ae_assert(nrestarts >= 0, "MLPTrainNetwork: NRestarts < 0.");
 // Train
    mlptrain_mlptrainnetworkx(s, nrestarts, -1, &s->subset, -1, &s->subset, 0, network, rep, true, &trnpool);
-   ae_frame_leave();
+   DeFrame();
 }
 
 // IMPORTANT: this is an "expert" version of the MLPTrain() function.  We  do
@@ -24684,7 +24452,6 @@ void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, doub
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 // API: void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
 void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep) {
-   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
    ae_int_t ccount;
@@ -24695,11 +24462,11 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t wcount;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetObj(mlpreport, rep);
-   NewMatrix(trnxy, 0, 0, DT_REAL);
-   NewMatrix(valxy, 0, 0, DT_REAL);
+   NewRMatrix(trnxy, 0, 0);
+   NewRMatrix(valxy, 0, 0);
    NewObj(mlpreport, tmprep);
    NewObj(modelerrors, moderr);
    nin = mlpgetinputscount(&ensemble->network);
@@ -24707,15 +24474,13 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
    wcount = mlpgetweightscount(&ensemble->network);
    if (npoints < 2 || restarts < 1 || decay < 0.0) {
       *info = -1;
-      ae_frame_leave();
-      return;
+      DeFrame();
    }
    if (mlpissoftmax(&ensemble->network)) {
       for (i = 0; i < npoints; i++) {
          if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
-            ae_frame_leave();
-            return;
+            DeFrame();
          }
       }
    }
@@ -24756,8 +24521,7 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
       mlptraines(&ensemble->network, &trnxy, trnsize, &valxy, valsize, decay, restarts, &tmpinfo, &tmprep);
       if (tmpinfo < 0) {
          *info = tmpinfo;
-         ae_frame_leave();
-         return;
+         DeFrame();
       }
    // save results
       ae_v_move(&ensemble->weights.xR[k * wcount], 1, ensemble->network.weights.xR, 1, wcount);
@@ -24773,7 +24537,7 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
    rep->rmserror = moderr.rmserror;
    rep->avgerror = moderr.avgerror;
    rep->avgrelerror = moderr.avgrelerror;
-   ae_frame_leave();
+   DeFrame();
 }
 
 // This function trains neural network ensemble passed to this function using
@@ -24807,12 +24571,11 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
 // ALGLIB: Copyright 22.08.2012 by Sergey Bochkanov
 // API: void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const ae_int_t nrestarts, mlpreport &rep);
 void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts, mlpreport *rep) {
-   ae_frame _frame_block;
    ae_int_t nin;
    ae_int_t nout;
    ae_int_t ntype;
    ae_int_t ttype;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    SetObj(mlpreport, rep);
    NewObj(ae_shared_pool, esessions);
    NewObj(modelerrors, tmprep);
@@ -24863,7 +24626,7 @@ void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts
    rep->rmserror = tmprep.rmserror;
    rep->avgerror = tmprep.avgerror;
    rep->avgrelerror = tmprep.avgrelerror;
-   ae_frame_leave();
+   DeFrame();
 }
 
 void mlpreport_init(void *_p, bool make_automatic) {
@@ -25226,18 +24989,17 @@ namespace alglib_impl {
 // ALGLIB: Copyright 21.03.2009 by Sergey Bochkanov
 // API: void kmeansgenerate(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t k, const ae_int_t restarts, ae_int_t &info, real_2d_array &c, integer_1d_array &xyc);
 void kmeansgenerate(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, ae_int_t restarts, ae_int_t *info, RMatrix *c, ZVector *xyc) {
-   ae_frame _frame_block;
    ae_int_t itscnt;
    double e;
-   ae_frame_make(&_frame_block);
+   EnFrame();
    *info = 0;
    SetMatrix(c);
    SetVector(xyc);
-   NewMatrix(dummy, 0, 0, DT_REAL);
+   NewRMatrix(dummy, 0, 0);
    NewObj(kmeansbuffers, buf);
    kmeansinitbuf(&buf);
    kmeansgenerateinternal(xy, npoints, nvars, k, 0, 1, 0, restarts, false, info, &itscnt, c, true, &dummy, false, xyc, &e, &buf);
-   ae_frame_leave();
+   DeFrame();
 }
 } // end of namespace alglib_impl
 
