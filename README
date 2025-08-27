@@ -57,12 +57,10 @@ new DSP routines slated for addition to the FastTransforms module
 for time-frequency and time-scale analysis (and hybridizations of the two),
 and further nativization into C++, are all pending.
 
+In addition, the repository is going to be rebased to include all of the earlier version 3 editions,
+and to also do a clean re-sequencing of the chain of revisions from ALGLIB to ALGLIB++.
+
 ALGLIB++ undergoes a process of automated upgrade/reengineering/refactoring/testing.
 It does not use version numbers but, instead, is marked by the timestamp of the most recent test.
 The latest updates of the testing and development sequence are listed in section A6 of the ALGLIB++ Supplementary Sections (Notes.htm).
-The timestamp of the current revision is 1682095979 (6442bf6b).
-
-The synchronization, for now, has been locked at version 3.20.0, which was the final version before version 4.00,
-pending the inclusion of the multi-threading code, and nativization of the ALGLIB infrastructure.
-In addition, the repository is going to be rebased to include all of the earlier version 3 editions,
-and to also do a clean re-sequencing of the chain of revisions from ALGLIB to ALGLIB++.
+The timestamp of the current revision is 1756247873 (68ae3741).
